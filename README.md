@@ -1,6 +1,13 @@
 PetitParser Examples
 ====================
 
+[![Pub Package](https://img.shields.io/pub/v/petitparser_examples.svg)](https://pub.dev/packages/petitparser_examples)
+[![Build Status](https://github.com/petitparser/dart-petitparser-examples/actions/workflows/dart.yml/badge.svg?branch=main)](https://github.com/petitparser/dart-petitparser-examples/actions/workflows/dart.yml)
+[![GitHub Issues](https://img.shields.io/github/issues/petitparser/dart-petitparser-examples.svg)](https://github.com/petitparser/dart-petitparser-examples/issues)
+[![GitHub Forks](https://img.shields.io/github/forks/petitparser/dart-petitparser-examples.svg)](https://github.com/petitparser/dart-petitparser-examples/network)
+[![GitHub Stars](https://img.shields.io/github/stars/petitparser/dart-petitparser-examples.svg)](https://github.com/petitparser/dart-petitparser-examples/stargazers)
+[![GitHub License](https://img.shields.io/badge/license-MIT-blue.svg)](https://raw.githubusercontent.com/petitparser/dart-petitparser-examples/main/LICENSE)
+
 This package contains examples to illustrate the use of [PetitParser](https://github.com/petitparser/dart-petitparser). A tutorial and full documentation is contained in the [package description](https://pub.dev/packages/petitparser) and [API documentation](https://pub.dev/documentation/petitparser/latest/).
 
 To run the web examples execute the following commands from the command line and navigate to http://localhost:8080/:
