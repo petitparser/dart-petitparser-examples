@@ -10,10 +10,10 @@ void main(List<String> arguments) {
   for (final option in arguments) {
     if (option.startsWith('-')) {
       if (option == '-?') {
-        print('${Platform.executable} prolog.dart rules...');
+        stdout.writeln('${Platform.executable} prolog.dart rules...');
         exit(0);
       } else {
-        print('Unknown option: $option');
+        stdout.writeln('Unknown option: $option');
         exit(1);
       }
     } else {
@@ -21,7 +21,7 @@ void main(List<String> arguments) {
       if (file.existsSync()) {
         rules.writeln(file.readAsStringSync());
       } else {
-        print('File not found: $option');
+        stdout.writeln('File not found: $option');
         exit(2);
       }
     }

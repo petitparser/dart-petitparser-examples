@@ -36,8 +36,6 @@ Map<Variable, Node>? mergeBindings(
 
 @immutable
 class Database {
-  final Map<String, List<Rule>> rules = {};
-
   factory Database.parse(String rules) =>
       Database(rulesParser.parse(rules).value);
 
@@ -46,6 +44,8 @@ class Database {
       this.rules.putIfAbsent(rule.head.name, () => []).add(rule);
     }
   }
+
+  final Map<String, List<Rule>> rules = {};
 
   Stream<Node> query(Term goal) async* {
     final candidates = rules[goal.name];
@@ -63,10 +63,10 @@ class Database {
 
 @immutable
 class Rule {
+  const Rule(this.head, this.body);
+
   final Term head;
   final Term body;
-
-  const Rule(this.head, this.body);
 
   Stream<Node> query(Database database, Term goal) async* {
     final match = head.match(goal);
@@ -94,9 +94,9 @@ abstract class Node {
 
 @immutable
 class Variable extends Node {
-  final String name;
-
   const Variable(this.name);
+
+  final String name;
 
   @override
   Map<Variable, Node>? match(Node other) {
@@ -130,15 +130,15 @@ class Variable extends Node {
 
 @immutable
 class Term extends Node {
-  final String name;
-  final List<Node> arguments;
-
   factory Term.parse(String rules) => termParser.parse(rules).value;
 
   factory Term(String name, Iterable<Node> list) =>
       Term._(name, list.toList(growable: false));
 
   const Term._(this.name, this.arguments);
+
+  final String name;
+  final List<Node> arguments;
 
   Stream<Node> query(Database database) async* {
     yield* database.query(this);

@@ -2,14 +2,14 @@ import 'name.dart';
 
 /// Environment of bindings.
 class Environment {
+  /// Constructor for the nested environment.
+  Environment([this._owner]) : _bindings = {};
+
   /// The owning environment.
   final Environment? _owner;
 
   /// The internal environment bindings.
   final Map<Name, dynamic> _bindings;
-
-  /// Constructor for the nested environment.
-  Environment([this._owner]) : _bindings = {};
 
   /// Constructor for a nested environment.
   Environment create() => Environment(this);

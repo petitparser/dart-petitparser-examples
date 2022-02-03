@@ -1,4 +1,5 @@
 import 'dart:convert' as convert;
+import 'dart:io';
 
 import 'package:petitparser_examples/json.dart';
 
@@ -38,20 +39,20 @@ void compare(String name, String input) {
   final parserResult = parser(input);
 
   if (nativeResult.toString() != parserResult.toString()) {
-    print('$name\nERROR');
+    stdout.writeln('$name\nERROR');
     return;
   }
 
   final nativeTime = benchmark(() => native(input));
   final parserTime = benchmark(() => parser(input));
-  print('$name\t'
+  stdout.writeln('$name\t'
       '${nativeTime.toStringAsFixed(3)}\t'
       '${parserTime.toStringAsFixed(3)}\t'
       '${percentChange(nativeTime, parserTime).round()}%');
 }
 
 void main() {
-  print('Name\tNative\tParser\tChange');
+  stdout.writeln('Name\tNative\tParser\tChange');
   compare('Object', '{"a": 1, "b": 2, "c": 3, "d": 4, "e": 5, "f": 6, "g": 7}');
   compare('Array', '[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16]');
   compare('Event', jsonEvent);

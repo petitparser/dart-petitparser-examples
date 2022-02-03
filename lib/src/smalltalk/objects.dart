@@ -34,17 +34,17 @@ extension BehaviorAccessor on dynamic {
 }
 
 class SmalltalkObject {
+  SmalltalkObject(this.behavior);
+
   Behavior behavior;
   Map<String, Object> fields = {};
-
-  SmalltalkObject(this.behavior);
 }
 
 class Behavior extends SmalltalkObject {
+  Behavior(this.name) : super(classBehavior);
+
   String name;
   Map<String, Function> methods = {};
-
-  Behavior(this.name) : super(classBehavior);
 
   void addMethod(String selector, Function function) =>
       methods[selector] = function;

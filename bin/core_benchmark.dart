@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:petitparser/petitparser.dart';
 import 'package:petitparser_examples/json.dart';
 
@@ -124,11 +126,11 @@ final Map<String, Function> benchmarks = {
 };
 
 void main() {
-  print('Name\tparseOn\tfastParseOn\tChange');
+  stdout.writeln('Name\tparseOn\tfastParseOn\tChange');
   for (final entry in benchmarks.entries) {
     final parseOnTime = benchmark(entry.value(false));
     final fastParseOnTime = benchmark(entry.value(true));
-    print('${entry.key}\t'
+    stdout.writeln('${entry.key}\t'
         '${parseOnTime.toStringAsFixed(3)}\t'
         '${fastParseOnTime.toStringAsFixed(3)}\t'
         '${percentChange(parseOnTime, fastParseOnTime).round()}%');

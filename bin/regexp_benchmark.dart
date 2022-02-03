@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:collection/collection.dart';
 import 'package:petitparser/petitparser.dart';
 
@@ -19,7 +21,7 @@ void compare(String regExp, Parser parser, String input) {
       .toList();
 
   if (!equality.equals(nativeResult, parserResult)) {
-    print('$regExp\tERROR');
+    stdout.writeln('$regExp\tERROR');
     return;
   }
 
@@ -31,14 +33,14 @@ void compare(String regExp, Parser parser, String input) {
       .allMatches(input)
       .map((matcher) => matcher.group(0))
       .toList());
-  print('$regExp\t'
+  stdout.writeln('$regExp\t'
       '${nativeTime.toStringAsFixed(3)}\t'
       '${parserTime.toStringAsFixed(3)}\t'
       '${percentChange(nativeTime, parserTime).round()}%');
 }
 
 void main() {
-  print('Expression\tNative\tParser\tChange');
+  stdout.writeln('Expression\tNative\tParser\tChange');
   compare(r'[0-9]', digit(),
       '!1!12!123!1234!12345!123456!1234567!12345678!123456789!');
   compare(r'[^0-9]', digit().not() & any(),

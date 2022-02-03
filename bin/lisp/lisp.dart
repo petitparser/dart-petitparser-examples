@@ -35,12 +35,12 @@ void main(List<String> arguments) {
       } else if (option == '-i') {
         interactiveMode = true;
       } else if (option == '-?') {
-        print('${Platform.executable} smalltalk.dart -n -i [files]');
-        print(' -i enforces the interactive mode');
-        print(' -n does not load the standard library');
+        stdout.writeln('${Platform.executable} smalltalk.dart -n -i [files]');
+        stdout.writeln(' -i enforces the interactive mode');
+        stdout.writeln(' -n does not load the standard library');
         exit(0);
       } else {
-        print('Unknown option: $option');
+        stdout.writeln('Unknown option: $option');
         exit(1);
       }
     } else {
@@ -48,7 +48,7 @@ void main(List<String> arguments) {
       if (file.existsSync()) {
         files.add(file);
       } else {
-        print('File not found: $option');
+        stdout.writeln('File not found: $option');
         exit(2);
       }
     }
