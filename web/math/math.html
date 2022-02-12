@@ -6,7 +6,7 @@
   <link rel="stylesheet"
         href="//cdn.rawgit.com/milligram/milligram/master/dist/milligram.min.css">
   <style>
-    #input, #output { font-family: monospace; width: 100%; }
+    #input, #result, #tree { font-family: monospace; width: 100%; }
     .error { color: red; }
   </style>
 </head>
@@ -17,7 +17,10 @@
   <input type="text" id="input" value="1 + 2 * 3"/>
 
   <h2>Result</h2>
-  <p id="output"></p>
+  <p id="result"></p>
+
+  <h2>Tree</h2>
+  <p id="tree"></p>
 
   <script src="math.dart.js"></script>
 </body>
