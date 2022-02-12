@@ -1,3 +1,6 @@
+/// Function type to be benchmarked.
+typedef Benchmark = void Function();
+
 /// Measures the time it takes to run [function] in microseconds.
 ///
 /// It does so in two steps:
@@ -6,14 +9,14 @@
 ///  - the code is benchmarked for the duration of [measure].
 ///
 /// The resulting duration is the average time measured to run [function] once.
-double benchmark(Function function,
+double benchmark(Benchmark function,
     {Duration warmup = const Duration(milliseconds: 200),
     Duration measure = const Duration(seconds: 2)}) {
   _benchmark(function, warmup);
   return _benchmark(function, measure);
 }
 
-double _benchmark(Function function, Duration duration) {
+double _benchmark(Benchmark function, Duration duration) {
   final watch = Stopwatch();
   final micros = duration.inMicroseconds;
   var count = 0;

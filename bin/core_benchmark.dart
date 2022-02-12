@@ -5,10 +5,14 @@ import 'package:petitparser_examples/json.dart';
 
 import 'benchmark.dart';
 
+// Function type
+
+typedef BenchmarkFactory = Benchmark Function(bool optimized);
+
 // Character tests
 
-Function charTest(List<String> inputs, Parser parser) => (fast) {
-      if (fast) {
+BenchmarkFactory charTest(List<String> inputs, Parser parser) => (optimized) {
+      if (optimized) {
         return () {
           for (var i = 0; i < inputs.length; i++) {
             parser.accept(inputs[i]);
@@ -28,9 +32,8 @@ final List<String> characters =
 
 // String tests
 
-Function stringTest(String input, Parser parser, {bool fast = false}) =>
-    (fast) {
-      if (fast) {
+BenchmarkFactory stringTest(String input, Parser parser) => (optimized) {
+      if (optimized) {
         return () => parser.accept(input);
       } else {
         return () => parser.parse(input).isSuccess;
@@ -60,7 +63,7 @@ const String jsonEvent =
 
 // All benchmarks
 
-final Map<String, Function> benchmarks = {
+final Map<String, BenchmarkFactory> benchmarks = {
   // char tests
   'any()': charTest(characters, any()),
   "anyOf('uncopyrightable')": charTest(characters, anyOf('uncopyrightable')),
@@ -116,8 +119,8 @@ final Map<String, Function> benchmarks = {
   ),
 
   // composite
-  'JsonParser()': (fast) {
-    if (fast) {
+  'JsonParser()': (optimized) {
+    if (optimized) {
       return () => json.fastParseOn(jsonEvent, 0);
     } else {
       return () => json.parse(jsonEvent);
