@@ -1,6 +1,11 @@
 # Changelog
 
-## 4.5.0 (unpublished)
+## 5.0.0
 
 * Dart 2.16 requirement.
-* Moved PetitParser Examples to a separate Git repository.
+* Cleaned up dynamic typing.
+* Updates to latest version of PetitParser.
+
+## 4.4.0
+
+* Initial version extracted from https://github.com/petitparser/dart-petitparser.
