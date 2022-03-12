@@ -7,6 +7,7 @@
 * Dart 2.16 requirement.
 * Cleaned up dynamic typing.
 * Updates to latest version of PetitParser.
+* Added a mathematical expression example.
 
 ## 4.4.0
 

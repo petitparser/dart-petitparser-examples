@@ -50,10 +50,19 @@ void main() {
   });
   test('multiply', () {
     verify('2 * 3', 6);
+    verify('2 * 3 * 4', 24);
     verify('6 / 3', 2);
+    verify('6 / 3 / 2', 1);
   });
   test('addition', () {
     verify('2 + 3', 5);
+    verify('2 + 3 + 4', 9);
     verify('5 - 3', 2);
+    verify('5 - 3 - 2', 0);
+  });
+  test('priority', () {
+    verify('1 + 2 * 3', 7);
+    verify('1 + (2 * 3)', 7);
+    verify('(1 + 2) * 3', 9);
   });
 }
