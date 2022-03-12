@@ -3,6 +3,7 @@ PetitParser Examples
 
 [![Pub Package](https://img.shields.io/pub/v/petitparser_examples.svg)](https://pub.dev/packages/petitparser_examples)
 [![Build Status](https://github.com/petitparser/dart-petitparser-examples/actions/workflows/dart.yml/badge.svg?branch=main)](https://github.com/petitparser/dart-petitparser-examples/actions/workflows/dart.yml)
+[![Code Coverage](https://codecov.io/gh/renggli/dart-petitparser-examples/branch/main/graph/badge.svg?token=TDwmzZtPdj)](https://codecov.io/gh/renggli/dart-petitparser-examples)
 [![GitHub Issues](https://img.shields.io/github/issues/petitparser/dart-petitparser-examples.svg)](https://github.com/petitparser/dart-petitparser-examples/issues)
 [![GitHub Forks](https://img.shields.io/github/forks/petitparser/dart-petitparser-examples.svg)](https://github.com/petitparser/dart-petitparser-examples/network)
 [![GitHub Stars](https://img.shields.io/github/stars/petitparser/dart-petitparser-examples.svg)](https://github.com/petitparser/dart-petitparser-examples/stargazers)
