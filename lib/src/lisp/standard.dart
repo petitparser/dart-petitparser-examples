@@ -5,7 +5,7 @@ import 'parser.dart';
 /// The standard library.
 class StandardEnvironment extends Environment {
   /// Imports the standard library into the [Environment].
-  StandardEnvironment(Environment owner) : super(owner) {
+  StandardEnvironment(super.owner) {
     evalString(lispParser, this, _standardLibrary);
   }
 
