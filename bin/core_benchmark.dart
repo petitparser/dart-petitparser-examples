@@ -40,7 +40,7 @@ BenchmarkFactory stringTest(String input, Parser parser) => (optimized) {
       }
     };
 
-final String string = characters.join();
+final String charactersString = characters.join();
 
 // JSON tests
 
@@ -69,7 +69,6 @@ final Map<String, BenchmarkFactory> benchmarks = {
   "anyOf('uncopyrightable')": charTest(characters, anyOf('uncopyrightable')),
   "char('a')": charTest(characters, char('a')),
   'digit()': charTest(characters, digit()),
-  'failure()': charTest(characters, failure()),
   'letter()': charTest(characters, letter()),
   'lowercase()': charTest(characters, lowercase()),
   "noneOf('uncopyrightable')": charTest(characters, noneOf('uncopyrightable')),
@@ -89,33 +88,62 @@ final Map<String, BenchmarkFactory> benchmarks = {
   'word()': charTest(characters, word()),
 
   // combinator tests
-  'optional()': charTest(characters, any().optional()),
   'and()': charTest(characters, any().and()),
-  'not()': charTest(characters, any().not()),
-  'neg()': charTest(characters, any().neg()),
-  'flatten()': charTest(characters, any().flatten()),
-  'token()': charTest(characters, any().token()),
-  'trim()': charTest(characters, any().trim()),
-  'end()': charTest(characters, any().end()),
-  'set()': charTest(characters, any().settable()),
-  'map()': charTest(characters, any().map((_) => null)),
   'cast()': charTest(characters, any().cast()),
   'castList()': charTest(characters, any().star().castList()),
-  'pick()': charTest(characters, any().star().pick(0)),
-  'permute()': charTest(characters, any().star().permute([0])),
+  'end()': charTest(characters, any().end()),
+  'epsilon()': charTest(characters, epsilon()),
+  'epsilonWith()': charTest(characters, epsilonWith('!')),
+  'failure()': charTest(characters, failure()),
+  'flatten()': charTest(characters, any().flatten()),
+  'label()': charTest(characters, any().labeled('label')),
+  'map()': charTest(characters, any().map((_) => null)),
+  'neg()': charTest(characters, any().neg()),
+  'not()': charTest(characters, any().not()),
+  'optional()': charTest(characters, any().optional()),
+  'optionalWith()': charTest(characters, any().optionalWith('!')),
   'or()': charTest(characters, failure().or(any()).star()),
+  'permute()': charTest(characters, any().star().permute([0])),
+  'pick()': charTest(characters, any().star().pick(0)),
+  'position()': charTest(characters, position()),
+  'set()': charTest(characters, any().settable()),
+  'token()': charTest(characters, any().token()),
+  'trim()': charTest(characters, any().trim()),
 
   // repeater tests
-  'star()': stringTest(string, any().star()),
-  'starGreedy()': stringTest(string, any().starGreedy(failure())),
-  'starLazy()': stringTest(string, any().starLazy(failure())),
-  'plus()': stringTest(string, any().plus()),
-  'plusGreedy()': stringTest(string, any().plusGreedy(failure())),
-  'plusLazy()': stringTest(string, any().plusLazy(failure())),
-  'times()': stringTest(string, any().times(string.length)),
+  'star()': stringTest(charactersString, any().star()),
+  'starGreedy()': stringTest(charactersString, any().starGreedy(failure())),
+  'starLazy()': stringTest(charactersString, any().starLazy(failure())),
+  'plus()': stringTest(charactersString, any().plus()),
+  'plusGreedy()': stringTest(charactersString, any().plusGreedy(failure())),
+  'plusLazy()': stringTest(charactersString, any().plusLazy(failure())),
+  'times()': stringTest(charactersString, any().times(charactersString.length)),
   'seq()': stringTest(
-    string,
-    List.filled(string.length, any()).toSequenceParser(),
+    charactersString,
+    List.filled(charactersString.length, any()).toSequenceParser(),
+  ),
+
+  // predicate tests
+  'string': stringTest(charactersString, string(charactersString)),
+  'stringIgnoreCase': stringTest(
+    charactersString,
+    stringIgnoreCase(charactersString),
+  ),
+  'predicate': stringTest(
+    charactersString,
+    predicate(
+      charactersString.length,
+      (value) => value == charactersString,
+      'not found',
+    ),
+  ),
+  'pattern (regexp)': stringTest(
+    charactersString,
+    PatternParser(RegExp('.*abc.*'), 'not found'),
+  ),
+  'pattern (string)': stringTest(
+    charactersString,
+    PatternParser(charactersString, 'not found'),
   ),
 
   // composite
