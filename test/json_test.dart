@@ -99,10 +99,6 @@ void main() {
       expect(parser.parse('00').isFailure, isTrue);
       expect(parser.parse('01').isFailure, isTrue);
     });
-    test('invalid integer', () {
-      expect(parser.parse('00').isFailure, isTrue);
-      expect(parser.parse('01').isFailure, isTrue);
-    });
     test('valid float', () {
       expect(parser.parse('0.0').value, 0.0);
       expect(parser.parse('0.12').value, 0.12);
