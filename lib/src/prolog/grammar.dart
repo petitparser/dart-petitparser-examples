@@ -10,21 +10,24 @@ class PrologGrammarDefinition extends GrammarDefinition {
       ref0(term) &
       (ref0(definitionToken) &
               ref0(term)
-                  .separatedBy(ref0(commaToken), includeSeparators: false))
+                  .plusSeparated(ref0(commaToken))
+                  .map((list) => list.elements))
           .optional() &
       ref0(terminatorToken);
   Parser term() =>
       ref0(atom) &
       (ref0(openParenToken) &
               ref0(parameter)
-                  .separatedBy(ref0(commaToken), includeSeparators: false) &
+                  .plusSeparated(ref0(commaToken))
+                  .map((list) => list.elements) &
               ref0(closeParentToken))
           .optional();
   Parser parameter() =>
       ref0(atom) &
       (ref0(openParenToken) &
               ref0(parameter)
-                  .separatedBy(ref0(commaToken), includeSeparators: false) &
+                  .plusSeparated(ref0(commaToken))
+                  .map((list) => list.elements) &
               ref0(closeParentToken))
           .optional();
   Parser atom() => ref0(variable) | ref0(value);

@@ -92,13 +92,13 @@ class DartGrammarDefinition extends GrammarDefinition {
           ref0(deferredToken).optional() &
           (ref0(asToken) & ref0(identifier)).optional() &
           ((ref0(showToken) | ref0(hideToken)) &
-                  ref0(identifier).separatedBy(ref1(token, ',')))
+                  ref0(identifier).plusSeparated(ref1(token, ',')))
               .optional() &
           ref1(token, ';') |
       ref0(exportToken) &
           ref0(singleLineStringLexicalToken) &
           ((ref0(showToken) | ref0(hideToken)) &
-                  ref0(identifier).separatedBy(ref1(token, ',')))
+                  ref0(identifier).plusSeparated(ref1(token, ',')))
               .optional() &
           ref1(token, ';') |
       ref0(partToken) & ref0(singleLineStringLexicalToken) & ref1(token, ';');
@@ -541,12 +541,13 @@ class DartGrammarDefinition extends GrammarDefinition {
       ref0(assignableExpression) & ref0(assignmentOperator) & ref0(expression) |
       ref0(conditionalExpression);
 
-  Parser expressionList() => ref0(expression).separatedBy(ref1(token, ','));
+  Parser expressionList() => ref0(expression).plusSeparated(ref1(token, ','));
 
   Parser arguments() =>
       ref1(token, '(') & ref0(argumentList).optional() & ref1(token, ')');
 
-  Parser argumentList() => ref0(argumentElement).separatedBy(ref1(token, ','));
+  Parser argumentList() =>
+      ref0(argumentElement).plusSeparated(ref1(token, ','));
 
   Parser argumentElement() => ref0(label) & ref0(expression) | ref0(expression);
 

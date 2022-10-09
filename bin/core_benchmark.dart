@@ -124,23 +124,23 @@ final Map<String, BenchmarkFactory> benchmarks = {
   'times()': stringTest(charactersString, any().times(charactersString.length)),
   'timesSeparated()': stringTest(charactersString,
       any().timesSeparated(epsilon(), charactersString.length)),
-  'separatedBy()': stringTest(charactersString, any().separatedBy(epsilon())),
-  'seq()': stringTest(charactersString,
-      List.filled(charactersString.length, any()).toSequenceParser()),
-  'seq2': stringTest(charactersString.substring(0, 2), seq2(any(), any())),
-  'seq3':
+  for (var i = 2; i < charactersString.length; i *= 2)
+    'seq($i chars)': stringTest(charactersString.substring(0, i),
+        List.filled(i, any()).toSequenceParser()),
+  'seq2()': stringTest(charactersString.substring(0, 2), seq2(any(), any())),
+  'seq3()':
       stringTest(charactersString.substring(0, 3), seq3(any(), any(), any())),
-  'seq4': stringTest(
+  'seq4()': stringTest(
       charactersString.substring(0, 4), seq4(any(), any(), any(), any())),
-  'seq5': stringTest(charactersString.substring(0, 5),
+  'seq5()': stringTest(charactersString.substring(0, 5),
       seq5(any(), any(), any(), any(), any())),
-  'seq6': stringTest(charactersString.substring(0, 6),
+  'seq6()': stringTest(charactersString.substring(0, 6),
       seq6(any(), any(), any(), any(), any(), any())),
-  'seq7': stringTest(charactersString.substring(0, 7),
+  'seq7()': stringTest(charactersString.substring(0, 7),
       seq7(any(), any(), any(), any(), any(), any(), any())),
-  'seq8': stringTest(charactersString.substring(0, 8),
+  'seq8()': stringTest(charactersString.substring(0, 8),
       seq8(any(), any(), any(), any(), any(), any(), any(), any())),
-  'seq9': stringTest(charactersString.substring(0, 9),
+  'seq9()': stringTest(charactersString.substring(0, 9),
       seq9(any(), any(), any(), any(), any(), any(), any(), any(), any())),
 
   // predicate tests

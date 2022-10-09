@@ -18,9 +18,9 @@ class JsonGrammarDefinition extends GrammarDefinition {
   Parser array() =>
       ref1(token, '[') & ref0(elements).optional() & ref1(token, ']');
   Parser elements() =>
-      ref0(value).separatedBy(ref1(token, ','), includeSeparators: false);
+      ref0(value).plusSeparated(ref1(token, ',')).map((list) => list.elements);
   Parser members() =>
-      ref0(pair).separatedBy(ref1(token, ','), includeSeparators: false);
+      ref0(pair).plusSeparated(ref1(token, ',')).map((list) => list.elements);
   Parser object() =>
       ref1(token, '{') & ref0(members).optional() & ref1(token, '}');
   Parser pair() => ref0(stringToken) & ref1(token, ':') & ref0(value);
