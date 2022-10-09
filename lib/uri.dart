@@ -4,24 +4,24 @@
 /// Appendix B of the standard: https://tools.ietf.org/html/rfc3986#appendix-B.
 import 'package:petitparser/petitparser.dart';
 
-import 'src/uri/authority.dart';
-import 'src/uri/query.dart';
+import 'src/uri/authority.dart' as lib_authority;
+import 'src/uri/query.dart' as lib_query;
 
-final uri = _uri.map((values) => <Symbol, dynamic>{
-      #scheme: values[0]?[0],
-      #authority: values[1]?[1],
-      ...authority.parse(values[1]?[1] ?? '').value,
-      #path: values[2],
-      #query: values[3]?[1],
-      #params: query.parse(values[3]?[1] ?? '').value,
-      #fragment: values[4]?[1],
+final uri = seq5(
+  seq2(_scheme, ':'.toParser()).optional(),
+  seq2('//'.toParser(), _authority).optional(),
+  _path,
+  seq2('?'.toParser(), _query).optional(),
+  seq2('#'.toParser(), _fragment).optional(),
+).map5((scheme, authority, path, query, fragment) => <Symbol, dynamic>{
+      #scheme: scheme?.first,
+      #authority: authority?.second,
+      ...lib_authority.authority.parse(authority?.second ?? '').value,
+      #path: path,
+      #query: query?.second,
+      #params: lib_query.query.parse(query?.second ?? '').value,
+      #fragment: fragment?.second,
     });
-
-final _uri = (_scheme & ':'.toParser()).optional() &
-    ('//'.toParser() & _authority).optional() &
-    _path &
-    ('?'.toParser() & _query).optional() &
-    ('#'.toParser() & _fragment).optional();
 
 final _scheme = pattern('^:/?#').plus().flatten('scheme');
 

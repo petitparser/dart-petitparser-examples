@@ -3,14 +3,11 @@
 /// Accepts input of the form "{key[=value]}&...".
 import 'package:petitparser/petitparser.dart';
 
-final query = _query.map((values) => values
-    .map((each) => <String?>[each[0], each[1]?[1]])
-    .where((each) => each[0] != '' || each[1] != null));
+final query = _param.plusSeparated('&'.toParser()).map(
+    (list) => list.elements.where((each) => each[0] != '' || each[1] != null));
 
-final _query = _param.separatedBy('&'.toParser(),
-    optionalSeparatorAtEnd: true, includeSeparators: false);
-
-final _param = _paramKey & ('='.toParser() & _paramValue).optional();
+final _param = seq2(_paramKey, seq2('='.toParser(), _paramValue).optional())
+    .map2((key, value) => <String?>[key, value?.second]);
 
 final _paramKey = pattern('^=&').star().flatten('param key');
 
