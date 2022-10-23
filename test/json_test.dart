@@ -3,10 +3,8 @@ import 'package:petitparser_examples/json.dart';
 import 'package:test/test.dart';
 
 void main() {
-  final grammar = JsonGrammarDefinition().build();
-  final parser = JsonParserDefinition().build();
+  final parser = JsonDefinition().build();
   test('linter', () {
-    expect(linter(grammar), isEmpty);
     expect(linter(parser), isEmpty);
   });
   group('arrays', () {
@@ -152,7 +150,6 @@ void main() {
           '"boundElements": {"length": 0}, "clientX": 89, "clientY": 502, '
           '"propertyName": "", "shiftKey": false, "ctrlLeft": false, '
           '"offsetX": 25, "offsetY": 2, "altKey": false}';
-      expect(grammar.parse(input).isSuccess, isTrue);
       expect(parser.parse(input).isSuccess, isTrue);
     });
     test('FireFox', () {
@@ -169,7 +166,6 @@ void main() {
           '"RESIZE": 67108864, "FORWARD": 134217728, "HELP": 268435456, '
           '"BACK": 536870912, "TEXT": 1073741824, "ALT_MASK": 1, '
           '"CONTROL_MASK": 2, "SHIFT_MASK": 4, "META_MASK": 8}';
-      expect(grammar.parse(input).isSuccess, isTrue);
       expect(parser.parse(input).isSuccess, isTrue);
     });
     test('WebKit', () {
@@ -181,7 +177,6 @@ void main() {
           '"MOUSEDRAG": 32, "BUBBLING_PHASE": 3, "MOUSEUP": 2, '
           '"CAPTURING_PHASE": 1, "MOUSEOVER": 4, "CLICK": 64, "DBLCLICK": 128, '
           '"KEYDOWN": 256, "KEYPRESS": 1024, "DRAGDROP": 2048}';
-      expect(grammar.parse(input).isSuccess, isTrue);
       expect(parser.parse(input).isSuccess, isTrue);
     });
   });
@@ -189,21 +184,20 @@ void main() {
     group('https://github.com/petitparser/dart-petitparser/issues/98', () {
       test('expected some value', () {
         const invalid = '';
-        final result = grammar.parse(invalid);
+        final result = parser.parse(invalid);
         expect(result.isFailure, isTrue);
         expect(result.position, 0);
         expect(
             result.message,
-            'Expected string OR Expected number OR Expected { OR '
-            'Expected [ OR Expected true OR Expected false OR '
-            'Expected null');
+            '"\\"" expected OR number expected OR "{" expected OR "[" expected '
+            'OR "true" expected OR "false" expected OR "null" expected');
       });
       test('expected closing curly', () {
         const invalid = '{"a": "bad "value" string"}';
-        final result = grammar.parse(invalid);
+        final result = parser.parse(invalid);
         expect(result.isFailure, isTrue);
         expect(result.position, 12);
-        expect(result.message, 'Expected }');
+        expect(result.message, '"}" expected');
       });
     });
   });

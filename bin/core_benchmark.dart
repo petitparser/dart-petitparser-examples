@@ -44,7 +44,7 @@ final String charactersString = characters.join();
 
 // JSON tests
 
-final json = JsonParserDefinition().build();
+final json = JsonDefinition().build();
 
 const String jsonEvent =
     '{"type": "change", "eventPhase": 2, "bubbles": true, "cancelable": true, '

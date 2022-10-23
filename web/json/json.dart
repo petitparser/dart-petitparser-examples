@@ -3,7 +3,7 @@ import 'dart:html';
 
 import 'package:petitparser_examples/json.dart';
 
-final parser = JsonParserDefinition().build();
+final parser = JsonDefinition().build();
 
 void execute(
   String value,

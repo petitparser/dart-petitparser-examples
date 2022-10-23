@@ -29,10 +29,8 @@ const String jsonNested = '''
 { "id": "5004", "type": "Maple" }]}]}}
 ''';
 
-final json = JsonParserDefinition().build();
-
-Object native(String input) => convert.json.decode(input);
-Object parser(String input) => json.parse(input).value;
+Object? native(String input) => convert.json.decode(input);
+Object? parser(String input) => parseJson(input);
 
 void compare(String name, String input) {
   final nativeResult = native(input);
