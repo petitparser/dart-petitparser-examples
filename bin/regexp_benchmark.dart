@@ -58,9 +58,9 @@ void main() {
   compare(
       r'#([a-f0-9]{6}|[a-f0-9]{3})',
       seq3(
-          char('#'),
-          pattern('a-f0-9').repeat(3),
-          pattern('a-f0-9').repeat(3).optional(),
+        char('#'),
+        pattern('a-f0-9').repeat(3),
+        pattern('a-f0-9').repeat(3).optional(),
       ),
       '#419527 #0839c4 #a95ba4 #da3e9e #15b331 #cafe00 #a7f #20c #46f #bb5');
   compare(
