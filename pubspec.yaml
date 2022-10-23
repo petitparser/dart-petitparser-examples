@@ -6,6 +6,7 @@ repository: https://github.com/petitparser/dart-petitparser-examples
 description: A collection of example parsers, applications, and benchmarks that
   illustrate the PetitParser framework.
 
+publish_to: none
 environment:
   sdk: '>=2.18.0 <3.0.0'
 dependencies:
