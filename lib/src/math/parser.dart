@@ -19,12 +19,13 @@ final parser = () {
         .flatten('variable expected')
         .trim()
         .map(_createVariable))
-    ..wrapper<List<String>, String>(
-        [word().plus().flatten('function expected'), char('(')]
-            .toSequenceParser()
-            .trim(),
+    ..wrapper(
+        seq2(
+          word().plus().flatten('function expected').trim(),
+          char('(').trim(),
+        ),
         char(')').trim(),
-        (left, value, right) => Unary(left[0], value, functions[left[0]]!))
+        (left, value, right) => _createFunction(left.first, value))
     ..wrapper(
         char('(').trim(), char(')').trim(), (left, value, right) => value);
   builder.group()
@@ -46,3 +47,6 @@ Expression _createValue(String value) => Value(num.parse(value));
 
 Expression _createVariable(String name) =>
     constants.containsKey(name) ? Value(constants[name]!) : Variable(name);
+
+Expression _createFunction(String name, Expression expression) =>
+    Unary(name, expression, functions[name]!);
