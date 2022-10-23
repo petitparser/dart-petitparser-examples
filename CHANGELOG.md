@@ -2,7 +2,8 @@
 
 ## 5.1.0 (unpublished)
 
-- Dart 2.17 requirement.
+- Dart 2.18 requirement.
+- Cleanup the JSON and URL parsers to be fully typed.
 
 ## 5.0.0
 
