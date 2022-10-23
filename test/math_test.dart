@@ -6,7 +6,7 @@ import 'package:test/test.dart';
 
 void verify(String input, num result,
         {Map<String, num> variables = const {}, double epsilon = 0.00001}) =>
-    expect(parser.parse(input).value(variables), closeTo(result, epsilon));
+    expect(parser.parse(input).value.eval(variables), closeTo(result, epsilon));
 
 void main() {
   test('linter', () {

@@ -1,6 +1,7 @@
 /// An abstract expression that can be evaluated.
 abstract class Expression {
-  num call(Map<String, num> variables);
+  /// Evaluates the expression with the provided [variables].
+  num eval(Map<String, num> variables);
 }
 
 /// A value expression.
@@ -10,7 +11,7 @@ class Value extends Expression {
   final num value;
 
   @override
-  num call(Map<String, num> variables) => value;
+  num eval(Map<String, num> variables) => value;
 
   @override
   String toString() => 'Value{$value}';
@@ -23,7 +24,7 @@ class Variable extends Expression {
   final String name;
 
   @override
-  num call(Map<String, num> variables) => variables.containsKey(name)
+  num eval(Map<String, num> variables) => variables.containsKey(name)
       ? variables[name]!
       : throw 'Unknown variable $name';
 
@@ -40,7 +41,7 @@ class Unary extends Expression {
   final num Function(num value) function;
 
   @override
-  num call(Map<String, num> variables) => function(value(variables));
+  num eval(Map<String, num> variables) => function(value.eval(variables));
 
   @override
   String toString() => 'Unary{$name}';
@@ -56,8 +57,8 @@ class Binary extends Expression {
   final num Function(num left, num right) function;
 
   @override
-  num call(Map<String, num> variables) =>
-      function(left(variables), right(variables));
+  num eval(Map<String, num> variables) =>
+      function(left.eval(variables), right.eval(variables));
 
   @override
   String toString() => 'Binary{$name}';

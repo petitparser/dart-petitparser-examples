@@ -11,7 +11,7 @@ void update() {
   try {
     final expr = parser.parse(input.value ?? '0').value;
     tree.innerHtml = inspect(expr);
-    result.text = ' = ${expr({})}';
+    result.text = ' = ${expr.eval({})}';
     result.classes.clear();
   } on Object catch (exception) {
     result.text = exception.toString();
