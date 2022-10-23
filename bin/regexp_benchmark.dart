@@ -20,8 +20,12 @@ void compare(String regExp, Parser parser, String input) {
       .map((matcher) => matcher.group(0))
       .toList();
 
-  if (!equality.equals(nativeResult, parserResult)) {
+  if (nativeResult.isEmpty ||
+      parserResult.isEmpty ||
+      !equality.equals(nativeResult, parserResult)) {
     stdout.writeln('$regExp\tERROR');
+    stdout.writeln(' - Native: $nativeResult');
+    stdout.writeln(' - Parser: $parserResult');
     return;
   }
 
@@ -43,30 +47,46 @@ void main() {
   stdout.writeln('Expression\tNative\tParser\tChange');
   compare(r'[0-9]', digit(),
       '!1!12!123!1234!12345!123456!1234567!12345678!123456789!');
-  compare(r'[^0-9]', digit().not() & any(),
+  compare(r'[^0-9]', seq2(digit().not(), any()),
       '!1!12!123!1234!12345!123456!1234567!12345678!123456789!');
   compare(r'[0-9]+', digit().plus(),
       '!1!12!123!1234!12345!123456!1234567!12345678!123456789!');
-  compare(r'[0-9]*!', digit().star() & char('!'),
+  compare(r'[0-9]*!', seq2(digit().star(), char('!')),
       '!1!12!123!1234!12345!123456!1234567!12345678!123456789!');
-  compare(r'![0-9]*', char('!') & digit().star(),
+  compare(r'![0-9]*', seq2(char('!'), digit().star()),
       '!1!12!123!1234!12345!123456!1234567!12345678!123456789!');
   compare(
+      r'#([a-f0-9]{6}|[a-f0-9]{3})',
+      seq3(
+          char('#'),
+          pattern('a-f0-9').repeat(3),
+          pattern('a-f0-9').repeat(3).optional(),
+      ),
+      '#419527 #0839c4 #a95ba4 #da3e9e #15b331 #cafe00 #a7f #20c #46f #bb5');
+  compare(
+      r'\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}',
+      digit().repeat(1, 3).timesSeparated(char('.'), 4),
+      '127.0.0.1, 73.60.124.136, 192.88.99.12, 203.0.113.0, 10.1.2.3, 0.0.0.0');
+  compare(
       r'[a-z]+@[a-z]+\.[a-z]{2,3}',
-      letter().plus() &
-          char('@') &
-          letter().plus() &
-          char('.') &
-          letter().repeat(2, 3),
+      seq5(
+        letter().plus(),
+        char('@'),
+        letter().plus(),
+        char('.'),
+        letter().repeat(2, 3),
+      ),
       'a@b.c, de@fg.hi, jkl@mno.pqr, stuv@wxyz.abcd, efghi@jklmn.opqrs');
   compare(
       r'[+-]?\d+(\.\d+)?([eE][+-]?\d+)?',
-      pattern('+-').optional() &
-          digit().plus() &
-          (char('.') & digit().plus()).optional() &
-          (pattern('eE') & pattern('+-').optional() & digit().plus())
-              .optional(),
+      seq4(
+        pattern('+-').optional(),
+        digit().plus(),
+        seq2(char('.'), digit().plus()).optional(),
+        seq3(pattern('eE'), pattern('+-').optional(), digit().plus())
+            .optional(),
+      ),
       '1, -2, 3.4, -5.6, 7e8, 9E0, 0e+1, 2E-3, -4.567e-890');
-  compare(r'\n|\r\n?', Token.newlineParser(),
+  compare(r'\n|\r\n?', newline(),
       '1\n12\n123\n1234\n12345\n123456\n1234567\n12345678\r\n123456789\r');
 }
