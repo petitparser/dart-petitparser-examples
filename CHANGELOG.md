@@ -1,6 +1,6 @@
 # Changelog
 
-## 5.1.0 (unpublished)
+## 5.1.0
 
 - Dart 2.18 requirement.
 - Cleanup the JSON and URL parsers to be fully typed.
