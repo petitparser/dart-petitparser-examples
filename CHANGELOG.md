@@ -1,5 +1,7 @@
 # Changelog
 
+## 5.2.0 (Unpublished)
+
 ## 5.1.0
 
 - Dart 2.18 requirement.
