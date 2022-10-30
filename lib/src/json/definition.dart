@@ -55,11 +55,11 @@ class JsonDefinition extends GrammarDefinition<JSON> {
   Parser<String> characterNormal() => pattern('^"\\');
   Parser<String> characterEscape() => seq2(
         char('\\'),
-        pattern(jsonEscapeChars.keys.join()),
+        anyOf(jsonEscapeChars.keys.join()),
       ).map2((_, char) => jsonEscapeChars[char]!);
   Parser<String> characterUnicode() => seq2(
         string('\\u'),
-        pattern('0-9A-Fa-f').times(4).flatten(),
+        pattern('0-9A-Fa-f').times(4).flatten('4-digit hex number expected'),
       ).map2((_, value) => String.fromCharCode(int.parse(value, radix: 16)));
 
   Parser<num> numberToken() =>
@@ -68,8 +68,5 @@ class JsonDefinition extends GrammarDefinition<JSON> {
       char('-').optional() &
       char('0').or(digit().plus()) &
       char('.').seq(digit().plus()).optional() &
-      pattern('eE')
-          .seq(pattern('-+').optional())
-          .seq(digit().plus())
-          .optional();
+      anyOf('eE').seq(anyOf('-+').optional()).seq(digit().plus()).optional();
 }

@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Math Evaluator</title>
+  <link rel="stylesheet"
+        href="//cdn.rawgit.com/milligram/milligram/master/dist/milligram.min.css">
+  <style>
+    #input { font-family: monospace; width: 100%; }
+    #error { color: red; }
+  </style>
+</head>
+<body>
+  <h1>Math Plotter</h1>
+
+  <h2>Function f<sub>t</sub>(x)</h2>
+  <input type="text" id="input" value="x * sin(10 * cos(t / 20) / x)"/>
+  <p id="error"></p>
+
+  <h2>Graph</h2>
+  <canvas id="canvas"></canvas>
+
+  <script src="plot.dart.js"></script>
+</body>
+</html>
