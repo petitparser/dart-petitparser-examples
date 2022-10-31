@@ -38,6 +38,7 @@ class Viewport {
   /// Plots the grid and axis.
   void grid(CanvasRenderingContext2D context,
       {String axisStyle = 'black', String gridStyle = 'gray'}) {
+    context.lineWidth = 0.5;
     for (var x = minX.floor(); x <= maxX.ceil(); x++) {
       final pixelX = toPixelX(x);
       context.strokeStyle = x == 0 ? axisStyle : gridStyle;
@@ -60,6 +61,7 @@ class Viewport {
   void plot(CanvasRenderingContext2D context, num Function(num x) function,
       {String functionStyle = 'blue'}) {
     context.strokeStyle = functionStyle;
+    context.lineWidth = 1.0;
     context.beginPath();
     for (var x = 0; x <= width; x++) {
       context.lineTo(x, toPixelY(function(fromPixelX(x))));
@@ -93,14 +95,16 @@ final viewport =
 Expression expression = Value(double.nan);
 
 void update() {
+  final source = input.value ?? '';
   try {
-    expression = parser.parse(input.value ?? '0').value;
+    expression = parser.parse(source).value;
     expression.eval({'x': 0, 't': 0});
     error.text = '';
   } on Object catch (exception) {
     expression = Value(double.nan);
     error.text = exception.toString();
   }
+  window.location.hash = Uri.encodeComponent(source);
 }
 
 void refresh(int tick) {
@@ -110,6 +114,9 @@ void refresh(int tick) {
 }
 
 void main() {
+  if (window.location.hash.startsWith('#')) {
+    input.value = Uri.decodeComponent(window.location.hash.substring(1));
+  }
   update();
   viewport.resize(canvas);
   input.onInput.listen((event) => update());

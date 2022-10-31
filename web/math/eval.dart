@@ -7,9 +7,10 @@ final result = querySelector('#result')! as ParagraphElement;
 final tree = querySelector('#tree')! as ParagraphElement;
 
 void update() {
+  final source = input.value ?? '0';
   tree.text = '';
   try {
-    final expr = parser.parse(input.value ?? '0').value;
+    final expr = parser.parse(source).value;
     tree.innerHtml = inspect(expr);
     result.text = ' = ${expr.eval({})}';
     result.classes.clear();
@@ -17,6 +18,7 @@ void update() {
     result.text = exception.toString();
     result.classes.add('error');
   }
+  window.location.hash = Uri.encodeComponent(source);
 }
 
 String inspect(Expression expr, [String indent = '']) {
@@ -31,6 +33,9 @@ String inspect(Expression expr, [String indent = '']) {
 }
 
 void main() {
-  input.onInput.listen((event) => update());
+  if (window.location.hash.startsWith('#')) {
+    input.value = Uri.decodeComponent(window.location.hash.substring(1));
+  }
   update();
+  input.onInput.listen((event) => update());
 }
