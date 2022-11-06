@@ -182,7 +182,7 @@ void main() {
   group('Parser', () {
     final atom = parserDefinition.build(start: parserDefinition.atom);
     test('Linter', () {
-      expect(linter(atom), isEmpty);
+      expect(linter(atom, excludedTypes: {}), isEmpty);
     });
     test('Name', () {
       final cell = atom.parse('foo').value;

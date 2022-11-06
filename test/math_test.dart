@@ -10,7 +10,7 @@ void verify(String input, num result,
 
 void main() {
   test('linter', () {
-    expect(linter(parser), isEmpty);
+    expect(linter(parser, excludedTypes: {}), isEmpty);
   });
   test('number', () {
     verify('0', 0);

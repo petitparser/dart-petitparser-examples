@@ -5,7 +5,7 @@ import 'package:test/test.dart';
 void main() {
   final parser = JsonDefinition().build();
   test('linter', () {
-    expect(linter(parser), isEmpty);
+    expect(linter(parser, excludedTypes: {}), isEmpty);
   });
   group('arrays', () {
     test('empty', () {
