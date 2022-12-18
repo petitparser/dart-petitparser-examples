@@ -1,6 +1,6 @@
 import 'package:collection/collection.dart';
 import 'package:meta/meta.dart';
-import 'package:more/iterable.dart';
+import 'package:more/collection.dart';
 
 import 'parser.dart';
 
