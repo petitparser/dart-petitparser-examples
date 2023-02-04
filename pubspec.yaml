@@ -11,6 +11,7 @@ environment:
   sdk: '>=2.18.0 <3.0.0'
 dependencies:
   collection: ^1.17.0
+  http: ^0.13.0
   meta: ^1.8.0
   more: ^3.9.5
   petitparser:

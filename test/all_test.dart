@@ -1,5 +1,6 @@
 import 'package:test/test.dart';
 
+import 'bibtex_test.dart' as bibtex_test;
 import 'dart_test.dart' as dart_test;
 import 'json_test.dart' as json_test;
 import 'lisp_test.dart' as lisp_test;
@@ -9,6 +10,7 @@ import 'smalltalk_test.dart' as smalltalk_test;
 import 'uri_test.dart' as uri_test;
 
 void main() {
+  group('bibtex', bibtex_test.main);
   group('dart', dart_test.main);
   group('json', json_test.main);
   group('lisp', lisp_test.main);
