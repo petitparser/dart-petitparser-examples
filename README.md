@@ -18,6 +18,10 @@ dart pub global activate webdev
 webdev serve --release
 ```
 
+### BibTeX
+
+A simple parser that reads a [BibTeX](https://en.wikipedia.org/wiki/BibTeX) file into a list of BibTeX entries with a list of fields.
+
 ### Dart
 
 This example contains the grammar of the Dart programming language. This is based on an early Dart 1.0 grammar specification and unfortunately does not support all valid Dart programs yet.
@@ -41,3 +45,7 @@ This example contains a simple grammar and evaluator for Prolog programs. The co
 ### Smalltalk
 
 This example contains a complete implementation of the Smalltalk grammar. This is a verbatim export of a grammar that was originally developed for the PetitParser infrastructure in Smalltalk and that was the base of the [Helvetia Language Workbench](https://www.lukas-renggli.ch/smalltalk/helvetia).
+
+### URI
+
+This is a simple grammar that takes an URL string and decomposes it into scheme, authority (including username, password, hostname, and port), path, query (including parameters as key-value pairs), and fragment.
