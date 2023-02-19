@@ -43,8 +43,8 @@ void update() {
   final eventStream = Stream.value(input.value ?? '')
       .toXmlEvents(withLocation: true)
       .tapEachEvent(
-        onCDATA: (event) => appendSax('CDATA', event.text),
-        onComment: (event) => appendSax('Comment', event.text),
+        onCDATA: (event) => appendSax('CDATA', event.value),
+        onComment: (event) => appendSax('Comment', event.value),
         onDeclaration: (event) => appendSax(
             'Declaration',
             event.attributes
@@ -54,14 +54,14 @@ void update() {
             appendSax('Doctype', event.name, event.externalId?.toString()),
         onEndElement: (event) => appendSax('End Element', event.name),
         onProcessing: (event) =>
-            appendSax('Processing', event.target, event.text),
+            appendSax('Processing', event.target, event.value),
         onStartElement: (event) => appendSax(
             'Element${event.isSelfClosing ? ' (self-closing)' : ''}',
             event.name,
             event.attributes
                 .map((attr) => '${attr.name}=${attr.value}')
                 .join('\n')),
-        onText: (event) => appendSax('Text', event.text),
+        onText: (event) => appendSax('Text', event.value),
       )
       .handleError((error) =>
           appendLine(saxOutput, error.toString(), classes: ['error']));
@@ -72,7 +72,7 @@ void update() {
       .flatten()
       .handleError((error) =>
           appendLine(domOutput, error.toString(), classes: ['error']))
-      .where((node) => node is! XmlText || node.text.trim().isNotEmpty)
+      .where((node) => node is! XmlText || node.value.trim().isNotEmpty)
       .listen((node) => appendLine(domOutput, node.toXmlString(pretty: true)));
 }
 
