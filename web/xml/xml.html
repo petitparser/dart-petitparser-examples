@@ -10,9 +10,8 @@
     #output td { font-family: monospace; vertical-align: top; width: 50%; }
     #sax div { display: flex; }
     #sax div span { flex: 1; }
-    #dom div { white-space: pre; }
+    #dom { white-space: pre; }
     .error { color: red; }
-
   </style>
 </head>
 <body>
@@ -20,7 +19,8 @@
 
 <h2>Input</h2>
 <p>
-    <textarea id="input">
+  <label for="input">XML</label>
+  <textarea id="input">
 <?xml version="1.0"?>
 <!DOCTYPE name [ <!ELEMENT html (head, body)> ]>
 <ns:foo attr="not namespaced" n1:ans="namespaced 1"
@@ -33,13 +33,18 @@
   <?processing instruction?>
 </ns:foo></textarea>
 </p>
+<p>
+  <label for="xpath">XPath</label>
+  <input id="xpath" value="//element">
+  <span id="xpath-error" class="error"></span>
+</p>
 
 <h2>Output</h2>
 <table>
   <thead>
   <tr>
     <th>Events (SAX)</th>
-    <th>DOM (pretty-printed)</th>
+    <th>Pretty-printed DOM with XPath matches</th>
   </tr>
   </thead>
   <tbody>
