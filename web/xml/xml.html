@@ -8,51 +8,57 @@
   <style>
     textarea { width: 100%; height: 200px; }
     textarea, input { font-family: monospace; }
-    #output td { font-family: monospace; vertical-align: top; width: 50%; }
-    #sax div { display: flex; }
-    #sax div span { flex: 1; }
-    #dom { white-space: pre; }
-    #dom strong { color: orange; }
-    .error { color: red; }
+    #sax-output, #dom-output { font-family: monospace; vertical-align: top; width: 50%; }
+    #sax-output div { display: flex; }
+    #sax-output div span { flex: 1; }
+    #dom-output { white-space: pre; }
+    #dom-output strong { background-color: #9b4dca; color: #fff; }
+    .error { color: red; font-weight: normal; }
   </style>
 </head>
 <body>
 <h1>XML Parser</h1>
 
 <h2>Input</h2>
-<p>
-  <label for="input">XML</label>
-  <textarea id="input">
-<?xml version="1.0"?>
-<!DOCTYPE name [ <!ELEMENT html (head, body)> ]>
-<ns:foo attr="not namespaced" n1:ans="namespaced 1"
-        n2:ans="namespace 2" >
-  Plain text content
-  <element/>
-  <ns:element/>
-  <!-- comment -->
-  <![CDATA[cdata]]>
-  <?processing instruction?>
-</ns:foo></textarea>
-</p>
-<p>
-  <label for="xpath">XPath</label>
-  <input id="xpath" value="//element">
-  <span id="xpath-error" class="error"></span>
-</p>
+<fieldset>
+  <label for="xml-input">XML</label>
+  <textarea id="xml-input"><?xml version="1.0"?>
+<bookshelf>
+  <book>
+    <title lang="en" pages="328" year="1949">Nineteen Eighty-Four</title>
+    <author>George Orwell</author>
+  </book>
+  <book>
+    <title lang="en" pages="234" year="1951">The Catcher in the Rye</title>
+    <author>J. D. Salinger</author>
+  </book>
+  <book>
+    <title lang="de" year="2005">
+      Die Vermessung der Welt
+    </title>
+    <author>Daniel Kehlmann</author><publisher>Rowohlt</publisher>
+  </book>
+</bookshelf></textarea>
+
+  <label for="xpath-input">XPath <span id="xpath-error" class="error"></span></label>
+  <input id="xpath-input" value="//book[title/@lang=&quot;en&quot;]/author/text()">
+
+  <input id="dom-pretty" type="checkbox">
+  <label for="dom-pretty" class="label-inline">Pretty-print DOM</label>
+</fieldset>
 
 <h2>Output</h2>
 <table>
   <thead>
   <tr>
     <th>Events (SAX)</th>
-    <th>Pretty-printed DOM with XPath matches</th>
+    <th>DOM with XPath</th>
   </tr>
   </thead>
   <tbody>
-  <tr id="output">
-    <td id="sax"></td>
-    <td id="dom"></td>
+  <tr>
+    <td id="sax-output"></td>
+    <td id="dom-output"></td>
   </tr>
   </tbody>
 </table>

@@ -49,3 +49,7 @@ This example contains a complete implementation of the Smalltalk grammar. This i
 ### URI
 
 This is a simple grammar that takes an URL string and decomposes it into scheme, authority (including username, password, hostname, and port), path, query (including parameters as key-value pairs), and fragment.
+
+### XML
+
+This examples parses XML files to events, creates and pretty-prints a DOM tree, and evaluates XPath expressions.

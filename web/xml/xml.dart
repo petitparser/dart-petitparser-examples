@@ -5,12 +5,12 @@ import 'package:xml/xml.dart';
 import 'package:xml/xml_events.dart';
 import 'package:xml/xpath.dart';
 
-final xmlInput = querySelector('#input') as TextAreaElement;
-final xpathInput = querySelector('#xpath') as TextInputElement;
-
-final saxOutput = querySelector('#sax') as Element;
-final domOutput = querySelector('#dom') as Element;
+final xmlInput = querySelector('#xml-input') as TextAreaElement;
+final xpathInput = querySelector('#xpath-input') as TextInputElement;
 final xpathError = querySelector('#xpath-error') as Element;
+final domPretty = querySelector('#dom-pretty') as CheckboxInputElement;
+final saxOutput = querySelector('#sax-output') as Element;
+final domOutput = querySelector('#dom-output') as Element;
 
 Element appendString(Element element, String object) {
   object
@@ -71,15 +71,17 @@ void update() {
 
   // Process the DOM stream
   eventStream.toXmlNodes().flatten().toList().then(
-        (elements) => updateDom(elements),
-        onError: (error) =>
-            appendLine(domOutput, error.toString(), classes: ['error']),
-      );
+      (elements) => updateDom(XmlDocument(elements)..normalize()),
+      onError: (error) =>
+          appendLine(saxOutput, error.toString(), classes: ['error']));
 }
 
-void updateDom(List<XmlNode> elements) {
-  final document = XmlDocument(elements);
-
+void updateDom(XmlDocument document) {
+  // If desired, pretty print the document.
+  if (domPretty.checked == true) {
+    document = XmlDocument.parse(document.toXmlString(pretty: true));
+  }
+  // Find the XPath matches.
   final matches = <XmlNode>{};
   try {
     matches.addAll(document.xpath(xpathInput.value ?? ''));
@@ -87,8 +89,8 @@ void updateDom(List<XmlNode> elements) {
   } catch (error) {
     xpathError.innerText = error.toString();
   }
-
-  HtmlPrettyWriter(HtmlBuffer(domOutput), matches).visit(document);
+  // Render the highlighted document.
+  HighlightWriter(HtmlBuffer(domOutput), matches).visit(document);
 }
 
 class HtmlBuffer extends StringSink {
@@ -127,8 +129,8 @@ class HtmlBuffer extends StringSink {
   void writeln([Object? object = ""]) => throw UnimplementedError();
 }
 
-class HtmlPrettyWriter extends XmlPrettyWriter {
-  HtmlPrettyWriter(this.htmlBuffer, this.matches) : super(htmlBuffer);
+class HighlightWriter extends XmlWriter {
+  HighlightWriter(this.htmlBuffer, this.matches) : super(htmlBuffer);
 
   final HtmlBuffer htmlBuffer;
 
@@ -147,5 +149,6 @@ class HtmlPrettyWriter extends XmlPrettyWriter {
 void main() {
   xmlInput.onInput.listen((event) => update());
   xpathInput.onInput.listen((event) => update());
+  domPretty.onInput.listen((event) => update());
   update();
 }
