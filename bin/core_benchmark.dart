@@ -36,7 +36,7 @@ BenchmarkFactory stringTest(String input, Parser parser) => (optimized) {
       if (optimized) {
         return () => parser.accept(input);
       } else {
-        return () => parser.parse(input).isSuccess;
+        return () => parser.parse(input);
       }
     };
 
@@ -169,7 +169,7 @@ final Map<String, BenchmarkFactory> benchmarks = {
   // composite
   'JsonParser()': (optimized) {
     if (optimized) {
-      return () => json.fastParseOn(jsonEvent, 0);
+      return () => json.accept(jsonEvent);
     } else {
       return () => json.parse(jsonEvent);
     }
