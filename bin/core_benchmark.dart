@@ -1,52 +1,74 @@
 import 'dart:io';
 
 import 'package:petitparser/petitparser.dart';
+import 'package:petitparser_examples/bibtex.dart';
 import 'package:petitparser_examples/json.dart';
+import 'package:petitparser_examples/math.dart' as math;
+import 'package:petitparser_examples/uri.dart';
 
 import 'benchmark.dart';
 
 // Function type
 
-typedef BenchmarkFactory = Benchmark Function(bool optimized);
+enum BenchmarkType { verify, parse, accept }
+
+typedef BenchmarkFactory = Benchmark Function(BenchmarkType type);
 
 // Character tests
 
-BenchmarkFactory charTest(List<String> inputs, Parser parser) => (optimized) {
-      if (optimized) {
-        return () {
-          for (var i = 0; i < inputs.length; i++) {
-            parser.accept(inputs[i]);
-          }
-        };
-      } else {
-        return () {
-          for (var i = 0; i < inputs.length; i++) {
-            parser.parse(inputs[i]);
-          }
-        };
+BenchmarkFactory charTest(List<String> inputs, Parser parser, int success) =>
+    (type) {
+      switch (type) {
+        case BenchmarkType.verify:
+          return () {
+            var count = 0;
+            for (var i = 0; i < inputs.length; i++) {
+              if (parser.accept(inputs[i])) count++;
+            }
+            if (success != count) {
+              throw StateError('Expected $success success, but got $count');
+            }
+          };
+        case BenchmarkType.parse:
+          return () {
+            for (var i = 0; i < inputs.length; i++) {
+              parser.parse(inputs[i]);
+            }
+          };
+        case BenchmarkType.accept:
+          return () {
+            for (var i = 0; i < inputs.length; i++) {
+              parser.accept(inputs[i]);
+            }
+          };
       }
     };
 
-final List<String> characters =
-    List.generate(0xff, (value) => String.fromCharCode(value));
+final characters = List.generate(0xff, (value) => String.fromCharCode(value));
 
 // String tests
 
-BenchmarkFactory stringTest(String input, Parser parser) => (optimized) {
-      if (optimized) {
-        return () => parser.accept(input);
-      } else {
-        return () => parser.parse(input);
+BenchmarkFactory stringTest(String input, Parser parser) => (type) {
+      switch (type) {
+        case BenchmarkType.verify:
+          return () {
+            if (!parser.accept(input)) throw StateError('Expected success');
+          };
+        case BenchmarkType.parse:
+          return () => parser.parse(input);
+        case BenchmarkType.accept:
+          return () => parser.accept(input);
       }
     };
 
-final String charactersString = characters.join();
+final charactersString = characters.join();
 
-// JSON tests
+// Other tests
 
+final bibtex = BibTeXDefinition().build();
 final json = JsonDefinition().build();
 
-const String jsonEvent =
+const jsonInput =
     '{"type": "change", "eventPhase": 2, "bubbles": true, "cancelable": true, '
     '"timeStamp": 0, "CAPTURING_PHASE": 1, "AT_TARGET": 2, '
     '"BUBBLING_PHASE": 3, "isTrusted": true, "MOUSEDOWN": 1, "MOUSEUP": 2, '
@@ -60,130 +82,138 @@ const String jsonEvent =
     '"FORWARD": 134217728, "HELP": 268435456, "BACK": 536870912, '
     '"TEXT": 1073741824, "ALT_MASK": 1, "CONTROL_MASK": 2, '
     '"SHIFT_MASK": 4, "META_MASK": 8}';
+const mathInput = '1 + 2 - (3 * 4 / sqrt(5 ^ pi)) - e';
+const bibtexInput = '@inproceedings{Reng10c,\n'
+    '\tTitle = "Practical Dynamic Grammars for Dynamic Languages",\n'
+    '\tAuthor = {Lukas Renggli and St\\\'ephane Ducasse and Tudor G\\^irba and Oscar Nierstrasz},\n'
+    '\tMonth = jun,\n'
+    '\tYear = 2010,\n'
+    '\tUrl = {http://scg.unibe.ch/archive/papers/Reng10cDynamicGrammars.pdf}}';
+const uriInput =
+    'https://www.lukas-renggli.ch/blog/petitparser-1?_s=Q5vcT_xEIhxf2Z4Q&_k=4pr02qyT&_n&42';
 
 // All benchmarks
 
-final Map<String, BenchmarkFactory> benchmarks = {
+final benchmarks = <String, BenchmarkFactory>{
   // char tests
-  'any()': charTest(characters, any()),
-  "anyOf('uncopyrightable')": charTest(characters, anyOf('uncopyrightable')),
-  "char('a')": charTest(characters, char('a')),
-  'digit()': charTest(characters, digit()),
-  'letter()': charTest(characters, letter()),
-  'lowercase()': charTest(characters, lowercase()),
-  "noneOf('uncopyrightable')": charTest(characters, noneOf('uncopyrightable')),
-  "pattern('^a')": charTest(characters, pattern('^a')),
+  'any()': charTest(characters, any(), 255),
+  "anyOf('uncopyrightable')":
+      charTest(characters, anyOf('uncopyrightable'), 15),
+  "char('a')": charTest(characters, char('a'), 1),
+  'digit()': charTest(characters, digit(), 10),
+  'letter()': charTest(characters, letter(), 52),
+  'lowercase()': charTest(characters, lowercase(), 26),
+  "noneOf('uncopyrightable')":
+      charTest(characters, noneOf('uncopyrightable'), 240),
+  "pattern('^a')": charTest(characters, pattern('^a'), 254),
   "pattern('^a-cx-zA-CX-Z1-37-9')":
-      charTest(characters, pattern('^a-cx-zA-CX-Z1-37-9')),
-  "pattern('^a-z')": charTest(characters, pattern('^a-z')),
-  "pattern('^acegik')": charTest(characters, pattern('^acegik')),
-  "pattern('a')": charTest(characters, pattern('a')),
+      charTest(characters, pattern('^a-cx-zA-CX-Z1-37-9'), 237),
+  "pattern('^a-z')": charTest(characters, pattern('^a-z'), 229),
+  "pattern('^acegik')": charTest(characters, pattern('^acegik'), 249),
+  "pattern('a')": charTest(characters, pattern('a'), 1),
   "pattern('a-cx-zA-CX-Z1-37-9')":
-      charTest(characters, pattern('a-cx-zA-CX-Z1-37-9')),
-  "pattern('a-z')": charTest(characters, pattern('a-z')),
-  "pattern('acegik')": charTest(characters, pattern('acegik')),
-  "range('a', 'z')": charTest(characters, range('a', 'z')),
-  'uppercase()': charTest(characters, uppercase()),
-  'whitespace()': charTest(characters, whitespace()),
-  'word()': charTest(characters, word()),
+      charTest(characters, pattern('a-cx-zA-CX-Z1-37-9'), 18),
+  "pattern('a-z')": charTest(characters, pattern('a-z'), 26),
+  "pattern('acegik')": charTest(characters, pattern('acegik'), 6),
+  "range('a', 'z')": charTest(characters, range('a', 'z'), 26),
+  'uppercase()': charTest(characters, uppercase(), 26),
+  'whitespace()': charTest(characters, whitespace(), 8),
+  'word()': charTest(characters, word(), 63),
 
   // combinator tests
-  'and()': charTest(characters, any().and()),
-  'cast()': charTest(characters, any().cast()),
-  'castList()': charTest(characters, any().star().castList()),
-  'end()': charTest(characters, any().end()),
-  'epsilon()': charTest(characters, epsilon()),
-  'epsilonWith()': charTest(characters, epsilonWith('!')),
-  'failure()': charTest(characters, failure()),
-  'flatten()': charTest(characters, any().flatten()),
-  'label()': charTest(characters, any().labeled('label')),
-  'map()': charTest(characters, any().map((_) => null)),
-  'neg()': charTest(characters, any().neg()),
-  'not()': charTest(characters, any().not()),
-  'optional()': charTest(characters, any().optional()),
-  'optionalWith()': charTest(characters, any().optionalWith('!')),
-  'or()': charTest(characters, failure().or(any()).star()),
-  'permute()': charTest(characters, any().star().permute([0])),
-  'pick()': charTest(characters, any().star().pick(0)),
-  'position()': charTest(characters, position()),
-  'set()': charTest(characters, any().settable()),
-  'token()': charTest(characters, any().token()),
-  'trim()': charTest(characters, any().trim()),
+  'and': charTest(characters, any().and(), 255),
+  'cast': charTest(characters, any().cast(), 255),
+  'castList': charTest(characters, any().star().castList(), 255),
+  'end': charTest(characters, any().end(), 255),
+  'epsilon': charTest(characters, epsilon(), 255),
+  'epsilonWith': charTest(characters, epsilonWith('!'), 255),
+  'failure': charTest(characters, failure(), 0),
+  'flatten': charTest(characters, any().flatten(), 255),
+  'label': charTest(characters, any().labeled('label'), 255),
+  'map': charTest(characters, any().map((_) => null), 255),
+  'newline': charTest(characters, newline(), 2),
+  'neg': charTest(characters, any().neg(), 0),
+  'not': charTest(characters, any().not(), 0),
+  'optional': charTest(characters, any().optional(), 255),
+  'optionalWith': charTest(characters, any().optionalWith('!'), 255),
+  'or': charTest(characters, failure().or(any()).star(), 255),
+  'permute': charTest(characters, any().star().permute([0]), 255),
+  'pick': charTest(characters, any().star().pick(0), 255),
+  'position': charTest(characters, position(), 255),
+  'set': charTest(characters, any().settable(), 255),
+  'skip': charTest(
+      characters, any().skip(before: epsilon(), after: epsilon()), 255),
+  'token': charTest(characters, any().token(), 255),
+  'trim': charTest(characters, any().trim(), 247),
+  'where': charTest(characters, any().where((_) => true), 255),
 
   // repeater tests
-  'star()': stringTest(charactersString, any().star()),
-  'starGreedy()': stringTest(charactersString, any().starGreedy(failure())),
-  'starLazy()': stringTest(charactersString, any().starLazy(failure())),
-  'starSeparated()':
-      stringTest(charactersString, any().starSeparated(epsilon())),
-  'plus()': stringTest(charactersString, any().plus()),
-  'plusGreedy()': stringTest(charactersString, any().plusGreedy(failure())),
-  'plusLazy()': stringTest(charactersString, any().plusLazy(failure())),
-  'plusSeparated()':
-      stringTest(charactersString, any().plusSeparated(epsilon())),
-  'times()': stringTest(charactersString, any().times(charactersString.length)),
-  'timesSeparated()': stringTest(charactersString,
+  'star': stringTest(charactersString, any().star()),
+  'starGreedy':
+      stringTest(charactersString, any().starGreedy(char(characters.last))),
+  'starLazy':
+      stringTest(charactersString, any().starLazy(char(characters.last))),
+  'starSeparated': stringTest(charactersString, any().starSeparated(epsilon())),
+  'plus': stringTest(charactersString, any().plus()),
+  'plusGreedy':
+      stringTest(charactersString, any().plusGreedy(char(characters.last))),
+  'plusLazy':
+      stringTest(charactersString, any().plusLazy(char(characters.last))),
+  'plusSeparated': stringTest(charactersString, any().plusSeparated(epsilon())),
+  'times': stringTest(charactersString, any().times(charactersString.length)),
+  'timesSeparated': stringTest(charactersString,
       any().timesSeparated(epsilon(), charactersString.length)),
   for (var i = 2; i < charactersString.length; i *= 2)
     'seq($i chars)': stringTest(charactersString.substring(0, i),
         List.filled(i, any()).toSequenceParser()),
-  'seq2()': stringTest(charactersString.substring(0, 2), seq2(any(), any())),
-  'seq3()':
+  'seq2': stringTest(charactersString.substring(0, 2), seq2(any(), any())),
+  'seq3':
       stringTest(charactersString.substring(0, 3), seq3(any(), any(), any())),
-  'seq4()': stringTest(
+  'seq4': stringTest(
       charactersString.substring(0, 4), seq4(any(), any(), any(), any())),
-  'seq5()': stringTest(charactersString.substring(0, 5),
+  'seq5': stringTest(charactersString.substring(0, 5),
       seq5(any(), any(), any(), any(), any())),
-  'seq6()': stringTest(charactersString.substring(0, 6),
+  'seq6': stringTest(charactersString.substring(0, 6),
       seq6(any(), any(), any(), any(), any(), any())),
-  'seq7()': stringTest(charactersString.substring(0, 7),
+  'seq7': stringTest(charactersString.substring(0, 7),
       seq7(any(), any(), any(), any(), any(), any(), any())),
-  'seq8()': stringTest(charactersString.substring(0, 8),
+  'seq8': stringTest(charactersString.substring(0, 8),
       seq8(any(), any(), any(), any(), any(), any(), any(), any())),
-  'seq9()': stringTest(charactersString.substring(0, 9),
+  'seq9': stringTest(charactersString.substring(0, 9),
       seq9(any(), any(), any(), any(), any(), any(), any(), any(), any())),
 
   // predicate tests
   'string': stringTest(charactersString, string(charactersString)),
-  'stringIgnoreCase': stringTest(
-    charactersString,
-    stringIgnoreCase(charactersString),
-  ),
+  'stringIgnoreCase':
+      stringTest(charactersString, stringIgnoreCase(charactersString)),
   'predicate': stringTest(
-    charactersString,
-    predicate(
-      charactersString.length,
-      (value) => value == charactersString,
-      'not found',
-    ),
-  ),
+      charactersString, predicate(charactersString.length, (_) => true, '')),
   'pattern (regexp)': stringTest(
-    charactersString,
-    PatternParser(RegExp('.*abc.*'), 'not found'),
-  ),
-  'pattern (string)': stringTest(
-    charactersString,
-    PatternParser(charactersString, 'not found'),
-  ),
+      charactersString, PatternParser(RegExp('.*abc.*', dotAll: true), '')),
+  'pattern (string)':
+      stringTest(charactersString, PatternParser(charactersString, '')),
 
   // composite
-  'JsonParser()': (optimized) {
-    if (optimized) {
-      return () => json.accept(jsonEvent);
-    } else {
-      return () => json.parse(jsonEvent);
-    }
-  },
+  'bibtex': stringTest(bibtexInput, bibtex),
+  'json': stringTest(jsonInput, json),
+  'math': stringTest(mathInput, math.parser),
+  'uri': stringTest(uriInput, uri),
 };
 
 void main() {
-  stdout.writeln('Name\tparseOn\tfastParseOn\tChange');
+  stdout.writeln('Name\tParse\tAccept\tChange');
   for (final entry in benchmarks.entries) {
-    final parseOnTime = benchmark(entry.value(false));
-    final fastParseOnTime = benchmark(entry.value(true));
-    stdout.writeln('${entry.key}\t'
-        '${parseOnTime.toStringAsFixed(3)}\t'
-        '${fastParseOnTime.toStringAsFixed(3)}\t'
-        '${percentChange(parseOnTime, fastParseOnTime).round()}%');
+    stdout.write('${entry.key}\t');
+    try {
+      entry.value(BenchmarkType.verify)();
+    } on StateError catch (error) {
+      stdout.writeln(error.message);
+      continue;
+    }
+    final parse = benchmark(entry.value(BenchmarkType.parse));
+    stdout.write('${parse.toStringAsFixed(3)}\t');
+    final accept = benchmark(entry.value(BenchmarkType.accept));
+    stdout.write('${accept.toStringAsFixed(3)}\t');
+    stdout.writeln('${percentChange(parse, accept).round()}%');
   }
 }
