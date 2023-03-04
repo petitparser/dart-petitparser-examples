@@ -13,7 +13,7 @@ const bibtexInput = '@inproceedings{Reng10c,\n'
     '\tAuthor = {Lukas Renggli and St\\\'ephane Ducasse and Tudor G\\^irba and Oscar Nierstrasz},\n'
     '\tMonth = jun,\n'
     '\tYear = 2010,\n'
-    '\tUrl = {http://scg.unibe.ch/archive/papers/Reng10cDynamicGrammars.pdf}';
+    '\tUrl = {http://scg.unibe.ch/archive/papers/Reng10cDynamicGrammars.pdf}}';
 
 final lispParser = lisp_example.LispParserDefinition().build();
 const lispInput = '(define (fib n)\n'
