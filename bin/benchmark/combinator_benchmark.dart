@@ -8,7 +8,7 @@ void main() {
   runChars('castList', any().star().castList(), 255);
   runChars('end', any().end(), 255);
   runChars('epsilon', epsilon(), 255);
-  runChars('epsilonWith', epsilonWith('!'), 255);
+  runChars('epsilonWith', epsilonWith<String>('!'), 255);
   runChars('failure', failure(), 0);
   runChars('flatten', any().flatten(), 255);
   runChars('label', any().labeled('label'), 255);

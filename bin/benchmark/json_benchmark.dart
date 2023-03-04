@@ -1,11 +1,11 @@
 import 'dart:convert' as convert;
 
 import 'package:petitparser/petitparser.dart';
-import 'package:petitparser_examples/json.dart' as jsonExample;
+import 'package:petitparser_examples/json.dart' as json_example;
 
 import 'util/runner.dart';
 
-final jsonParser = jsonExample.JsonDefinition().build();
+final jsonParser = json_example.JsonDefinition().build();
 
 const jsonArray = '[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16]';
 const jsonObject = '{"a": 1, "b": 2, "c": 3, "d": 4, "e": 5, "f": 6, "g": 7}';
