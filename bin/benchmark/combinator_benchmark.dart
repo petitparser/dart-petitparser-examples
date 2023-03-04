@@ -4,27 +4,38 @@ import 'util/runner.dart';
 
 void main() {
   runChars('and', any().and(), 255);
-  runChars('cast', any().cast(), 255);
-  runChars('castList', any().star().castList(), 255);
-  runChars('end', any().end(), 255);
-  runChars('epsilon', epsilon(), 255);
-  runChars('epsilonWith', epsilonWith<String>('!'), 255);
-  runChars('failure', failure(), 0);
-  runChars('flatten', any().flatten(), 255);
-  runChars('label', any().labeled('label'), 255);
-  runChars('map', any().map((_) {}), 255);
-  runChars('neg', any().neg(), 0);
-  runChars('newline', newline(), 2);
+  for (var i = 2; i <= 16; i *= 2) {
+    final parsers = [...List.filled(i - 1, failure()), any()];
+    runString('choice($i, select-first)',
+        parsers.toChoiceParser(failureJoiner: selectFirst));
+    runString('choice($i, select-last)',
+        parsers.toChoiceParser(failureJoiner: selectLast));
+    runString('choice($i, select-farthest)',
+        parsers.toChoiceParser(failureJoiner: selectFarthest));
+    runString('choice($i, select-farthest-joined)',
+        parsers.toChoiceParser(failureJoiner: selectFarthestJoined));
+  }
   runChars('not', any().not(), 0);
+  runChars('neg', any().neg(), 0);
   runChars('optional', any().optional(), 255);
   runChars('optionalWith', any().optionalWith('!'), 255);
-  runChars('or', failure().or(any()).star(), 255);
-  runChars('permute', any().star().permute([0]), 255);
-  runChars('pick', any().star().pick(0), 255);
-  runChars('position', position(), 255);
-  runChars('set', any().settable(), 255);
+  for (var i = 2; i < defaultStringInput.length; i *= 2) {
+    runString('seq($i)', List.filled(i, any()).toSequenceParser());
+  }
+  runString('seq2', seq2(any(), any()));
+  runString('seq3', seq3(any(), any(), any()));
+  runString('seq4', seq4(any(), any(), any(), any()));
+  runString('seq5', seq5(any(), any(), any(), any(), any()));
+  runString('seq6', seq6(any(), any(), any(), any(), any(), any()));
+  runString('seq7', seq7(any(), any(), any(), any(), any(), any(), any()));
+  runString(
+    'seq8',
+    seq8(any(), any(), any(), any(), any(), any(), any(), any()),
+  );
+  runString(
+    'seq9',
+    seq9(any(), any(), any(), any(), any(), any(), any(), any(), any()),
+  );
+  runChars('settable', any().settable(), 255);
   runChars('skip', any().skip(before: epsilon(), after: epsilon()), 255);
-  runChars('token', any().token(), 255);
-  runChars('trim', any().trim(), 247);
-  runChars('where', any().where((_) => true), 255);
 }

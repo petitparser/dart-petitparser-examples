@@ -24,23 +24,4 @@ void main() {
   runString('plusSeparated', any().plusSeparated(epsilon()));
   runString('timesSeparated', any().timesSeparated(epsilon(), length));
   runString('repeatSeparated', any().repeatSeparated(epsilon(), half, length));
-
-  for (var i = 2; i < length; i *= 2) {
-    runString('seq($i)', List.filled(i, any()).toSequenceParser());
-  }
-
-  runString('seq2', seq2(any(), any()));
-  runString('seq3', seq3(any(), any(), any()));
-  runString('seq4', seq4(any(), any(), any(), any()));
-  runString('seq5', seq5(any(), any(), any(), any(), any()));
-  runString('seq6', seq6(any(), any(), any(), any(), any(), any()));
-  runString('seq7', seq7(any(), any(), any(), any(), any(), any(), any()));
-  runString(
-    'seq8',
-    seq8(any(), any(), any(), any(), any(), any(), any(), any()),
-  );
-  runString(
-    'seq9',
-    seq9(any(), any(), any(), any(), any(), any(), any(), any(), any()),
-  );
 }
