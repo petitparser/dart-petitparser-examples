@@ -5,14 +5,15 @@ import 'util/runner.dart';
 void main() {
   runChars('and', any().and(), 255);
   for (var i = 2; i <= 16; i *= 2) {
+    final number = i.toString().padLeft(2);
     final parsers = [...List.filled(i - 1, failure()), any()];
-    runString('choice($i, select-first)',
+    runString('choice($number, select-first)',
         parsers.toChoiceParser(failureJoiner: selectFirst));
-    runString('choice($i, select-last)',
+    runString('choice($number, select-last)',
         parsers.toChoiceParser(failureJoiner: selectLast));
-    runString('choice($i, select-farthest)',
+    runString('choice($number, select-farthest)',
         parsers.toChoiceParser(failureJoiner: selectFarthest));
-    runString('choice($i, select-farthest-joined)',
+    runString('choice($number, select-farthest-joined)',
         parsers.toChoiceParser(failureJoiner: selectFarthestJoined));
   }
   runChars('not', any().not(), 0);
@@ -20,7 +21,7 @@ void main() {
   runChars('optional', any().optional(), 255);
   runChars('optionalWith', any().optionalWith('!'), 255);
   for (var i = 2; i < defaultStringInput.length; i *= 2) {
-    runString('seq($i)', List.filled(i, any()).toSequenceParser());
+    runString('seq(${i.toString().padLeft(3)})', List.filled(i, any()).toSequenceParser());
   }
   runString('seq2', seq2(any(), any()));
   runString('seq3', seq3(any(), any(), any()));
