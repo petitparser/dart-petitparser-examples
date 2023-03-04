@@ -49,10 +49,10 @@ const uriInput =
     'https://www.lukas-renggli.ch/blog/petitparser-1?_s=Q5vcT_xEIhxf2Z4Q&_k=4pr02qyT&_n&42';
 
 void main() {
-  runString('bibtex', bibtexParser, bibtexInput);
-  runString('json', jsonParser, jsonInput);
-  runString('lisp', lispParser, lispInput);
-  runString('math', mathParser, mathInput);
-  runString('prolog', prologParser, prologInput);
-  runString('uri', uriParser, uriInput);
+  runString('example - bibtex', bibtexParser, bibtexInput);
+  runString('example - json', jsonParser, jsonInput);
+  runString('example - lisp', lispParser, lispInput);
+  runString('example - math', mathParser, mathInput);
+  runString('example - prolog', prologParser, prologInput);
+  runString('example - uri', uriParser, uriInput);
 }

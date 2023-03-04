@@ -34,7 +34,7 @@ const jsonNested = '''
 ''';
 
 void runJson(String name, String input) => run(
-      'JSON $name',
+      name,
       verify: () {
         final parserResult = jsonParser.parse(input).value;
         final nativeResult = convert.json.decode(input);
@@ -48,14 +48,14 @@ void runJson(String name, String input) => run(
     );
 
 void main() {
-  runJson('string', '"abcdef"');
-  runJson('integer', '33550336');
-  runJson('floating', '3.14159265359');
-  runJson('true', 'true');
-  runJson('false', 'false');
-  runJson('null', 'null');
-  runJson('array', jsonArray);
-  runJson('object', jsonObject);
-  runJson('event', jsonEvent);
-  runJson('nested', jsonNested);
+  runJson('json - string', '"abcdef"');
+  runJson('json - integer', '33550336');
+  runJson('json - floating', '3.14159265359');
+  runJson('json - true', 'true');
+  runJson('json - false', 'false');
+  runJson('json - null', 'null');
+  runJson('json - array', jsonArray);
+  runJson('json - object', jsonObject);
+  runJson('json - event', jsonEvent);
+  runJson('json - nested', jsonNested);
 }

@@ -7,21 +7,23 @@ final half = length ~/ 2;
 final last = defaultStringInput[length - 1];
 
 void main() {
-  runString('star', any().star());
-  runString('plus', any().plus());
-  runString('times', any().times(length));
-  runString('repeat', any().repeat(half, length));
+  runString('repeat - star', any().star());
+  runString('repeat - plus', any().plus());
+  runString('repeat - times', any().times(length));
+  runString('repeat - repeat', any().repeat(half, length));
 
-  runString('starGreedy', any().starGreedy(char(last)));
-  runString('plusGreedy', any().plusGreedy(char(last)));
-  runString('timesGreedy', any().repeatGreedy(char(last), half, length));
+  runString('repeat - starGreedy', any().starGreedy(char(last)));
+  runString('repeat - plusGreedy', any().plusGreedy(char(last)));
+  runString(
+      'repeat - timesGreedy', any().repeatGreedy(char(last), half, length));
 
-  runString('starLazy', any().starLazy(char(last)));
-  runString('plusLazy', any().plusLazy(char(last)));
-  runString('timesLazy', any().repeatLazy(char(last), half, length));
+  runString('repeat - starLazy', any().starLazy(char(last)));
+  runString('repeat - plusLazy', any().plusLazy(char(last)));
+  runString('repeat - timesLazy', any().repeatLazy(char(last), half, length));
 
-  runString('starSeparated', any().starSeparated(epsilon()));
-  runString('plusSeparated', any().plusSeparated(epsilon()));
-  runString('timesSeparated', any().timesSeparated(epsilon(), length));
-  runString('repeatSeparated', any().repeatSeparated(epsilon(), half, length));
+  runString('repeat - starSeparated', any().starSeparated(epsilon()));
+  runString('repeat - plusSeparated', any().plusSeparated(epsilon()));
+  runString('repeat - timesSeparated', any().timesSeparated(epsilon(), length));
+  runString('repeat - repeatSeparated',
+      any().repeatSeparated(epsilon(), half, length));
 }

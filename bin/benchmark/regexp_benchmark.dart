@@ -8,7 +8,7 @@ const equality = ListEquality();
 void runRegExp(String regexp, Parser<void> parser, String input) {
   final parserPattern = parser.toPattern();
   final nativePattern = RegExp(regexp);
-  run('RegExp $regexp',
+  run('regexp - $regexp',
       verify: () {
         final parserResult = parserPattern
             .allMatches(input)

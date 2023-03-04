@@ -3,9 +3,13 @@ import 'package:petitparser/petitparser.dart';
 import 'util/runner.dart';
 
 void main() {
-  runString('string', string(defaultStringInput));
-  runString('stringIgnoreCase', stringIgnoreCase(defaultStringInput));
-  runString('predicate', predicate(defaultStringInput.length, (_) => true, ''));
-  runString('pattern-regexp', PatternParser(RegExp('.*a.*', dotAll: true), ''));
-  runString('pattern-string', PatternParser(defaultStringInput, ''));
+  runString('predicate - string', string(defaultStringInput));
+  runString(
+      'predicate - stringIgnoreCase', stringIgnoreCase(defaultStringInput));
+  runString('predicate - predicate',
+      predicate(defaultStringInput.length, (_) => true, ''));
+  runString('predicate - pattern - regexp',
+      PatternParser(RegExp('.*a.*', dotAll: true), ''));
+  runString(
+      'predicate - pattern - string', PatternParser(defaultStringInput, ''));
 }
