@@ -1,11 +1,15 @@
 import 'dart:convert' as convert;
-import 'dart:io';
 
-import 'package:petitparser_examples/json.dart';
+import 'package:petitparser/petitparser.dart';
+import 'package:petitparser_examples/json.dart' as jsonExample;
 
-import 'benchmark.dart';
+import 'util/runner.dart';
 
-const String jsonEvent = '''
+final jsonParser = jsonExample.JsonDefinition().build();
+
+const jsonArray = '[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16]';
+const jsonObject = '{"a": 1, "b": 2, "c": 3, "d": 4, "e": 5, "f": 6, "g": 7}';
+const jsonEvent = '''
 {"type": "change", "eventPhase": 2, "bubbles": true, "cancelable": true, 
 "timeStamp": 0, "CAPTURING_PHASE": 1, "AT_TARGET": 2, "BUBBLING_PHASE": 3, 
 "isTrusted": true, "MOUSEDOWN": 1, "MOUSEUP": 2, "MOUSEOVER": 4, "MOUSEOUT": 8, 
@@ -18,7 +22,7 @@ const String jsonEvent = '''
 "TEXT": 1073741824, "ALT_MASK": 1, "CONTROL_MASK": 2, "SHIFT_MASK": 4, 
 "META_MASK": 8}
 ''';
-const String jsonNested = '''
+const jsonNested = '''
 {"items":{"item":[{"id": "0001","type": "donut",
 "name": "Cake","ppu": 0.55,"batters":{"batter":[{ "id": "1001", "type": 
 "Regular" },{ "id": "1002", "type": "Chocolate" },{ "id": "1003", "type": 
@@ -29,30 +33,29 @@ const String jsonNested = '''
 { "id": "5004", "type": "Maple" }]}]}}
 ''';
 
-Object? native(String input) => convert.json.decode(input);
-Object? parser(String input) => parseJson(input);
-
-void compare(String name, String input) {
-  final nativeResult = native(input);
-  final parserResult = parser(input);
-
-  if (nativeResult.toString() != parserResult.toString()) {
-    stdout.writeln('$name\nERROR');
-    return;
-  }
-
-  final nativeTime = benchmark(() => native(input));
-  final parserTime = benchmark(() => parser(input));
-  stdout.writeln('$name\t'
-      '${nativeTime.toStringAsFixed(3)}\t'
-      '${parserTime.toStringAsFixed(3)}\t'
-      '${percentChange(nativeTime, parserTime).round()}%');
-}
+void runJson(String name, String input) => run(
+      'JSON $name',
+      verify: () {
+        final parserResult = jsonParser.parse(input).value;
+        final nativeResult = convert.json.decode(input);
+        if (parserResult.toString() != nativeResult.toString()) {
+          throw StateError('Parsers provide inconsistent results');
+        }
+      },
+      parse: () => jsonParser.parse(input),
+      accept: () => jsonParser.accept(input),
+      native: () => convert.json.decode(input),
+    );
 
 void main() {
-  stdout.writeln('Name\tNative\tParser\tChange');
-  compare('Object', '{"a": 1, "b": 2, "c": 3, "d": 4, "e": 5, "f": 6, "g": 7}');
-  compare('Array', '[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16]');
-  compare('Event', jsonEvent);
-  compare('Nested', jsonNested);
+  runJson('string', '"abcdef"');
+  runJson('integer', '33550336');
+  runJson('floating', '3.14159265359');
+  runJson('true', 'true');
+  runJson('false', 'false');
+  runJson('null', 'null');
+  runJson('array', jsonArray);
+  runJson('object', jsonObject);
+  runJson('event', jsonEvent);
+  runJson('nested', jsonNested);
 }
