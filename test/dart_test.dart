@@ -11,7 +11,7 @@ void main() {
     expect(linter(grammar.build()), isEmpty);
   });
   group('directives', () {
-    final directives = grammar.build(start: grammar.start).end();
+    final directives = grammar.buildFrom(grammar.start()).end();
     test('hashbang', () {
       expect('#!/bin/dart\n', accept(directives));
     });
@@ -52,7 +52,7 @@ void main() {
     });
   });
   group('expression', () {
-    final expression = grammar.build(start: grammar.expression).end();
+    final expression = grammar.buildFrom(grammar.expression()).end();
     test('literal numbers', () {
       expect('1', accept(expression));
       expect('1.2', accept(expression));
@@ -204,7 +204,7 @@ void main() {
     });
   });
   group('statement', () {
-    final statement = grammar.build(start: grammar.statement).end();
+    final statement = grammar.buildFrom(grammar.statement()).end();
     test('label', () {
       expect('a: {}', accept(statement));
       expect('a: b: {}', accept(statement));
@@ -300,7 +300,7 @@ void main() {
     });
   });
   group('member', () {
-    final member = grammar.build(start: grammar.classMemberDefinition).end();
+    final member = grammar.buildFrom(grammar.classMemberDefinition()).end();
     test('function', () {
       expect('a() {}', accept(member));
       expect('a b() {}', accept(member));
@@ -384,7 +384,7 @@ void main() {
     });
   });
   group('definition', () {
-    final definition = grammar.build(start: grammar.topLevelDefinition).end();
+    final definition = grammar.buildFrom(grammar.topLevelDefinition()).end();
     test('class', () {
       expect('class A {}', accept(definition));
       expect('class A extends B {}', accept(definition));
@@ -431,7 +431,7 @@ void main() {
     });
   });
   group('whitespace', () {
-    final whitespaces = grammar.build(start: grammar.hiddenWhitespace).end();
+    final whitespaces = grammar.buildFrom(grammar.hiddenWhitespace()).end();
     test('whitespace', () {
       expect(' ', accept(whitespaces));
       expect('\t', accept(whitespaces));
@@ -481,7 +481,7 @@ void main() {
     });
   });
   group('child parsers', () {
-    final parser = grammar.build(start: grammar.stringLexicalToken).end();
+    final parser = grammar.buildFrom(grammar.stringLexicalToken()).end();
     test('singleLineString', () {
       expect("'hi'", accept(parser));
       expect('"hi"', accept(parser));
@@ -492,7 +492,7 @@ void main() {
   });
   group('official', () {
     test('identifier', () {
-      final parser = grammar.build(start: grammar.identifier).end();
+      final parser = grammar.buildFrom(grammar.identifier()).end();
       expect('foo', accept(parser));
       expect('bar9', accept(parser));
       expect('dollar\$', accept(parser));
@@ -506,7 +506,7 @@ void main() {
       expect('', isNot(accept(parser)));
     });
     test('numeric literal', () {
-      final parser = grammar.build(start: grammar.literal).end();
+      final parser = grammar.buildFrom(grammar.literal()).end();
       expect('0', accept(parser));
       expect('1984', accept(parser));
       expect(' 1984', accept(parser));
@@ -531,7 +531,7 @@ void main() {
       expect('', isNot(accept(parser)));
     });
     test('boolean literal', () {
-      final parser = grammar.build(start: grammar.literal).end();
+      final parser = grammar.buildFrom(grammar.literal()).end();
       expect('true', accept(parser));
       expect('false', accept(parser));
       expect(' true', accept(parser));

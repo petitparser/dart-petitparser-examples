@@ -6,7 +6,7 @@ export 'src/json/definition.dart';
 export 'src/json/types.dart';
 
 /// Internal JSON parser.
-final _jsonParser = JsonDefinition().build<JSON>();
+final _jsonParser = JsonDefinition().build();
 
 /// Converts the given JSON-string [input] to its corresponding object.
 ///

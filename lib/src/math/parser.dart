@@ -7,7 +7,7 @@ import 'common.dart';
 
 final parser = () {
   final builder = ExpressionBuilder<Expression>();
-  builder.group()
+  builder
     ..primitive((digit().plus() &
             (char('.') & digit().plus()).optional() &
             (pattern('eE') & pattern('+-').optional() & digit().plus())
@@ -18,7 +18,8 @@ final parser = () {
     ..primitive((letter() & word().star())
         .flatten('variable expected')
         .trim()
-        .map(_createVariable))
+        .map(_createVariable));
+  builder.group()
     ..wrapper(
         seq2(
           word().plus().flatten('function expected').trim(),

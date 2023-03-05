@@ -180,7 +180,7 @@ void main() {
     });
   });
   group('Parser', () {
-    final atom = parserDefinition.build(start: parserDefinition.atom);
+    final atom = parserDefinition.buildFrom(parserDefinition.atom());
     test('Linter', () {
       expect(linter(atom, excludedTypes: {}), isEmpty);
     });

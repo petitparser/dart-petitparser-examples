@@ -8,11 +8,10 @@ final _definition = PrologParserDefinition();
 
 /// The standard prolog parser to read rules.
 final Parser<List<Rule>> rulesParser =
-    _definition.build<List<Rule>>(start: _definition.rules).end();
+    _definition.buildFrom(_definition.rules()).end();
 
 /// The standard prolog parser to read queries.
-final Parser<Term> termParser =
-    _definition.build<Term>(start: _definition.term).end();
+final Parser<Term> termParser = _definition.buildFrom(_definition.term()).end();
 
 /// LISP parser definition.
 class PrologParserDefinition extends PrologGrammarDefinition {

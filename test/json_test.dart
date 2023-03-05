@@ -180,25 +180,43 @@ void main() {
       expect(parser.parse(input).isSuccess, isTrue);
     });
   });
-  group('issues', () {
-    group('https://github.com/petitparser/dart-petitparser/issues/98', () {
-      test('expected some value', () {
-        const invalid = '';
-        final result = parser.parse(invalid);
-        expect(result.isFailure, isTrue);
-        expect(result.position, 0);
-        expect(
-            result.message,
-            '"\\"" expected OR number expected OR "{" expected OR "[" expected '
-            'OR "true" expected OR "false" expected OR "null" expected');
-      });
-      test('expected closing curly', () {
-        const invalid = '{"a": "bad "value" string"}';
-        final result = parser.parse(invalid);
-        expect(result.isFailure, isTrue);
-        expect(result.position, 12);
-        expect(result.message, '"}" expected');
-      });
+  group('errors', () {
+    void expectError(String input, int position, String message) {
+      final result = parser.parse(input);
+      expect(result.isFailure, isTrue);
+      expect(result.position, position);
+      expect(result.message, message);
+    }
+
+    test('expected value', () {
+      expectError('', 0, 'value expected');
+    });
+    test('expected array closing', () {
+      expectError('[', 1, '"]" expected');
+    });
+    test('expected array element', () {
+      expectError('[1,', 3, 'value expected');
+    });
+    test('expected object closing', () {
+      expectError('{', 1, '"}" expected');
+    });
+    test('expected object colon', () {
+      expectError('{"a"', 4, '":" expected');
+    });
+    test('expected object value', () {
+      expectError('{"a":', 5, 'value expected');
+    });
+    test('expected object entry', () {
+      expectError('{"a":1,', 7, '"\\"" expected');
+    });
+    test('expected string closing', () {
+      expectError('"', 1, '"\\"" expected');
+    });
+    test('expected number (fractional part)', () {
+      expectError('1.', 0, 'number expected');
+    });
+    test('expected number (exponent part)', () {
+      expectError('1e', 0, 'number expected');
     });
   });
 }
