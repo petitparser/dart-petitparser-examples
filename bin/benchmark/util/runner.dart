@@ -54,40 +54,52 @@ void run(
 }
 
 /// Generic character benchmark runner.
-void runChars(String name, Parser<void> parser, int success,
-    [List<String>? charsInput]) {
-  final chars = charsInput ?? defaultCharsInput;
+void runChars(String name, Parser<void> parser, int success, [String? input]) {
+  final string = input ?? defaultStringInput;
+  final stringLength = string.length;
+  final fullContext = Context(string, isSkip: false);
+  final skipContext = Context(string, isSkip: true);
   run(
     name,
     verify: () {
       var count = 0;
-      for (var i = 0; i < chars.length; i++) {
-        if (parser.accept(chars[i])) count++;
+      for (var i = 0; i < stringLength; i++) {
+        if (parser.accept(string[i])) count++;
       }
       if (success != count) {
         throw StateError('Expected $success success, but got $count');
       }
     },
     parse: () {
-      for (var i = 0; i < chars.length; i++) {
-        parser.parse(chars[i]);
+      for (var i = 0; i < stringLength; i++) {
+        fullContext.position = i;
+        parser.parseOn(fullContext);
       }
     },
     accept: () {
-      for (var i = 0; i < chars.length; i++) {
-        parser.accept(chars[i]);
+      for (var i = 0; i < stringLength; i++) {
+        skipContext.position = i;
+        parser.parseOn(skipContext);
       }
     },
   );
 }
 
 /// Generic string benchmark runner.
-void runString(String name, Parser<void> parser, [String? stringInput]) {
-  final string = stringInput ?? defaultStringInput;
+void runString(String name, Parser<void> parser, [String? input]) {
+  final string = input ?? defaultStringInput;
+  final fullContext = Context(string, isSkip: false);
+  final skipContext = Context(string, isSkip: true);
   run(
     name,
     verify: () => parser.parse(string).value,
-    parse: () => parser.parse(string),
-    accept: () => parser.accept(string),
+    parse: () {
+      fullContext.position = 0;
+      parser.parseOn(fullContext);
+    },
+    accept: () {
+      skipContext.position = 0;
+      parser.parseOn(skipContext);
+    },
   );
 }

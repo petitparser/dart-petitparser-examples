@@ -1,29 +1,33 @@
 /// Function type to be benchmarked.
 typedef Benchmark = void Function();
 
-/// Measures the time it takes to run [function] in microseconds.
-///
-/// It does so in two steps:
-///
-///  - the code is warmed up for the duration of [warmup]; and
-///  - the code is benchmarked for the duration of [measure].
-///
-/// The resulting duration is the average time measured to run [function] once.
-double benchmark(Benchmark function, {Duration? warmup, Duration? measure}) {
-  _benchmark(function, warmup ?? const Duration(milliseconds: 200));
-  return _benchmark(function, measure ?? const Duration(seconds: 2));
+/// Measures the time it takes to run [function] in microseconds. The resulting
+/// duration is the average time measured to run [function] once.
+double benchmark(
+  Benchmark function, {
+  int minLoops = 128,
+  Duration minDuration = const Duration(milliseconds: 500),
+}) {
+  // Figure out how many times we need to loop to reach the desired duration.
+  var count = minLoops;
+  while (_benchmark(function, count) <= minDuration) {
+    count *= 2;
+  }
+  if (count == minLoops) {
+    throw StateError('$function cannot be performed $minLoops times '
+        'in $minDuration.');
+  }
+  return _benchmark(function, count).inMicroseconds / count;
 }
 
-double _benchmark(Benchmark function, Duration duration) {
+@pragma('vm:never-inline')
+@pragma('vm:no-interrupts')
+Duration _benchmark(Benchmark function, int count) {
   final watch = Stopwatch();
-  final micros = duration.inMicroseconds;
-  var count = 0;
-  var elapsed = 0;
   watch.start();
-  while (elapsed < micros) {
+  while (count-- > 0) {
     function();
-    elapsed = watch.elapsedMicroseconds;
-    count++;
   }
-  return elapsed / count;
+  watch.stop();
+  return watch.elapsed;
 }
