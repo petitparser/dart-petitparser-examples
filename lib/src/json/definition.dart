@@ -9,10 +9,10 @@ class JsonDefinition extends GrammarDefinition<JSON> {
   @override
   Parser<JSON> start() => ref0(value).end();
   Parser<JSON> value() => [
-        ref0(stringToken),
-        ref0(numberToken),
         ref0(object),
         ref0(array),
+        ref0(stringToken),
+        ref0(numberToken),
         ref0(trueToken),
         ref0(falseToken),
         ref0(nullToken),
@@ -26,11 +26,11 @@ class JsonDefinition extends GrammarDefinition<JSON> {
         char('}').trim(),
       ).map4((_, __, elements, ___) => elements);
   Parser<Map<String, JSON>> objectElements() => ref0(objectElement)
-      .starSeparated(char(',').commit().trim())
+      .starSeparated(char(',').trim().commit())
       .map((list) => Map.fromEntries(list.elements));
   Parser<MapEntry<String, JSON>> objectElement() =>
-      seq4(ref0(stringToken), cut(), char(':').trim(), ref0(value))
-          .map4((key, _, __, value) => MapEntry(key, value));
+      seq5(ref0(stringToken), cut(), char(':').trim(), cut(), ref0(value))
+          .map5((key, _, __, ___, value) => MapEntry(key, value));
 
   Parser<List<JSON>> array() => seq4(
         char('[').trim(),
@@ -39,7 +39,7 @@ class JsonDefinition extends GrammarDefinition<JSON> {
         char(']').trim(),
       ).map4((_, __, elements, ___) => elements);
   Parser<List<JSON>> arrayElements() => ref0(value)
-      .starSeparated(char(',').commit().trim())
+      .starSeparated(char(',').trim().commit())
       .map((list) => list.elements);
 
   Parser<bool> trueToken() => string('true').trim().map((_) => true);

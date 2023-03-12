@@ -184,8 +184,8 @@ void main() {
     void expectError(String input, int position, String message) {
       final result = parser.parse(input);
       expect(result.isFailure, isTrue);
-      expect(result.position, position);
       expect(result.message, message);
+      expect(result.position, position);
     }
 
     test('expected value', () {
