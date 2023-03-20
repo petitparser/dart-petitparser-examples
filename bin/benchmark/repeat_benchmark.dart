@@ -26,4 +26,9 @@ void main() {
   runString('repeat - timesSeparated', any().timesSeparated(epsilon(), length));
   runString('repeat - repeatSeparated',
       any().repeatSeparated(epsilon(), half, length));
+
+  runString('repeat - starString', any().starString());
+  runString('repeat - plusString', any().plusString());
+  runString('repeat - timesString', any().timesString(length));
+  runString('repeat - repeatString', any().repeatString(half, length));
 }
