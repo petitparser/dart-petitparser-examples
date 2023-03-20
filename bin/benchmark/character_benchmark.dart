@@ -20,6 +20,8 @@ void main() {
       pattern('a-cx-zA-CX-Z1-37-9'), 18);
   runChars('character - pattern - a-z', pattern('a-z'), 26);
   runChars('character - pattern - acegik', pattern('acegik'), 6);
+  runChars('character - pattern - any', pattern('\u0000-\uffff'), 255);
+  runChars('character - pattern - none', pattern('^\u0000-\uffff'), 0);
   runChars('character - range', range('a', 'z'), 26);
   runChars('character - uppercase', uppercase(), 26);
   runChars('character - whitespace', whitespace(), 8);
