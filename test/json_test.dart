@@ -150,7 +150,7 @@ void main() {
           '"boundElements": {"length": 0}, "clientX": 89, "clientY": 502, '
           '"propertyName": "", "shiftKey": false, "ctrlLeft": false, '
           '"offsetX": 25, "offsetY": 2, "altKey": false}';
-      expect(parser.parse(input).isSuccess, isTrue);
+      expect(parseJson(input), isNotNull);
     });
     test('FireFox', () {
       const input = '{"type": "change", "eventPhase": 2, "bubbles": true, '
@@ -166,7 +166,7 @@ void main() {
           '"RESIZE": 67108864, "FORWARD": 134217728, "HELP": 268435456, '
           '"BACK": 536870912, "TEXT": 1073741824, "ALT_MASK": 1, '
           '"CONTROL_MASK": 2, "SHIFT_MASK": 4, "META_MASK": 8}';
-      expect(parser.parse(input).isSuccess, isTrue);
+      expect(parseJson(input), isNotNull);
     });
     test('WebKit', () {
       const input = '{"returnValue": true, "timeStamp": 1226697417289, '
@@ -177,7 +177,7 @@ void main() {
           '"MOUSEDRAG": 32, "BUBBLING_PHASE": 3, "MOUSEUP": 2, '
           '"CAPTURING_PHASE": 1, "MOUSEOVER": 4, "CLICK": 64, "DBLCLICK": 128, '
           '"KEYDOWN": 256, "KEYPRESS": 1024, "DRAGDROP": 2048}';
-      expect(parser.parse(input).isSuccess, isTrue);
+      expect(parseJson(input), isNotNull);
     });
   });
   group('errors', () {
