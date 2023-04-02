@@ -45,20 +45,20 @@ class BibTeXDefinition extends GrammarDefinition<List<BibTeXEntry>> {
   Parser<String> fieldValueInBraces() =>
       seq3(char('{'), ref0(fieldStringWithinBraces), char('}'))
           .flatten("braced string expected");
+
   Parser<List> fieldStringWithinBraces() => [
         ref0(fieldCharWithinBraces),
         escapeChar,
         seq3(char('{'), ref0(fieldStringWithinBraces), char('}'))
       ].toChoiceParser().star();
+
   Parser<String> fieldCharWithinBraces() => pattern(r'^\{}');
 
   // Basic strings
-  final type = letter().plus().flatten("type expected").skip(before: char('@'));
-  final citeKey =
-      pattern('a-zA-Z0-9_:-').plus().flatten("citation key expected");
-  final fieldName =
-      pattern('a-zA-Z0-9_-').plus().flatten("field name expected");
-  final rawString = pattern('a-zA-Z0-9').plus().flatten("raw string expected");
+  final type = letter().plusString("type expected").skip(before: char('@'));
+  final citeKey = pattern('a-zA-Z0-9_:-').plusString("citation key expected");
+  final fieldName = pattern('a-zA-Z0-9_-').plusString("field name expected");
+  final rawString = pattern('a-zA-Z0-9').plusString("raw string expected");
 
   // Other tokens
   final escapeChar = seq2(char(r'\'), any());

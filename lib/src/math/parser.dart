@@ -22,7 +22,7 @@ final parser = () {
   builder.group()
     ..wrapper(
         seq2(
-          word().plus().flatten('function expected').trim(),
+          word().plusString('function expected').trim(),
           char('(').trim(),
         ),
         char(')').trim(),

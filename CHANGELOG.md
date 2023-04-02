@@ -1,6 +1,9 @@
 # Changelog
 
-## 5.2.0 (Unpublished)
+## 6.0.0
+
+- Dart 2.19 requirement.
+- PetitParser 6.0.0 requirement.
 
 ## 5.1.0
 

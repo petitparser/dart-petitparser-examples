@@ -114,7 +114,7 @@ exampleWithNumber: x
       expect(() => grammar.token(123), throwsArgumentError);
     });
     test('linter', () {
-      expect(linter(resolve(grammar.start())), isEmpty);
+      expect(linter(grammar.build()), isEmpty);
     });
     // All the productions and production actions of the grammar and parser.
     verify('Array1', '{}', grammar.array, parser.array, isArrayNode([]));

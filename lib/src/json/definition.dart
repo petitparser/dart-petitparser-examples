@@ -64,7 +64,7 @@ class JsonDefinition extends GrammarDefinition<JSON> {
       ).map2((_, char) => jsonEscapeChars[char]!);
   Parser<String> characterUnicode() => seq2(
         string('\\u'),
-        pattern('0-9A-Fa-f').times(4).flatten('4-digit hex number expected'),
+        pattern('0-9A-Fa-f').timesString(4, '4-digit hex number expected'),
       ).map2((_, value) => String.fromCharCode(int.parse(value, radix: 16)));
 
   Parser<num> numberToken() =>
