@@ -32,7 +32,7 @@ void main() {
       expect(Node.fromString(r'abc'), ConcatNode([la, lb, lc]));
       expect(Node.fromString(r'abcd'), ConcatNode([la, lb, lc, ld]));
     });
-    test('or', () {
+    test('alternate', () {
       expect(Node.fromString(r'a|b'), AlternateNode([la, lb]));
       expect(Node.fromString(r'a|b|c'), AlternateNode([la, lb, lc]));
       expect(Node.fromString(r'a|b|c|d'), AlternateNode([la, lb, lc, ld]));
@@ -82,6 +82,110 @@ void main() {
           Node.fromString(r'ab+'), ConcatNode([la, RepeatNode(lb, 1, null)]));
       expect(
           Node.fromString(r'(ab)+'), RepeatNode(ConcatNode([la, lb]), 1, null));
+    });
+  });
+  group('NFA', () {
+    StateRange toNFA(String regexp) => Node.fromString(regexp).toNFA();
+    test('empty', () {
+      final matcher = toNFA('');
+      expect(matcher.match(''), isTrue);
+      expect(matcher.match('a'), isFalse);
+      expect(matcher.match(' ab'), isFalse);
+    });
+    test('literal', () {
+      final matcher = toNFA('a');
+      expect(matcher.match(''), isFalse);
+      expect(matcher.match('a'), isTrue);
+      expect(matcher.match('aaa'), isFalse);
+    });
+    test('concat', () {
+      final matcher = toNFA('abc');
+      expect(matcher.match('abc'), isTrue);
+      expect(matcher.match(''), isFalse);
+      expect(matcher.match('a'), isFalse);
+      expect(matcher.match('ab'), isFalse);
+      expect(matcher.match('abd'), isFalse);
+      expect(matcher.match('abcd'), isFalse);
+      expect(matcher.match('cba'), isFalse);
+    });
+    test('alternate', () {
+      final matcher = toNFA('a|b');
+      expect(matcher.match('a'), isTrue);
+      expect(matcher.match('b'), isTrue);
+      expect(matcher.match('d'), isFalse);
+    });
+    test('optional', () {
+      final matcher = toNFA('a?');
+      expect(matcher.match(''), isTrue);
+      expect(matcher.match('a'), isTrue);
+      expect(matcher.match('aa'), isFalse);
+      expect(matcher.match('aaa'), isFalse);
+      expect(matcher.match('aba'), isFalse);
+      expect(matcher.match('b'), isFalse);
+    });
+    test('star', () {
+      final matcher = toNFA('a*');
+      expect(matcher.match(''), isTrue);
+      expect(matcher.match('aaaa'), isTrue);
+      expect(matcher.match('aa'), isTrue);
+      expect(matcher.match('aba'), isFalse);
+    });
+    test('plus', () {
+      final matcher = toNFA('a+');
+      expect(matcher.match(''), isFalse);
+      expect(matcher.match('a'), isTrue);
+      expect(matcher.match('aa'), isTrue);
+      expect(matcher.match('aaa'), isTrue);
+      expect(matcher.match('aba'), isFalse);
+      expect(matcher.match('b'), isFalse);
+    });
+    group('examples', () {
+      test('a*b', () {
+        final matcher = toNFA('a*b');
+        expect(matcher.match(''), isFalse);
+        expect(matcher.match('aaaab'), isTrue);
+        expect(matcher.match('aab'), isTrue);
+        expect(matcher.match('b'), isTrue);
+        expect(matcher.match('aba'), isFalse);
+      });
+      test('(0|(1(01*(00)*0)*1)*)*', () {
+        // All binary numbers divisible by 3
+        final matcher = toNFA('(0|(1(01*(00)*0)*1)*)*');
+        expect(matcher.match(''), isTrue);
+        expect(matcher.match('0'), isTrue);
+        expect(matcher.match('00'), isTrue);
+        expect(matcher.match('11'), isTrue);
+        expect(matcher.match('000'), isTrue);
+        expect(matcher.match('011'), isTrue);
+        expect(matcher.match('110'), isTrue);
+        expect(matcher.match('0000'), isTrue);
+        expect(matcher.match('0011'), isTrue);
+      });
+      test('(a|b)*c', () {
+        final matcher = toNFA('(a|b)*c');
+        expect(matcher.match('c'), isTrue);
+        expect(matcher.match('ac'), isTrue);
+        expect(matcher.match('ababc'), isTrue);
+        expect(matcher.match('bbbc'), isTrue);
+        expect(matcher.match('aaaaaaac'), isTrue);
+        expect(matcher.match('ac'), isTrue);
+        expect(matcher.match('bac'), isTrue);
+        expect(matcher.match('abbbbc'), isTrue);
+        expect(matcher.match('cc'), isFalse);
+        expect(matcher.match('a'), isFalse);
+        expect(matcher.match('b'), isFalse);
+        expect(matcher.match('ababab'), isFalse);
+      });
+      test('a(b*|c)', () {
+        final matcher = toNFA('a(b*|c)');
+        expect(matcher.match('ac'), isTrue);
+        expect(matcher.match('abbbb'), isTrue);
+        expect(matcher.match('ab'), isTrue);
+        expect(matcher.match('a'), isTrue);
+        expect(matcher.match('abc'), isFalse);
+        expect(matcher.match('acc'), isFalse);
+        expect(matcher.match(''), isFalse);
+      });
     });
   });
   test('linter', () {

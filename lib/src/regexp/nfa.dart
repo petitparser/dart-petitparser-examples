@@ -31,8 +31,9 @@ class StateRange {
       final prev = sequence[i].end;
       final next = sequence[i + 1].start;
       prev.epsilons.add(next);
-      next.isEnd = i < sequence.length - 2;
+      prev.isEnd = false;
     }
+    sequence.last.end.isEnd = true;
     return StateRange(start: sequence.first.start, end: sequence.last.end);
   }
 
@@ -74,4 +75,32 @@ class StateRange {
 
   final State start;
   final State end;
+
+  bool match(String input) {
+    var currentStates = <State>[];
+    _updateStates(start, currentStates, {});
+    for (final value in input.runes) {
+      final nextStates = <State>[];
+      for (final state in currentStates) {
+        final nextState = state.transitions[value];
+        if (nextState != null) {
+          _updateStates(nextState, nextStates, {});
+        }
+      }
+      currentStates = nextStates;
+    }
+    return currentStates.any((state) => state.isEnd);
+  }
+
+  void _updateStates(State state, List<State> nextStates, Set<State> visited) {
+    if (state.epsilons.isEmpty) {
+      nextStates.add(state);
+    } else {
+      for (var other in state.epsilons) {
+        if (visited.add(other)) {
+          _updateStates(other, nextStates, visited);
+        }
+      }
+    }
+  }
 }
