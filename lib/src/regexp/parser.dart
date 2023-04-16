@@ -6,7 +6,7 @@ import 'node.dart';
 final nodeParser = () {
   final builder = ExpressionBuilder<Node>();
 
-  const meta = r'\.()*+?|';
+  const meta = r'\.()!*+?|&';
   builder
     ..primitive(noneOf(meta).map((char) => LiteralNode(char)))
     ..primitive(
@@ -23,19 +23,20 @@ final nodeParser = () {
               min ?? 0, max ?? (comma == null ? min ?? 0 : null)));
 
   builder.group()
-    ..postfix(char('*'), (exp, _) => QuantifierNode(exp, 0))
-    ..postfix(char('+'), (exp, _) => QuantifierNode(exp, 1))
-    ..postfix(char('?'), (exp, _) => QuantifierNode(exp, 0, 1))
-    ..postfix(
-        range, (exp, range) => QuantifierNode(exp, range.first, range.second));
+    ..prefix(char('!'), (_, exp) => ComplementNode(exp))
+    ..postfix(char('*'), (exp, _) => QuantificationNode(exp, 0))
+    ..postfix(char('+'), (exp, _) => QuantificationNode(exp, 1))
+    ..postfix(char('?'), (exp, _) => QuantificationNode(exp, 0, 1))
+    ..postfix(range,
+        (exp, range) => QuantificationNode(exp, range.first, range.second));
 
   builder.group()
-    ..left(epsilon(), (left, _, right) => ConcatNode(left, right))
+    ..left(epsilon(), (left, _, right) => ConcatenationNode(left, right))
     ..optional(EmptyNode());
 
-  builder
-      .group()
-      .left(char('|'), (left, _, right) => AlternateNode(left, right));
+  builder.group()
+    ..left(char('|'), (left, _, right) => AlternationNode(left, right))
+    ..left(char('&'), (left, _, right) => IntersectionNode(left, right));
 
   return builder.build().end();
 }();

@@ -1,5 +1,3 @@
-import 'package:collection/collection.dart';
-
 import 'nfa.dart';
 import 'parser.dart';
 
@@ -71,8 +69,8 @@ class LiteralNode extends Node {
   int get hashCode => Object.hash(runtimeType, codePoint);
 }
 
-class ConcatNode extends Node {
-  ConcatNode(this.left, this.right);
+class ConcatenationNode extends Node {
+  ConcatenationNode(this.left, this.right);
 
   final Node left;
   final Node right;
@@ -87,18 +85,18 @@ class ConcatNode extends Node {
   }
 
   @override
-  String toString() => 'ConcatNode($left, $right)';
+  String toString() => 'ConcatenationNode($left, $right)';
 
   @override
   bool operator ==(Object other) =>
-      other is ConcatNode && other.left == left && other.right == right;
+      other is ConcatenationNode && other.left == left && other.right == right;
 
   @override
   int get hashCode => Object.hash(runtimeType, left, right);
 }
 
-class AlternateNode extends Node {
-  AlternateNode(this.left, this.right);
+class AlternationNode extends Node {
+  AlternationNode(this.left, this.right);
 
   final Node left;
   final Node right;
@@ -122,18 +120,38 @@ class AlternateNode extends Node {
   }
 
   @override
-  String toString() => 'AlternateNode($left, $right)';
+  String toString() => 'AlternationNode($left, $right)';
 
   @override
   bool operator ==(Object other) =>
-      other is AlternateNode && other.left == left && other.right == right;
+      other is AlternationNode && other.left == left && other.right == right;
 
   @override
   int get hashCode => Object.hash(runtimeType, left, right);
 }
 
-class QuantifierNode extends Node {
-  QuantifierNode(this.child, this.min, [this.max]);
+class IntersectionNode extends Node {
+  IntersectionNode(this.left, this.right);
+
+  final Node left;
+  final Node right;
+
+  @override
+  Nfa toNfa() => throw UnsupportedError(toString());
+
+  @override
+  String toString() => 'IntersectionNode($left, $right)';
+
+  @override
+  bool operator ==(Object other) =>
+      other is IntersectionNode && other.left == left && other.right == right;
+
+  @override
+  int get hashCode => Object.hash(runtimeType, left, right);
+}
+
+class QuantificationNode extends Node {
+  QuantificationNode(this.child, this.min, [this.max]);
 
   final Node child;
   final int min;
@@ -161,7 +179,7 @@ class QuantifierNode extends Node {
       childNfa.end.epsilons.add(childNfa.start);
       childNfa.end.isEnd = false;
     } else {
-      throw StateError('Unsupported repeat($min, $max)');
+      throw UnsupportedError(toString());
     }
     return Nfa(start: start, end: end);
   }
@@ -171,7 +189,7 @@ class QuantifierNode extends Node {
 
   @override
   bool operator ==(Object other) =>
-      other is QuantifierNode &&
+      other is QuantificationNode &&
       other.child == child &&
       other.min == min &&
       other.max == max;
@@ -180,4 +198,21 @@ class QuantifierNode extends Node {
   int get hashCode => Object.hash(runtimeType, child, min, max);
 }
 
-const nodeListEquality = ListEquality<Node>();
+class ComplementNode extends Node {
+  ComplementNode(this.child);
+
+  final Node child;
+
+  @override
+  Nfa toNfa() => throw UnsupportedError(toString());
+
+  @override
+  String toString() => 'ComplementNode($child)';
+
+  @override
+  bool operator ==(Object other) =>
+      other is ComplementNode && other.child == child;
+
+  @override
+  int get hashCode => Object.hash(runtimeType, child);
+}

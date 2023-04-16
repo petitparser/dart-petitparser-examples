@@ -25,65 +25,79 @@ void main() {
     });
     test('escape', () {
       expect(Node.fromString(r'\\'), LiteralNode('\\'));
+      expect(Node.fromString(r'\.'), LiteralNode('.'));
       expect(Node.fromString(r'\('), LiteralNode('('));
       expect(Node.fromString(r'\)'), LiteralNode(')'));
+      expect(Node.fromString(r'\!'), LiteralNode('!'));
       expect(Node.fromString(r'\?'), LiteralNode('?'));
       expect(Node.fromString(r'\+'), LiteralNode('+'));
       expect(Node.fromString(r'\*'), LiteralNode('*'));
       expect(Node.fromString(r'\|'), LiteralNode('|'));
+      expect(Node.fromString(r'\&'), LiteralNode('&'));
     });
-    test('concat', () {
-      expect(Node.fromString(r'ab'), ConcatNode(la, lb));
-      expect(Node.fromString(r'abc'), ConcatNode(ConcatNode(la, lb), lc));
-      expect(Node.fromString(r'abcd'),
-          ConcatNode(ConcatNode(ConcatNode(la, lb), lc), ld));
+    test('concatenation', () {
+      expect(Node.fromString(r'ab'), ConcatenationNode(la, lb));
+      expect(Node.fromString(r'abc'),
+          ConcatenationNode(ConcatenationNode(la, lb), lc));
     });
-    test('alternate', () {
-      expect(Node.fromString(r'a|b'), AlternateNode(la, lb));
-      expect(
-          Node.fromString(r'a|b|c'), AlternateNode(AlternateNode(la, lb), lc));
-      expect(Node.fromString(r'a|b|c|d'),
-          AlternateNode(AlternateNode(AlternateNode(la, lb), lc), ld));
+    test('alternation', () {
+      expect(Node.fromString(r'a|b'), AlternationNode(la, lb));
+      expect(Node.fromString(r'a|b|c'),
+          AlternationNode(AlternationNode(la, lb), lc));
+    });
+    test('intersection', () {
+      expect(Node.fromString(r'a&b'), IntersectionNode(la, lb));
+      expect(Node.fromString(r'a&b&c'),
+          IntersectionNode(IntersectionNode(la, lb), lc));
+    });
+    test('complement', () {
+      expect(Node.fromString(r'!a'), ComplementNode(la));
     });
     test('optional', () {
-      expect(Node.fromString(r'a?'), QuantifierNode(la, 0, 1));
+      expect(Node.fromString(r'a?'), QuantificationNode(la, 0, 1));
     });
     test('star', () {
-      expect(Node.fromString(r'a*'), QuantifierNode(la, 0, null));
+      expect(Node.fromString(r'a*'), QuantificationNode(la, 0, null));
     });
     test('plus', () {
-      expect(Node.fromString(r'a+'), QuantifierNode(la, 1, null));
+      expect(Node.fromString(r'a+'), QuantificationNode(la, 1, null));
     });
     test('repeat n times', () {
-      expect(Node.fromString(r'a{1}'), QuantifierNode(la, 1, 1));
-      expect(Node.fromString(r'a{23}'), QuantifierNode(la, 23, 23));
+      expect(Node.fromString(r'a{1}'), QuantificationNode(la, 1, 1));
+      expect(Node.fromString(r'a{23}'), QuantificationNode(la, 23, 23));
     });
     test('repeat n or more times', () {
-      expect(Node.fromString(r'a{4,}'), QuantifierNode(la, 4, null));
-      expect(Node.fromString(r'a{56,}'), QuantifierNode(la, 56, null));
+      expect(Node.fromString(r'a{4,}'), QuantificationNode(la, 4, null));
+      expect(Node.fromString(r'a{56,}'), QuantificationNode(la, 56, null));
     });
     test('repeat up to n times', () {
-      expect(Node.fromString(r'a{,7}'), QuantifierNode(la, 0, 7));
-      expect(Node.fromString(r'a{,89}'), QuantifierNode(la, 0, 89));
+      expect(Node.fromString(r'a{,7}'), QuantificationNode(la, 0, 7));
+      expect(Node.fromString(r'a{,89}'), QuantificationNode(la, 0, 89));
     });
     test('repeat at lest n and at most m times', () {
-      expect(Node.fromString(r'a{1,2}'), QuantifierNode(la, 1, 2));
-      expect(Node.fromString(r'a{34,567}'), QuantifierNode(la, 34, 567));
+      expect(Node.fromString(r'a{1,2}'), QuantificationNode(la, 1, 2));
+      expect(Node.fromString(r'a{34,567}'), QuantificationNode(la, 34, 567));
     });
     test('concat and or', () {
-      expect(Node.fromString(r'ab|cd'),
-          AlternateNode(ConcatNode(la, lb), ConcatNode(lc, ld)));
-      expect(Node.fromString(r'a(b|c)d'),
-          ConcatNode(ConcatNode(la, AlternateNode(lb, lc)), ld));
+      expect(
+          Node.fromString(r'ab|cd'),
+          AlternationNode(
+              ConcatenationNode(la, lb), ConcatenationNode(lc, ld)));
+      expect(
+          Node.fromString(r'a(b|c)d'),
+          ConcatenationNode(
+              ConcatenationNode(la, AlternationNode(lb, lc)), ld));
     });
     test('concat and repeat', () {
-      expect(Node.fromString(r'ab+'), ConcatNode(la, QuantifierNode(lb, 1)));
-      expect(Node.fromString(r'(ab)+'), QuantifierNode(ConcatNode(la, lb), 1));
+      expect(Node.fromString(r'ab+'),
+          ConcatenationNode(la, QuantificationNode(lb, 1)));
+      expect(Node.fromString(r'(ab)+'),
+          QuantificationNode(ConcatenationNode(la, lb), 1));
     });
   });
   group('NFA', () {
     for (final testData in tests) {
-      test(testData.pattern, () {
+      test('"${testData.pattern}" (${testData.expects.length})', () {
         final pattern = Nfa.fromString(testData.pattern);
         for (final expectData in testData.expects) {
           expect(pattern.tryMatch(expectData.input), expectData.match,
