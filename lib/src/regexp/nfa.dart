@@ -87,6 +87,7 @@ class StateRange {
           _addStates(nextState, nextStates);
         }
       }
+      if (nextStates.isEmpty) return false;
       currentStates = nextStates;
     }
     return currentStates.any((state) => state.isEnd);
