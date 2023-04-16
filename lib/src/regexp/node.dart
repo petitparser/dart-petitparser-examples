@@ -132,8 +132,8 @@ class AlternateNode extends Node {
   int get hashCode => Object.hash(runtimeType, left, right);
 }
 
-class RepeatNode extends Node {
-  RepeatNode(this.child, this.min, [this.max]);
+class QuantifierNode extends Node {
+  QuantifierNode(this.child, this.min, [this.max]);
 
   final Node child;
   final int min;
@@ -167,11 +167,11 @@ class RepeatNode extends Node {
   }
 
   @override
-  String toString() => 'RepeatNode($child, $min, $max)';
+  String toString() => 'QuantifierNode($child, $min, $max)';
 
   @override
   bool operator ==(Object other) =>
-      other is RepeatNode &&
+      other is QuantifierNode &&
       other.child == child &&
       other.min == min &&
       other.max == max;

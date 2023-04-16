@@ -1,11 +1,17 @@
+import 'node.dart';
+import 'pattern.dart';
+
 /// Nondeterministic Finite Automaton
-class Nfa {
+class Nfa extends RegexpPattern {
   Nfa({required this.start, required this.end});
+
+  factory Nfa.fromString(String regexp) => Node.fromString(regexp).toNfa();
 
   final NfaState start;
   final NfaState end;
 
-  bool match(String input) {
+  @override
+  bool tryMatch(String input) {
     var currentStates = <NfaState>{};
     _addStates(start, currentStates);
     for (final value in input.runes) {

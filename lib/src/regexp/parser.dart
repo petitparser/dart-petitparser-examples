@@ -23,11 +23,11 @@ final nodeParser = () {
               min ?? 0, max ?? (comma == null ? min ?? 0 : null)));
 
   builder.group()
-    ..postfix(char('*'), (exp, _) => RepeatNode(exp, 0))
-    ..postfix(char('+'), (exp, _) => RepeatNode(exp, 1))
-    ..postfix(char('?'), (exp, _) => RepeatNode(exp, 0, 1))
+    ..postfix(char('*'), (exp, _) => QuantifierNode(exp, 0))
+    ..postfix(char('+'), (exp, _) => QuantifierNode(exp, 1))
+    ..postfix(char('?'), (exp, _) => QuantifierNode(exp, 0, 1))
     ..postfix(
-        range, (exp, range) => RepeatNode(exp, range.first, range.second));
+        range, (exp, range) => QuantifierNode(exp, range.first, range.second));
 
   builder.group()
     ..left(epsilon(), (left, _, right) => ConcatNode(left, right))
