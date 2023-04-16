@@ -1,31 +1,37 @@
 import 'package:petitparser/expression.dart';
 import 'package:petitparser/parser.dart';
 
-import 'matcher.dart';
+import 'node.dart';
 
-Parser<Matcher> createParser() {
-  final builder = ExpressionBuilder<Matcher>();
+final nodeParser = () {
+  final builder = ExpressionBuilder<Node>();
 
-  const meta = r'\().*+?|';
+  const meta = r'\()*+?|';
   builder
-    ..primitive(noneOf(meta).map((char) => Literal(char)))
+    ..primitive(noneOf(meta).map((char) => LiteralNode(char)))
     ..primitive(
-        anyOf(meta).skip(before: char(r'\')).map((char) => Literal(char)))
-    ..primitive(char('.').map((_) => Dot()));
+        anyOf(meta).skip(before: char(r'\')).map((char) => LiteralNode(char)));
 
   builder.group().wrapper(char('('), char(')'), (_, value, __) => value);
 
+  final integer = digit().plusString().trim().map(int.parse);
+  final range =
+      seq3(integer.optional(), char(',').trim().optional(), integer.optional())
+          .skip(before: char('{'), after: char('}'))
+          .map3((min, comma, max) => Sequence2<int, int?>(
+              min ?? 0, max ?? (comma == null ? min ?? 0 : null)));
+
   builder.group()
-    ..postfix(char('*'), (regex, _) => Star(regex))
-    ..postfix(char('+'), (regex, _) => Concat(regex, Star(regex)))
-    ..postfix(char('?'), (regex, _) => Or(regex, Empty()));
+    ..postfix(char('*'), (exp, _) => exp.star())
+    ..postfix(char('+'), (exp, _) => exp.plus())
+    ..postfix(char('?'), (exp, _) => exp.optional())
+    ..postfix(range, (exp, range) => exp.repeat(range.first, range.second));
 
-  builder
-      .group()
-      .concat((list) => list.reduce((left, right) => Concat(left, right)));
+  builder.group()
+    ..left(epsilon(), (left, _, right) => left.concat(right))
+    ..optional(EmptyNode());
 
-  builder.group().left(char('|'), (left, _, right) => Or(left, right));
+  builder.group().left(char('|'), (left, _, right) => left.or(right));
 
-  final empty = epsilonWith(Empty());
-  return [builder.build(), empty].toChoiceParser().end();
-}
+  return builder.build().end();
+}();
