@@ -15,6 +15,9 @@ class Nfa {
         if (nextState != null) {
           _addStates(nextState, nextStates);
         }
+        for (final nextState in state.dots) {
+          _addStates(nextState, nextStates);
+        }
       }
       if (nextStates.isEmpty) return false;
       currentStates = nextStates;
@@ -38,4 +41,6 @@ class NfaState {
   final Map<int, NfaState> transitions = {};
 
   final List<NfaState> epsilons = [];
+
+  final List<NfaState> dots = [];
 }

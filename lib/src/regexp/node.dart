@@ -28,6 +28,25 @@ class EmptyNode extends Node {
   int get hashCode => runtimeType.hashCode;
 }
 
+class DotNode extends Node {
+  @override
+  Nfa toNfa() {
+    final start = NfaState(isEnd: false);
+    final end = NfaState(isEnd: true);
+    start.dots.add(end);
+    return Nfa(start: start, end: end);
+  }
+
+  @override
+  String toString() => 'DotNode()';
+
+  @override
+  bool operator ==(Object other) => other is DotNode;
+
+  @override
+  int get hashCode => runtimeType.hashCode;
+}
+
 class LiteralNode extends Node {
   LiteralNode(String literal) : codePoint = literal.runes.single;
 

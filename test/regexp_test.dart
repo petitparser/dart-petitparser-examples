@@ -13,6 +13,11 @@ void main() {
       expect(Node.fromString(r'()'), EmptyNode());
       expect(Node.fromString(r'(())'), EmptyNode());
     });
+    test('dot', () {
+      expect(Node.fromString(r'.'), DotNode());
+      expect(Node.fromString(r'(.)'), DotNode());
+      expect(Node.fromString(r'((.))'), DotNode());
+    });
     test('literal', () {
       expect(Node.fromString(r'a'), la);
       expect(Node.fromString(r'(a)'), la);
@@ -83,6 +88,13 @@ void main() {
       expect(matcher.match(''), isTrue);
       expect(matcher.match('a'), isFalse);
       expect(matcher.match(' ab'), isFalse);
+    });
+    test('dot', () {
+      final matcher = toNFA('.');
+      expect(matcher.match(''), isFalse);
+      expect(matcher.match('a'), isTrue);
+      expect(matcher.match('b'), isTrue);
+      expect(matcher.match('aaa'), isFalse);
     });
     test('literal', () {
       final matcher = toNFA('a');

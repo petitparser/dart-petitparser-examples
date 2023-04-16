@@ -6,11 +6,12 @@ import 'node.dart';
 final nodeParser = () {
   final builder = ExpressionBuilder<Node>();
 
-  const meta = r'\()*+?|';
+  const meta = r'\.()*+?|';
   builder
     ..primitive(noneOf(meta).map((char) => LiteralNode(char)))
     ..primitive(
-        anyOf(meta).skip(before: char(r'\')).map((char) => LiteralNode(char)));
+        anyOf(meta).skip(before: char(r'\')).map((char) => LiteralNode(char)))
+    ..primitive(char('.').map((_) => DotNode()));
 
   builder.group().wrapper(char('('), char(')'), (_, value, __) => value);
 
