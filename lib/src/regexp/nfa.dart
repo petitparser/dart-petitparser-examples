@@ -77,14 +77,14 @@ class StateRange {
   final State end;
 
   bool match(String input) {
-    var currentStates = <State>[];
-    _updateStates(start, currentStates, {});
+    var currentStates = <State>{};
+    _addStates(start, currentStates);
     for (final value in input.runes) {
-      final nextStates = <State>[];
+      final nextStates = <State>{};
       for (final state in currentStates) {
         final nextState = state.transitions[value];
         if (nextState != null) {
-          _updateStates(nextState, nextStates, {});
+          _addStates(nextState, nextStates);
         }
       }
       currentStates = nextStates;
@@ -92,15 +92,10 @@ class StateRange {
     return currentStates.any((state) => state.isEnd);
   }
 
-  void _updateStates(State state, List<State> nextStates, Set<State> visited) {
-    if (state.epsilons.isEmpty) {
-      nextStates.add(state);
-    } else {
-      for (var other in state.epsilons) {
-        if (visited.add(other)) {
-          _updateStates(other, nextStates, visited);
-        }
-      }
+  void _addStates(State state, Set<State> states) {
+    if (!states.add(state)) return;
+    for (var other in state.epsilons) {
+      _addStates(other, states);
     }
   }
 }
