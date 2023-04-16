@@ -6,36 +6,17 @@ import 'parser.dart';
 abstract class Node {
   static Node fromString(String regexp) => nodeParser.parse(regexp).value;
 
-  Node star() => repeat(0, null);
-
-  Node plus() => repeat(1, null);
-
-  Node optional() => repeat(0, 1);
-
-  Node repeat(int min, int? max) => RepeatNode(this, min, max);
-
-  Node concat(Node other) {
-    final self = this;
-    return ConcatNode([
-      if (self is ConcatNode) ...self.children else self,
-      if (other is ConcatNode) ...other.children else other,
-    ]);
-  }
-
-  Node or(Node other) {
-    final self = this;
-    return AlternateNode([
-      if (self is AlternateNode) ...self.children else self,
-      if (other is AlternateNode) ...other.children else other,
-    ]);
-  }
-
-  Nfa toNFA();
+  Nfa toNfa();
 }
 
 class EmptyNode extends Node {
   @override
-  Nfa toNFA() => Nfa.epsilon();
+  Nfa toNfa() {
+    final start = NfaState(isEnd: false);
+    final end = NfaState(isEnd: true);
+    start.epsilons.add(end);
+    return Nfa(start: start, end: end);
+  }
 
   @override
   String toString() => 'EmptyNode()';
@@ -53,7 +34,12 @@ class LiteralNode extends Node {
   final int codePoint;
 
   @override
-  Nfa toNFA() => Nfa.literal(codePoint);
+  Nfa toNfa() {
+    final start = NfaState(isEnd: false);
+    final end = NfaState(isEnd: true);
+    start.transitions[codePoint] = end;
+    return Nfa(start: start, end: end);
+  }
 
   @override
   String toString() => 'LiteralNode(${String.fromCharCode(codePoint)})';
@@ -67,53 +53,99 @@ class LiteralNode extends Node {
 }
 
 class ConcatNode extends Node {
-  ConcatNode(this.children);
+  ConcatNode(this.left, this.right);
 
-  final List<Node> children;
-
-  @override
-  Nfa toNFA() => Nfa.concat(children.map((child) => child.toNFA()));
+  final Node left;
+  final Node right;
 
   @override
-  String toString() => 'ConcatNode($children)';
+  Nfa toNfa() {
+    final leftNfa = left.toNfa();
+    final rightNfa = right.toNfa();
+    leftNfa.end.epsilons.add(rightNfa.start);
+    leftNfa.end.isEnd = false;
+    return Nfa(start: leftNfa.start, end: rightNfa.end);
+  }
+
+  @override
+  String toString() => 'ConcatNode($left, $right)';
 
   @override
   bool operator ==(Object other) =>
-      other is ConcatNode && nodeListEquality.equals(other.children, children);
+      other is ConcatNode && other.left == left && other.right == right;
 
   @override
-  int get hashCode => Object.hash(runtimeType, nodeListEquality.hash(children));
+  int get hashCode => Object.hash(runtimeType, left, right);
 }
 
 class AlternateNode extends Node {
-  AlternateNode(this.children);
+  AlternateNode(this.left, this.right);
 
-  final List<Node> children;
-
-  @override
-  Nfa toNFA() => Nfa.union(children.map((child) => child.toNFA()));
+  final Node left;
+  final Node right;
 
   @override
-  String toString() => 'AlternateNode($children)';
+  Nfa toNfa() {
+    final start = NfaState(isEnd: false);
+    final end = NfaState(isEnd: true);
+
+    final leftNfa = left.toNfa();
+    start.epsilons.add(leftNfa.start);
+    leftNfa.end.epsilons.add(end);
+    leftNfa.end.isEnd = false;
+
+    final rightNfa = right.toNfa();
+    start.epsilons.add(rightNfa.start);
+    rightNfa.end.epsilons.add(end);
+    rightNfa.end.isEnd = false;
+
+    return Nfa(start: start, end: end);
+  }
+
+  @override
+  String toString() => 'AlternateNode($left, $right)';
 
   @override
   bool operator ==(Object other) =>
-      other is AlternateNode &&
-      nodeListEquality.equals(other.children, children);
+      other is AlternateNode && other.left == left && other.right == right;
 
   @override
-  int get hashCode => Object.hash(runtimeType, nodeListEquality.hash(children));
+  int get hashCode => Object.hash(runtimeType, left, right);
 }
 
 class RepeatNode extends Node {
-  RepeatNode(this.child, this.min, this.max);
+  RepeatNode(this.child, this.min, [this.max]);
 
   final Node child;
   final int min;
   final int? max;
 
   @override
-  Nfa toNFA() => Nfa.repeat(child.toNFA(), min, max);
+  Nfa toNfa() {
+    final start = NfaState(isEnd: false);
+    final end = NfaState(isEnd: true);
+    final childNfa = child.toNfa();
+    if (min == 0 && max == null) {
+      start.epsilons.add(end);
+      start.epsilons.add(childNfa.start);
+      childNfa.end.epsilons.add(end);
+      childNfa.end.epsilons.add(childNfa.start);
+      childNfa.end.isEnd = false;
+    } else if (min == 0 && max == 1) {
+      start.epsilons.add(end);
+      start.epsilons.add(childNfa.start);
+      childNfa.end.epsilons.add(end);
+      childNfa.end.isEnd = false;
+    } else if (min == 1 && max == null) {
+      start.epsilons.add(childNfa.start);
+      childNfa.end.epsilons.add(end);
+      childNfa.end.epsilons.add(childNfa.start);
+      childNfa.end.isEnd = false;
+    } else {
+      throw StateError('Unsupported repeat($min, $max)');
+    }
+    return Nfa(start: start, end: end);
+  }
 
   @override
   String toString() => 'RepeatNode($child, $min, $max)';

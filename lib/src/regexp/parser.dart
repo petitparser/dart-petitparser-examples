@@ -22,16 +22,19 @@ final nodeParser = () {
               min ?? 0, max ?? (comma == null ? min ?? 0 : null)));
 
   builder.group()
-    ..postfix(char('*'), (exp, _) => exp.star())
-    ..postfix(char('+'), (exp, _) => exp.plus())
-    ..postfix(char('?'), (exp, _) => exp.optional())
-    ..postfix(range, (exp, range) => exp.repeat(range.first, range.second));
+    ..postfix(char('*'), (exp, _) => RepeatNode(exp, 0))
+    ..postfix(char('+'), (exp, _) => RepeatNode(exp, 1))
+    ..postfix(char('?'), (exp, _) => RepeatNode(exp, 0, 1))
+    ..postfix(
+        range, (exp, range) => RepeatNode(exp, range.first, range.second));
 
   builder.group()
-    ..left(epsilon(), (left, _, right) => left.concat(right))
+    ..left(epsilon(), (left, _, right) => ConcatNode(left, right))
     ..optional(EmptyNode());
 
-  builder.group().left(char('|'), (left, _, right) => left.or(right));
+  builder
+      .group()
+      .left(char('|'), (left, _, right) => AlternateNode(left, right));
 
   return builder.build().end();
 }();

@@ -28,14 +28,17 @@ void main() {
       expect(Node.fromString(r'\|'), LiteralNode('|'));
     });
     test('concat', () {
-      expect(Node.fromString(r'ab'), ConcatNode([la, lb]));
-      expect(Node.fromString(r'abc'), ConcatNode([la, lb, lc]));
-      expect(Node.fromString(r'abcd'), ConcatNode([la, lb, lc, ld]));
+      expect(Node.fromString(r'ab'), ConcatNode(la, lb));
+      expect(Node.fromString(r'abc'), ConcatNode(ConcatNode(la, lb), lc));
+      expect(Node.fromString(r'abcd'),
+          ConcatNode(ConcatNode(ConcatNode(la, lb), lc), ld));
     });
     test('alternate', () {
-      expect(Node.fromString(r'a|b'), AlternateNode([la, lb]));
-      expect(Node.fromString(r'a|b|c'), AlternateNode([la, lb, lc]));
-      expect(Node.fromString(r'a|b|c|d'), AlternateNode([la, lb, lc, ld]));
+      expect(Node.fromString(r'a|b'), AlternateNode(la, lb));
+      expect(
+          Node.fromString(r'a|b|c'), AlternateNode(AlternateNode(la, lb), lc));
+      expect(Node.fromString(r'a|b|c|d'),
+          AlternateNode(AlternateNode(AlternateNode(la, lb), lc), ld));
     });
     test('optional', () {
       expect(Node.fromString(r'a?'), RepeatNode(la, 0, 1));
@@ -63,29 +66,18 @@ void main() {
       expect(Node.fromString(r'a{34,567}'), RepeatNode(la, 34, 567));
     });
     test('concat and or', () {
-      expect(
-          Node.fromString(r'ab|cd'),
-          AlternateNode([
-            ConcatNode([la, lb]),
-            ConcatNode([lc, ld]),
-          ]));
-      expect(
-          Node.fromString(r'a(b|c)d'),
-          ConcatNode([
-            la,
-            AlternateNode([lb, lc]),
-            ld
-          ]));
+      expect(Node.fromString(r'ab|cd'),
+          AlternateNode(ConcatNode(la, lb), ConcatNode(lc, ld)));
+      expect(Node.fromString(r'a(b|c)d'),
+          ConcatNode(ConcatNode(la, AlternateNode(lb, lc)), ld));
     });
     test('concat and repeat', () {
-      expect(
-          Node.fromString(r'ab+'), ConcatNode([la, RepeatNode(lb, 1, null)]));
-      expect(
-          Node.fromString(r'(ab)+'), RepeatNode(ConcatNode([la, lb]), 1, null));
+      expect(Node.fromString(r'ab+'), ConcatNode(la, RepeatNode(lb, 1)));
+      expect(Node.fromString(r'(ab)+'), RepeatNode(ConcatNode(la, lb), 1));
     });
   });
   group('NFA', () {
-    Nfa toNFA(String regexp) => Node.fromString(regexp).toNFA();
+    Nfa toNFA(String regexp) => Node.fromString(regexp).toNfa();
     test('empty', () {
       final matcher = toNFA('');
       expect(matcher.match(''), isTrue);
