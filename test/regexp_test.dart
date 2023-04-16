@@ -85,7 +85,7 @@ void main() {
     });
   });
   group('NFA', () {
-    StateRange toNFA(String regexp) => Node.fromString(regexp).toNFA();
+    Nfa toNFA(String regexp) => Node.fromString(regexp).toNFA();
     test('empty', () {
       final matcher = toNFA('');
       expect(matcher.match(''), isTrue);
@@ -313,9 +313,84 @@ void main() {
         expect(matcher.match('aababab'), isFalse);
         expect(matcher.match('aabbbbb'), isFalse);
       });
+      for (final example
+          in examples.split('\n').map((line) => line.split(' '))) {
+        test(example[0], () {
+          final matcher = toNFA(example[0]);
+          expect(matcher.match(example[1]), isTrue);
+          if (example.length > 2) {
+            expect(matcher.match(example[2]), isFalse);
+          }
+        });
+      }
     });
   });
   test('linter', () {
     expect(linter(nodeParser), isEmpty);
   });
 }
+
+// https://github.com/xysun/regex/blob/master/testing.py
+const examples = '''(ab|a)(bc|c) abc acb
+(ab)c|abc abc ab
+(a*)(b?)(b+) aaabbbb aaaa
+((a|a)|a) a aa
+(a*)(a|aa) aaaa b
+a(b)|c(d)|a(e)f aef adf
+(a|b)c|a(b|c) ac acc
+(a|b)c|a(b|c) ab acc
+(a|b)*c|(a|ab)*c abc bbbcabbbc
+a?(ab|ba)ab abab aaabab
+(aa|aaa)*|(a|aaaaa) aa
+(a)(b)(c) abc
+((((((((((x)))))))))) x
+((((((((((x))))))))))* xx
+a?(ab|ba)* ababababababababababababababababa
+a*a*a*a*a*b aaaaaaaab
+abc abc
+ab*c abc
+ab*bc abbc
+ab*bc abbbbc
+ab+bc abbc
+ab+bc abbbbc
+ab?bc abbc
+ab?bc abc
+ab|cd ab
+(a)b(c) abc
+a* aaa
+(a+|b)* ab
+(a+|b)+ ab
+a|b|c|d|e e
+(a|b|c|d|e)f ef
+abcd*efg abcdefg
+(ab|ab*)bc abc
+(ab|a)b*c abc
+((a)(b)c)(d) abcd
+(a|ab)(c|bcd) abcd
+(a|ab)(bcd|c) abcd
+(ab|a)(c|bcd) abcd
+(ab|a)(bcd|c) abcd
+((a|ab)(c|bcd))(d*) abcd
+((a|ab)(bcd|c))(d*) abcd
+((ab|a)(c|bcd))(d*) abcd
+((ab|a)(bcd|c))(d*) abcd
+(a|ab)((c|bcd)(d*)) abcd
+(a|ab)((bcd|c)(d*)) abcd
+(ab|a)((c|bcd)(d*)) abcd
+(ab|a)((bcd|c)(d*)) abcd
+(a*)(b|abc) abc
+(a*)(abc|b) abc
+((a*)(b|abc))(c*) abc
+((a*)(abc|b))(c*) abc
+(a*)((b|abc))(c*) abc
+(a*)((abc|b)(c*)) abc
+(a*)(b|abc) abc
+(a*)(abc|b) abc
+((a*)(b|abc))(c*) abc
+((a*)(abc|b))(c*) abc
+(a*)((b|abc)(c*)) abc
+(a*)((abc|b)(c*)) abc
+(a|ab) ab
+(ab|a) ab
+(a|ab)(b*) ab
+(ab|a)(b*) ab''';

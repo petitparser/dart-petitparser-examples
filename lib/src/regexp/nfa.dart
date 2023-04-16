@@ -1,31 +1,22 @@
-class State {
-  State({required this.isEnd});
+/// Nondeterministic Finite Automaton
+class Nfa {
+  Nfa({required this.start, required this.end});
 
-  bool isEnd;
-
-  final Map<int, State> transitions = {};
-
-  final List<State> epsilons = [];
-}
-
-class StateRange {
-  StateRange({required this.start, required this.end});
-
-  factory StateRange.epsilon() {
-    final start = State(isEnd: false);
-    final end = State(isEnd: true);
+  factory Nfa.epsilon() {
+    final start = NfaState(isEnd: false);
+    final end = NfaState(isEnd: true);
     start.epsilons.add(end);
-    return StateRange(start: start, end: end);
+    return Nfa(start: start, end: end);
   }
 
-  factory StateRange.literal(int value) {
-    final start = State(isEnd: false);
-    final end = State(isEnd: true);
+  factory Nfa.literal(int value) {
+    final start = NfaState(isEnd: false);
+    final end = NfaState(isEnd: true);
     start.transitions[value] = end;
-    return StateRange(start: start, end: end);
+    return Nfa(start: start, end: end);
   }
 
-  factory StateRange.concat(Iterable<StateRange> ranges) {
+  factory Nfa.concat(Iterable<Nfa> ranges) {
     final sequence = ranges.toList();
     for (var i = 0; i < sequence.length - 1; i++) {
       final prev = sequence[i].end;
@@ -34,23 +25,23 @@ class StateRange {
       prev.isEnd = false;
     }
     sequence.last.end.isEnd = true;
-    return StateRange(start: sequence.first.start, end: sequence.last.end);
+    return Nfa(start: sequence.first.start, end: sequence.last.end);
   }
 
-  factory StateRange.union(Iterable<StateRange> ranges) {
-    final start = State(isEnd: false);
-    final end = State(isEnd: true);
+  factory Nfa.union(Iterable<Nfa> ranges) {
+    final start = NfaState(isEnd: false);
+    final end = NfaState(isEnd: true);
     for (final range in ranges) {
       start.epsilons.add(range.start);
       range.end.epsilons.add(end);
       range.end.isEnd = false;
     }
-    return StateRange(start: start, end: end);
+    return Nfa(start: start, end: end);
   }
 
-  factory StateRange.repeat(StateRange other, int min, int? max) {
-    final start = State(isEnd: false);
-    final end = State(isEnd: true);
+  factory Nfa.repeat(Nfa other, int min, int? max) {
+    final start = NfaState(isEnd: false);
+    final end = NfaState(isEnd: true);
     if (min == 0 && max == null) {
       start.epsilons.add(end);
       start.epsilons.add(other.start);
@@ -70,17 +61,17 @@ class StateRange {
     } else {
       throw StateError('Unsupported repeat($min, $max)');
     }
-    return StateRange(start: start, end: end);
+    return Nfa(start: start, end: end);
   }
 
-  final State start;
-  final State end;
+  final NfaState start;
+  final NfaState end;
 
   bool match(String input) {
-    var currentStates = <State>{};
+    var currentStates = <NfaState>{};
     _addStates(start, currentStates);
     for (final value in input.runes) {
-      final nextStates = <State>{};
+      final nextStates = <NfaState>{};
       for (final state in currentStates) {
         final nextState = state.transitions[value];
         if (nextState != null) {
@@ -93,10 +84,20 @@ class StateRange {
     return currentStates.any((state) => state.isEnd);
   }
 
-  void _addStates(State state, Set<State> states) {
+  void _addStates(NfaState state, Set<NfaState> states) {
     if (!states.add(state)) return;
     for (var other in state.epsilons) {
       _addStates(other, states);
     }
   }
+}
+
+class NfaState {
+  NfaState({required this.isEnd});
+
+  bool isEnd;
+
+  final Map<int, NfaState> transitions = {};
+
+  final List<NfaState> epsilons = [];
 }

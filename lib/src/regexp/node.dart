@@ -30,12 +30,12 @@ abstract class Node {
     ]);
   }
 
-  StateRange toNFA();
+  Nfa toNFA();
 }
 
 class EmptyNode extends Node {
   @override
-  StateRange toNFA() => StateRange.epsilon();
+  Nfa toNFA() => Nfa.epsilon();
 
   @override
   String toString() => 'EmptyNode()';
@@ -53,7 +53,7 @@ class LiteralNode extends Node {
   final int codePoint;
 
   @override
-  StateRange toNFA() => StateRange.literal(codePoint);
+  Nfa toNFA() => Nfa.literal(codePoint);
 
   @override
   String toString() => 'LiteralNode(${String.fromCharCode(codePoint)})';
@@ -72,8 +72,7 @@ class ConcatNode extends Node {
   final List<Node> children;
 
   @override
-  StateRange toNFA() =>
-      StateRange.concat(children.map((child) => child.toNFA()));
+  Nfa toNFA() => Nfa.concat(children.map((child) => child.toNFA()));
 
   @override
   String toString() => 'ConcatNode($children)';
@@ -92,8 +91,7 @@ class AlternateNode extends Node {
   final List<Node> children;
 
   @override
-  StateRange toNFA() =>
-      StateRange.union(children.map((child) => child.toNFA()));
+  Nfa toNFA() => Nfa.union(children.map((child) => child.toNFA()));
 
   @override
   String toString() => 'AlternateNode($children)';
@@ -115,7 +113,7 @@ class RepeatNode extends Node {
   final int? max;
 
   @override
-  StateRange toNFA() => StateRange.repeat(child.toNFA(), min, max);
+  Nfa toNFA() => Nfa.repeat(child.toNFA(), min, max);
 
   @override
   String toString() => 'RepeatNode($child, $min, $max)';
