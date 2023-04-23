@@ -2,9 +2,9 @@
 
 ## 5.4.0
 
-- Dart 2.19 requirement.
-- Add RegExp example.
-- Add XML demo.
+- Upgrade to Dart 2.19 and PetitParser 5.4.
+- Add BibTeX and RegExp examples.
+- Add XML, XPath, and BibTeX demos.
 
 ## 5.1.0
 
