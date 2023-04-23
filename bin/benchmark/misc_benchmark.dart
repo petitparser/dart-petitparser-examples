@@ -3,7 +3,7 @@ import 'package:petitparser/petitparser.dart';
 import 'util/runner.dart';
 
 void main() {
-  runChars('misc - end', any().end(), 255);
+  runChars('misc - end', any().end(), 1);
   runChars('misc - endOfInput', endOfInput(), 0);
   runChars('misc - epsilon', epsilon(), 255);
   runChars('misc - epsilonWith', epsilonWith<String>('!'), 255);

@@ -70,12 +70,12 @@ void runChars(String name, Parser<void> parser, int success, [String? input]) {
     },
     parse: () {
       for (var i = 0; i < stringLength; i++) {
-        parser.accept(string, start: i);
+        parser.parse(string, start: i);
       }
     },
     accept: () {
       for (var i = 0; i < stringLength; i++) {
-        parser.parse(string, start: i);
+        parser.accept(string, start: i);
       }
     },
   );
