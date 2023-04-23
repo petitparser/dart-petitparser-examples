@@ -57,14 +57,12 @@ void run(
 void runChars(String name, Parser<void> parser, int success, [String? input]) {
   final string = input ?? defaultStringInput;
   final stringLength = string.length;
-  final fullContext = Context(string, isSkip: false);
-  final skipContext = Context(string, isSkip: true);
   run(
     name,
     verify: () {
       var count = 0;
       for (var i = 0; i < stringLength; i++) {
-        if (parser.accept(string[i])) count++;
+        if (parser.accept(string, start: i)) count++;
       }
       if (success != count) {
         throw StateError('Expected $success success, but got $count');
@@ -72,14 +70,12 @@ void runChars(String name, Parser<void> parser, int success, [String? input]) {
     },
     parse: () {
       for (var i = 0; i < stringLength; i++) {
-        fullContext.position = i;
-        parser.parseOn(fullContext);
+        parser.accept(string, start: i);
       }
     },
     accept: () {
       for (var i = 0; i < stringLength; i++) {
-        skipContext.position = i;
-        parser.parseOn(skipContext);
+        parser.parse(string, start: i);
       }
     },
   );
@@ -88,18 +84,14 @@ void runChars(String name, Parser<void> parser, int success, [String? input]) {
 /// Generic string benchmark runner.
 void runString(String name, Parser<void> parser, [String? input]) {
   final string = input ?? defaultStringInput;
-  final fullContext = Context(string, isSkip: false);
-  final skipContext = Context(string, isSkip: true);
   run(
     name,
     verify: () => parser.parse(string).value,
     parse: () {
-      fullContext.position = 0;
-      parser.parseOn(fullContext);
+      parser.parse(string);
     },
     accept: () {
-      skipContext.position = 0;
-      parser.parseOn(skipContext);
+      parser.accept(string);
     },
   );
 }

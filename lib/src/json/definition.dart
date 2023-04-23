@@ -19,39 +19,35 @@ class JsonDefinition extends GrammarDefinition<JSON> {
         failure('value expected'),
       ].toChoiceParser();
 
-  Parser<Map<String, JSON>> object() => seq4(
+  Parser<Map<String, JSON>> object() => seq3(
         char('{').trim(),
-        cut(),
         ref0(objectElements),
         char('}').trim(),
-      ).map4((_, __, elements, ___) => elements);
+      ).map3((_, elements, __) => elements);
   Parser<Map<String, JSON>> objectElements() => ref0(objectElement)
-      .starSeparated(char(',').trim().commit())
+      .starSeparated(char(',').trim())
       .map((list) => Map.fromEntries(list.elements));
   Parser<MapEntry<String, JSON>> objectElement() =>
-      seq5(ref0(stringToken), cut(), char(':').trim(), cut(), ref0(value))
-          .map5((key, _, __, ___, value) => MapEntry(key, value));
+      seq3(ref0(stringToken), char(':').trim(), ref0(value))
+          .map3((key, _, value) => MapEntry(key, value));
 
-  Parser<List<JSON>> array() => seq4(
+  Parser<List<JSON>> array() => seq3(
         char('[').trim(),
-        cut(),
         ref0(arrayElements),
         char(']').trim(),
-      ).map4((_, __, elements, ___) => elements);
-  Parser<List<JSON>> arrayElements() => ref0(value)
-      .starSeparated(char(',').trim().commit())
-      .map((list) => list.elements);
+      ).map3((_, elements, __) => elements);
+  Parser<List<JSON>> arrayElements() =>
+      ref0(value).starSeparated(char(',').trim()).map((list) => list.elements);
 
   Parser<bool> trueToken() => string('true').trim().map((_) => true);
   Parser<bool> falseToken() => string('false').trim().map((_) => false);
   Parser<Object?> nullToken() => string('null').trim().map((_) => null);
 
-  Parser<String> stringToken() => seq4(
+  Parser<String> stringToken() => seq3(
         char('"'),
-        cut(),
         ref0(characterPrimitive).star(),
         char('"'),
-      ).trim().map4((_, __, chars, ___) => chars.join());
+      ).trim().map3((_, chars, __) => chars.join());
   Parser<String> characterPrimitive() => [
         ref0(characterNormal),
         ref0(characterEscape),
@@ -69,11 +65,11 @@ class JsonDefinition extends GrammarDefinition<JSON> {
 
   Parser<num> numberToken() =>
       ref0(numberPrimitive).flatten('number expected').trim().map(num.parse);
-  Parser<void> numberPrimitive() => <Parser>[
+  Parser<void> numberPrimitive() => <Parser<void>>[
         char('-').optional(),
         [char('0'), digit().plus()].toChoiceParser(),
-        [char('.'), cut(), digit().plus()].toSequenceParser().optional(),
-        [anyOf('eE'), cut(), anyOf('-+').optional(), digit().plus()]
+        [char('.'), digit().plus()].toSequenceParser().optional(),
+        [anyOf('eE'), anyOf('-+').optional(), digit().plus()]
             .toSequenceParser()
             .optional()
       ].toSequenceParser();

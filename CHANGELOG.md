@@ -1,9 +1,10 @@
 # Changelog
 
-## 6.0.0
+## 5.4.0
 
 - Dart 2.19 requirement.
-- PetitParser 6.0.0 requirement.
+- Add RegExp example.
+- Add XML demo.
 
 ## 5.1.0
 

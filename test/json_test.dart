@@ -192,31 +192,31 @@ void main() {
       expectError('', 0, 'value expected');
     });
     test('expected array closing', () {
-      expectError('[', 1, '"]" expected');
+      expectError('[', 0, 'value expected');
     });
     test('expected array element', () {
-      expectError('[1,', 3, 'value expected');
+      expectError('[1,', 0, 'value expected');
     });
     test('expected object closing', () {
-      expectError('{', 1, '"}" expected');
+      expectError('{', 0, 'value expected');
     });
     test('expected object colon', () {
-      expectError('{"a"', 4, '":" expected');
+      expectError('{"a"', 0, 'value expected');
     });
     test('expected object value', () {
-      expectError('{"a":', 5, 'value expected');
+      expectError('{"a":', 0, 'value expected');
     });
     test('expected object entry', () {
-      expectError('{"a":1,', 7, '"\\"" expected');
+      expectError('{"a":1,', 0, 'value expected');
     });
     test('expected string closing', () {
-      expectError('"', 1, '"\\"" expected');
+      expectError('"', 0, 'value expected');
     });
     test('expected number (fractional part)', () {
-      expectError('1.', 0, 'number expected');
+      expectError('1.', 1, 'end of input expected');
     });
     test('expected number (exponent part)', () {
-      expectError('1e', 0, 'number expected');
+      expectError('1e', 1, 'end of input expected');
     });
   });
 }
