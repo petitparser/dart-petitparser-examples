@@ -19,7 +19,7 @@ abstract class RegexpPattern implements Pattern {
   bool tryMatch(String input);
 }
 
-class RegexpMatch extends Match {
+class RegexpMatch implements Match {
   RegexpMatch(this.pattern, this.input, this.start, this.end);
 
   @override

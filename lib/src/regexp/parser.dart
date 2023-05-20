@@ -19,8 +19,8 @@ final nodeParser = () {
   final range =
       seq3(integer.optional(), char(',').trim().optional(), integer.optional())
           .skip(before: char('{'), after: char('}'))
-          .map3((min, comma, max) => Sequence2<int, int?>(
-              min ?? 0, max ?? (comma == null ? min ?? 0 : null)));
+          .map3((min, comma, max) =>
+              (min ?? 0, max ?? (comma == null ? min ?? 0 : null)));
 
   builder.group()
     ..prefix(char('!'), (_, exp) => ComplementNode(exp))

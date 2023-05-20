@@ -93,7 +93,7 @@ void updateDom(XmlDocument document) {
   HighlightWriter(HtmlBuffer(domOutput), matches).visit(document);
 }
 
-class HtmlBuffer extends StringSink {
+class HtmlBuffer implements StringSink {
   HtmlBuffer(Element root) {
     stack.add(root);
   }
