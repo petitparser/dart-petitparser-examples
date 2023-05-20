@@ -46,9 +46,9 @@ void main() {
   group('scg.bib', () {
     late final List<BibTeXEntry> entries;
     setUpAll(() async {
-      final response = await http.get(Uri.parse(
+      final body = await http.read(Uri.parse(
           'https://raw.githubusercontent.com/scgbern/scgbib/main/scg.bib'));
-      entries = parser.parse(response.body).value;
+      entries = parser.parse(body).value;
     });
     test('size', () {
       expect(entries.length, greaterThan(9600));
