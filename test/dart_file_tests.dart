@@ -4,7 +4,6 @@
 import 'dart:io';
 
 import 'package:collection/collection.dart';
-import 'package:petitparser/petitparser.dart';
 import 'package:petitparser_examples/dart.dart';
 import 'package:test/test.dart';
 

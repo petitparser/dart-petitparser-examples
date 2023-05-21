@@ -14,13 +14,13 @@ final uri = seq5(
   seq2('?'.toParser(), _query).optional(),
   seq2('#'.toParser(), _fragment).optional(),
 ).map5((scheme, authority, path, query, fragment) => <Symbol, dynamic>{
-      #scheme: scheme?.first,
-      #authority: authority?.second,
-      ...lib_authority.authority.parse(authority?.second ?? '').value,
+      #scheme: scheme?.$1,
+      #authority: authority?.$2,
+      ...lib_authority.authority.parse(authority?.$2 ?? '').value,
       #path: path,
-      #query: query?.second,
-      #params: lib_query.query.parse(query?.second ?? '').value,
-      #fragment: fragment?.second,
+      #query: query?.$2,
+      #params: lib_query.query.parse(query?.$2 ?? '').value,
+      #fragment: fragment?.$2,
     });
 
 final _scheme = pattern('^:/?#').plusString('scheme');

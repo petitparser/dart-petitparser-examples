@@ -27,8 +27,8 @@ final nodeParser = () {
     ..postfix(char('*'), (exp, _) => QuantificationNode(exp, 0))
     ..postfix(char('+'), (exp, _) => QuantificationNode(exp, 1))
     ..postfix(char('?'), (exp, _) => QuantificationNode(exp, 0, 1))
-    ..postfix(range,
-        (exp, range) => QuantificationNode(exp, range.first, range.second));
+    ..postfix(
+        range, (exp, range) => QuantificationNode(exp, range.$1, range.$2));
 
   builder.group()
     ..left(epsilon(), (left, _, right) => ConcatenationNode(left, right))

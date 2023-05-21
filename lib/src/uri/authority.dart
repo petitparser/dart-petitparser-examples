@@ -8,10 +8,10 @@ final authority = seq3(
   _hostname.optional(),
   _port.optional(),
 ).map3((credentials, hostname, port) => {
-      #username: credentials?.first,
-      #password: credentials?.second?.second,
+      #username: credentials?.$1,
+      #password: credentials?.$2?.$2,
       #hostname: hostname,
-      #port: port?.second,
+      #port: port?.$2,
     });
 
 final _credentials =

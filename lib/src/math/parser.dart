@@ -26,7 +26,7 @@ final parser = () {
           char('(').trim(),
         ),
         char(')').trim(),
-        (left, value, right) => _createFunction(left.first, value))
+        (left, value, right) => _createFunction(left.$1, value))
     ..wrapper(
         char('(').trim(), char(')').trim(), (left, value, right) => value);
   builder.group()
