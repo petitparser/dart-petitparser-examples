@@ -10,9 +10,9 @@ environment:
   sdk: ^3.0.0
 dependencies:
   collection: ^1.17.0
-  http: ^0.13.0
+  http: ^1.0.0
   meta: ^1.9.0
-  more: ^3.10.0
+  more: ^4.0.0
   petitparser: ^5.5.0
   xml: ^6.3.0
 dev_dependencies:
@@ -24,3 +24,5 @@ dev_dependencies:
 dependency_overrides:
   petitparser:
     git: https://github.com/petitparser/dart-petitparser.git
+  xml:
+    git: https://github.com/renggli/dart-xml.git

@@ -11,12 +11,7 @@ PetitParser Examples
 
 This package contains examples to illustrate the use of [PetitParser](https://github.com/petitparser/dart-petitparser). A tutorial and full documentation is contained in the [package description](https://pub.dev/packages/petitparser) and [API documentation](https://pub.dev/documentation/petitparser/latest/). [petitparser.github.io](https://petitparser.github.io/) contains more information about PetitParser, running examples in the browser, and links to ports to other languages.
 
-To run the web examples execute the following commands from the command line and navigate to http://localhost:8080/:
-
-```bash
-dart pub global activate webdev
-webdev serve --release
-```
+## Examples
 
 ### BibTeX
 
@@ -34,6 +29,10 @@ This example contains a complete implementation of [JSON](https://json.org/). It
 
 This example contains a simple grammar and evaluator for LISP. The code is reasonably complete to run and evaluate complex programs. Binaries for a Read–Eval–Print Loop (REPL) are provided for the console and the web browser.
 
+```bash
+dart run bin/lisp/lisp.dart
+```
+
 ### Math
 
 This example contains a simple evaluator for mathematical expressions, it builds a parse-tree that can then be used to print or evaluate expressions.
@@ -41,6 +40,10 @@ This example contains a simple evaluator for mathematical expressions, it builds
 ### Prolog
 
 This example contains a simple grammar and evaluator for Prolog programs. The code is reasonably complete to run and evaluate basic prolog programs. Binaries for a Read–Eval–Print Loop (REPL) are provided for the console and the web browser.
+
+```bash
+dart run bin/prolog/prolog.dart
+```
 
 ### Smalltalk
 
@@ -52,4 +55,21 @@ This is a simple grammar that takes an URL string and decomposes it into scheme,
 
 ### XML
 
-This examples parses XML files to events, creates and pretty-prints a DOM tree, and evaluates XPath expressions.
+This examples parses XML files to events, creates and pretty-prints a DOM tree, and evaluates XPath expressions. Depends on [xml](https://github.com/renggli/dart-xml) package.
+
+## Web
+
+To run the web examples execute the following commands from the command line and navigate to http://localhost:8080/:
+
+```bash
+dart pub global activate webdev
+webdev serve --release
+```
+
+## Benchmarks
+
+To run the benchmarks execute the following command from the command line:
+
+```bash
+ls -1 bin/benchmark/*.dart | xargs -n 1 dart run --no-enable-asserts
+```
