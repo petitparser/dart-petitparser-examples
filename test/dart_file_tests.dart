@@ -4,6 +4,7 @@
 import 'dart:io';
 
 import 'package:collection/collection.dart';
+import 'package:petitparser/core.dart';
 import 'package:petitparser_examples/dart.dart';
 import 'package:test/test.dart';
 
@@ -25,7 +26,7 @@ void generateTests(String title, Directory root) {
       test(file.path.substring(root.path.length + 1), () async {
         final input = await file.readAsString();
         final result = grammar.parse(input);
-        if (result.isFailure) fail('$result\n\n${addLineNumbers(input)}');
+        if (result is Failure) fail('$result\n\n${addLineNumbers(input)}');
       });
     }
   });

@@ -12,7 +12,7 @@ final parser = uri.end();
 void uriTest(String source, Map<Symbol, dynamic> values) {
   test(source, () {
     final result = parser.parse(source);
-    expect(result.isSuccess, isTrue, reason: 'isSuccess');
+    expect(result is Success, isTrue, reason: 'isSuccess');
     for (final entry in values.entries) {
       expect(result.value[entry.key], entry.value,
           reason: entry.key.toString());
@@ -165,7 +165,7 @@ void main() {
     ]) {
       test(input, () {
         final result = parser.parse(input);
-        expect(result.isSuccess, isTrue);
+        expect(result is Success, isTrue);
       });
     }
   });

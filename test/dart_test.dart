@@ -3,7 +3,7 @@ import 'package:petitparser/reflection.dart';
 import 'package:petitparser_examples/dart.dart';
 import 'package:test/test.dart';
 
-Function accept(Parser parser) => (input) => parser.parse(input).isSuccess;
+Function accept(Parser parser) => (input) => parser.parse(input) is Success;
 
 void main() {
   final grammar = DartGrammarDefinition();

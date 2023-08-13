@@ -10,7 +10,7 @@ final output = querySelector('#output')! as ParagraphElement;
 
 void update() {
   final result = uri.parse(input.value ?? '');
-  if (result.isSuccess) {
+  if (result is Success) {
     output.innerHtml = '''
     <table>
       <tr>
