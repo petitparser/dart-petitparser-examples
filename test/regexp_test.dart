@@ -2,6 +2,13 @@ import 'package:petitparser/reflection.dart';
 import 'package:petitparser_examples/regexp.dart';
 import 'package:test/test.dart';
 
+void expectedEqual(Node actual, Node expected) {
+  expect(actual, expected);
+  expect(actual, isNot(same(expected)));
+  expect(actual.hashCode, expected.hashCode);
+  expect(actual.toString(), expected.toString());
+}
+
 void main() {
   group('parser', () {
     final la = LiteralNode('a');
@@ -9,89 +16,91 @@ void main() {
     final lc = LiteralNode('c');
     final ld = LiteralNode('d');
     test('empty', () {
-      expect(Node.fromString(r''), EmptyNode());
-      expect(Node.fromString(r'()'), EmptyNode());
-      expect(Node.fromString(r'(())'), EmptyNode());
+      expectedEqual(Node.fromString(r''), EmptyNode());
+      expectedEqual(Node.fromString(r'()'), EmptyNode());
+      expectedEqual(Node.fromString(r'(())'), EmptyNode());
     });
     test('dot', () {
-      expect(Node.fromString(r'.'), DotNode());
-      expect(Node.fromString(r'(.)'), DotNode());
-      expect(Node.fromString(r'((.))'), DotNode());
+      expectedEqual(Node.fromString(r'.'), DotNode());
+      expectedEqual(Node.fromString(r'(.)'), DotNode());
+      expectedEqual(Node.fromString(r'((.))'), DotNode());
     });
     test('literal', () {
-      expect(Node.fromString(r'a'), la);
-      expect(Node.fromString(r'(a)'), la);
-      expect(Node.fromString(r'((a))'), la);
+      expectedEqual(Node.fromString(r'a'), la);
+      expectedEqual(Node.fromString(r'(a)'), la);
+      expectedEqual(Node.fromString(r'((a))'), la);
     });
     test('escape', () {
-      expect(Node.fromString(r'\\'), LiteralNode('\\'));
-      expect(Node.fromString(r'\.'), LiteralNode('.'));
-      expect(Node.fromString(r'\('), LiteralNode('('));
-      expect(Node.fromString(r'\)'), LiteralNode(')'));
-      expect(Node.fromString(r'\!'), LiteralNode('!'));
-      expect(Node.fromString(r'\?'), LiteralNode('?'));
-      expect(Node.fromString(r'\+'), LiteralNode('+'));
-      expect(Node.fromString(r'\*'), LiteralNode('*'));
-      expect(Node.fromString(r'\|'), LiteralNode('|'));
-      expect(Node.fromString(r'\&'), LiteralNode('&'));
+      expectedEqual(Node.fromString(r'\\'), LiteralNode('\\'));
+      expectedEqual(Node.fromString(r'\.'), LiteralNode('.'));
+      expectedEqual(Node.fromString(r'\('), LiteralNode('('));
+      expectedEqual(Node.fromString(r'\)'), LiteralNode(')'));
+      expectedEqual(Node.fromString(r'\!'), LiteralNode('!'));
+      expectedEqual(Node.fromString(r'\?'), LiteralNode('?'));
+      expectedEqual(Node.fromString(r'\+'), LiteralNode('+'));
+      expectedEqual(Node.fromString(r'\*'), LiteralNode('*'));
+      expectedEqual(Node.fromString(r'\|'), LiteralNode('|'));
+      expectedEqual(Node.fromString(r'\&'), LiteralNode('&'));
     });
     test('concatenation', () {
-      expect(Node.fromString(r'ab'), ConcatenationNode(la, lb));
-      expect(Node.fromString(r'abc'),
+      expectedEqual(Node.fromString(r'ab'), ConcatenationNode(la, lb));
+      expectedEqual(Node.fromString(r'abc'),
           ConcatenationNode(ConcatenationNode(la, lb), lc));
     });
     test('alternation', () {
-      expect(Node.fromString(r'a|b'), AlternationNode(la, lb));
-      expect(Node.fromString(r'a|b|c'),
+      expectedEqual(Node.fromString(r'a|b'), AlternationNode(la, lb));
+      expectedEqual(Node.fromString(r'a|b|c'),
           AlternationNode(AlternationNode(la, lb), lc));
     });
     test('intersection', () {
-      expect(Node.fromString(r'a&b'), IntersectionNode(la, lb));
-      expect(Node.fromString(r'a&b&c'),
+      expectedEqual(Node.fromString(r'a&b'), IntersectionNode(la, lb));
+      expectedEqual(Node.fromString(r'a&b&c'),
           IntersectionNode(IntersectionNode(la, lb), lc));
     });
     test('complement', () {
-      expect(Node.fromString(r'!a'), ComplementNode(la));
+      expectedEqual(Node.fromString(r'!a'), ComplementNode(la));
     });
     test('optional', () {
-      expect(Node.fromString(r'a?'), QuantificationNode(la, 0, 1));
+      expectedEqual(Node.fromString(r'a?'), QuantificationNode(la, 0, 1));
     });
     test('star', () {
-      expect(Node.fromString(r'a*'), QuantificationNode(la, 0, null));
+      expectedEqual(Node.fromString(r'a*'), QuantificationNode(la, 0, null));
     });
     test('plus', () {
-      expect(Node.fromString(r'a+'), QuantificationNode(la, 1, null));
+      expectedEqual(Node.fromString(r'a+'), QuantificationNode(la, 1, null));
     });
     test('repeat n times', () {
-      expect(Node.fromString(r'a{1}'), QuantificationNode(la, 1, 1));
-      expect(Node.fromString(r'a{23}'), QuantificationNode(la, 23, 23));
+      expectedEqual(Node.fromString(r'a{1}'), QuantificationNode(la, 1, 1));
+      expectedEqual(Node.fromString(r'a{23}'), QuantificationNode(la, 23, 23));
     });
     test('repeat n or more times', () {
-      expect(Node.fromString(r'a{4,}'), QuantificationNode(la, 4, null));
-      expect(Node.fromString(r'a{56,}'), QuantificationNode(la, 56, null));
+      expectedEqual(Node.fromString(r'a{4,}'), QuantificationNode(la, 4, null));
+      expectedEqual(
+          Node.fromString(r'a{56,}'), QuantificationNode(la, 56, null));
     });
     test('repeat up to n times', () {
-      expect(Node.fromString(r'a{,7}'), QuantificationNode(la, 0, 7));
-      expect(Node.fromString(r'a{,89}'), QuantificationNode(la, 0, 89));
+      expectedEqual(Node.fromString(r'a{,7}'), QuantificationNode(la, 0, 7));
+      expectedEqual(Node.fromString(r'a{,89}'), QuantificationNode(la, 0, 89));
     });
     test('repeat at lest n and at most m times', () {
-      expect(Node.fromString(r'a{1,2}'), QuantificationNode(la, 1, 2));
-      expect(Node.fromString(r'a{34,567}'), QuantificationNode(la, 34, 567));
+      expectedEqual(Node.fromString(r'a{1,2}'), QuantificationNode(la, 1, 2));
+      expectedEqual(
+          Node.fromString(r'a{34,567}'), QuantificationNode(la, 34, 567));
     });
     test('concat and or', () {
-      expect(
+      expectedEqual(
           Node.fromString(r'ab|cd'),
           AlternationNode(
               ConcatenationNode(la, lb), ConcatenationNode(lc, ld)));
-      expect(
+      expectedEqual(
           Node.fromString(r'a(b|c)d'),
           ConcatenationNode(
               ConcatenationNode(la, AlternationNode(lb, lc)), ld));
     });
     test('concat and repeat', () {
-      expect(Node.fromString(r'ab+'),
+      expectedEqual(Node.fromString(r'ab+'),
           ConcatenationNode(la, QuantificationNode(lb, 1)));
-      expect(Node.fromString(r'(ab)+'),
+      expectedEqual(Node.fromString(r'(ab)+'),
           QuantificationNode(ConcatenationNode(la, lb), 1));
     });
   });
@@ -107,6 +116,30 @@ void main() {
         }
       });
     }
+    test('unsupported', () {
+      expect(() => Node.fromString(r'a{2,}').toNfa(), throwsUnsupportedError);
+      expect(() => Node.fromString(r'!a').toNfa(), throwsUnsupportedError);
+    });
+  });
+  group('pattern', () {
+    final pattern = Node.fromString(r'a+').toNfa();
+    test('matchAsPrefix', () {
+      final match = pattern.matchAsPrefix('aaa')!;
+      expect(match.pattern, pattern);
+      expect(match.input, 'aaa');
+      expect(match.start, 0);
+      expect(match.end, 3);
+      expect(match.groupCount, 0);
+      expect(match.group(0), 'aaa');
+      expect(match[0], 'aaa');
+      expect(match.groups([0, 1]), ['aaa', null]);
+    });
+    test('allMatches', () {
+      expect(
+        pattern.allMatches('aaa').map((each) => each[0]),
+        ['aaa', 'aa', 'a'],
+      );
+    });
   });
   test('linter', () {
     expect(linter(nodeParser), isEmpty);

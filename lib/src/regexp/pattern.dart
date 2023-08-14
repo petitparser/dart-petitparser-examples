@@ -1,6 +1,7 @@
 import 'package:meta/meta.dart';
 
 abstract class RegexpPattern implements Pattern {
+  // TODO: make it correctly match sub-strings
   @override
   Match? matchAsPrefix(String input, [int start = 0]) =>
       tryMatch(input.substring(start))
