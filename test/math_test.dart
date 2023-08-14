@@ -25,6 +25,7 @@ void main() {
   test('variable', () {
     verify('x', 42, variables: {'x': 42});
     verify('x / y', 0.5, variables: {'x': 1, 'y': 2});
+    expect(() => verify('x', double.nan, variables: {}), throwsArgumentError);
   });
   test('constants', () {
     verify('pi', pi);

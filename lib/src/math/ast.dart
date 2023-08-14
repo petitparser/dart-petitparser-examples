@@ -26,7 +26,7 @@ class Variable extends Expression {
   @override
   num eval(Map<String, num> variables) => variables.containsKey(name)
       ? variables[name]!
-      : throw 'Unknown variable $name';
+      : throw ArgumentError.value(name, 'Unknown variable');
 
   @override
   String toString() => 'Variable{$name}';
