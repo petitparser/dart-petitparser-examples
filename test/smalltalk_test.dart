@@ -7,6 +7,22 @@ import 'package:test/test.dart';
 final grammar = SmalltalkGrammarDefinition();
 final parser = SmalltalkParserDefinition();
 
+class NodeCollector extends Visitor {
+  static List<Node> allNodes(Node node) {
+    final visitor = NodeCollector();
+    visitor.visit(node);
+    return visitor.nodes;
+  }
+
+  final List<Node> nodes = [];
+
+  @override
+  void visit(Node node) {
+    nodes.add(node);
+    super.visit(node);
+  }
+}
+
 dynamic parse(String source, Parser Function() production) {
   final parser = resolve(production()).end();
   final result = parser.parse(source);
@@ -20,6 +36,7 @@ void verify(String name, String source, Parser Function() grammarProduction,
     test('grammar', () => parse(source, grammarProduction));
     test('parser', () {
       final ast = parse(source, parserProduction);
+      expect(NodeCollector.allNodes(ast), isNotEmpty);
       expect(ast, parseMatcher);
     });
   });
