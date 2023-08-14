@@ -23,6 +23,12 @@ mixin IsSurrounded implements Node {
   }
 }
 
+enum SelectorType {
+  unary,
+  binary,
+  keyword;
+}
+
 mixin HasSelector implements Node {
   final List<Token> selectorToken = [];
 
@@ -30,11 +36,11 @@ mixin HasSelector implements Node {
 
   String get selector => selectorToken.map((token) => token.input).join();
 
-  bool get isUnary => arguments.isEmpty;
-
-  bool get isBinary => !(isUnary || isKeyword);
-
-  bool get isKeyword => selectorToken.first.value.endsWith(':');
+  SelectorType get selectorType => arguments.isEmpty
+      ? SelectorType.unary
+      : selectorToken.first.value.endsWith(':')
+          ? SelectorType.keyword
+          : SelectorType.binary;
 }
 
 class MethodNode extends Node with HasSelector {
