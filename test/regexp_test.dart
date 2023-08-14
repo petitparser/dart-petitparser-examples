@@ -118,6 +118,7 @@ void main() {
     }
     test('unsupported', () {
       expect(() => Node.fromString(r'a{2,}').toNfa(), throwsUnsupportedError);
+      expect(() => Node.fromString(r'a&b').toNfa(), throwsUnsupportedError);
       expect(() => Node.fromString(r'!a').toNfa(), throwsUnsupportedError);
     });
   });

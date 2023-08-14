@@ -256,8 +256,8 @@ class DartGrammarDefinition extends GrammarDefinition {
       ref0(identifier) &
       ref0(formalParameterList);
 
-  Parser constantConstructorDeclaration() =>
-      ref0(constToken) & ref0(qualified) & ref0(formalParameterList);
+  // Parser constantConstructorDeclaration() =>
+  //     ref0(constToken) & ref0(qualified) & ref0(formalParameterList);
 
   Parser specialSignatureDefinition() =>
       ref0(staticToken).optional() &
@@ -507,17 +507,17 @@ class DartGrammarDefinition extends GrammarDefinition {
 
   Parser finallyPart() => ref0(finallyToken) & ref0(block);
 
-  Parser variableDeclaration() =>
-      ref0(declaredIdentifier) & (ref1(token, ',') & ref0(identifier)).star();
+  // Parser variableDeclaration() =>
+  //     ref0(declaredIdentifier) & (ref1(token, ',') & ref0(identifier)).star();
 
   Parser initializedVariableDeclaration() =>
       ref0(declaredIdentifier) &
       (ref1(token, '=') & ref0(expression)).optional() &
       (ref1(token, ',') & ref0(initializedIdentifier)).star();
 
-  Parser initializedIdentifierList() =>
-      ref0(initializedIdentifier) &
-      (ref1(token, ',') & ref0(initializedIdentifier)).star();
+  // Parser initializedIdentifierList() =>
+  //     ref0(initializedIdentifier) &
+  //     (ref1(token, ',') & ref0(initializedIdentifier)).star();
 
   Parser initializedIdentifier() =>
       ref0(identifier) & (ref1(token, '=') & ref0(expression)).optional();
