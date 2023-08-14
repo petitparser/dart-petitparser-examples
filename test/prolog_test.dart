@@ -8,15 +8,35 @@ void main() {
     test('linter', () {
       expect(linter(rulesParser, excludedTypes: {}), isEmpty);
     });
-    test('toString', () {
+    test('empty', () {
+      final db = Database.parse('foo.');
+      expect(db.toString(), 'foo :- true.');
+    });
+    test('single', () {
+      final db = Database.parse('foo(a, b).');
+      expect(db.toString(), 'foo(a, b) :- true.');
+    });
+    test('multiple', () {
       final db = Database.parse('''
-      foo(bar, zork).
-      bok(X, Y) :- foo(X, Y), foo(Y, X).
+        foo(X, Y) :- foo(Y, X).
+        foo(X, Z) :- foo(X, Y), foo(Y, Z).
       ''');
       expect(
           db.toString(),
-          'foo(bar, zork) :- true.\n\n'
-          'bok(X, Y) :- foo(X, Y), foo(Y, X).');
+          'foo(X, Y) :- foo(Y, X).\n'
+          'foo(X, Z) :- foo(X, Y), foo(Y, Z).');
+    });
+    test('two', () {
+      final db = Database.parse('''
+        foo(a, b).
+        foo(X, Y) :- foo(Y, X).
+        foo(X, Z) :- foo(X, Y), foo(Y, Z).
+      ''');
+      expect(
+          db.toString(),
+          'foo(a, b) :- true.\n'
+          'foo(X, Y) :- foo(Y, X).\n'
+          'foo(X, Z) :- foo(X, Y), foo(Y, Z).');
     });
     test('parse error', () {
       expect(
@@ -30,7 +50,15 @@ void main() {
     test('linter', () {
       expect(linter(termParser, excludedTypes: {}), isEmpty);
     });
-    test('toString', () {
+    test('empty', () {
+      final query = Term.parse('foo');
+      expect(query.toString(), 'foo');
+    });
+    test('one', () {
+      final query = Term.parse('foo(bar)');
+      expect(query.toString(), 'foo(bar)');
+    });
+    test('two', () {
       final query = Term.parse('foo(bar, zork)');
       expect(query.toString(), 'foo(bar, zork)');
     });
