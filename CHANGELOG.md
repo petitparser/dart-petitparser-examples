@@ -1,5 +1,7 @@
 # Changelog
 
+## 6.1.0 (Unpublished)
+
 ## 6.0.0
 
 - Update to Dart 3.1 and PetitParser 6.
