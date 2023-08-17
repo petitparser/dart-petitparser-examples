@@ -5,6 +5,12 @@ homepage: https://petitparser.github.io
 repository: https://github.com/petitparser/dart-petitparser-examples
 description: A collection of example parsers, applications, and benchmarks that
   illustrate the PetitParser framework.
+topics:
+  - grammar
+  - parser
+  - parser-combinator
+  - parsing
+  - peg
 
 environment:
   sdk: ^3.1.0
