@@ -1,9 +1,12 @@
+import 'package:petitparser/petitparser.dart';
 import 'package:petitparser_examples/bibtex.dart' as bibtex_example;
 import 'package:petitparser_examples/json.dart' as json_example;
 import 'package:petitparser_examples/lisp.dart' as lisp_example;
 import 'package:petitparser_examples/math.dart' as math_example;
 import 'package:petitparser_examples/prolog.dart' as prolog_example;
 import 'package:petitparser_examples/uri.dart' as uri_example;
+import 'package:xml/src/xml_events/parser.dart' as xml_example;
+import 'package:xml/xml.dart';
 
 import 'util/runner.dart';
 
@@ -48,6 +51,20 @@ final uriParser = uri_example.uri;
 const uriInput =
     'https://www.lukas-renggli.ch/blog/petitparser-1?_s=Q5vcT_xEIhxf2Z4Q&_k=4pr02qyT&_n&42';
 
+final xmlParser =
+    xml_example.XmlEventParser(defaultEntityMapping).build().star().end();
+const xmlInput = '<?xml version="1.0"?>\n'
+    '<!DOCTYPE name [ <!ELEMENT html (head, body)> ]>\n'
+    '<ns:foo attr="not namespaced" n1:ans="namespaced 1" '
+    '        n2:ans="namespace 2" >\n'
+    '  Plain text contents!'
+    '  <element/>\n'
+    '  <ns:element/>\n'
+    '  <!-- comment -->\n'
+    '  <![CDATA[cdata]]>\n'
+    '  <?processing instruction?>\n'
+    '</ns:foo>';
+
 void main() {
   runString('example - bibtex', bibtexParser, bibtexInput);
   runString('example - json', jsonParser, jsonInput);
@@ -55,4 +72,5 @@ void main() {
   runString('example - math', mathParser, mathInput);
   runString('example - prolog', prologParser, prologInput);
   runString('example - uri', uriParser, uriInput);
+  runString('example - xml', xmlParser, xmlInput);
 }

@@ -1,23 +1,35 @@
+import 'package:data/stats.dart';
+
 /// Function type to be benchmarked.
 typedef Benchmark = void Function();
 
-/// Measures the time it takes to run [function] in microseconds. The resulting
-/// duration is the average time measured to run [function] once.
-double benchmark(
+/// Measures the time it takes to run [function] in microseconds.
+///
+/// A single measurement is repeated at least [minLoop] times, and for at
+/// least [minDuration]. The measurement is sampled [sampleCount] times.
+Jackknife<double> benchmark(
   Benchmark function, {
-  int minLoops = 128,
-  Duration minDuration = const Duration(milliseconds: 500),
+  int minLoop = 100,
+  Duration minDuration = const Duration(milliseconds: 100),
+  int sampleCount = 25,
+  double confidenceLevel = 0.95,
 }) {
-  // Figure out how many times we need to loop to reach the desired duration.
-  var count = minLoops;
+  // Estimate count and warmup.
+  var count = minLoop;
   while (_benchmark(function, count) <= minDuration) {
     count *= 2;
   }
-  if (count == minLoops) {
-    throw StateError('$function cannot be performed $minLoops times '
+  if (count == minLoop) {
+    throw StateError('$function cannot be performed $minLoop times '
         'in $minDuration.');
   }
-  return _benchmark(function, count).inMicroseconds / count;
+  // Collect samples.
+  final samples = <double>[];
+  for (var i = 0; i < sampleCount; i++) {
+    samples.add(_benchmark(function, count).inMicroseconds / count);
+  }
+  return Jackknife(samples, (list) => list.arithmeticMean(),
+      confidenceLevel: confidenceLevel);
 }
 
 @pragma('vm:never-inline')

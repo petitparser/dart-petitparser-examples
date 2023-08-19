@@ -2,8 +2,8 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:collection/collection.dart';
-import 'package:more/collection.dart';
-import 'package:more/comparator.dart';
+import 'package:data/stats.dart';
+import 'package:more/more.dart';
 import 'package:petitparser/petitparser.dart';
 
 import 'benchmark.dart';
@@ -23,6 +23,11 @@ final List<MapEntry<String, Benchmark>> _benchmarkEntries = (() {
       comparator: compareAsciiLowerCase.onResultOf((entry) => entry.key));
 })();
 
+final numberPrinter = FixedNumberPrinter(precision: 3, separator: ',');
+
+String formatBenchmark(Jackknife<double> jackknife) =>
+    numberPrinter(jackknife.estimate);
+
 /// Generic benchmark runner.
 void run(
   String name, {
@@ -41,13 +46,13 @@ void run(
         return;
       }
     }
-    final parseMs = benchmark(parse);
-    stdout.write('${parseMs.toStringAsFixed(3)}\t');
-    final acceptMs = benchmark(accept);
-    stdout.write('${acceptMs.toStringAsFixed(3)}\t');
+    final parseJackknife = benchmark(parse);
+    stdout.write('${formatBenchmark(parseJackknife)}\t');
+    final acceptJackknife = benchmark(accept);
+    stdout.write('${formatBenchmark(acceptJackknife)}\t');
     if (native != null) {
-      final nativeMs = benchmark(native);
-      stdout.write('${nativeMs.toStringAsFixed(3)}\t');
+      final nativeJackknife = benchmark(native);
+      stdout.write('${formatBenchmark(nativeJackknife)}\t');
     }
     stdout.writeln();
   }));
