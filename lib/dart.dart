@@ -1,5 +1,5 @@
 /// This package contains the grammar of the Dart programming language.
 ///
-/// The grammar is adapted from [https://code.google.com/p/dart/source/browse/branches/bleeding_edge/dart/language/grammar/Dart.g].
+/// The grammar is adapted from [Dart programming language specification](https://www.ecma-international.org/publications-and-standards/standards/ecma-408/).
 /// Unfortunately, it is unable to parse all valid Dart programs yet.
 export 'src/dart/grammar.dart';
