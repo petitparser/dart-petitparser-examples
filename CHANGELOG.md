@@ -1,10 +1,8 @@
 # Changelog
 
-## 6.1.0 (Unpublished)
-
 ## 6.0.0
 
-- Update to Dart 3.1 and PetitParser 6.
+- Update to Dart 3.0 and PetitParser 6.0.
 - Cleanup usage of deprecated code.
 - Better test coverage.
 
