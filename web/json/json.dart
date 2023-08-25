@@ -36,8 +36,8 @@ void execute(
   }
 }
 
-final input = querySelector('#input')! as TextAreaElement;
-final action = querySelector('#action')! as SubmitButtonInputElement;
+final input = querySelector('#input') as TextAreaElement;
+final action = querySelector('#action') as SubmitButtonInputElement;
 
 final timingCustom = querySelector('#timing .custom')!;
 final timingNative = querySelector('#timing .native')!;

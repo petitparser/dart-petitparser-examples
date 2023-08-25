@@ -2,9 +2,9 @@ import 'dart:html';
 
 import 'package:petitparser_examples/smalltalk.dart';
 
-final input = querySelector('#input')! as TextAreaElement;
-final output = querySelector('#output')! as ParagraphElement;
-final parse = querySelector('#parse')! as SubmitButtonInputElement;
+final input = querySelector('#input') as TextAreaElement;
+final output = querySelector('#output') as ParagraphElement;
+final parse = querySelector('#parse') as SubmitButtonInputElement;
 
 final parserDefinition = SmalltalkParserDefinition();
 final methodParser = parserDefinition.build();

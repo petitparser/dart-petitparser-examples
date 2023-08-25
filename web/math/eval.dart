@@ -2,9 +2,9 @@ import 'dart:html';
 
 import 'package:petitparser_examples/math.dart';
 
-final input = querySelector('#input')! as TextInputElement;
-final result = querySelector('#result')! as ParagraphElement;
-final tree = querySelector('#tree')! as ParagraphElement;
+final input = querySelector('#input') as TextInputElement;
+final result = querySelector('#result') as ParagraphElement;
+final tree = querySelector('#tree') as ParagraphElement;
 
 void update() {
   final source = input.value ?? '0';

@@ -5,8 +5,8 @@ import 'package:petitparser_examples/uri.dart';
 
 final parser = uri.end();
 
-final input = querySelector('#input')! as InputElement;
-final output = querySelector('#output')! as ParagraphElement;
+final input = querySelector('#input') as InputElement;
+final output = querySelector('#output') as ParagraphElement;
 
 void update() {
   final result = uri.parse(input.value ?? '');

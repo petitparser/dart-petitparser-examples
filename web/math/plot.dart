@@ -99,9 +99,9 @@ class Viewport {
   num fromPixelY(num value) => (height - value) * (maxY - minY) / height + minY;
 }
 
-final input = querySelector('#input')! as TextInputElement;
-final error = querySelector('#error')! as ParagraphElement;
-final canvas = querySelector('#canvas')! as CanvasElement;
+final input = querySelector('#input') as TextInputElement;
+final error = querySelector('#error') as ParagraphElement;
+final canvas = querySelector('#canvas') as CanvasElement;
 
 final viewport = Viewport(canvas, minX: -5, maxX: 5, minY: -2.5, maxY: 2.5);
 
