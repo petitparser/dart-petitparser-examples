@@ -27,3 +27,6 @@ dev_dependencies:
   build_web_compilers: ^4.0.0
   lints: ^2.1.0
   test: ^1.24.0
+dependency_overrides:
+  xml:
+    git: https://github.com/renggli/dart-xml.git

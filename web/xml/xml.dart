@@ -93,15 +93,36 @@ void updateDom(XmlDocument document) {
   HighlightWriter(HtmlBuffer(domOutput), matches).visit(document);
 }
 
+void selectDom(MouseEvent event) {
+  for (var node = event.target as Node?;
+      node != null && node != domOutput;
+      node = node.parentNode) {
+    if (node is Element) {
+      final path = node.attributes['title'];
+      if (path != null && path.isNotEmpty) {
+        xpathInput.value = path;
+        update();
+        break;
+      }
+    }
+  }
+}
+
 class HtmlBuffer implements StringSink {
   HtmlBuffer(Element root) {
     stack.add(root);
   }
 
   final List<Node> stack = [];
+  final List<Map<String, String?>> attributes = [];
 
-  void nest(String tag, void Function() function) {
-    final element = Element.tag(tag);
+  void nest(Map<String, String?> attributes, void Function() function) {
+    final element = Element.span();
+    for (final MapEntry(:key, :value) in attributes.entries) {
+      if (value != null && value.isNotEmpty) {
+        element.setAttribute(key, value);
+      }
+    }
     stack.last.append(element);
     stack.add(element);
     function();
@@ -137,18 +158,16 @@ class HighlightWriter extends XmlWriter {
   final Set<XmlNode> matches;
 
   @override
-  void visit(XmlHasVisitor node) {
-    if (matches.contains(node)) {
-      htmlBuffer.nest('strong', () => super.visit(node));
-    } else {
-      super.visit(node);
-    }
-  }
+  void visit(XmlHasVisitor node) => htmlBuffer.nest({
+        'class': matches.contains(node) ? 'selection' : null,
+        'title': node is XmlNode ? node.xpathGenerate() : null,
+      }, () => super.visit(node));
 }
 
 void main() {
   xmlInput.onInput.listen((event) => update());
   xpathInput.onInput.listen((event) => update());
   domPretty.onInput.listen((event) => update());
+  domOutput.onClick.listen((event) => selectDom(event));
   update();
 }
