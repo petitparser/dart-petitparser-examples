@@ -1,3 +1,4 @@
+import 'package:petitparser/definition.dart';
 import 'package:petitparser/expression.dart';
 import 'package:petitparser/parser.dart';
 
@@ -8,9 +9,8 @@ final nodeParser = () {
 
   const meta = r'\.()!*+?|&';
   builder
-    ..primitive(noneOf(meta).map((char) => LiteralNode(char)))
-    ..primitive(
-        anyOf(meta).skip(before: char(r'\')).map((char) => LiteralNode(char)))
+    ..primitive(noneOf(meta).map(LiteralNode.new))
+    ..primitive(anyOf(meta).skip(before: char(r'\')).map(LiteralNode.new))
     ..primitive(char('.').map((_) => DotNode()));
 
   builder.group().wrapper(char('('), char(')'), (_, value, __) => value);
@@ -38,5 +38,5 @@ final nodeParser = () {
     ..left(char('|'), (left, _, right) => AlternationNode(left, right))
     ..left(char('&'), (left, _, right) => IntersectionNode(left, right));
 
-  return builder.build().end();
+  return resolve(builder.build()).end();
 }();

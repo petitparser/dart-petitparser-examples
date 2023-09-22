@@ -41,7 +41,7 @@ final parser = () {
   builder.group()
     ..left(char('+').trim(), (a, op, b) => Binary('+', a, b, (x, y) => x + y))
     ..left(char('-').trim(), (a, op, b) => Binary('-', a, b, (x, y) => x - y));
-  return builder.build().end();
+  return resolve(builder.build()).end();
 }();
 
 Expression _createValue(String value) => Value(num.parse(value));

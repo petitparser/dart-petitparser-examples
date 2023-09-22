@@ -13,9 +13,8 @@ void main() {
   final native = NativeEnvironment();
   final standard = StandardEnvironment(native);
 
-  dynamic exec(String value, [Environment? env]) {
-    return evalString(lispParser, env ?? standard.create(), value);
-  }
+  dynamic exec(String value, [Environment? env]) =>
+      evalString(lispParser, env ?? standard.create(), value);
 
   group('Cell', () {
     test('Name', () {

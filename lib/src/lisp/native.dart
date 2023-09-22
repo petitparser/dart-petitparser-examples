@@ -58,27 +58,23 @@ class NativeEnvironment extends Environment {
     throw ArgumentError('Invalid define: $args');
   }
 
-  static Lambda _lambda(Environment lambdaEnv, dynamic lambdaArgs) {
-    return (evalEnv, evalArgs) {
-      final inner = lambdaEnv.create();
-      var names = lambdaArgs.head;
-      var values = evalArguments(evalEnv, evalArgs);
-      while (names != null && values != null) {
-        inner.define(names.head, values.head);
-        names = names.tail;
-        values = values.tail;
-      }
-      return evalList(inner, lambdaArgs.tail);
-    };
-  }
+  static Lambda _lambda(Environment lambdaEnv, dynamic lambdaArgs) =>
+      (evalEnv, evalArgs) {
+        final inner = lambdaEnv.create();
+        var names = lambdaArgs.head;
+        var values = evalArguments(evalEnv, evalArgs);
+        while (names != null && values != null) {
+          inner.define(names.head, values.head);
+          names = names.tail;
+          values = values.tail;
+        }
+        return evalList(inner, lambdaArgs.tail);
+      };
 
-  static dynamic _quote(Environment env, dynamic args) {
-    return args.head;
-  }
+  static dynamic _quote(Environment env, dynamic args) => args.head;
 
-  static dynamic _eval(Environment env, dynamic args) {
-    return eval(env.create(), eval(env, args.head));
-  }
+  static dynamic _eval(Environment env, dynamic args) =>
+      eval(env.create(), eval(env, args.head));
 
   static dynamic _apply(Environment env, dynamic args) {
     final Function function = eval(env, args.head);
@@ -100,9 +96,8 @@ class NativeEnvironment extends Environment {
     return evalList(inner, args.tail);
   }
 
-  static dynamic _set(Environment env, dynamic args) {
-    return env[args.head] = eval(env, args.tail.head);
-  }
+  static dynamic _set(Environment env, dynamic args) =>
+      env[args.head] = eval(env, args.tail.head);
 
   static dynamic _print(Environment env, dynamic args) {
     final buffer = StringBuffer();
@@ -156,9 +151,7 @@ class NativeEnvironment extends Environment {
     return false;
   }
 
-  static dynamic _not(Environment env, dynamic args) {
-    return !eval(env, args.head);
-  }
+  static dynamic _not(Environment env, dynamic args) => !eval(env, args.head);
 
   static dynamic _plus(Environment env, dynamic args) {
     num value = eval(env, args.head);

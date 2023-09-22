@@ -1,6 +1,8 @@
 /// Parsers an URI query.
 ///
 /// Accepts input of the form "{key[=value]}&...".
+library query;
+
 import 'package:petitparser/petitparser.dart';
 
 final query = _param.plusSeparated('&'.toParser()).map(

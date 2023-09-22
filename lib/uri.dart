@@ -2,6 +2,8 @@
 ///
 /// The accepted inputs and decomposition matches the example given in
 /// Appendix B of the standard: https://tools.ietf.org/html/rfc3986#appendix-B.
+library uri;
+
 import 'package:petitparser/petitparser.dart';
 
 import 'src/uri/authority.dart' as lib_authority;

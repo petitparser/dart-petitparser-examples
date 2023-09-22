@@ -16,8 +16,8 @@ Element appendString(Element element, String object) {
   object
       .split('\n')
       .where((each) => each.trim().isNotEmpty)
-      .map<Node>((each) => Text(each))
-      .separatedBy(() => Element.br())
+      .map<Node>(Text.new)
+      .separatedBy(Element.br)
       .forEach(element.append);
   return element;
 }
@@ -133,8 +133,8 @@ class HtmlBuffer implements StringSink {
     object
         .toString()
         .split('\n')
-        .map<Node>((each) => Text(each))
-        .separatedBy(() => Element.br())
+        .map<Node>(Text.new)
+        .separatedBy(Element.br)
         .forEach(stack.last.append);
   }
 
@@ -167,6 +167,6 @@ void main() {
   xmlInput.onInput.listen((event) => update());
   xpathInput.onInput.listen((event) => update());
   domPretty.onInput.listen((event) => update());
-  domOutput.onClick.listen((event) => selectDom(event));
+  domOutput.onClick.listen(selectDom);
   update();
 }

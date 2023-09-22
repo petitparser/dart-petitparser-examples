@@ -33,7 +33,7 @@ class Nfa extends RegexpPattern {
 
   void _addStates(NfaState state, Set<NfaState> states) {
     if (!states.add(state)) return;
-    for (var other in state.epsilons) {
+    for (final other in state.epsilons) {
       _addStates(other, states);
     }
   }

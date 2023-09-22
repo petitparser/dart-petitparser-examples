@@ -8,14 +8,13 @@ import 'package:petitparser/petitparser.dart';
 
 import 'benchmark.dart';
 
-final defaultCharsInput =
-    List.generate(0xff, (value) => String.fromCharCode(value));
+final defaultCharsInput = List.generate(0xff, String.fromCharCode);
 final defaultStringInput = defaultCharsInput.join();
 
 final List<MapEntry<String, Benchmark>> _benchmarkEntries = (() {
   Future.delayed(const Duration(milliseconds: 1)).then((_) {
     stdout.writeln(['name', 'parser', 'accept', 'native'].join('\t'));
-    for (var benchmarkEntry in _benchmarkEntries) {
+    for (final benchmarkEntry in _benchmarkEntries) {
       benchmarkEntry.value();
     }
   });

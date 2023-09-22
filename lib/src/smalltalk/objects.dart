@@ -104,5 +104,5 @@ void bootstrap() {
   arrayBehavior.addMethod(
       'at:put:', (self, index, object) => self[index] = object);
 
-  classBehavior.addMethod('new', (self) => SmalltalkObject(self));
+  classBehavior.addMethod('new', SmalltalkObject.new);
 }

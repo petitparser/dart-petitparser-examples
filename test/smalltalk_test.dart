@@ -76,7 +76,7 @@ TypeMatcher<SequenceNode> isSequenceNode(
         List<Matcher> statements = const []}) =>
     isA<SequenceNode>()
         .having((node) => node.temporaries, 'temporaries',
-            temporaries.map((each) => isVariableNode(each)))
+            temporaries.map(isVariableNode))
         .having((node) => node.statements, 'statements', statements);
 
 TypeMatcher<ReturnNode> isReturnNode(Matcher value) =>
@@ -88,7 +88,7 @@ TypeMatcher<BlockNode> isBlockNode(
         List<Matcher> statements = const []}) =>
     isA<BlockNode>()
         .having((node) => node.arguments, 'arguments',
-            arguments.map((each) => isVariableNode(each)))
+            arguments.map(isVariableNode))
         .having((node) => node.body, 'body',
             isSequenceNode(temporaries: temporaries, statements: statements));
 
@@ -108,7 +108,7 @@ TypeMatcher<MethodNode> isMethodNode(String selector, SelectorType selectorType,
         .having((node) => node.selector, 'selector', selector)
         .having((node) => node.selectorType, 'selectorType', selectorType)
         .having((node) => node.arguments, 'arguments',
-            arguments.map((each) => isVariableNode(each)))
+            arguments.map(isVariableNode))
         .having((node) => node.pragmas, 'pragmas', pragmas)
         .having((node) => node.body, 'body',
             isSequenceNode(temporaries: temporaries, statements: statements));

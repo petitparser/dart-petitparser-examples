@@ -133,12 +133,10 @@ ArrayNode buildArray(List statements) {
   return result;
 }
 
-ValueNode buildAssignment(ValueNode node, List parts) {
-  return parts.reversed.fold(
-      node,
-      (result, variableAndToken) =>
-          AssignmentNode(variableAndToken[0], variableAndToken[1], result));
-}
+ValueNode buildAssignment(ValueNode node, List parts) => parts.reversed.fold(
+    node,
+    (result, variableAndToken) =>
+        AssignmentNode(variableAndToken[0], variableAndToken[1], result));
 
 ValueNode buildBlock(List arguments, SequenceNode body) {
   final result = BlockNode(body);
@@ -161,16 +159,14 @@ ValueNode buildCascade(ValueNode value, List parts) {
   return value;
 }
 
-ValueNode buildMessage(ValueNode receiver, List parts) {
-  return parts
-      .where((selectorAndArguments) => selectorAndArguments.isNotEmpty)
-      .fold(receiver, (receiver, selectorAndArguments) {
-    final message = MessageNode(receiver);
-    addTo<Token>(message.selectorToken, selectorAndArguments);
-    addTo<ValueNode>(message.arguments, selectorAndArguments);
-    return message;
-  });
-}
+ValueNode buildMessage(ValueNode receiver, List parts) => parts
+        .where((selectorAndArguments) => selectorAndArguments.isNotEmpty)
+        .fold(receiver, (receiver, selectorAndArguments) {
+      final message = MessageNode(receiver);
+      addTo<Token>(message.selectorToken, selectorAndArguments);
+      addTo<ValueNode>(message.arguments, selectorAndArguments);
+      return message;
+    });
 
 MethodNode buildMethod(List parts) {
   final result = MethodNode();

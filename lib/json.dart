@@ -1,4 +1,6 @@
 /// This package contains a complete implementation of [JSON](https://json.org/).
+library json;
+
 import 'src/json/definition.dart';
 import 'src/json/types.dart';
 
