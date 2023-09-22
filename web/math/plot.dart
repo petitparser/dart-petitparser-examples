@@ -94,9 +94,6 @@ class Viewport {
 
   /// Converts pixel to logical x-coordinate.
   num fromPixelX(num value) => value * (maxX - minX) / width + minX;
-
-  /// Converts pixel to logical y-coordinate.
-  num fromPixelY(num value) => (height - value) * (maxY - minY) / height + minY;
 }
 
 final input = querySelector('#input') as TextInputElement;

@@ -114,7 +114,6 @@ class HtmlBuffer implements StringSink {
   }
 
   final List<Node> stack = [];
-  final List<Map<String, String?>> attributes = [];
 
   void nest(Map<String, String?> attributes, void Function() function) {
     final element = Element.span();

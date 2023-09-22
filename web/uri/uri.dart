@@ -3,8 +3,6 @@ import 'dart:html';
 import 'package:petitparser/petitparser.dart';
 import 'package:petitparser_examples/uri.dart';
 
-final parser = uri.end();
-
 final input = querySelector('#input') as InputElement;
 final output = querySelector('#output') as ParagraphElement;
 
