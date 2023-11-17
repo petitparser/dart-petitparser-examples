@@ -19,7 +19,7 @@ class Environment {
     if (_bindings.containsKey(key)) {
       return _bindings[key];
     } else if (_owner != null) {
-      return _owner![key];
+      return _owner[key];
     } else {
       _invalidBinding(key);
       return null;
@@ -31,7 +31,7 @@ class Environment {
     if (_bindings.containsKey(key)) {
       _bindings[key] = value;
     } else if (_owner != null) {
-      _owner![key] = value;
+      _owner[key] = value;
     } else {
       _invalidBinding(key);
     }
