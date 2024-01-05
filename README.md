@@ -37,6 +37,10 @@ dart run bin/lisp/lisp.dart
 
 This example contains a simple evaluator for mathematical expressions, it builds a parse-tree that can then be used to print or evaluate expressions.
 
+### Pascal
+
+A complete pascal grammar following the Apple Pascal Standard from 1978.
+
 ### Prolog
 
 This example contains a simple grammar and evaluator for Prolog programs. The code is reasonably complete to run and evaluate basic prolog programs. Binaries for a Read–Eval–Print Loop (REPL) are provided for the console and the web browser.
