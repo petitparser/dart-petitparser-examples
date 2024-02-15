@@ -6,13 +6,16 @@ include: package:lints/recommended.yaml
 #    strict-raw-types: true
 linter:
   rules:
+    - annotate_redeclares
     # - avoid_dynamic_calls
     - avoid_final_parameters
     - avoid_print
     - avoid_unused_constructor_parameters
     - camel_case_types
+    - collection_methods_unrelated_type
     - combinators_ordering
     - comment_references
+    - directives_ordering
     - invalid_case_patterns
     - no_self_assignments
     - no_wildcard_variable_uses
@@ -26,6 +29,7 @@ linter:
     - prefer_final_locals
     - prefer_if_elements_to_conditional_expressions
     - prefer_relative_imports
+    # - prefer_single_quotes
     - unnecessary_await_in_return
     - unnecessary_breaks
     # - unnecessary_lambdas
