@@ -1,7 +1,8 @@
 import 'dart:async';
-import 'dart:html';
+import 'dart:js_interop';
 
 import 'package:petitparser_examples/math.dart';
+import 'package:web/web.dart';
 
 class Viewport {
   Viewport(
@@ -14,7 +15,7 @@ class Viewport {
         width = canvas.offsetWidth,
         height = canvas.offsetHeight;
 
-  final CanvasElement canvas;
+  final HTMLCanvasElement canvas;
   final CanvasRenderingContext2D context;
 
   final num minX;
@@ -50,7 +51,7 @@ class Viewport {
     context.lineWidth = 0.5;
     for (var x = minX.floor(); x <= maxX.ceil(); x++) {
       final pixelX = toPixelX(x);
-      context.strokeStyle = x == 0 ? axisStyle : gridStyle;
+      context.strokeStyle = x == 0 ? axisStyle.toJS : gridStyle.toJS;
       context.beginPath();
       context.moveTo(pixelX, 0);
       context.lineTo(pixelX, height);
@@ -58,7 +59,7 @@ class Viewport {
     }
     for (var y = minY.floor(); y <= maxY.ceil(); y++) {
       final pixelY = toPixelY(y);
-      context.strokeStyle = y == 0 ? axisStyle : gridStyle;
+      context.strokeStyle = y == 0 ? axisStyle.toJS : gridStyle.toJS;
       context.beginPath();
       context.moveTo(0, pixelY);
       context.lineTo(width, pixelY);
@@ -68,7 +69,7 @@ class Viewport {
 
   /// Plots a numeric function.
   void plot(num Function(num x) function, {String functionStyle = 'blue'}) {
-    context.strokeStyle = functionStyle;
+    context.strokeStyle = functionStyle.toJS;
     context.lineWidth = 1.0;
     context.beginPath();
     num lastY = double.infinity;
@@ -96,23 +97,23 @@ class Viewport {
   num fromPixelX(num value) => value * (maxX - minX) / width + minX;
 }
 
-final input = querySelector('#input') as TextInputElement;
-final error = querySelector('#error') as ParagraphElement;
-final canvas = querySelector('#canvas') as CanvasElement;
+final input = document.querySelector('#input') as HTMLInputElement;
+final error = document.querySelector('#error') as HTMLElement;
+final canvas = document.querySelector('#canvas') as HTMLCanvasElement;
 
 final viewport = Viewport(canvas, minX: -5, maxX: 5, minY: -2.5, maxY: 2.5);
 
 Expression expression = Value(double.nan);
 
-void resize() {
-  final rect = canvas.parent?.getBoundingClientRect();
+void resize(Event event) {
+  final rect = canvas.parentElement?.getBoundingClientRect();
   if (rect != null) {
     viewport.resize(rect.width, rect.width / 2);
   }
 }
 
 void update() {
-  final source = input.value ?? '';
+  final source = input.value;
   try {
     expression = parser.parse(source).value;
     expression.eval({'x': 0, 't': 0});
@@ -134,8 +135,8 @@ void main() {
   if (window.location.hash.startsWith('#')) {
     input.value = Uri.decodeComponent(window.location.hash.substring(1));
   }
-  resize();
-  window.onResize.listen((event) => resize());
+  resize(Event('resize'));
+  window.addEventListener('resize', resize.toJS);
   update();
   input.onInput.listen((event) => update());
   Timer.periodic(const Duration(milliseconds: 1000 ~/ 30),

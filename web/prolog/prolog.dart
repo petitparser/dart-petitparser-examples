@@ -1,26 +1,25 @@
-import 'dart:html';
-
 import 'package:petitparser_examples/prolog.dart';
+import 'package:web/web.dart';
 
-final rulesElement = querySelector('#rules') as TextAreaElement;
-final queryElement = querySelector('#query') as TextInputElement;
-final askElement = querySelector('#ask') as SubmitButtonInputElement;
-final answersElement = querySelector('#answers') as UListElement;
+final rulesElement = document.querySelector('#rules') as HTMLInputElement;
+final queryElement = document.querySelector('#query') as HTMLInputElement;
+final askElement = document.querySelector('#ask') as HTMLButtonElement;
+final answersElement = document.querySelector('#answers') as HTMLElement;
 
 void main() {
   askElement.onClick.listen((event) async {
-    answersElement.innerHtml = '';
+    answersElement.innerHTML = '';
 
     Database? db;
     try {
-      db = Database.parse(rulesElement.value ?? '');
+      db = Database.parse(rulesElement.value);
     } on Object catch (error) {
       appendMessage('Error parsing rules: $error', isError: true);
     }
 
     Term? query;
     try {
-      query = Term.parse(queryElement.value ?? '');
+      query = Term.parse(queryElement.value);
     } on Object catch (error) {
       appendMessage('Error parsing query: $error', isError: true);
     }
@@ -42,9 +41,9 @@ void main() {
 
 void appendMessage(String message, {bool isError = false}) {
   final element = document.createElement('li');
-  element.innerHtml = message;
+  element.innerHTML = message;
   if (isError) {
-    element.classes.add('error');
+    element.classList.add('error');
   }
   answersElement.append(element);
 }

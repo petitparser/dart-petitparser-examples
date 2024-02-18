@@ -1,25 +1,24 @@
-import 'dart:html';
-
 import 'package:petitparser_examples/smalltalk.dart';
+import 'package:web/web.dart';
 
-final input = querySelector('#input') as TextAreaElement;
-final output = querySelector('#output') as ParagraphElement;
-final parse = querySelector('#parse') as SubmitButtonInputElement;
+final input = document.querySelector('#input') as HTMLInputElement;
+final output = document.querySelector('#output') as HTMLElement;
+final parse = document.querySelector('#parse') as HTMLButtonElement;
 
 final parserDefinition = SmalltalkParserDefinition();
 final methodParser = parserDefinition.build();
 
 void main() {
   parse.onClick.listen((event) {
-    output.innerHtml = 'Evaluating...';
-    output.classes.clear();
+    output.innerHTML = 'Evaluating...';
+    output.classList.value = '';
     try {
-      final result = methodParser.parse(input.value ?? '');
+      final result = methodParser.parse(input.value);
       final visitor = PrintVisitor()..visit(result.value);
-      output.innerHtml = visitor.buffer.toString();
+      output.innerHTML = visitor.buffer.toString();
     } on Object catch (exception) {
       output.text = exception.toString();
-      output.classes.add('error');
+      output.classList.add('error');
     }
   });
 }

@@ -1,14 +1,14 @@
 import 'dart:convert' as convert;
-import 'dart:html';
 
 import 'package:petitparser_examples/json.dart';
+import 'package:web/web.dart';
 
 final parser = JsonDefinition().build();
 
 void execute(
   String value,
-  Element timingElement,
-  Element outputElement,
+  HTMLElement timingElement,
+  HTMLElement outputElement,
   dynamic Function(String value) parse,
 ) {
   Object? result;
@@ -27,33 +27,32 @@ void execute(
 
   timingElement.innerText = '$timingμs';
   if (result is Exception) {
-    outputElement.classes.add('error');
+    outputElement.classList.add('error');
     outputElement.innerText =
         result is FormatException ? result.message : result.toString();
   } else {
-    outputElement.classes.remove('error');
+    outputElement.classList.remove('error');
     outputElement.innerText = convert.json.encode(result);
   }
 }
 
-final input = querySelector('#input') as TextAreaElement;
-final action = querySelector('#action') as SubmitButtonInputElement;
+final input = document.querySelector('#input') as HTMLTextAreaElement;
+final action = document.querySelector('#action') as HTMLButtonElement;
 
-final timingCustom = querySelector('#timing .custom')!;
-final timingNative = querySelector('#timing .native')!;
-final outputCustom = querySelector('#output .custom')!;
-final outputNative = querySelector('#output .native')!;
+final timingCustom = document.querySelector('#timing .custom') as HTMLElement;
+final timingNative = document.querySelector('#timing .native') as HTMLElement;
+final outputCustom = document.querySelector('#output .custom') as HTMLElement;
+final outputNative = document.querySelector('#output .native') as HTMLElement;
 
 void update() {
-  final value = input.value ?? '';
   execute(
-    value,
+    input.value,
     timingCustom,
     outputCustom,
     (input) => parser.parse(input).value,
   );
   execute(
-    value,
+    input.value,
     timingNative,
     outputNative,
     (input) => convert.json.decode(input),

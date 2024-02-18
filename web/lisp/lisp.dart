@@ -1,12 +1,11 @@
-import 'dart:html';
-
 import 'package:petitparser_examples/lisp.dart';
+import 'package:web/web.dart';
 
-final input = querySelector('#input') as TextAreaElement;
-final output = querySelector('#output') as ParagraphElement;
-final console = querySelector('#console') as ParagraphElement;
-final environment = querySelector('#environment') as ParagraphElement;
-final evaluate = querySelector('#evaluate') as SubmitButtonInputElement;
+final input = document.querySelector('#input') as HTMLInputElement;
+final output = document.querySelector('#output') as HTMLElement;
+final console = document.querySelector('#console') as HTMLElement;
+final environment = document.querySelector('#environment') as HTMLElement;
+final evaluate = document.querySelector('#evaluate') as HTMLButtonElement;
 
 final root = NativeEnvironment();
 final standard = StandardEnvironment(root);
@@ -14,19 +13,19 @@ final user = standard.create();
 
 void main() {
   printer = (object) {
-    console.appendText(object.toString());
+    console.append(document.createTextNode(object.toString()));
     console.append(document.createElement('br'));
   };
   evaluate.onClick.listen((event) {
-    output.innerHtml = 'Evaluating...';
-    output.classes.clear();
-    console.innerHtml = '';
+    output.innerHTML = 'Evaluating...';
+    output.classList.value = '';
+    console.innerHTML = '';
     try {
-      final result = evalString(lispParser, user, input.value ?? '');
+      final result = evalString(lispParser, user, input.value);
       output.text = result.toString();
     } on Object catch (exception) {
       output.text = exception.toString();
-      output.classes.add('error');
+      output.classList.add('error');
     }
     inspect(environment, user);
   });
@@ -50,5 +49,5 @@ void inspect(Element element, Environment? environment) {
     }
     environment = environment.owner;
   }
-  element.innerHtml = buffer.toString();
+  element.innerHTML = buffer.toString();
 }

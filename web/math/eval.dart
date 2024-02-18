@@ -1,24 +1,22 @@
-import 'dart:html';
-
 import 'package:petitparser_examples/math.dart';
+import 'package:web/web.dart';
 
-final input = querySelector('#input') as TextInputElement;
-final result = querySelector('#result') as ParagraphElement;
-final tree = querySelector('#tree') as ParagraphElement;
+final input = document.querySelector('#input') as HTMLInputElement;
+final result = document.querySelector('#result') as HTMLElement;
+final tree = document.querySelector('#tree') as HTMLElement;
 
 void update() {
-  final source = input.value ?? '0';
   tree.text = '';
   try {
-    final expr = parser.parse(source).value;
-    tree.innerHtml = inspect(expr);
+    final expr = parser.parse(input.value).value;
+    tree.innerHTML = inspect(expr);
     result.text = ' = ${expr.eval({})}';
-    result.classes.clear();
+    result.classList.value = '';
   } on Object catch (exception) {
     result.text = exception.toString();
-    result.classes.add('error');
+    result.classList.add('error');
   }
-  window.location.hash = Uri.encodeComponent(source);
+  window.location.hash = Uri.encodeComponent(input.value);
 }
 
 String inspect(Expression expr, [String indent = '']) {

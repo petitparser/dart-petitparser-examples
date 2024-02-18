@@ -1,15 +1,14 @@
-import 'dart:html';
-
 import 'package:petitparser/petitparser.dart';
 import 'package:petitparser_examples/uri.dart';
+import 'package:web/web.dart';
 
-final input = querySelector('#input') as InputElement;
-final output = querySelector('#output') as ParagraphElement;
+final input = document.querySelector('#input') as HTMLInputElement;
+final output = document.querySelector('#output') as HTMLElement;
 
 void update() {
-  final result = uri.parse(input.value ?? '');
+  final result = uri.parse(input.value);
   if (result is Success) {
-    output.innerHtml = '''
+    output.innerHTML = '''
     <table>
       <tr>
         <th>Scheme</th>
@@ -56,7 +55,7 @@ void update() {
     </table>
     ''';
   } else {
-    output.innerHtml = '''
+    output.innerHTML = '''
     <span class="error">
       Error at ${result.position}: ${result.message}
     </span>

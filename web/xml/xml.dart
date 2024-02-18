@@ -1,39 +1,38 @@
-import 'dart:html';
-
 import 'package:more/collection.dart';
+import 'package:web/web.dart';
 import 'package:xml/xml.dart';
 import 'package:xml/xml_events.dart';
 import 'package:xml/xpath.dart';
 
-final xmlInput = querySelector('#xml-input') as TextAreaElement;
-final xpathInput = querySelector('#xpath-input') as TextInputElement;
-final xpathError = querySelector('#xpath-error') as Element;
-final domPretty = querySelector('#dom-pretty') as CheckboxInputElement;
-final saxOutput = querySelector('#sax-output') as Element;
-final domOutput = querySelector('#dom-output') as Element;
+final xmlInput = document.querySelector('#xml-input') as HTMLInputElement;
+final xpathInput = document.querySelector('#xpath-input') as HTMLInputElement;
+final xpathError = document.querySelector('#xpath-error') as HTMLElement;
+final domPretty = document.querySelector('#dom-pretty') as HTMLInputElement;
+final saxOutput = document.querySelector('#sax-output') as HTMLElement;
+final domOutput = document.querySelector('#dom-output') as HTMLElement;
 
 Element appendString(Element element, String object) {
   object
       .split('\n')
-      .where((each) => each.trim().isNotEmpty)
-      .map<Node>(Text.new)
-      .separatedBy(Element.br)
-      .forEach(element.append);
+      .where((data) => data.trim().isNotEmpty)
+      .map<Node>((data) => document.createTextNode(data))
+      .separatedBy(() => document.createElement('br'))
+      .forEach((node) => element.append(node));
   return element;
 }
 
 void appendLine(Element target, String? data, {Iterable<String>? classes}) {
-  final element = Element.div();
-  if (classes != null) element.classes = classes;
-  element.appendText(data.toString());
+  final element = document.createElement('div');
+  if (classes != null) element.classList.value = classes.join(' ');
+  element.append(document.createTextNode(data.toString()));
   target.append(element);
 }
 
 void appendSax(String type, [String? first, String? second]) {
-  final element = Element.div();
-  element.append(appendString(Element.span(), type));
-  element.append(appendString(Element.span(), first ?? ''));
-  element.append(appendString(Element.span(), second ?? ''));
+  final element = document.createElement('div');
+  element.append(appendString(document.createElement('span'), type));
+  element.append(appendString(document.createElement('span'), first ?? ''));
+  element.append(appendString(document.createElement('span'), second ?? ''));
   saxOutput.append(element);
 }
 
@@ -43,7 +42,7 @@ void update() {
   saxOutput.innerText = '';
 
   // Process the XML event stream
-  final eventStream = Stream.value(xmlInput.value ?? '')
+  final eventStream = Stream.value(xmlInput.value)
       .toXmlEvents(withLocation: true)
       .tapEachEvent(
         onCDATA: (event) => appendSax('CDATA', event.value),
@@ -84,7 +83,7 @@ void updateDom(XmlDocument document) {
   // Find the XPath matches.
   final matches = <XmlNode>{};
   try {
-    matches.addAll(document.xpath(xpathInput.value ?? ''));
+    matches.addAll(document.xpath(xpathInput.value));
     xpathError.innerText = '';
   } catch (error) {
     xpathError.innerText = error.toString();
@@ -97,8 +96,8 @@ void selectDom(MouseEvent event) {
   for (var node = event.target as Node?;
       node != null && node != domOutput;
       node = node.parentNode) {
-    if (node is Element) {
-      final path = node.attributes['title'];
+    if (node is HTMLElement) {
+      final path = node.getAttribute('title');
       if (path != null && path.isNotEmpty) {
         xpathInput.value = path;
         update();
@@ -116,13 +115,13 @@ class HtmlBuffer implements StringSink {
   final List<Node> stack = [];
 
   void nest(Map<String, String?> attributes, void Function() function) {
-    final element = Element.span();
+    final element = document.createElement('span');
     for (final MapEntry(:key, :value) in attributes.entries) {
       if (value != null && value.isNotEmpty) {
         element.setAttribute(key, value);
       }
     }
-    stack.last.append(element);
+    stack.last.appendChild(element);
     stack.add(element);
     function();
     stack.removeLast();
@@ -133,9 +132,9 @@ class HtmlBuffer implements StringSink {
     object
         .toString()
         .split('\n')
-        .map<Node>(Text.new)
-        .separatedBy(Element.br)
-        .forEach(stack.last.append);
+        .map<Node>((data) => document.createTextNode(data))
+        .separatedBy(() => document.createElement('br'))
+        .forEach((node) => stack.last.appendChild(node));
   }
 
   @override
