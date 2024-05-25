@@ -1,5 +1,5 @@
 /// This package contains a complete implementation of [JSON](https://json.org/).
-library json;
+library;
 
 import 'src/json/definition.dart';
 import 'src/json/types.dart';
@@ -14,6 +14,8 @@ final _jsonParser = JsonDefinition().build();
 ///
 /// For example:
 ///
-///     final result = parseJson('{"a": 1, "b": [2, 3.4], "c": false}');
-///     print(result.value);  // {a: 1, b: [2, 3.4], c: false}
+/// ```dart
+/// final result = parseJson('{"a": 1, "b": [2, 3.4], "c": false}');
+/// print(result.value);  // {a: 1, b: [2, 3.4], c: false}
+/// ```
 JSON parseJson(String input) => _jsonParser.parse(input).value;

@@ -1,7 +1,7 @@
 /// Further parse the URI authority into username, password, hostname and port.
 ///
 /// Accepts input of the form "[username[:password]@]hostname[:port]".
-library authority;
+library;
 
 import 'package:petitparser/petitparser.dart';
 

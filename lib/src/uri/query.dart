@@ -1,7 +1,7 @@
 /// Parsers an URI query.
 ///
 /// Accepts input of the form "{key[=value]}&...".
-library query;
+library;
 
 import 'package:petitparser/petitparser.dart';
 

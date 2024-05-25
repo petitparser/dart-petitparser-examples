@@ -2,7 +2,7 @@
 ///
 /// The accepted inputs and decomposition matches the example given in
 /// Appendix B of the standard: https://tools.ietf.org/html/rfc3986#appendix-B.
-library uri;
+library;
 
 import 'package:petitparser/petitparser.dart';
 

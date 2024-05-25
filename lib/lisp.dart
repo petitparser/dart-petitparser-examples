@@ -2,7 +2,7 @@
 ///
 /// The code is reasonably complete to run and evaluate reasonably complex
 /// programs from the console or the web browser.
-library lisp;
+library;
 
 export 'src/lisp/cons.dart';
 export 'src/lisp/environment.dart';

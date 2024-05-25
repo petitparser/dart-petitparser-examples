@@ -3,7 +3,7 @@
 ///
 /// The code is reasonably complete to run and evaluate reasonably complex
 /// programs from the console or the web browser.
-library prolog;
+library;
 
 export 'src/prolog/evaluator.dart';
 export 'src/prolog/grammar.dart';

@@ -1,4 +1,4 @@
 /// This package contains the grammar of Pascal.
-library pascal;
+library;
 
 export 'src/pascal/grammar.dart';
