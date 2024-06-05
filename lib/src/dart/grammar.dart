@@ -544,7 +544,10 @@ class DartGrammarDefinition extends GrammarDefinition {
   Parser expressionList() => ref0(expression).plusSeparated(ref1(token, ','));
 
   Parser arguments() =>
-      ref1(token, '(') & ref0(argumentList).optional() & ref1(token, ')');
+      ref1(token, '(') &
+      ref0(argumentList).optional() &
+      ref1(token, ',').optional() &
+      ref1(token, ')');
 
   Parser argumentList() =>
       ref0(argumentElement).plusSeparated(ref1(token, ','));
@@ -742,7 +745,7 @@ class DartGrammarDefinition extends GrammarDefinition {
   Parser identifierPartLexicalToken() =>
       ref0(identifierStartLexicalToken) | ref0(digitLexicalToken);
 
-  Parser letterLexicalToken() => letter();
+  Parser letterLexicalToken() => letter() & (ref1(token, "?") | ref1(token, "!")).optional();
 
   Parser digitLexicalToken() => digit();
 
