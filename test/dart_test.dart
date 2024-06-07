@@ -145,9 +145,6 @@ void main() {
       expect('a?.b', accept(expression));
       expect('a.b?', accept(expression));
       expect('a.b!', accept(expression));
-      expect('b()!', accept(expression));
-      expect('a.b()?', accept(expression));
-      expect('a?.b()', accept(expression));
       expect('?.a.b', isNot(accept(expression)));
       expect('?a.b', isNot(accept(expression)));
       expect('a?b', isNot(accept(expression)));
@@ -163,6 +160,9 @@ void main() {
       expect('a(b: c?.d)', accept(expression));
       expect('a(b: c, d: e)', accept(expression));
       expect('a(b: c, d: e,)', accept(expression));
+      expect('b()!', accept(expression));
+      expect('a.b()?', accept(expression));
+      expect('a?.b()', accept(expression));
     });
     test('invoke (double)', () {
       expect('a()()', accept(expression));
