@@ -149,6 +149,7 @@ void main() {
       expect('?a.b', isNot(accept(expression)));
       expect('a?b', isNot(accept(expression)));
       expect('a!b', isNot(accept(expression)));
+      expect('a?.?b', isNot(accept(expression)));
     });
 
     test('invoke', () {
@@ -163,6 +164,7 @@ void main() {
       expect('b()!', accept(expression));
       expect('a.b()?', accept(expression));
       expect('a?.b()', accept(expression));
+      expect('a?()', isNot(accept(expression)));
     });
     test('invoke (double)', () {
       expect('a()()', accept(expression));
