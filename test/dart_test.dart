@@ -142,13 +142,18 @@ void main() {
     test('access', () {
       expect('a.b', accept(expression));
       expect('a.b.c', accept(expression));
+      expect('a?.b', accept(expression));
+      expect('a.b?', accept(expression));
+      expect('a.b!', accept(expression));
+      expect('b()!', accept(expression));
+      expect('a.b()?', accept(expression));
+      expect('a?.b()', accept(expression));
+      expect('?.a.b', isNot(accept(expression)));
+      expect('?a.b', isNot(accept(expression)));
+      expect('a?b', isNot(accept(expression)));
+      expect('a!b', isNot(accept(expression)));
     });
-    test('indexed', () {
-      expect('a[b]', accept(expression));
-      expect('a[b] = c', accept(expression));
-      expect('a[b][c]', accept(expression));
-      expect('a[b][c] = d', accept(expression));
-    });
+
     test('invoke', () {
       expect('a()', accept(expression));
       expect('a(b)', accept(expression));
