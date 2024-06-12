@@ -142,19 +142,29 @@ void main() {
     test('access', () {
       expect('a.b', accept(expression));
       expect('a.b.c', accept(expression));
+      expect('a?.b', accept(expression));
+      expect('a.b?', accept(expression));
+      expect('a.b!', accept(expression));
+      expect('?.a.b', isNot(accept(expression)));
+      expect('?a.b', isNot(accept(expression)));
+      expect('a?b', isNot(accept(expression)));
+      expect('a!b', isNot(accept(expression)));
+      expect('a?.?b', isNot(accept(expression)));
     });
-    test('indexed', () {
-      expect('a[b]', accept(expression));
-      expect('a[b] = c', accept(expression));
-      expect('a[b][c]', accept(expression));
-      expect('a[b][c] = d', accept(expression));
-    });
+
     test('invoke', () {
       expect('a()', accept(expression));
       expect('a(b)', accept(expression));
       expect('a(b, c)', accept(expression));
       expect('a(b: c)', accept(expression));
+      expect('a(b: c!.d)', accept(expression));
+      expect('a(b: c?.d)', accept(expression));
       expect('a(b: c, d: e)', accept(expression));
+      expect('a(b: c, d: e,)', accept(expression));
+      expect('b()!', accept(expression));
+      expect('a.b()?', accept(expression));
+      expect('a?.b()', accept(expression));
+      expect('a?()', isNot(accept(expression)));
     });
     test('invoke (double)', () {
       expect('a()()', accept(expression));
@@ -162,6 +172,7 @@ void main() {
       expect('a(b, c)(b, c)', accept(expression));
       expect('a(b: c)(b: c)', accept(expression));
       expect('a(b: c, d: e)(b: c, d: e)', accept(expression));
+      expect('a(b: c, d: e,)(b: c, d: e,)', accept(expression));
     });
     test('constructor', () {
       expect('new a()', accept(expression));

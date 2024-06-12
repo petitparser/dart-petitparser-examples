@@ -544,7 +544,11 @@ class DartGrammarDefinition extends GrammarDefinition {
   Parser expressionList() => ref0(expression).plusSeparated(ref1(token, ','));
 
   Parser arguments() =>
-      ref1(token, '(') & ref0(argumentList).optional() & ref1(token, ')');
+      ref1(token, '(') &
+      ref0(argumentList).optional() &
+      ref1(token, ',').optional() &
+      ref1(token, ')') &
+      nullSafetyAnnotations().optional();
 
   Parser argumentList() =>
       ref0(argumentElement).plusSeparated(ref1(token, ','));
@@ -631,11 +635,15 @@ class DartGrammarDefinition extends GrammarDefinition {
       ref0(assignableExpression) & ref0(postfixOperator) |
       ref0(primary) & ref0(selector).star();
 
-  Parser selector() => ref0(assignableSelector) | ref0(arguments);
+  Parser selector() =>
+    nullSafetyAnnotations().optional()
+    & ref0(assignableSelector) | ref0(arguments);
+
+  Parser nullSafetyAnnotations() => ref1(token, "?") | ref1(token, "!");
 
   Parser assignableSelector() =>
       ref1(token, '[') & ref0(expression) & ref1(token, ']') |
-      ref1(token, '.') & ref0(identifier);
+      ref1(token, '.') & ref0(identifier) & nullSafetyAnnotations().optional();
 
   Parser primary() =>
       ref0(thisToken) |
