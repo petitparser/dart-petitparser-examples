@@ -2,9 +2,15 @@ import 'package:petitparser/reflection.dart';
 import 'package:petitparser_examples/lisp.dart';
 import 'package:test/test.dart';
 
-const Matcher isName = TypeMatcher<Name>();
-const Matcher isString = TypeMatcher<String>();
-const Matcher isCons = TypeMatcher<Cons>();
+import 'utils/expect.dart';
+
+Matcher isName([dynamic name = anything]) =>
+    const TypeMatcher<Name>().having((name) => name.toString(), 'name', name);
+
+Matcher isCons({dynamic head = anything, dynamic tail = anything}) =>
+    const TypeMatcher<Cons>()
+        .having((cons) => cons.head, 'head', head)
+        .having((cons) => cons.tail, 'tail', tail);
 
 void main() {
   final grammarDefinition = LispGrammarDefinition();
@@ -67,115 +73,115 @@ void main() {
       expect(linter(grammar), isEmpty);
     });
     test('Name', () {
-      final result = grammar.parse('foo').value;
-      expect(result, ['foo']);
+      expect(grammar, isSuccess('foo', value: ['foo']));
     });
     test('Name for operator', () {
-      final result = grammar.parse('+').value;
-      expect(result, ['+']);
+      expect(grammar, isSuccess('+', value: ['+']));
     });
     test('Name for special', () {
-      final result = grammar.parse('set!').value;
-      expect(result, ['set!']);
+      expect(grammar, isSuccess('set!', value: ['set!']));
     });
     test('String', () {
-      final result = grammar.parse('"foo"').value;
-      expect(result, [
-        [
-          '"',
-          ['f', 'o', 'o'],
-          '"'
-        ]
-      ]);
+      expect(
+          grammar,
+          isSuccess('"foo"', value: [
+            [
+              '"',
+              ['f', 'o', 'o'],
+              '"'
+            ]
+          ]));
     });
     test('String with escape', () {
-      final result = grammar.parse('"\\""').value;
-      expect(result, [
-        [
-          '"',
-          [
-            ['\\', '"']
-          ],
-          '"'
-        ]
-      ]);
+      expect(
+          grammar,
+          isSuccess('"\\""', value: [
+            [
+              '"',
+              [
+                ['\\', '"']
+              ],
+              '"'
+            ]
+          ]));
     });
     test('Number integer', () {
-      final result = grammar.parse('123').value;
-      expect(result, ['123']);
+      expect(grammar, isSuccess('123', value: ['123']));
     });
     test('Number negative integer', () {
-      final result = grammar.parse('-123').value;
-      expect(result, ['-123']);
+      expect(grammar, isSuccess('-123', value: ['-123']));
     });
     test('Number positive integer', () {
-      final result = grammar.parse('+123').value;
-      expect(result, ['+123']);
+      expect(grammar, isSuccess('+123', value: ['+123']));
     });
     test('Number floating', () {
-      final result = grammar.parse('123.45').value;
-      expect(result, ['123.45']);
+      expect(grammar, isSuccess('123.45', value: ['123.45']));
     });
     test('Number floating exponential', () {
-      final result = grammar.parse('1.23e4').value;
-      expect(result, ['1.23e4']);
+      expect(grammar, isSuccess('1.23e4', value: ['1.23e4']));
     });
     test('List empty', () {
-      final result = grammar.parse('()').value;
-      expect(result, [
-        ['(', [], ')']
-      ]);
+      expect(
+          grammar,
+          isSuccess('()', value: [
+            ['(', [], ')']
+          ]));
     });
     test('List empty []', () {
-      final result = grammar.parse('[]').value;
-      expect(result, [
-        ['[', [], ']']
-      ]);
+      expect(
+          grammar,
+          isSuccess('[]', value: [
+            ['[', [], ']']
+          ]));
     });
     test('List empty {}', () {
-      final result = grammar.parse('{}').value;
-      expect(result, [
-        ['{', [], '}']
-      ]);
+      expect(
+          grammar,
+          isSuccess('{}', value: [
+            ['{', [], '}']
+          ]));
     });
     test('List one element', () {
-      final result = grammar.parse('(1)').value;
-      expect(result, [
-        [
-          '(',
-          ['1', []],
-          ')'
-        ]
-      ]);
+      expect(
+          grammar,
+          isSuccess('(1)', value: [
+            [
+              '(',
+              ['1', []],
+              ')'
+            ]
+          ]));
     });
     test('List two elements', () {
-      final result = grammar.parse('(1 2)').value;
-      expect(result, [
-        [
-          '(',
-          [
-            '1',
-            ['2', []]
-          ],
-          ')'
-        ]
-      ]);
+      expect(
+          grammar,
+          isSuccess('(1 2)', value: [
+            [
+              '(',
+              [
+                '1',
+                ['2', []]
+              ],
+              ')'
+            ]
+          ]));
     });
     test('List three elements', () {
-      final result = grammar.parse('(+ 1 2)').value;
-      expect(result, [
-        [
-          '(',
-          [
-            '+',
+      expect(
+          grammar,
+          isSuccess('(+ 1 2)', value: [
             [
-              '1',
-              ['2', []]
+              '(',
+              [
+                '+',
+                [
+                  '1',
+                  ['2', []]
+                ]
+              ],
+              ')'
             ]
-          ],
-          ')'
-        ]
-      ]);
+          ]));
     });
   });
   group('Parser', () {
@@ -184,85 +190,60 @@ void main() {
       expect(linter(atom, excludedTypes: {}), isEmpty);
     });
     test('Name', () {
-      final cell = atom.parse('foo').value;
-      expect(cell, isName);
-      expect(cell.toString(), 'foo');
+      expect(atom, isSuccess('foo', value: isName('foo')));
     });
     test('Name for operator', () {
-      final cell = atom.parse('+').value;
-      expect(cell, isName);
-      expect(cell.toString(), '+');
+      expect(atom, isSuccess('+', value: isName('+')));
     });
     test('Name for special', () {
-      final cell = atom.parse('set!').value;
-      expect(cell, isName);
-      expect(cell.toString(), 'set!');
+      expect(atom, isSuccess('set!', value: isName('set!')));
     });
     test('String', () {
-      final cell = atom.parse('"foo"').value;
-      expect(cell, isString);
-      expect(cell, 'foo');
+      expect(atom, isSuccess('"foo"', value: 'foo'));
     });
     test('String with escape', () {
-      final cell = atom.parse('"\\""').value;
-      expect(cell, '"');
+      expect(atom, isSuccess('"\\""', value: '"'));
     });
     test('Number integer', () {
-      final cell = atom.parse('123').value;
-      expect(cell, 123);
+      expect(atom, isSuccess('123', value: 123));
     });
     test('Number negative integer', () {
-      final cell = atom.parse('-123').value;
-      expect(cell, -123);
+      expect(atom, isSuccess('-123', value: -123));
     });
     test('Number positive integer', () {
-      final cell = atom.parse('+123').value;
-      expect(cell, 123);
+      expect(atom, isSuccess('+123', value: 123));
     });
     test('Number floating', () {
-      final cell = atom.parse('123.45').value;
-      expect(cell, 123.45);
+      expect(atom, isSuccess('123.45', value: 123.45));
     });
     test('Number floating exponential', () {
-      final cell = atom.parse('1.23e4').value;
-      expect(cell, 1.23e4);
+      expect(atom, isSuccess('1.23e4', value: 1.23e4));
     });
     test('List empty', () {
-      final cell = atom.parse('()').value;
-      expect(cell, isNull);
+      expect(atom, isSuccess('()', value: isNull));
     });
     test('List empty []', () {
-      final cell = atom.parse('[ ]').value;
-      expect(cell, isNull);
+      expect(atom, isSuccess('[ ]', value: isNull));
     });
     test('List empty {}', () {
-      final cell = atom.parse('{   }').value;
-      expect(cell, isNull);
+      expect(atom, isSuccess('{   }', value: isNull));
     });
     test('List one element', () {
-      final cell = atom.parse('(1)').value;
-      expect(cell, isCons);
-      expect(cell.head, 1);
-      expect(cell.tail, isNull);
+      expect(atom, isSuccess('(1)', value: isCons(head: 1, tail: isNull)));
     });
     test('List two elements', () {
-      final cell = atom.parse('(1 2)').value;
-      expect(cell, isCons);
-      expect(cell.head, 1);
-      expect(cell.tail, isCons);
-      expect(cell.tail.head, 2);
-      expect(cell.tail.tail, isNull);
+      expect(
+          atom,
+          isSuccess('(1 2)',
+              value: isCons(head: 1, tail: isCons(head: 2, tail: isNull))));
     });
     test('List three elements', () {
-      final cell = atom.parse('(+ 1 2)').value;
-      expect(cell, isCons);
-      expect(cell.head, isName);
-      expect(cell.head.toString(), '+');
-      expect(cell.tail, isCons);
-      expect(cell.tail.head, 1);
-      expect(cell.tail.tail, isCons);
-      expect(cell.tail.tail.head, 2);
-      expect(cell.tail.tail.tail, isNull);
+      expect(
+          atom,
+          isSuccess('(+ 1 2)',
+              value: isCons(
+                  head: isName('+'),
+                  tail: isCons(head: 1, tail: isCons(head: 2, tail: isNull)))));
     });
   });
   group('Natives', () {
