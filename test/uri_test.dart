@@ -6,18 +6,13 @@ import 'package:petitparser_examples/src/uri/query.dart';
 import 'package:petitparser_examples/uri.dart';
 import 'package:test/test.dart';
 
+import 'utils/expect.dart';
+
 final parser = uri.end();
 
 @isTest
 void uriTest(String source, Map<Symbol, dynamic> values) {
-  test(source, () {
-    final result = parser.parse(source);
-    expect(result is Success, isTrue, reason: 'isSuccess');
-    for (final entry in values.entries) {
-      expect(result.value[entry.key], entry.value,
-          reason: entry.key.toString());
-    }
-  });
+  test(source, () => expect(parser, isSuccess(source, value: values)));
 }
 
 void main() {
@@ -62,6 +57,9 @@ void main() {
     #port: '22',
     #path: '/foo bar/zork<>',
     #query: r'\^`{|}',
+    #params: [
+      ['\\^`{|}', isNull]
+    ],
     #fragment: isNull,
   });
   uriTest('data:text/plain;charset=iso-8859-7,hallo', {
@@ -163,10 +161,7 @@ void main() {
       'http://a.b-c.de',
       'http://223.255.255.254',
     ]) {
-      test(input, () {
-        final result = parser.parse(input);
-        expect(result is Success, isTrue);
-      });
+      test(input, () => expect(parser, isSuccess(input)));
     }
   });
 }
