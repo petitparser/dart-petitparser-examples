@@ -636,8 +636,8 @@ class DartGrammarDefinition extends GrammarDefinition {
       ref0(primary) & ref0(selector).star();
 
   Parser selector() =>
-    nullSafetyAnnotations().optional()
-    & ref0(assignableSelector) | ref0(arguments);
+      nullSafetyAnnotations().optional() & ref0(assignableSelector) |
+      ref0(arguments);
 
   Parser nullSafetyAnnotations() => ref1(token, "?") | ref1(token, "!");
 

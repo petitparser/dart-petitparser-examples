@@ -3,19 +3,10 @@ import 'package:petitparser/reflection.dart';
 import 'package:petitparser_examples/pascal.dart';
 import 'package:test/test.dart';
 
+import 'utils/expect.dart';
+
 final grammar = PascalGrammarDefinition();
 final parser = grammar.build();
-
-TypeMatcher isSuccess(String input, {dynamic value = anything}) =>
-    isA<Parser>().having(
-        (parser) => parser.parse(input),
-        'parse',
-        isA<Success>().having(
-            (success) => success.value is Token && value is! Token
-                ? success.value.value
-                : success.value,
-            'value',
-            value));
 
 void main() {
   group('productions', () {
