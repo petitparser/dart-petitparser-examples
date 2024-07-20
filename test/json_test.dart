@@ -1,7 +1,8 @@
-import 'package:petitparser/core.dart';
 import 'package:petitparser/reflection.dart';
 import 'package:petitparser_examples/json.dart';
 import 'package:test/test.dart';
+
+import 'utils/expect.dart';
 
 void main() {
   final parser = JsonDefinition().build();
@@ -10,132 +11,138 @@ void main() {
   });
   group('arrays', () {
     test('empty', () {
-      expect(parser.parse('[]').value, []);
+      expect(parser, isSuccess('[]', value: []));
     });
     test('small', () {
-      expect(parser.parse('["a"]').value, ['a']);
+      expect(parser, isSuccess('["a"]', value: ['a']));
     });
     test('large', () {
-      expect(parser.parse('["a", "b", "c"]').value, ['a', 'b', 'c']);
+      expect(parser, isSuccess('["a", "b", "c"]', value: ['a', 'b', 'c']));
     });
     test('nested', () {
-      expect(parser.parse('[["a"]]').value, [
-        ['a']
-      ]);
+      expect(
+          parser,
+          isSuccess('[["a"]]', value: [
+            ['a']
+          ]));
     });
     test('invalid', () {
-      expect(parser.parse('[') is Failure, isTrue);
-      expect(parser.parse('[1') is Failure, isTrue);
-      expect(parser.parse('[1,') is Failure, isTrue);
-      expect(parser.parse('[1,]') is Failure, isTrue);
-      expect(parser.parse('[1 2]') is Failure, isTrue);
-      expect(parser.parse('[]]') is Failure, isTrue);
+      expect(parser, isFailure('['));
+      expect(parser, isFailure('[1'));
+      expect(parser, isFailure('[1,'));
+      expect(parser, isFailure('[1,]'));
+      expect(parser, isFailure('[1 2]'));
+      expect(parser, isFailure('[]]'));
     });
   });
   group('objects', () {
     test('empty', () {
-      expect(parser.parse('{}').value, {});
+      expect(parser, isSuccess('{}', value: {}));
     });
     test('small', () {
-      expect(parser.parse('{"a": 1}').value, {'a': 1});
+      expect(parser, isSuccess('{"a": 1}', value: {'a': 1}));
     });
     test('large', () {
-      expect(parser.parse('{"a": 1, "b": 2, "c": 3}').value,
-          {'a': 1, 'b': 2, 'c': 3});
+      expect(
+          parser,
+          isSuccess('{"a": 1, "b": 2, "c": 3}',
+              value: {'a': 1, 'b': 2, 'c': 3}));
     });
     test('nested', () {
-      expect(parser.parse('{"obj": {"a": 1}}').value, {
-        'obj': {'a': 1}
-      });
+      expect(
+          parser,
+          isSuccess('{"obj": {"a": 1}}', value: {
+            'obj': {'a': 1}
+          }));
     });
     test('invalid', () {
-      expect(parser.parse('{') is Failure, isTrue);
-      expect(parser.parse("{'a'") is Failure, isTrue);
-      expect(parser.parse("{'a':") is Failure, isTrue);
-      expect(parser.parse("{'a':'b'") is Failure, isTrue);
-      expect(parser.parse("{'a':'b',") is Failure, isTrue);
-      expect(parser.parse("{'a'}") is Failure, isTrue);
-      expect(parser.parse("{'a':}") is Failure, isTrue);
-      expect(parser.parse("{'a':'b',}") is Failure, isTrue);
-      expect(parser.parse('{}}') is Failure, isTrue);
+      expect(parser, isFailure('{'));
+      expect(parser, isFailure("{'a'"));
+      expect(parser, isFailure("{'a':"));
+      expect(parser, isFailure("{'a':'b'"));
+      expect(parser, isFailure("{'a':'b',"));
+      expect(parser, isFailure("{'a'}"));
+      expect(parser, isFailure("{'a':}"));
+      expect(parser, isFailure("{'a':'b',}"));
+      expect(parser, isFailure('{}}'));
     });
   });
   group('literals', () {
     test('valid true', () {
-      expect(parser.parse('true').value, isTrue);
+      expect(parser, isSuccess('true', value: true));
     });
     test('invalid true', () {
-      expect(parser.parse('tr') is Failure, isTrue);
-      expect(parser.parse('trace') is Failure, isTrue);
-      expect(parser.parse('truest') is Failure, isTrue);
+      expect(parser, isFailure('tr'));
+      expect(parser, isFailure('trace'));
+      expect(parser, isFailure('truest'));
     });
     test('valid false', () {
-      expect(parser.parse('false').value, isFalse);
+      expect(parser, isSuccess('false', value: false));
     });
     test('invalid false', () {
-      expect(parser.parse('fa') is Failure, isTrue);
-      expect(parser.parse('falsely') is Failure, isTrue);
-      expect(parser.parse('fabulous') is Failure, isTrue);
+      expect(parser, isFailure('fa'));
+      expect(parser, isFailure('falsely'));
+      expect(parser, isFailure('fabulous'));
     });
     test('valid null', () {
-      expect(parser.parse('null').value, isNull);
+      expect(parser, isSuccess('null', value: null));
     });
     test('invalid null', () {
-      expect(parser.parse('nu') is Failure, isTrue);
-      expect(parser.parse('nuclear') is Failure, isTrue);
-      expect(parser.parse('nullified') is Failure, isTrue);
+      expect(parser, isFailure('nu'));
+      expect(parser, isFailure('nuclear'));
+      expect(parser, isFailure('nullified'));
     });
     test('valid integer', () {
-      expect(parser.parse('0').value, 0);
-      expect(parser.parse('1').value, 1);
-      expect(parser.parse('-1').value, -1);
-      expect(parser.parse('12').value, 12);
-      expect(parser.parse('-12').value, -12);
-      expect(parser.parse('1e2').value, 100);
-      expect(parser.parse('1e+2').value, 100);
+      expect(parser, isSuccess('0', value: 0));
+      expect(parser, isSuccess('1', value: 1));
+      expect(parser, isSuccess('-1', value: -1));
+      expect(parser, isSuccess('12', value: 12));
+      expect(parser, isSuccess('-12', value: -12));
+      expect(parser, isSuccess('1e2', value: 100));
+      expect(parser, isSuccess('1e+2', value: 100));
     });
     test('invalid integer', () {
-      expect(parser.parse('00') is Failure, isTrue);
-      expect(parser.parse('01') is Failure, isTrue);
+      expect(parser, isFailure('00'));
+      expect(parser, isFailure('01'));
     });
     test('valid float', () {
-      expect(parser.parse('0.0').value, 0.0);
-      expect(parser.parse('0.12').value, 0.12);
-      expect(parser.parse('-0.12').value, -0.12);
-      expect(parser.parse('12.34').value, 12.34);
-      expect(parser.parse('-12.34').value, -12.34);
-      expect(parser.parse('1.2e-1').value, 1.2e-1);
-      expect(parser.parse('1.2E-1').value, 1.2e-1);
+      expect(parser, isSuccess('0.0', value: 0.0));
+      expect(parser, isSuccess('0.12', value: 0.12));
+      expect(parser, isSuccess('-0.12', value: -0.12));
+      expect(parser, isSuccess('12.34', value: 12.34));
+      expect(parser, isSuccess('-12.34', value: -12.34));
+      expect(parser, isSuccess('1.2e-1', value: 1.2e-1));
+      expect(parser, isSuccess('1.2E-1', value: 1.2e-1));
     });
     test('invalid float', () {
-      expect(parser.parse('.1') is Failure, isTrue);
-      expect(parser.parse('0.1.1') is Failure, isTrue);
+      expect(parser, isFailure('.1'));
+      expect(parser, isFailure('0.1.1'));
     });
     test('plain string', () {
-      expect(parser.parse('""').value, '');
-      expect(parser.parse('"foo"').value, 'foo');
-      expect(parser.parse('"foo bar"').value, 'foo bar');
+      expect(parser, isSuccess('""', value: ''));
+      expect(parser, isSuccess('"foo"', value: 'foo'));
+      expect(parser, isSuccess('"foo bar"', value: 'foo bar'));
     });
     test('escaped string', () {
-      expect(parser.parse('"\\""').value, '"');
-      expect(parser.parse('"\\\\"').value, '\\');
-      expect(parser.parse('"\\b"').value, '\b');
-      expect(parser.parse('"\\f"').value, '\f');
-      expect(parser.parse('"\\n"').value, '\n');
-      expect(parser.parse('"\\r"').value, '\r');
-      expect(parser.parse('"\\t"').value, '\t');
+      expect(parser, isSuccess('"\\""', value: '"'));
+      expect(parser, isSuccess('"\\\\"', value: '\\'));
+      expect(parser, isSuccess('"\\b"', value: '\b'));
+      expect(parser, isSuccess('"\\f"', value: '\f'));
+      expect(parser, isSuccess('"\\n"', value: '\n'));
+      expect(parser, isSuccess('"\\r"', value: '\r'));
+      expect(parser, isSuccess('"\\t"', value: '\t'));
     });
     test('unicode string', () {
-      expect(parser.parse('"\\u0030"').value, '0');
-      expect(parser.parse('"\\u007B"').value, '{');
-      expect(parser.parse('"\\u007d"').value, '}');
+      expect(parser, isSuccess('"\\u0030"', value: '0'));
+      expect(parser, isSuccess('"\\u007B"', value: '{'));
+      expect(parser, isSuccess('"\\u007d"', value: '}'));
     });
     test('invalid string', () {
-      expect(parser.parse('"') is Failure, isTrue);
-      expect(parser.parse('"a') is Failure, isTrue);
-      expect(parser.parse('"a\\"') is Failure, isTrue);
-      expect(parser.parse('"\\u00"') is Failure, isTrue);
-      expect(parser.parse('"\\u000X"') is Failure, isTrue);
+      expect(parser, isFailure('"'));
+      expect(parser, isFailure('"a'));
+      expect(parser, isFailure('"a\\"'));
+      expect(parser, isFailure('"\\u00"'));
+      expect(parser, isFailure('"\\u000X"'));
     });
   });
   group('browser', () {
@@ -182,42 +189,39 @@ void main() {
     });
   });
   group('errors', () {
-    void expectError(String input, int position, String message) {
-      final result = parser.parse(input);
-      expect(result is Failure, isTrue);
-      expect(result.message, message);
-      expect(result.position, position);
-    }
-
     test('expected value', () {
-      expectError('', 0, 'value expected');
+      expect(parser, isFailure('', position: 0, message: 'value expected'));
     });
     test('expected array closing', () {
-      expectError('[', 0, 'value expected');
+      expect(parser, isFailure('[', position: 0, message: 'value expected'));
     });
     test('expected array element', () {
-      expectError('[1,', 0, 'value expected');
+      expect(parser, isFailure('[1,', position: 0, message: 'value expected'));
     });
     test('expected object closing', () {
-      expectError('{', 0, 'value expected');
+      expect(parser, isFailure('{', position: 0, message: 'value expected'));
     });
     test('expected object colon', () {
-      expectError('{"a"', 0, 'value expected');
+      expect(parser, isFailure('{"a"', position: 0, message: 'value expected'));
     });
     test('expected object value', () {
-      expectError('{"a":', 0, 'value expected');
+      expect(
+          parser, isFailure('{"a":', position: 0, message: 'value expected'));
     });
     test('expected object entry', () {
-      expectError('{"a":1,', 0, 'value expected');
+      expect(
+          parser, isFailure('{"a":1,', position: 0, message: 'value expected'));
     });
     test('expected string closing', () {
-      expectError('"', 0, 'value expected');
+      expect(parser, isFailure('"', position: 0, message: 'value expected'));
     });
     test('expected number (fractional part)', () {
-      expectError('1.', 1, 'end of input expected');
+      expect(parser,
+          isFailure('1.', position: 1, message: 'end of input expected'));
     });
     test('expected number (exponent part)', () {
-      expectError('1e', 1, 'end of input expected');
+      expect(parser,
+          isFailure('1e', position: 1, message: 'end of input expected'));
     });
   });
 }
