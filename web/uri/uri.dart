@@ -1,3 +1,5 @@
+import 'dart:js_interop';
+
 import 'package:petitparser/petitparser.dart';
 import 'package:petitparser_examples/uri.dart';
 import 'package:web/web.dart';
@@ -53,13 +55,15 @@ void update() {
         <td>${result.value[#fragment]}</td>
       </tr>
     </table>
-    ''';
+    '''
+        .toJS;
   } else {
     output.innerHTML = '''
     <span class="error">
       Error at ${result.position}: ${result.message}
     </span>
-    ''';
+    '''
+        .toJS;
   }
 }
 

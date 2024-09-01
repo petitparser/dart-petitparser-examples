@@ -1,3 +1,5 @@
+import 'dart:js_interop';
+
 import 'package:petitparser_examples/math.dart';
 import 'package:web/web.dart';
 
@@ -9,7 +11,7 @@ void update() {
   tree.text = '';
   try {
     final expr = parser.parse(input.value).value;
-    tree.innerHTML = inspect(expr);
+    tree.innerHTML = inspect(expr).toJS;
     result.text = ' = ${expr.eval({})}';
     result.classList.value = '';
   } on Object catch (exception) {

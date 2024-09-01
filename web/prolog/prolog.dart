@@ -8,7 +8,7 @@ final answersElement = document.querySelector('#answers') as HTMLElement;
 
 void main() {
   askElement.onClick.listen((event) async {
-    answersElement.innerHTML = '';
+    answersElement.innerText = '';
 
     Database? db;
     try {
@@ -41,7 +41,7 @@ void main() {
 
 void appendMessage(String message, {bool isError = false}) {
   final element = document.createElement('li');
-  element.innerHTML = message;
+  element.textContent = message;
   if (isError) {
     element.classList.add('error');
   }

@@ -1,3 +1,5 @@
+import 'dart:js_interop';
+
 import 'package:petitparser_examples/lisp.dart';
 import 'package:web/web.dart';
 
@@ -17,9 +19,9 @@ void main() {
     console.append(document.createElement('br'));
   };
   evaluate.onClick.listen((event) {
-    output.innerHTML = 'Evaluating...';
+    output.innerText = 'Evaluating...';
     output.classList.value = '';
-    console.innerHTML = '';
+    console.innerText = '';
     try {
       final result = evalString(lispParser, user, input.value);
       output.text = result.toString();
@@ -49,5 +51,5 @@ void inspect(Element element, Environment? environment) {
     }
     environment = environment.owner;
   }
-  element.innerHTML = buffer.toString();
+  element.innerHTML = buffer.toString().toJS;
 }
