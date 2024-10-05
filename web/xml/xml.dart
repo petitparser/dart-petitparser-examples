@@ -1,3 +1,5 @@
+import 'dart:js_interop';
+
 import 'package:more/collection.dart';
 import 'package:web/web.dart';
 import 'package:xml/xml.dart';
@@ -96,8 +98,9 @@ void selectDom(MouseEvent event) {
   for (var node = event.target as Node?;
       node != null && node != domOutput;
       node = node.parentNode) {
-    if (node is HTMLElement) {
-      final path = node.getAttribute('title');
+    if (node.isA<HTMLElement>()) {
+      final element = node as HTMLElement;
+      final path = element.getAttribute('title');
       if (path != null && path.isNotEmpty) {
         xpathInput.value = path;
         update();
