@@ -62,13 +62,8 @@ class PrologParserDefinition extends PrologGrammarDefinition {
 
   @override
   Parser<Variable> variable() => super.variable().map((name) {
-        if (name == '_') {
-          return Variable(name);
-        }
-        if (scope.containsKey(name)) {
-          return scope[name]!;
-        }
-        return scope[name] = Variable(name);
+        if (name == '_') return Variable(name);
+        return scope.putIfAbsent(name, () => Variable(name));
       });
 
   @override
