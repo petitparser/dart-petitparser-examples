@@ -16,7 +16,7 @@ class JsonDefinition extends GrammarDefinition<JSON> {
         ref0(trueToken),
         ref0(falseToken),
         ref0(nullToken),
-        failure('value expected'),
+        failure(message: 'value expected'),
       ].toChoiceParser();
 
   Parser<Map<String, JSON>> object() => seq3(

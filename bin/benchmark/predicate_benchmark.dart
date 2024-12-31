@@ -4,8 +4,8 @@ import 'util/runner.dart';
 
 void main() {
   runString('predicate - string', string(defaultStringInput));
-  runString(
-      'predicate - stringIgnoreCase', stringIgnoreCase(defaultStringInput));
+  runString('predicate - string (ignore case)',
+      string(defaultStringInput, ignoreCase: true));
   runString('predicate - predicate',
       predicate(defaultStringInput.length, (_) => true, ''));
   runString('predicate - pattern - regexp',
