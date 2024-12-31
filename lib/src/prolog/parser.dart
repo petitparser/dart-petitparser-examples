@@ -13,7 +13,7 @@ final Parser<List<Rule>> rulesParser =
 /// The standard prolog parser to read queries.
 final Parser<Term> termParser = _definition.buildFrom(_definition.term()).end();
 
-/// LISP parser definition.
+/// Prolog parser definition.
 class PrologParserDefinition extends PrologGrammarDefinition {
   final Map<String, Variable> scope = {};
 
@@ -26,11 +26,11 @@ class PrologParserDefinition extends PrologGrammarDefinition {
         final head = each[0];
         final rest = each[1];
         if (rest == null) {
-          return Rule(head, const Value('true'));
+          return Rule(head, const True());
         }
         final List terms = rest[1];
         if (terms.isEmpty) {
-          return Rule(head, const Value('true'));
+          return Rule(head, const True());
         } else if (terms.length == 1) {
           return Rule(head, terms[0]);
         } else {
@@ -63,7 +63,7 @@ class PrologParserDefinition extends PrologGrammarDefinition {
   @override
   Parser<Variable> variable() => super.variable().map((name) {
         if (name == '_') {
-          return const Variable('_');
+          return Variable(name);
         }
         if (scope.containsKey(name)) {
           return scope[name]!;

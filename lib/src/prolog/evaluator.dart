@@ -9,14 +9,11 @@ const Equality<List<Node>> argumentEquality = ListEquality();
 Map<Variable, Node> newBindings() => Map<Variable, Node>.identity();
 
 Map<Variable, Node>? mergeBindings(
-  Map<Variable, Node>? first,
-  Map<Variable, Node>? second,
-) {
+    Map<Variable, Node>? first, Map<Variable, Node>? second) {
   if (first == null || second == null) {
     return null;
   }
-  final result = newBindings();
-  result.addAll(first);
+  final result = newBindings()..addAll(first);
   for (final key in second.keys) {
     final value = second[key]!;
     final other = result[key];
@@ -35,7 +32,7 @@ Map<Variable, Node>? mergeBindings(
 }
 
 @immutable
-class Database {
+final class Database {
   factory Database.parse(String rules) =>
       Database(rulesParser.parse(rules).value);
 
@@ -47,13 +44,10 @@ class Database {
 
   final Map<String, List<Rule>> rules = {};
 
-  Stream<Node> query(Term goal) async* {
+  Iterable<Node> query(Term goal) {
     final candidates = rules[goal.name];
-    if (candidates != null) {
-      for (final rule in candidates) {
-        yield* rule.query(this, goal);
-      }
-    }
+    if (candidates == null) return const [];
+    return candidates.expand((rule) => rule.query(this, goal));
   }
 
   @override
@@ -62,21 +56,20 @@ class Database {
 }
 
 @immutable
-class Rule {
+final class Rule {
   const Rule(this.head, this.body);
 
   final Term head;
   final Term body;
 
-  Stream<Node> query(Database database, Term goal) async* {
+  Iterable<Node> query(Database database, Term goal) {
     final match = head.match(goal);
-    if (match != null) {
-      final newHead = head.substitute(match);
-      final newBody = body.substitute(match);
-      await for (final item in newBody.query(database)) {
-        yield newHead.substitute(newBody.match(item));
-      }
-    }
+    if (match == null) return const [];
+    final newHead = head.substitute(match);
+    final newBody = body.substitute(match);
+    return newBody
+        .query(database)
+        .map((item) => newHead.substitute(newBody.match(item)));
   }
 
   @override
@@ -140,9 +133,7 @@ class Term extends Node {
   final String name;
   final List<Node> arguments;
 
-  Stream<Node> query(Database database) async* {
-    yield* database.query(this);
-  }
+  Iterable<Node> query(Database database) => database.query(this);
 
   @override
   Map<Variable, Node>? match(Node other) {
@@ -180,13 +171,22 @@ class Term extends Node {
 }
 
 @immutable
+class True extends Term {
+  const True() : super._('true', const []);
+
+  @override
+  Term substitute(Map<Variable, Node>? bindings) => this;
+
+  @override
+  Iterable<Node> query(Database database) => [this];
+}
+
+@immutable
 class Value extends Term {
   const Value(String name) : super._(name, const []);
 
   @override
-  Stream<Node> query(Database database) async* {
-    yield this;
-  }
+  Iterable<Node> query(Database database) => [this];
 
   @override
   Value substitute(Map<Variable, Node>? bindings) => this;
@@ -209,12 +209,12 @@ class Conjunction extends Term {
   const Conjunction._(List<Node> args) : super._(',', args);
 
   @override
-  Stream<Node> query(Database database) async* {
-    Stream<Node> solutions(int index, Map<Variable, Node> bindings) async* {
+  Iterable<Node> query(Database database) {
+    Iterable<Node> solutions(int index, Map<Variable, Node> bindings) sync* {
       if (index < arguments.length) {
         final arg = arguments[index];
         final subs = arg.substitute(bindings) as Term;
-        await for (final item in database.query(subs)) {
+        for (final item in database.query(subs)) {
           final unified = mergeBindings(arg.match(item), bindings);
           if (unified != null) {
             yield* solutions(index + 1, unified);
@@ -225,7 +225,7 @@ class Conjunction extends Term {
       }
     }
 
-    yield* solutions(0, newBindings());
+    return solutions(0, newBindings());
   }
 
   @override

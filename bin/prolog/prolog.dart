@@ -36,7 +36,7 @@ void main(List<String> arguments) {
       .transform(systemEncoding.decoder)
       .transform(const LineSplitter())
       .map(Term.parse)
-      .asyncMap((goal) async {
-    await db.query(goal).forEach(stdout.writeln);
+      .map((goal) {
+    db.query(goal).forEach(stdout.writeln);
   }).forEach((each) => stdout.write('?- '));
 }

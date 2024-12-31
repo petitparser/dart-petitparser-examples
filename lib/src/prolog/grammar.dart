@@ -39,7 +39,7 @@ class PrologGrammarDefinition extends GrammarDefinition {
   Parser commentSingle() => char('%') & Token.newlineParser().neg().star();
   Parser commentMulti() => string('/*').starLazy(string('*/')) & string('*/');
 
-  Parser token(Object parser, [String? message]) {
+  Parser<String> token(Object parser, [String? message]) {
     if (parser is Parser) {
       return parser.flatten(message).trim(ref0(space));
     } else if (parser is String) {
@@ -51,19 +51,19 @@ class PrologGrammarDefinition extends GrammarDefinition {
     }
   }
 
-  Parser variableToken() => ref2(
+  Parser<String> variableToken() => ref2(
         token,
         pattern('A-Z_') & pattern('A-Za-z0-9_').star(),
         'Variable expected',
       );
-  Parser valueToken() => ref2(
+  Parser<String> valueToken() => ref2(
         token,
         pattern('a-z') & pattern('A-Za-z0-9_').star(),
         'Value expected',
       );
-  Parser openParenToken() => ref1(token, '(');
-  Parser closeParentToken() => ref1(token, ')');
-  Parser commaToken() => ref1(token, ',');
-  Parser terminatorToken() => ref1(token, '.');
-  Parser definitionToken() => ref1(token, ':-');
+  Parser<String> openParenToken() => ref1(token, '(');
+  Parser<String> closeParentToken() => ref1(token, ')');
+  Parser<String> commaToken() => ref1(token, ',');
+  Parser<String> terminatorToken() => ref1(token, '.');
+  Parser<String> definitionToken() => ref1(token, ':-');
 }

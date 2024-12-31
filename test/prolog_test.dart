@@ -90,73 +90,59 @@ void main() {
     ''');
     test('eric son of thorne', () async {
       final query = Term.parse('father_child(eric, thorne)');
-      expect(
-          db.query(query),
-          emitsInOrder([
-            Term.parse('father_child(eric, thorne)'),
-          ]));
+      expect(db.query(query), [
+        Term.parse('father_child(eric, thorne)'),
+      ]);
     });
     test('children of stephanie', () async {
       final query = Term.parse('mother_child(stephanie, X)');
-      expect(
-          db.query(query),
-          emitsInOrder([
-            Term.parse('mother_child(stephanie, thorne)'),
-            Term.parse('mother_child(stephanie, kristen)'),
-            Term.parse('mother_child(stephanie, felicia)'),
-          ]));
+      expect(db.query(query), [
+        Term.parse('mother_child(stephanie, thorne)'),
+        Term.parse('mother_child(stephanie, kristen)'),
+        Term.parse('mother_child(stephanie, felicia)'),
+      ]);
     });
     test('fathers and children', () async {
       final query = Term.parse('father_child(X, Y)');
-      expect(
-          db.query(query),
-          emitsInOrder([
-            Term.parse('father_child(massimo, ridge)'),
-            Term.parse('father_child(eric, thorne)'),
-            Term.parse('father_child(thorne, alexandria)'),
-          ]));
+      expect(db.query(query), [
+        Term.parse('father_child(massimo, ridge)'),
+        Term.parse('father_child(eric, thorne)'),
+        Term.parse('father_child(thorne, alexandria)'),
+      ]);
     });
     test('parents of thorne', () async {
       final query = Term.parse('parent_child(X, thorne)');
-      expect(
-          db.query(query),
-          emitsInOrder([
-            Term.parse('parent_child(eric, thorne)'),
-            Term.parse('parent_child(stephanie, thorne)'),
-          ]));
+      expect(db.query(query), [
+        Term.parse('parent_child(eric, thorne)'),
+        Term.parse('parent_child(stephanie, thorne)'),
+      ]);
     });
     test('parents and children', () async {
       final query = Term.parse('parent_child(X, Y)');
-      expect(
-          db.query(query),
-          emitsInOrder([
-            Term.parse('parent_child(massimo, ridge)'),
-            Term.parse('parent_child(eric, thorne)'),
-            Term.parse('parent_child(thorne, alexandria)'),
-            Term.parse('parent_child(stephanie, thorne)'),
-            Term.parse('parent_child(stephanie, kristen)'),
-            Term.parse('parent_child(stephanie, felicia)'),
-          ]));
+      expect(db.query(query), [
+        Term.parse('parent_child(massimo, ridge)'),
+        Term.parse('parent_child(eric, thorne)'),
+        Term.parse('parent_child(thorne, alexandria)'),
+        Term.parse('parent_child(stephanie, thorne)'),
+        Term.parse('parent_child(stephanie, kristen)'),
+        Term.parse('parent_child(stephanie, felicia)'),
+      ]);
     });
     test('siblings of felicia', () async {
       final query = Term.parse('sibling(X, felicia)');
-      expect(
-          db.query(query),
-          emitsInOrder([
-            Term.parse('sibling(thorne, felicia)'),
-            Term.parse('sibling(kristen, felicia)'),
-            Term.parse('sibling(felicia, felicia)'),
-          ]));
+      expect(db.query(query), [
+        Term.parse('sibling(thorne, felicia)'),
+        Term.parse('sibling(kristen, felicia)'),
+        Term.parse('sibling(felicia, felicia)'),
+      ]);
     });
     test('ancestors of alexandria', () {
       final query = Term.parse('ancestor(X, alexandria)');
-      expect(
-          db.query(query),
-          emitsInOrder([
-            Term.parse('ancestor(thorne, alexandria)'),
-            Term.parse('ancestor(eric, alexandria)'),
-            Term.parse('ancestor(stephanie, alexandria)'),
-          ]));
+      expect(db.query(query), [
+        Term.parse('ancestor(thorne, alexandria)'),
+        Term.parse('ancestor(eric, alexandria)'),
+        Term.parse('ancestor(stephanie, alexandria)'),
+      ]);
     });
   });
   group("Einstein's Problem", () {
@@ -209,11 +195,9 @@ void main() {
     ''');
     test('Who Owns the Fish?', () {
       final query = Term.parse('solution(FishOwner)');
-      expect(
-          db.query(query),
-          emitsInOrder([
-            Term.parse('solution(german)'),
-          ]));
-    }, skip: 'Causes a stack overflow in Dart 2.6 and later.');
+      expect(db.query(query), [
+        Term.parse('solution(german)'),
+      ]);
+    });
   });
 }

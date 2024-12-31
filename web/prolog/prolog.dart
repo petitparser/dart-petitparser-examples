@@ -29,7 +29,7 @@ void main() {
     }
 
     var hasResult = false;
-    await db.query(query).forEach((item) {
+    db.query(query).forEach((item) {
       appendMessage(item.toString());
       hasResult = true;
     });
