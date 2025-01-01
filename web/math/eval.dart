@@ -23,11 +23,10 @@ void update() {
 
 String inspect(Expression expr, [String indent = '']) {
   final result = StringBuffer('$indent$expr<br>');
-  if (expr is Unary) {
-    result.write(inspect(expr.value, '&nbsp;&nbsp;$indent'));
-  } else if (expr is Binary) {
-    result.write(inspect(expr.left, '&nbsp;&nbsp;$indent'));
-    result.write(inspect(expr.right, '&nbsp;&nbsp;$indent'));
+  if (expr is Application) {
+    for (final argument in expr.arguments) {
+      result.write(inspect(argument, '&nbsp;&nbsp;$indent'));
+    }
   }
   return result.toString();
 }

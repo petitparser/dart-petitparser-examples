@@ -31,16 +31,28 @@ void main() {
     verify('pi', pi);
     verify('e', e);
   });
-  test('functions', () {
+  test('functions (1 arg)', () {
+    verify('acos(0.5)', acos(0.5));
+    verify('asin(0.5)', asin(0.5));
+    verify('atan(0.5)', atan(0.5));
+    verify('cos(7)', cos(7));
     verify('exp(7)', exp(7));
     verify('log(7)', log(7));
     verify('sin(7)', sin(7));
-    verify('asin(0.5)', asin(0.5));
-    verify('cos(7)', cos(7));
-    verify('acos(0.5)', acos(0.5));
-    verify('tan(7)', tan(7));
-    verify('atan(0.5)', atan(0.5));
     verify('sqrt(2)', sqrt(2));
+    verify('tan(7)', tan(7));
+    verify('abs(-1)', 1);
+    verify('ceil(1.2)', 2);
+    verify('floor(1.2)', 1);
+    verify('round(1.6)', 2);
+    verify('sign(-2)', -1);
+    verify('truncate(-1.2)', -1);
+  });
+  test('functions (2 args)', () {
+    verify('atan2(2, 3)', atan2(2, 3));
+    verify('max(2, 3)', max(2, 3));
+    verify('min(2, 3)', min(2, 3));
+    verify('pow(2, 3)', pow(2, 3));
   });
   test('prefix', () {
     verify('+2', 2);

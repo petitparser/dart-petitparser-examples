@@ -32,34 +32,18 @@ class Variable extends Expression {
   String toString() => 'Variable{$name}';
 }
 
-/// An unary expression.
-class Unary extends Expression {
-  Unary(this.name, this.value, this.function);
+/// A function application.
+class Application extends Expression {
+  Application(this.name, this.arguments, this.function);
 
   final String name;
-  final Expression value;
-  final num Function(num value) function;
+  final List<Expression> arguments;
+  final Function function;
 
   @override
-  num eval(Map<String, num> variables) => function(value.eval(variables));
+  num eval(Map<String, num> variables) => Function.apply(
+      function, arguments.map((argument) => argument.eval(variables)).toList());
 
   @override
-  String toString() => 'Unary{$name}';
-}
-
-/// A binary expression.
-class Binary extends Expression {
-  Binary(this.name, this.left, this.right, this.function);
-
-  final String name;
-  final Expression left;
-  final Expression right;
-  final num Function(num left, num right) function;
-
-  @override
-  num eval(Map<String, num> variables) =>
-      function(left.eval(variables), right.eval(variables));
-
-  @override
-  String toString() => 'Binary{$name}';
+  String toString() => 'Application{$name}';
 }

@@ -15,39 +15,55 @@ final parser = () {
         .flatten('number expected')
         .trim()
         .map(_createValue))
-    ..primitive((letter() & word().star())
-        .flatten('variable expected')
-        .trim()
-        .map(_createVariable));
-  builder.group()
-    ..wrapper(
-        seq2(
-          word().plusString('function expected').trim(),
-          char('(').trim(),
-        ),
-        char(')').trim(),
-        (left, value, right) => _createFunction(left.$1, value))
-    ..wrapper(
-        char('(').trim(), char(')').trim(), (left, value, right) => value);
+    ..primitive(seq2(
+            seq2(letter(), word().star()).flatten('name expected').trim(),
+            seq3(
+              char('(').trim(),
+              builder.loopback
+                  .starSeparated(char(',').trim())
+                  .map((list) => list.elements),
+              char(')').trim(),
+            ).map3((_, list, __) => list).optionalWith(const <Expression>[]))
+        .map2((name, args) => _createBinding(name, args)));
+  builder.group().wrapper(
+      char('(').trim(), char(')').trim(), (left, value, right) => value);
   builder.group()
     ..prefix(char('+').trim(), (op, a) => a)
-    ..prefix(char('-').trim(), (op, a) => Unary('-', a, (x) => -x));
-  builder
-      .group()
-      .right(char('^').trim(), (a, op, b) => Binary('^', a, b, math.pow));
+    ..prefix(char('-').trim(), (op, a) => Application('-', [a], (x) => -x));
+  builder.group().right(
+      char('^').trim(), (a, op, b) => Application('^', [a, b], math.pow));
   builder.group()
-    ..left(char('*').trim(), (a, op, b) => Binary('*', a, b, (x, y) => x * y))
-    ..left(char('/').trim(), (a, op, b) => Binary('/', a, b, (x, y) => x / y));
+    ..left(char('*').trim(),
+        (a, op, b) => Application('*', [a, b], (x, y) => x * y))
+    ..left(char('/').trim(),
+        (a, op, b) => Application('/', [a, b], (x, y) => x / y));
   builder.group()
-    ..left(char('+').trim(), (a, op, b) => Binary('+', a, b, (x, y) => x + y))
-    ..left(char('-').trim(), (a, op, b) => Binary('-', a, b, (x, y) => x - y));
+    ..left(char('+').trim(),
+        (a, op, b) => Application('+', [a, b], (x, y) => x + y))
+    ..left(char('-').trim(),
+        (a, op, b) => Application('-', [a, b], (x, y) => x - y));
   return resolve(builder.build()).end();
 }();
 
 Expression _createValue(String value) => Value(num.parse(value));
 
-Expression _createVariable(String name) =>
-    constants.containsKey(name) ? Value(constants[name]!) : Variable(name);
+Expression _createBinding(String name, List<Expression> arguments) {
+  switch (arguments.length) {
+    case 0:
+      final value = constants[name];
+      return value == null ? Variable(name) : Value(value);
+    case 1:
+      final function = checkValue(name, functions1[name]);
+      return Application(name, arguments, function);
+    case 2:
+      final function = checkValue(name, functions2[name]);
+      return Application(name, arguments, function);
+    default:
+      throwUnknown(name);
+  }
+}
 
-Expression _createFunction(String name, Expression expression) =>
-    Unary(name, expression, functions[name]!);
+T checkValue<T>(String name, T? value) => value ?? throwUnknown(name);
+
+Never throwUnknown(String name) =>
+    throw ArgumentError.value(name, 'Unknown function');
