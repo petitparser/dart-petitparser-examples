@@ -12,14 +12,20 @@ void main() {
   runString('repeat - times', any().times(length));
   runString('repeat - repeat', any().repeat(half, length));
 
-  runString('repeat - starGreedy', any().starGreedy(char(last)));
-  runString('repeat - plusGreedy', any().plusGreedy(char(last)));
+  runString('repeat - starGreedy', any().starGreedy(char(last)),
+      position: length - 1);
+  runString('repeat - plusGreedy', any().plusGreedy(char(last)),
+      position: length - 1);
   runString(
-      'repeat - timesGreedy', any().repeatGreedy(char(last), half, length));
+      'repeat - timesGreedy', any().repeatGreedy(char(last), half, length),
+      position: length - 1);
 
-  runString('repeat - starLazy', any().starLazy(char(last)));
-  runString('repeat - plusLazy', any().plusLazy(char(last)));
-  runString('repeat - timesLazy', any().repeatLazy(char(last), half, length));
+  runString('repeat - starLazy', any().starLazy(char(last)),
+      position: length - 1);
+  runString('repeat - plusLazy', any().plusLazy(char(last)),
+      position: length - 1);
+  runString('repeat - timesLazy', any().repeatLazy(char(last), half, length),
+      position: length - 1);
 
   runString('repeat - starSeparated', any().starSeparated(epsilon()));
   runString('repeat - plusSeparated', any().plusSeparated(epsilon()));

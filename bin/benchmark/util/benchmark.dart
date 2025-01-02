@@ -9,7 +9,7 @@ typedef Benchmark = void Function();
 /// least [minDuration]. The measurement is sampled [sampleCount] times.
 Jackknife<double> benchmark(
   Benchmark function, {
-  int minLoop = 100,
+  int minLoop = 25,
   Duration minDuration = const Duration(milliseconds: 100),
   int sampleCount = 25,
   double confidenceLevel = 0.95,

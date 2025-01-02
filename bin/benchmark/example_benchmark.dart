@@ -1,5 +1,6 @@
 import 'package:petitparser/petitparser.dart';
 import 'package:petitparser_examples/bibtex.dart' as bibtex_example;
+import 'package:petitparser_examples/csv.dart' as csv_example;
 import 'package:petitparser_examples/json.dart' as json_example;
 import 'package:petitparser_examples/lisp.dart' as lisp_example;
 import 'package:petitparser_examples/math.dart' as math_example;
@@ -17,6 +18,11 @@ const bibtexInput = '@inproceedings{Reng10c,\n'
     '\tMonth = jun,\n'
     '\tYear = 2010,\n'
     '\tUrl = {http://scg.unibe.ch/archive/papers/Reng10cDynamicGrammars.pdf}}';
+
+final csvParser = csv_example.csv;
+const csvInput = 'Los Angeles,34°03′N,118°15′W\n'
+    'New York City,40°42′46″N,74°00′21″W\n'
+    'Paris,48°51′24″N,2°21′03″E';
 
 final lispParser = lisp_example.LispParserDefinition().build();
 const lispInput = '(define (fib n)\n'
@@ -66,11 +72,12 @@ const xmlInput = '<?xml version="1.0"?>\n'
     '</ns:foo>';
 
 void main() {
-  runString('example - bibtex', bibtexParser, bibtexInput);
-  runString('example - json', jsonParser, jsonInput);
-  runString('example - lisp', lispParser, lispInput);
-  runString('example - math', mathParser, mathInput);
-  runString('example - prolog', prologParser, prologInput);
-  runString('example - uri', uriParser, uriInput);
-  runString('example - xml', xmlParser, xmlInput);
+  runString('example - bibtex', bibtexParser, input: bibtexInput);
+  runString('example - csv', csvParser, input: csvInput);
+  runString('example - json', jsonParser, input: jsonInput);
+  runString('example - lisp', lispParser, input: lispInput);
+  runString('example - math', mathParser, input: mathInput);
+  runString('example - prolog', prologParser, input: prologInput);
+  runString('example - uri', uriParser, input: uriInput);
+  runString('example - xml', xmlParser, input: xmlInput);
 }
