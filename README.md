@@ -75,5 +75,5 @@ webdev serve --release
 To run the benchmarks execute the following command from the command line:
 
 ```bash
-ls -1 bin/benchmark/*.dart | xargs -n 1 dart run --no-enable-asserts
+dart run --no-enable-asserts bin/benchmark/benchmark.dart
 ```

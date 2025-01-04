@@ -1,7 +1,7 @@
 import 'package:collection/collection.dart';
 import 'package:petitparser/petitparser.dart';
 
-import 'util/runner.dart';
+import '../utils/runner.dart';
 
 const equality = ListEquality();
 

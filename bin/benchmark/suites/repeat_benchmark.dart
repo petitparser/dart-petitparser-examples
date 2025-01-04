@@ -1,6 +1,6 @@
 import 'package:petitparser/petitparser.dart';
 
-import 'util/runner.dart';
+import '../utils/runner.dart';
 
 final length = defaultStringInput.length;
 final half = length ~/ 2;

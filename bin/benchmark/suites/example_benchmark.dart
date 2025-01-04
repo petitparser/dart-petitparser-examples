@@ -9,7 +9,7 @@ import 'package:petitparser_examples/uri.dart' as uri_example;
 import 'package:xml/src/xml_events/parser.dart' as xml_example;
 import 'package:xml/xml.dart';
 
-import 'util/runner.dart';
+import '../utils/runner.dart';
 
 final bibtexParser = bibtex_example.BibTeXDefinition().build();
 const bibtexInput = '@inproceedings{Reng10c,\n'

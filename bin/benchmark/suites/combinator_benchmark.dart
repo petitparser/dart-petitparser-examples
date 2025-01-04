@@ -1,6 +1,6 @@
 import 'package:petitparser/petitparser.dart';
 
-import 'util/runner.dart';
+import '../utils/runner.dart';
 
 void main() {
   runChars('combinator - and', any().and(), success: 319);
