@@ -34,11 +34,11 @@ Jackknife<double> benchmark(
 
 @pragma('vm:never-inline')
 @pragma('vm:unsafe:no-interrupts')
-@pragma('vm:unsafe:no-bounds-checks')
 Duration _benchmark(Benchmark function, int count) {
   final watch = Stopwatch();
   watch.start();
-  while (count-- > 0) {
+  var n = count + 0;
+  while (n-- > 0) {
     function();
   }
   watch.stop();

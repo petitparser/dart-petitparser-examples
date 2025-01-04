@@ -10,7 +10,7 @@ import 'package:petitparser/petitparser.dart';
 import 'benchmark.dart';
 
 /// When set to true, only verify the assertions.
-const isTestOnly = false;
+var verifyOnly = false;
 
 final defaultCharsInput = [
   // ASCII characters (265 times)
@@ -41,25 +41,25 @@ String formatBenchmark(Jackknife<double> jackknife) =>
 /// Generic benchmark runner.
 void run(
   String name, {
-  Benchmark? verify,
+  required Benchmark verify,
   required Benchmark parse,
   required Benchmark accept,
   Benchmark? native,
 }) {
   _benchmarkEntries.add(MapEntry(name, () {
     stdout.write('$name\t');
-    if (verify != null) {
-      try {
-        verify();
-      } catch (error) {
-        stdout.writeln(error);
-        return;
-      }
-      if (isTestOnly) {
-        stdout.writeln('OK');
-        return;
-      }
+    // Verification.
+    try {
+      verify();
+    } catch (error) {
+      stdout.writeln(error);
+      return;
     }
+    if (verifyOnly) {
+      stdout.writeln('OK');
+      return;
+    }
+    // Benchmark.
     final parseJackknife = benchmark(parse);
     stdout.write('${formatBenchmark(parseJackknife)}\t');
     final acceptJackknife = benchmark(accept);
@@ -75,12 +75,13 @@ void run(
 /// Generic character benchmark runner.
 void runChars(String name, Parser<void> parser, {int? success, String? input}) {
   final input_ = input ?? defaultStringInput;
+  final inputLength = input_.length;
   final success_ = success ?? input_.length;
   run(
     name,
     verify: () {
       var count = 0;
-      for (var i = 0; i < input_.length; i++) {
+      for (var i = 0; i < inputLength; i++) {
         if (parser.accept(input_, start: i)) count++;
       }
       if (success_ != count) {
@@ -88,12 +89,12 @@ void runChars(String name, Parser<void> parser, {int? success, String? input}) {
       }
     },
     parse: () {
-      for (var i = 0; i < input_.length; i++) {
+      for (var i = 0; i < inputLength; i++) {
         parser.parse(input_, start: i);
       }
     },
     accept: () {
-      for (var i = 0; i < input_.length; i++) {
+      for (var i = 0; i < inputLength; i++) {
         parser.accept(input_, start: i);
       }
     },

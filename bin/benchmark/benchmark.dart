@@ -8,7 +8,12 @@ import 'suites/predicate_benchmark.dart' as predicate_benchmark;
 import 'suites/regexp_benchmark.dart' as regexp_benchmark;
 import 'suites/repeat_benchmark.dart' as repeat_benchmark;
 
-void main() {
+import 'utils/runner.dart' as runner;
+
+void main(List<String> args) {
+  if (args.contains('verify')) {
+    runner.verifyOnly = true;
+  }
   action_benchmark.main();
   character_benchmark.main();
   combinator_benchmark.main();

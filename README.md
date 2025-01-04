@@ -77,3 +77,9 @@ To run the benchmarks execute the following command from the command line:
 ```bash
 dart run --no-enable-asserts bin/benchmark/benchmark.dart
 ```
+
+To only run the associated verification code use:
+
+```bash
+dart run bin/benchmark/benchmark.dart verify
+```
