@@ -9,6 +9,9 @@ import 'package:petitparser/petitparser.dart';
 
 import 'benchmark.dart';
 
+/// When set to true, only verify the assertions.
+const isTestOnly = false;
+
 final defaultCharsInput = [
   // ASCII characters (265 times)
   ...List.generate(0xff, String.fromCharCode),
@@ -52,6 +55,10 @@ void run(
         stdout.writeln(error);
         return;
       }
+      if (isTestOnly) {
+        stdout.writeln('OK');
+        return;
+      }
     }
     final parseJackknife = benchmark(parse);
     stdout.write('${formatBenchmark(parseJackknife)}\t');
@@ -66,29 +73,28 @@ void run(
 }
 
 /// Generic character benchmark runner.
-void runChars(String name, Parser<void> parser,
-    {int? success, List<String>? input}) {
-  final input_ = input ?? defaultCharsInput;
+void runChars(String name, Parser<void> parser, {int? success, String? input}) {
+  final input_ = input ?? defaultStringInput;
   final success_ = success ?? input_.length;
   run(
     name,
     verify: () {
       var count = 0;
-      for (final char in input_) {
-        if (parser.accept(char)) count++;
+      for (var i = 0; i < input_.length; i++) {
+        if (parser.accept(input_, start: i)) count++;
       }
       if (success_ != count) {
         throw StateError('Expected $success_ successes, but got $count');
       }
     },
     parse: () {
-      for (final char in input_) {
-        parser.parse(char);
+      for (var i = 0; i < input_.length; i++) {
+        parser.parse(input_, start: i);
       }
     },
     accept: () {
-      for (final char in input_) {
-        parser.accept(char);
+      for (var i = 0; i < input_.length; i++) {
+        parser.accept(input_, start: i);
       }
     },
   );

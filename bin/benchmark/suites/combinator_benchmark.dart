@@ -3,17 +3,17 @@ import 'package:petitparser/petitparser.dart';
 import '../utils/runner.dart';
 
 void main() {
-  runChars('combinator - and', any().and(), success: 319);
+  runChars('combinator - and', any().and(), success: 351);
   for (var i = 2; i < 10; i++) {
     final parsers = [...List.filled(i - 1, failure()), any()];
-    runChars('combinator - or [$i]', parsers.toChoiceParser(), success: 319);
+    runChars('combinator - or [$i]', parsers.toChoiceParser(), success: 351);
   }
   runChars('combinator - not', any().not(), success: 0);
   runChars('combinator - neg', any().neg(), success: 0);
-  runChars('combinator - optional', any().optional(), success: 319);
-  runChars('combinator - optionalWith', any().optionalWith('!'), success: 319);
+  runChars('combinator - optional', any().optional(), success: 351);
+  runChars('combinator - optionalWith', any().optionalWith('!'), success: 351);
   for (var i = 2; i < 256; i *= 2) {
-    runString('combinator - seq [${i.toString().padLeft(3)}]',
+    runString('combinator - seq [${i.toString().padLeft(3, '0')}]',
         List.filled(i, any()).toSequenceParser(),
         position: i);
   }
@@ -33,7 +33,7 @@ void main() {
   runString('combinator - seq9',
       seq9(any(), any(), any(), any(), any(), any(), any(), any(), any()),
       position: 9);
-  runChars('combinator - settable', any().settable(), success: 319);
+  runChars('combinator - settable', any().settable(), success: 351);
   runChars('combinator - skip', any().skip(before: epsilon(), after: epsilon()),
-      success: 319);
+      success: 351);
 }

@@ -12,6 +12,6 @@ void main() {
   runChars('action - permute', any().star().permute([0]));
   runChars('action - pick', any().star().pick(0));
   runChars('action - token', any().token());
-  runChars('action - trim', any().trim(), success: 311);
+  runChars('action - trim', any().trim(), success: 351);
   runChars('action - where', any().where((_) => true));
 }
