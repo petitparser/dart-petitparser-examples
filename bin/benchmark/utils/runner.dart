@@ -33,7 +33,7 @@ final List<MapEntry<String, Benchmark>> _benchmarkEntries = (() {
       comparator: compareAsciiLowerCase.onResultOf((entry) => entry.key));
 })();
 
-final numberPrinter = FixedNumberPrinter(precision: 3, separator: ',');
+final numberPrinter = FixedNumberPrinter(precision: 3);
 
 String formatBenchmark(Jackknife<double> jackknife) =>
     numberPrinter(jackknife.estimate);
