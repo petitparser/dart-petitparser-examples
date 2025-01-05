@@ -15,6 +15,7 @@ topics:
 environment:
   sdk: ^3.6.0
 dependencies:
+  args: ^2.6.0
   collection: ^1.19.0
   data: ^0.14.0
   http: ^1.2.0
@@ -31,4 +32,5 @@ dev_dependencies:
 
 dependency_overrides:
   petitparser:
-    git: https://github.com/petitparser/dart-petitparser
+    # git: https://github.com/petitparser/dart-petitparser
+    path: ../petitparser

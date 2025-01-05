@@ -78,8 +78,10 @@ To run the benchmarks execute the following command from the command line:
 dart run --no-enable-asserts bin/benchmark/benchmark.dart
 ```
 
-To only run the associated verification code use:
+Each benchmark prints the standard parsing performance, then the fast parsing performance (where return results are ignored), and possibly a native comparison (i.e. with regular expressions or native JSON parser). With the arguments `--confidence` or `--stderr` the respective variations are printed.
+
+To only run the verification code use:
 
 ```bash
-dart run bin/benchmark/benchmark.dart verify
+dart run bin/benchmark/benchmark.dart --no-benchmark
 ```

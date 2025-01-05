@@ -9,8 +9,20 @@ import 'package:petitparser/petitparser.dart';
 
 import 'benchmark.dart';
 
-/// When set to true, only verify the assertions.
-var verifyOnly = false;
+/// Whether to run the actual benchmark.
+var optionBenchmark = true;
+
+/// Whether to run the verification code.
+var optionVerification = true;
+
+/// Whether to print the standard error.
+var optionPrintStandardError = false;
+
+/// Whether to print the confidence intervals.
+var optionPrintConfidenceIntervals = false;
+
+/// Whether to filter to a specific benchmark.
+String? optionFilter;
 
 final defaultCharsInput = [
   // ASCII characters (265 times)
@@ -22,21 +34,17 @@ final defaultCharsInput = [
 ].shuffled(Random(42));
 final defaultStringInput = defaultCharsInput.join();
 
-final List<MapEntry<String, Benchmark>> _benchmarkEntries = (() {
+final List<({String name, Benchmark benchmark})> _benchmarkEntries = (() {
   Future.delayed(const Duration(milliseconds: 1)).then((_) {
-    stdout.writeln(['name', 'parser', 'accept', 'native'].join('\t'));
-    for (final benchmarkEntry in _benchmarkEntries) {
-      benchmarkEntry.value();
+    for (final (:name, :benchmark) in _benchmarkEntries) {
+      if (optionFilter == null || optionFilter == name) benchmark();
     }
   });
-  return SortedList<MapEntry<String, Benchmark>>(
-      comparator: compareAsciiLowerCase.onResultOf((entry) => entry.key));
+  return SortedList<({String name, Benchmark benchmark})>(
+      comparator: compareAsciiLowerCase.onResultOf((entry) => entry.name));
 })();
 
 final numberPrinter = FixedNumberPrinter(precision: 3);
-
-String formatBenchmark(Jackknife<double> jackknife) =>
-    numberPrinter(jackknife.estimate);
 
 /// Generic benchmark runner.
 void run(
@@ -46,30 +54,45 @@ void run(
   required Benchmark accept,
   Benchmark? native,
 }) {
-  _benchmarkEntries.add(MapEntry(name, () {
-    stdout.write('$name\t');
-    // Verification.
-    try {
-      verify();
-    } catch (error) {
-      stdout.writeln(error);
-      return;
+  _benchmarkEntries.add((
+    name: name,
+    benchmark: () {
+      // Print name.
+      stdout.write(name);
+      // Verification.
+      if (optionVerification) {
+        try {
+          verify();
+          if (!optionBenchmark) {
+            stdout.write('\tOK');
+          }
+        } catch (error) {
+          stdout.writeln('\t$error');
+          return;
+        }
+      }
+      // Benchmark.
+      if (optionBenchmark) {
+        final benchmarks = [
+          benchmark(parse),
+          benchmark(accept),
+          native?.also(benchmark),
+        ].whereType<Jackknife<double>>();
+        for (final benchmark in benchmarks) {
+          stdout.write('\t${numberPrinter(benchmark.estimate)}');
+          if (optionPrintStandardError) {
+            stdout.write(' ± ${numberPrinter(benchmark.standardError)}');
+          }
+          if (optionPrintConfidenceIntervals) {
+            stdout.write(' [${numberPrinter(benchmark.lowerBound)}; '
+                '${numberPrinter(benchmark.lowerBound)}]');
+          }
+        }
+      }
+      // Complete.
+      stdout.writeln();
     }
-    if (verifyOnly) {
-      stdout.writeln('OK');
-      return;
-    }
-    // Benchmark.
-    final parseJackknife = benchmark(parse);
-    stdout.write('${formatBenchmark(parseJackknife)}\t');
-    final acceptJackknife = benchmark(accept);
-    stdout.write('${formatBenchmark(acceptJackknife)}\t');
-    if (native != null) {
-      final nativeJackknife = benchmark(native);
-      stdout.write('${formatBenchmark(nativeJackknife)}\t');
-    }
-    stdout.writeln();
-  }));
+  ));
 }
 
 /// Generic character benchmark runner.
