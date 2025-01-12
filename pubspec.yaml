@@ -21,7 +21,7 @@ dependencies:
   http: ^1.2.0
   meta: ^1.16.0
   more: ^4.5.0
-  petitparser: ^7.0.0
+  petitparser: ^6.0.0
   web: ^1.1.0
   xml: ^6.5.0
 dev_dependencies:
@@ -32,5 +32,6 @@ dev_dependencies:
 
 dependency_overrides:
   petitparser:
-    # git: https://github.com/petitparser/dart-petitparser
-    path: ../petitparser
+    git:
+      url: https://github.com/petitparser/dart-petitparser
+      ref: unicode
