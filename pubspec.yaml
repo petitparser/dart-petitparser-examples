@@ -35,3 +35,7 @@ dependency_overrides:
     git:
       url: https://github.com/petitparser/dart-petitparser
       ref: unicode
+  xml:
+    git:
+      url: https://github.com/renggli/dart-xml
+      ref: unicode
