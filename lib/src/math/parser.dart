@@ -12,19 +12,21 @@ final parser = () {
             (char('.') & digit().plus()).optional() &
             (pattern('eE') & pattern('+-').optional() & digit().plus())
                 .optional())
-        .flatten('number expected')
+        .flatten(message: 'number expected')
         .trim()
         .map(_createValue))
     ..primitive(seq2(
-            seq2(letter(), word().star()).flatten('name expected').trim(),
-            seq3(
-              char('(').trim(),
-              builder.loopback
-                  .starSeparated(char(',').trim())
-                  .map((list) => list.elements),
-              char(')').trim(),
-            ).map3((_, list, __) => list).optionalWith(const <Expression>[]))
-        .map2((name, args) => _createBinding(name, args)));
+        seq2(letter(), word().star()).flatten(message: 'name expected').trim(),
+        seq3(
+          char('(').trim(),
+          builder.loopback
+              .starSeparated(char(',').trim())
+              .map((list) => list.elements),
+          char(')').trim(),
+        )
+            .map3((_, list, __) => list)
+            .optionalWith(const <Expression>[])).map2(
+        (name, args) => _createBinding(name, args)));
   builder.group().wrapper(
       char('(').trim(), char(')').trim(), (left, value, right) => value);
   builder.group()

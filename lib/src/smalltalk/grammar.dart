@@ -15,7 +15,10 @@ class SmalltalkGrammarDefinition extends GrammarDefinition {
           .trim(ref0(spacer));
     } else if (source is Parser) {
       ArgumentError.checkNotNull(message, 'message');
-      return source.flatten('Expected $message').token().trim(ref0(spacer));
+      return source
+          .flatten(message: 'Expected $message')
+          .token()
+          .trim(ref0(spacer));
     } else {
       throw ArgumentError('Unknown token type: $source.');
     }

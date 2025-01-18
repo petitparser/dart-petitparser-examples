@@ -41,7 +41,7 @@ class PrologGrammarDefinition extends GrammarDefinition {
 
   Parser<String> token(Object parser, [String? message]) {
     if (parser is Parser) {
-      return parser.flatten(message).trim(ref0(space));
+      return parser.flatten(message: message).trim(ref0(space));
     } else if (parser is String) {
       return parser
           .toParser(message: message ?? '$parser expected')

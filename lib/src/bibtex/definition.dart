@@ -36,7 +36,7 @@ class BibTeXDefinition extends GrammarDefinition<List<BibTeXEntry>> {
   // Quoted strings
   Parser<String> fieldValueInQuotes() =>
       seq3(char('"'), ref0(fieldStringWithinQuotes), char('"'))
-          .flatten("quoted string expected");
+          .flatten(message: "quoted string expected");
   Parser<List> fieldStringWithinQuotes() =>
       [ref0(fieldCharWithinQuotes), escapeChar].toChoiceParser().star();
   Parser<String> fieldCharWithinQuotes() => pattern(r'^\"');
@@ -44,7 +44,7 @@ class BibTeXDefinition extends GrammarDefinition<List<BibTeXEntry>> {
   // Braced strings
   Parser<String> fieldValueInBraces() =>
       seq3(char('{'), ref0(fieldStringWithinBraces), char('}'))
-          .flatten("braced string expected");
+          .flatten(message: "braced string expected");
 
   Parser<List> fieldStringWithinBraces() => [
         ref0(fieldCharWithinBraces),
@@ -55,10 +55,14 @@ class BibTeXDefinition extends GrammarDefinition<List<BibTeXEntry>> {
   Parser<String> fieldCharWithinBraces() => pattern(r'^\{}');
 
   // Basic strings
-  final type = letter().plusString("type expected").skip(before: char('@'));
-  final citeKey = pattern('a-zA-Z0-9_:-').plusString("citation key expected");
-  final fieldName = pattern('a-zA-Z0-9_-').plusString("field name expected");
-  final rawString = pattern('a-zA-Z0-9').plusString("raw string expected");
+  final type =
+      letter().plusString(message: "type expected").skip(before: char('@'));
+  final citeKey =
+      pattern('a-zA-Z0-9_:-').plusString(message: "citation key expected");
+  final fieldName =
+      pattern('a-zA-Z0-9_-').plusString(message: "field name expected");
+  final rawString =
+      pattern('a-zA-Z0-9').plusString(message: "raw string expected");
 
   // Other tokens
   final escapeChar = seq2(char(r'\'), any());

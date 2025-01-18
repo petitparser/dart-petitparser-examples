@@ -24,7 +24,7 @@ class LispGrammarDefinition extends GrammarDefinition {
   Parser cell() => ref0(atom) & ref0(cells);
   Parser empty() => ref0(space).star();
 
-  Parser number() => ref0(numberToken).flatten('Number expected');
+  Parser number() => ref0(numberToken).flatten(message: 'Number expected');
   Parser numberToken() =>
       anyOf('-+').optional() &
       char('0').or(digit().plus()) &
@@ -36,7 +36,7 @@ class LispGrammarDefinition extends GrammarDefinition {
   Parser characterEscape() => char('\\') & any();
   Parser characterRaw() => pattern('^"');
 
-  Parser symbol() => ref0(symbolToken).flatten('Symbol expected');
+  Parser symbol() => ref0(symbolToken).flatten(message: 'Symbol expected');
   Parser symbolToken() =>
       pattern('a-zA-Z!#\$%&*/:<=>?@\\^_|~+-') &
       pattern('a-zA-Z0-9!#\$%&*/:<=>?@\\^_|~+-').star();

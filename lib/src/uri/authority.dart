@@ -19,10 +19,10 @@ final authority = seq3(
 final _credentials =
     seq3(_username, seq2(':'.toParser(), _password).optional(), '@'.toParser());
 
-final _username = pattern('^:@').plusString('username');
+final _username = pattern('^:@').plusString(message: 'username');
 
-final _password = pattern('^@').plusString('password');
+final _password = pattern('^@').plusString(message: 'password');
 
-final _hostname = pattern('^:').plusString('hostname');
+final _hostname = pattern('^:').plusString(message: 'hostname');
 
-final _port = seq2(':'.toParser(), digit().plusString('port'));
+final _port = seq2(':'.toParser(), digit().plusString(message: 'port'));

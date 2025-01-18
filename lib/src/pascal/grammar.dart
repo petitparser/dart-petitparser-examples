@@ -251,9 +251,9 @@ class PascalGrammarDefinition extends GrammarDefinition {
 
   // endregion
 
-  Parser identifier() =>
-      ref1(token, seq2(letter(), word().star()).flatten('identifier expected'))
-          .where((each) => !_keywords.contains(each));
+  Parser identifier() => ref1(token,
+          seq2(letter(), word().star()).flatten(message: 'identifier expected'))
+      .where((each) => !_keywords.contains(each));
 
   Parser variable() => seq2(
       ref0(identifier),
@@ -277,7 +277,7 @@ class PascalGrammarDefinition extends GrammarDefinition {
           pattern('+-').optional(),
           digit().plus(),
         ).optional(),
-      ).flatten('unsigned number expected').map(num.parse));
+      ).flatten(message: 'unsigned number expected').map(num.parse));
 
   Parser stringLiteral() => ref1(
       token,
@@ -285,7 +285,7 @@ class PascalGrammarDefinition extends GrammarDefinition {
         char("'"),
         pattern("^'").star(),
         char("'"),
-      ).flatten('string expected'));
+      ).flatten(message: 'string expected'));
 
   Parser expression() => seq2(
       ref0(simpleExpression),
@@ -355,8 +355,8 @@ class PascalGrammarDefinition extends GrammarDefinition {
           ref1(token, ')'))
       .optional();
 
-  Parser unsignedInteger() => ref1(
-      token, digit().plusString('unsigned integer expected').map(int.parse));
+  Parser unsignedInteger() => ref1(token,
+      digit().plusString(message: 'unsigned integer expected').map(int.parse));
 
   Parser constant() => [
         seq2(pattern('+-'),

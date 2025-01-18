@@ -11,6 +11,6 @@ final query = _param.plusSeparated('&'.toParser()).map(
 final _param = seq2(_paramKey, seq2('='.toParser(), _paramValue).optional())
     .map2((key, value) => <String?>[key, value?.$2]);
 
-final _paramKey = pattern('^=&').starString('param key');
+final _paramKey = pattern('^=&').starString(message: 'param key');
 
-final _paramValue = pattern('^&').starString('param value');
+final _paramValue = pattern('^&').starString(message: 'param value');

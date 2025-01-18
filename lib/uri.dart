@@ -25,12 +25,12 @@ final uri = seq5(
       #fragment: fragment?.$2,
     });
 
-final _scheme = pattern('^:/?#').plusString('scheme');
+final _scheme = pattern('^:/?#').plusString(message: 'scheme');
 
-final _authority = pattern('^/?#').starString('authority');
+final _authority = pattern('^/?#').starString(message: 'authority');
 
-final _path = pattern('^?#').starString('path');
+final _path = pattern('^?#').starString(message: 'path');
 
-final _query = pattern('^#').starString('query');
+final _query = pattern('^#').starString(message: 'query');
 
-final _fragment = any().starString('fragment');
+final _fragment = any().starString(message: 'fragment');

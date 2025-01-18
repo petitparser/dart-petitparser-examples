@@ -16,7 +16,7 @@ class JsonDefinition extends GrammarDefinition<JSON> {
         ref0(trueToken),
         ref0(falseToken),
         ref0(nullToken),
-        failure('value expected'),
+        failure(message: 'value expected'),
       ].toChoiceParser();
 
   Parser<Map<String, JSON>> object() => seq3(
@@ -60,11 +60,14 @@ class JsonDefinition extends GrammarDefinition<JSON> {
       ).map2((_, char) => jsonEscapeChars[char]!);
   Parser<String> characterUnicode() => seq2(
         string('\\u'),
-        pattern('0-9A-Fa-f').timesString(4, '4-digit hex number expected'),
+        pattern('0-9A-Fa-f')
+            .timesString(4, message: '4-digit hex number expected'),
       ).map2((_, value) => String.fromCharCode(int.parse(value, radix: 16)));
 
-  Parser<num> numberToken() =>
-      ref0(numberPrimitive).flatten('number expected').trim().map(num.parse);
+  Parser<num> numberToken() => ref0(numberPrimitive)
+      .flatten(message: 'number expected')
+      .trim()
+      .map(num.parse);
   Parser<void> numberPrimitive() => <Parser<void>>[
         char('-').optional(),
         [char('0'), digit().plus()].toChoiceParser(),
