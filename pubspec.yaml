@@ -29,3 +29,7 @@ dev_dependencies:
   build_web_compilers: ^4.1.0
   lints: ^5.1.0
   test: ^1.25.0
+
+dependency_overrides:
+  petitparser:
+    path: ../petitparser
