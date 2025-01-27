@@ -411,7 +411,7 @@ class PascalGrammarDefinition extends GrammarDefinition {
       if (_isKeyword.accept(source)) {
         _keywords.add(source);
         return token(source
-            .toParser(message: message, caseInsensitive: true)
+            .toParser(message: message, ignoreCase: true)
             .skip(after: word().not()));
       } else {
         return token(source.toParser(message: message));
