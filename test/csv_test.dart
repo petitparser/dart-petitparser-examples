@@ -5,6 +5,7 @@ import 'package:test/test.dart';
 import 'utils/expect.dart';
 
 void main() {
+  final csv = CsvDefinition().build();
   test('linter', () {
     expect(linter(csv, excludedTypes: {}), isEmpty);
   });

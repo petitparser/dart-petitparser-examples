@@ -3,18 +3,46 @@ library;
 
 import 'package:petitparser/petitparser.dart';
 
-final csv = _lines.end();
+class CsvDefinition extends GrammarDefinition<List<List<String>>> {
+  CsvDefinition({
+    this.quoteChar = '"',
+    this.escapeChar = '"',
+    this.delimiter = ",",
+    this.newline = "\n",
+  });
 
-final _lines = _records.starSeparated(newline()).map((list) => list.elements);
-final _records = _field.starSeparated(char(',')).map((list) => list.elements);
+  final String quoteChar;
+  final String escapeChar;
+  final String delimiter;
+  final String newline;
 
-final _field = _quotedField | _plainField;
+  @override
+  Parser<List<List<String>>> start() => ref0(lines).end();
 
-final _quotedField =
-    _quotedFieldContent.skip(before: char('"'), after: char('"'));
-final _quotedFieldContent = _quotedFieldChar.star().map((list) => list.join());
-final _quotedFieldChar = string('""').map((value) => value[0]) | pattern('^"');
+  Parser<List<List<String>>> lines() =>
+      ref0(records).starSeparated(string(newline)).map((list) => list.elements);
+  Parser<List<String>> records() =>
+      ref0(field).starSeparated(char(delimiter)).map((list) => list.elements);
 
-final _plainField = _plainFieldContent;
-final _plainFieldContent = _plainFieldChar.starString();
-final _plainFieldChar = pattern("^,\n\r");
+  Parser<String> field() => [
+        ref0(quotedField),
+        ref0(plainField),
+      ].toChoiceParser();
+
+  Parser<String> quotedField() => ref0(quotedFieldContent)
+      .skip(before: char(quoteChar), after: char(quoteChar));
+  Parser<String> quotedFieldContent() =>
+      ref0(quotedFieldChar).star().map((list) => list.join());
+  Parser<String> quotedFieldChar() => [
+        seq2(char(escapeChar), any()).map2((_, char) => char),
+        pattern('^$quoteChar'),
+      ].toChoiceParser();
+
+  Parser<String> plainField() => ref0(plainFieldContent);
+  Parser<String> plainFieldContent() =>
+      ref0(plainFieldChar).star().map((list) => list.join());
+  Parser<String> plainFieldChar() => [
+        seq2(char(escapeChar), any()).map2((_, char) => char),
+        pattern("^$delimiter$newline")
+      ].toChoiceParser();
+}

@@ -19,7 +19,7 @@ const bibtexInput = '@inproceedings{Reng10c,\n'
     '\tYear = 2010,\n'
     '\tUrl = {http://scg.unibe.ch/archive/papers/Reng10cDynamicGrammars.pdf}}';
 
-final csvParser = csv_example.csv;
+final csvParser = csv_example.CsvDefinition().build();
 const csvInput = 'Los Angeles,34°03′N,118°15′W\n'
     'New York City,40°42′46″N,74°00′21″W\n'
     'Paris,48°51′24″N,2°21′03″E';
