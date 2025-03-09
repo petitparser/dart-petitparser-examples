@@ -19,14 +19,14 @@ void main() {
     console.append(document.createElement('br'));
   };
   evaluate.onClick.listen((event) {
-    output.innerText = 'Evaluating...';
+    output.textContent = 'Evaluating...';
     output.classList.value = '';
-    console.innerText = '';
+    console.textContent = '';
     try {
       final result = evalString(lispParser, user, input.value);
-      output.text = result.toString();
+      output.textContent = result.toString();
     } on Object catch (exception) {
-      output.text = exception.toString();
+      output.textContent = exception.toString();
       output.classList.add('error');
     }
     inspect(environment, user);

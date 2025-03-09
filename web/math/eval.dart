@@ -8,14 +8,14 @@ final result = document.querySelector('#result') as HTMLElement;
 final tree = document.querySelector('#tree') as HTMLElement;
 
 void update() {
-  tree.text = '';
+  tree.textContent = '';
   try {
     final expr = parser.parse(input.value).value;
     tree.innerHTML = inspect(expr).toJS;
-    result.text = ' = ${expr.eval({})}';
+    result.textContent = ' = ${expr.eval({})}';
     result.classList.value = '';
   } on Object catch (exception) {
-    result.text = exception.toString();
+    result.textContent = exception.toString();
     result.classList.add('error');
   }
   window.location.hash = Uri.encodeComponent(input.value);

@@ -12,14 +12,14 @@ final methodParser = parserDefinition.build();
 
 void main() {
   parse.onClick.listen((event) {
-    output.innerText = 'Evaluating...';
+    output.textContent = 'Evaluating...';
     output.classList.value = '';
     try {
       final result = methodParser.parse(input.value);
       final visitor = PrintVisitor()..visit(result.value);
       output.innerHTML = visitor.buffer.toString().toJS;
     } on Object catch (exception) {
-      output.text = exception.toString();
+      output.textContent = exception.toString();
       output.classList.add('error');
     }
   });

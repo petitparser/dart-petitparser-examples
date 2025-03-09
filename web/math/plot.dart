@@ -117,10 +117,10 @@ void update() {
   try {
     expression = parser.parse(source).value;
     expression.eval({'x': 0, 't': 0});
-    error.text = '';
+    error.textContent = '';
   } on Object catch (exception) {
     expression = Value(double.nan);
-    error.text = exception.toString();
+    error.textContent = exception.toString();
   }
   window.location.hash = Uri.encodeComponent(source);
 }
