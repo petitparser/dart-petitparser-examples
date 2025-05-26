@@ -26,7 +26,7 @@ final parser = () {
               .starSeparated(char(',').trim())
               .map((list) => list.elements),
           char(')').trim(),
-        ).map3((_, list, __) => list).optionalWith(const <Expression>[]),
+        ).map3((_, list, _) => list).optionalWith(const <Expression>[]),
       ).map2((name, args) => _createBinding(name, args)),
     );
   builder.group().wrapper(

@@ -520,10 +520,10 @@ exampleWithNumber: x
     );
     verify(
       'Variable7',
-      '__gen_var_123__',
+      '_gen_var_123_',
       grammar.primary,
       parser.primary,
-      isVariableNode('__gen_var_123__'),
+      isVariableNode('_gen_var_123_'),
     );
     verify(
       'ArgumentsBlock1',
@@ -902,10 +902,10 @@ exampleWithNumber: x
     );
     verify(
       'SymbolLiteral6',
-      '#__gen__binding',
+      '#_gen_binding',
       grammar.symbolLiteral,
       parser.symbolLiteral,
-      isLiteralNode('__gen__binding'),
+      isLiteralNode('_gen_binding'),
     );
     verify(
       'SymbolLiteral7',

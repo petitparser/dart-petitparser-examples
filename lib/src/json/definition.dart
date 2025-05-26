@@ -23,7 +23,7 @@ class JsonDefinition extends GrammarDefinition<JSON> {
     char('{').trim(),
     ref0(objectElements),
     char('}').trim(),
-  ).map3((_, elements, __) => elements);
+  ).map3((_, elements, _) => elements);
   Parser<Map<String, JSON>> objectElements() => ref0(objectElement)
       .starSeparated(char(',').trim())
       .map((list) => Map.fromEntries(list.elements));
@@ -37,7 +37,7 @@ class JsonDefinition extends GrammarDefinition<JSON> {
     char('[').trim(),
     ref0(arrayElements),
     char(']').trim(),
-  ).map3((_, elements, __) => elements);
+  ).map3((_, elements, _) => elements);
   Parser<List<JSON>> arrayElements() =>
       ref0(value).starSeparated(char(',').trim()).map((list) => list.elements);
 
@@ -49,7 +49,7 @@ class JsonDefinition extends GrammarDefinition<JSON> {
     char('"'),
     ref0(characterPrimitive).star(),
     char('"'),
-  ).trim().map3((_, chars, __) => chars.join());
+  ).trim().map3((_, chars, _) => chars.join());
   Parser<String> characterPrimitive() => [
     ref0(characterNormal),
     ref0(characterEscape),

@@ -13,7 +13,7 @@ final nodeParser = () {
     ..primitive(anyOf(meta).skip(before: char(r'\')).map(LiteralNode.new))
     ..primitive(char('.').map((_) => DotNode()));
 
-  builder.group().wrapper(char('('), char(')'), (_, value, __) => value);
+  builder.group().wrapper(char('('), char(')'), (_, value, _) => value);
 
   final integer = digit().plusString().trim().map(int.parse);
   final range =

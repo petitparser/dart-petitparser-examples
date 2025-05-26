@@ -24,7 +24,7 @@ class BibTeXDefinition extends GrammarDefinition<List<BibTeXEntry>> {
         ref0(fields),
         char('}').trim(),
       ).map6(
-        (type, _, key, __, fields, ___) =>
+        (type, _, key, _, fields, _) =>
             BibTeXEntry(type: type, key: key, fields: fields),
       );
 
