@@ -34,18 +34,18 @@ const jsonNested = '''
 ''';
 
 void runJson(String name, String input) => run(
-      name,
-      verify: () {
-        final parserResult = jsonParser.parse(input).value;
-        final nativeResult = convert.json.decode(input);
-        if (parserResult.toString() != nativeResult.toString()) {
-          throw StateError('Parsers provide inconsistent results');
-        }
-      },
-      parse: () => jsonParser.parse(input),
-      accept: () => jsonParser.accept(input),
-      native: () => convert.json.decode(input),
-    );
+  name,
+  verify: () {
+    final parserResult = jsonParser.parse(input).value;
+    final nativeResult = convert.json.decode(input);
+    if (parserResult.toString() != nativeResult.toString()) {
+      throw StateError('Parsers provide inconsistent results');
+    }
+  },
+  parse: () => jsonParser.parse(input),
+  accept: () => jsonParser.accept(input),
+  native: () => convert.json.decode(input),
+);
 
 void main() {
   runJson('json - string', '"abcdef"');

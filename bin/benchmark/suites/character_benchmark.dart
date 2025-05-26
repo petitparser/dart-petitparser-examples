@@ -42,20 +42,26 @@ void main() {
 
   runChars('character - pattern - ^a', pattern('^a'), success: 350);
   runChars(
-      'character - pattern - ^a (ignore case)', pattern('^a', ignoreCase: true),
-      success: 349);
+    'character - pattern - ^a (ignore case)',
+    pattern('^a', ignoreCase: true),
+    success: 349,
+  );
   // runChars('character - pattern - ^a (unicode)', pattern('^a', unicode: true),
   //     success: 350);
   // runChars('character - pattern - ^a (ignore case, unicode)',
   //     pattern('^a', ignoreCase: true, unicode: true),
   //     success: 349);
 
-  runChars('character - pattern - ^a-cx-zA-CX-Z1-37-9',
-      pattern('^a-cx-zA-CX-Z1-37-9'),
-      success: 333);
-  runChars('character - pattern - ^a-cx-zA-CX-Z1-37-9 (ignore case)',
-      pattern('^a-cx-zA-CX-Z1-37-9', ignoreCase: true),
-      success: 333);
+  runChars(
+    'character - pattern - ^a-cx-zA-CX-Z1-37-9',
+    pattern('^a-cx-zA-CX-Z1-37-9'),
+    success: 333,
+  );
+  runChars(
+    'character - pattern - ^a-cx-zA-CX-Z1-37-9 (ignore case)',
+    pattern('^a-cx-zA-CX-Z1-37-9', ignoreCase: true),
+    success: 333,
+  );
   // runChars('character - pattern - ^a-cx-zA-CX-Z1-37-9 (unicode)',
   //     pattern('^a-cx-zA-CX-Z1-37-9', unicode: true),
   //     success: 333);
@@ -64,9 +70,11 @@ void main() {
   //     success: 333);
 
   runChars('character - pattern - ^a-z', pattern('^a-z'), success: 325);
-  runChars('character - pattern - ^a-z (ignore case)',
-      pattern('^a-z', ignoreCase: true),
-      success: 299);
+  runChars(
+    'character - pattern - ^a-z (ignore case)',
+    pattern('^a-z', ignoreCase: true),
+    success: 299,
+  );
   // runChars(
   //     'character - pattern - ^a-z (unicode)', pattern('^a-z', unicode: true),
   //     success: 325);
@@ -75,9 +83,11 @@ void main() {
   //     success: 299);
 
   runChars('character - pattern - ^acegik', pattern('^acegik'), success: 345);
-  runChars('character - pattern - ^acegik (ignore case)',
-      pattern('^acegik', ignoreCase: true),
-      success: 339);
+  runChars(
+    'character - pattern - ^acegik (ignore case)',
+    pattern('^acegik', ignoreCase: true),
+    success: 339,
+  );
   // runChars('character - pattern - ^acegik (unicode)',
   //     pattern('^acegik', unicode: true),
   //     success: 345);
@@ -87,8 +97,10 @@ void main() {
 
   runChars('character - pattern - a', pattern('a'), success: 1);
   runChars(
-      'character - pattern - a (ignore case)', pattern('a', ignoreCase: true),
-      success: 2);
+    'character - pattern - a (ignore case)',
+    pattern('a', ignoreCase: true),
+    success: 2,
+  );
   // runChars('character - pattern - a (unicode)', pattern('a', unicode: true),
   //     success: 1);
   // runChars('character - pattern - a (ignore case, unicode)',
@@ -96,11 +108,15 @@ void main() {
   //     success: 2);
 
   runChars(
-      'character - pattern - a-cx-zA-CX-Z1-37-9', pattern('a-cx-zA-CX-Z1-37-9'),
-      success: 18);
-  runChars('character - pattern - a-cx-zA-CX-Z1-37-9 (ignore case)',
-      pattern('a-cx-zA-CX-Z1-37-9', ignoreCase: true),
-      success: 18);
+    'character - pattern - a-cx-zA-CX-Z1-37-9',
+    pattern('a-cx-zA-CX-Z1-37-9'),
+    success: 18,
+  );
+  runChars(
+    'character - pattern - a-cx-zA-CX-Z1-37-9 (ignore case)',
+    pattern('a-cx-zA-CX-Z1-37-9', ignoreCase: true),
+    success: 18,
+  );
   // runChars('character - pattern - a-cx-zA-CX-Z1-37-9 (unicode)',
   //     pattern('a-cx-zA-CX-Z1-37-9', unicode: true),
   //     success: 18);
@@ -109,9 +125,11 @@ void main() {
   //     success: 18);
 
   runChars('character - pattern - a-z', pattern('a-z'), success: 26);
-  runChars('character - pattern - a-z (ignore case)',
-      pattern('a-z', ignoreCase: true),
-      success: 52);
+  runChars(
+    'character - pattern - a-z (ignore case)',
+    pattern('a-z', ignoreCase: true),
+    success: 52,
+  );
   // runChars('character - pattern - a-z (unicode)', pattern('a-z', unicode: true),
   //     success: 26);
   // runChars('character - pattern - a-z (ignore case, unicode)',
@@ -119,9 +137,11 @@ void main() {
   //     success: 52);
 
   runChars('character - pattern - acegik', pattern('acegik'), success: 6);
-  runChars('character - pattern - acegik (ignore case)',
-      pattern('acegik', ignoreCase: true),
-      success: 12);
+  runChars(
+    'character - pattern - acegik (ignore case)',
+    pattern('acegik', ignoreCase: true),
+    success: 12,
+  );
   // runChars('character - pattern - acegik (unicode)',
   //     pattern('acegik', unicode: true),
   //     success: 6);

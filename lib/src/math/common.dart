@@ -1,10 +1,7 @@
 import 'dart:math';
 
 /// Common mathematical constants.
-const constants = {
-  'e': e,
-  'pi': pi,
-};
+const constants = {'e': e, 'pi': pi};
 
 /// Common mathematical functions (1 argument).
 final functions1 = {

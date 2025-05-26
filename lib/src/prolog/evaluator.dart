@@ -9,7 +9,9 @@ const Equality<List<Node>> argumentEquality = ListEquality();
 Map<Variable, Node> newBindings() => Map<Variable, Node>.identity();
 
 Map<Variable, Node>? mergeBindings(
-    Map<Variable, Node>? first, Map<Variable, Node>? second) {
+  Map<Variable, Node>? first,
+  Map<Variable, Node>? second,
+) {
   if (first == null || second == null) {
     return null;
   }

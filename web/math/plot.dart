@@ -11,9 +11,9 @@ class Viewport {
     required this.maxX,
     required this.minY,
     required this.maxY,
-  })  : context = canvas.context2D,
-        width = canvas.offsetWidth,
-        height = canvas.offsetHeight;
+  }) : context = canvas.context2D,
+       width = canvas.offsetWidth,
+       height = canvas.offsetHeight;
 
   final HTMLCanvasElement canvas;
   final CanvasRenderingContext2D context;
@@ -139,6 +139,8 @@ void main() {
   window.addEventListener('resize', resize.toJS);
   update();
   input.onInput.listen((event) => update());
-  Timer.periodic(const Duration(milliseconds: 1000 ~/ 30),
-      (Timer timer) => refresh(timer.tick));
+  Timer.periodic(
+    const Duration(milliseconds: 1000 ~/ 30),
+    (Timer timer) => refresh(timer.tick),
+  );
 }

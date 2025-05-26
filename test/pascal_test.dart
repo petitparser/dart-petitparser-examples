@@ -288,18 +288,22 @@ void main() {
   group('grammar', () {
     test('hello world', () {
       expect(
-          parser,
-          isSuccess([
+        parser,
+        isSuccess(
+          [
             "program simple;",
             "begin",
             "  writeln('Hello World!');",
             "end.",
-          ].join('\n')));
+          ].join('\n'),
+        ),
+      );
     });
     test('comparestrings', () {
       expect(
-          parser,
-          isSuccess([
+        parser,
+        isSuccess(
+          [
             "program comparestrings;",
             "var s: string;",
             "    t: string;"
@@ -315,7 +319,9 @@ void main() {
             "      if s < t then",
             "        writeln(s, ' is less than ', t);",
             "end.",
-          ].join('\n')));
+          ].join('\n'),
+        ),
+      );
     });
     test('linter', () => expect(linter(parser), isEmpty));
   });

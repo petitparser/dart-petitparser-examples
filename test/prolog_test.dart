@@ -22,9 +22,10 @@ void main() {
         foo(X, Z) :- foo(X, Y), foo(Y, Z).
       ''');
       expect(
-          db.toString(),
-          'foo(X, Y) :- foo(Y, X).\n'
-          'foo(X, Z) :- foo(X, Y), foo(Y, Z).');
+        db.toString(),
+        'foo(X, Y) :- foo(Y, X).\n'
+        'foo(X, Z) :- foo(X, Y), foo(Y, Z).',
+      );
     });
     test('two', () {
       final db = Database.parse('''
@@ -33,17 +34,21 @@ void main() {
         foo(X, Z) :- foo(X, Y), foo(Y, Z).
       ''');
       expect(
-          db.toString(),
-          'foo(a, b) :- true.\n'
-          'foo(X, Y) :- foo(Y, X).\n'
-          'foo(X, Z) :- foo(X, Y), foo(Y, Z).');
+        db.toString(),
+        'foo(a, b) :- true.\n'
+        'foo(X, Y) :- foo(Y, X).\n'
+        'foo(X, Z) :- foo(X, Y), foo(Y, Z).',
+      );
     });
     test('parse error', () {
       expect(
-          () => Database.parse('1'),
-          throwsA(isA<ParserException>()
+        () => Database.parse('1'),
+        throwsA(
+          isA<ParserException>()
               .having((e) => e.message, 'message', 'end of input expected')
-              .having((e) => e.offset, 'offset', 0)));
+              .having((e) => e.offset, 'offset', 0),
+        ),
+      );
     });
   });
   group('term', () {
@@ -64,10 +69,13 @@ void main() {
     });
     test('parse error', () {
       expect(
-          () => Term.parse('1'),
-          throwsA(isA<ParserException>()
+        () => Term.parse('1'),
+        throwsA(
+          isA<ParserException>()
               .having((e) => e.message, 'message', 'Value expected')
-              .having((e) => e.offset, 'offset', 0)));
+              .having((e) => e.offset, 'offset', 0),
+        ),
+      );
     });
   });
   group('Forrester family', () {
@@ -90,9 +98,7 @@ void main() {
     ''');
     test('eric son of thorne', () async {
       final query = Term.parse('father_child(eric, thorne)');
-      expect(db.query(query), [
-        Term.parse('father_child(eric, thorne)'),
-      ]);
+      expect(db.query(query), [Term.parse('father_child(eric, thorne)')]);
     });
     test('children of stephanie', () async {
       final query = Term.parse('mother_child(stephanie, X)');
@@ -195,9 +201,7 @@ void main() {
     ''');
     test('Who Owns the Fish?', () {
       final query = Term.parse('solution(FishOwner)');
-      expect(db.query(query), [
-        Term.parse('solution(german)'),
-      ]);
+      expect(db.query(query), [Term.parse('solution(german)')]);
     });
   });
 }

@@ -44,18 +44,24 @@ void main() {
     });
     test('concatenation', () {
       expectedEqual(Node.fromString(r'ab'), ConcatenationNode(la, lb));
-      expectedEqual(Node.fromString(r'abc'),
-          ConcatenationNode(ConcatenationNode(la, lb), lc));
+      expectedEqual(
+        Node.fromString(r'abc'),
+        ConcatenationNode(ConcatenationNode(la, lb), lc),
+      );
     });
     test('alternation', () {
       expectedEqual(Node.fromString(r'a|b'), AlternationNode(la, lb));
-      expectedEqual(Node.fromString(r'a|b|c'),
-          AlternationNode(AlternationNode(la, lb), lc));
+      expectedEqual(
+        Node.fromString(r'a|b|c'),
+        AlternationNode(AlternationNode(la, lb), lc),
+      );
     });
     test('intersection', () {
       expectedEqual(Node.fromString(r'a&b'), IntersectionNode(la, lb));
-      expectedEqual(Node.fromString(r'a&b&c'),
-          IntersectionNode(IntersectionNode(la, lb), lc));
+      expectedEqual(
+        Node.fromString(r'a&b&c'),
+        IntersectionNode(IntersectionNode(la, lb), lc),
+      );
     });
     test('complement', () {
       expectedEqual(Node.fromString(r'!a'), ComplementNode(la));
@@ -76,7 +82,9 @@ void main() {
     test('repeat n or more times', () {
       expectedEqual(Node.fromString(r'a{4,}'), QuantificationNode(la, 4, null));
       expectedEqual(
-          Node.fromString(r'a{56,}'), QuantificationNode(la, 56, null));
+        Node.fromString(r'a{56,}'),
+        QuantificationNode(la, 56, null),
+      );
     });
     test('repeat up to n times', () {
       expectedEqual(Node.fromString(r'a{,7}'), QuantificationNode(la, 0, 7));
@@ -85,23 +93,29 @@ void main() {
     test('repeat at lest n and at most m times', () {
       expectedEqual(Node.fromString(r'a{1,2}'), QuantificationNode(la, 1, 2));
       expectedEqual(
-          Node.fromString(r'a{34,567}'), QuantificationNode(la, 34, 567));
+        Node.fromString(r'a{34,567}'),
+        QuantificationNode(la, 34, 567),
+      );
     });
     test('concat and or', () {
       expectedEqual(
-          Node.fromString(r'ab|cd'),
-          AlternationNode(
-              ConcatenationNode(la, lb), ConcatenationNode(lc, ld)));
+        Node.fromString(r'ab|cd'),
+        AlternationNode(ConcatenationNode(la, lb), ConcatenationNode(lc, ld)),
+      );
       expectedEqual(
-          Node.fromString(r'a(b|c)d'),
-          ConcatenationNode(
-              ConcatenationNode(la, AlternationNode(lb, lc)), ld));
+        Node.fromString(r'a(b|c)d'),
+        ConcatenationNode(ConcatenationNode(la, AlternationNode(lb, lc)), ld),
+      );
     });
     test('concat and repeat', () {
-      expectedEqual(Node.fromString(r'ab+'),
-          ConcatenationNode(la, QuantificationNode(lb, 1)));
-      expectedEqual(Node.fromString(r'(ab)+'),
-          QuantificationNode(ConcatenationNode(la, lb), 1));
+      expectedEqual(
+        Node.fromString(r'ab+'),
+        ConcatenationNode(la, QuantificationNode(lb, 1)),
+      );
+      expectedEqual(
+        Node.fromString(r'(ab)+'),
+        QuantificationNode(ConcatenationNode(la, lb), 1),
+      );
     });
   });
   group('NFA', () {
@@ -109,10 +123,14 @@ void main() {
       test('"${testData.pattern}" (${testData.expects.length})', () {
         final pattern = Nfa.fromString(testData.pattern);
         for (final expectData in testData.expects) {
-          expect(pattern.tryMatch(expectData.input), expectData.match,
-              reason: '"${testData.pattern}" '
-                  '${expectData.match ? 'matches' : 'does not match'} '
-                  '"${expectData.input}"');
+          expect(
+            pattern.tryMatch(expectData.input),
+            expectData.match,
+            reason:
+                '"${testData.pattern}" '
+                '${expectData.match ? 'matches' : 'does not match'} '
+                '"${expectData.input}"',
+          );
         }
       });
     }
@@ -136,10 +154,11 @@ void main() {
       expect(match.groups([0, 1]), ['aaa', null]);
     });
     test('allMatches', () {
-      expect(
-        pattern.allMatches('aaa').map((each) => each[0]),
-        ['aaa', 'aa', 'a'],
-      );
+      expect(pattern.allMatches('aaa').map((each) => each[0]), [
+        'aaa',
+        'aa',
+        'a',
+      ]);
     });
   });
   test('linter', () {
@@ -163,22 +182,14 @@ class Expect {
 
 const tests = [
   // Basics
-  Test(r'', [
-    Expect('', true),
-    Expect('a', false),
-    Expect('ab', false),
-  ]),
+  Test(r'', [Expect('', true), Expect('a', false), Expect('ab', false)]),
   Test(r'.', [
     Expect('', false),
     Expect('a', true),
     Expect('b', true),
     Expect('aaa', false),
   ]),
-  Test(r'a', [
-    Expect('', false),
-    Expect('a', true),
-    Expect('aaa', false),
-  ]),
+  Test(r'a', [Expect('', false), Expect('a', true), Expect('aaa', false)]),
   Test(r'ab', [
     Expect('ab', true),
     Expect('', false),
@@ -189,11 +200,7 @@ const tests = [
     Expect('abx', false),
     Expect('ba', false),
   ]),
-  Test(r'a|b', [
-    Expect('a', true),
-    Expect('b', true),
-    Expect('d', false),
-  ]),
+  Test(r'a|b', [Expect('a', true), Expect('b', true), Expect('d', false)]),
   Test(r'a?', [
     Expect('', true),
     Expect('a', true),

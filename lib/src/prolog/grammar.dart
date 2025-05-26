@@ -9,25 +9,25 @@ class PrologGrammarDefinition extends GrammarDefinition {
   Parser rule() =>
       ref0(term) &
       (ref0(definitionToken) &
-              ref0(term)
-                  .plusSeparated(ref0(commaToken))
-                  .map((list) => list.elements))
+              ref0(
+                term,
+              ).plusSeparated(ref0(commaToken)).map((list) => list.elements))
           .optional() &
       ref0(terminatorToken);
   Parser term() =>
       ref0(atom) &
       (ref0(openParenToken) &
-              ref0(parameter)
-                  .plusSeparated(ref0(commaToken))
-                  .map((list) => list.elements) &
+              ref0(
+                parameter,
+              ).plusSeparated(ref0(commaToken)).map((list) => list.elements) &
               ref0(closeParentToken))
           .optional();
   Parser parameter() =>
       ref0(atom) &
       (ref0(openParenToken) &
-              ref0(parameter)
-                  .plusSeparated(ref0(commaToken))
-                  .map((list) => list.elements) &
+              ref0(
+                parameter,
+              ).plusSeparated(ref0(commaToken)).map((list) => list.elements) &
               ref0(closeParentToken))
           .optional();
   Parser atom() => ref0(variable) | ref0(value);
@@ -52,15 +52,15 @@ class PrologGrammarDefinition extends GrammarDefinition {
   }
 
   Parser<String> variableToken() => ref2(
-        token,
-        pattern('A-Z_') & pattern('A-Za-z0-9_').star(),
-        'Variable expected',
-      );
+    token,
+    pattern('A-Z_') & pattern('A-Za-z0-9_').star(),
+    'Variable expected',
+  );
   Parser<String> valueToken() => ref2(
-        token,
-        pattern('a-z') & pattern('A-Za-z0-9_').star(),
-        'Value expected',
-      );
+    token,
+    pattern('a-z') & pattern('A-Za-z0-9_').star(),
+    'Value expected',
+  );
   Parser<String> openParenToken() => ref1(token, '(');
   Parser<String> closeParentToken() => ref1(token, ')');
   Parser<String> commaToken() => ref1(token, ',');

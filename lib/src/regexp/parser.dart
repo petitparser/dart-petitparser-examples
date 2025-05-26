@@ -19,8 +19,10 @@ final nodeParser = () {
   final range =
       seq3(integer.optional(), char(',').trim().optional(), integer.optional())
           .skip(before: char('{'), after: char('}'))
-          .map3((min, comma, max) =>
-              (min ?? 0, max ?? (comma == null ? min ?? 0 : null)));
+          .map3(
+            (min, comma, max) =>
+                (min ?? 0, max ?? (comma == null ? min ?? 0 : null)),
+          );
 
   builder.group()
     ..prefix(char('!'), (_, exp) => ComplementNode(exp))
@@ -28,7 +30,9 @@ final nodeParser = () {
     ..postfix(char('+'), (exp, _) => QuantificationNode(exp, 1))
     ..postfix(char('?'), (exp, _) => QuantificationNode(exp, 0, 1))
     ..postfix(
-        range, (exp, range) => QuantificationNode(exp, range.$1, range.$2));
+      range,
+      (exp, range) => QuantificationNode(exp, range.$1, range.$2),
+    );
 
   builder.group()
     ..left(epsilon(), (left, _, right) => ConcatenationNode(left, right))

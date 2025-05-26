@@ -12,7 +12,8 @@ import 'package:xml/xml.dart';
 import '../utils/runner.dart';
 
 final bibtexParser = bibtex_example.BibTeXDefinition().build();
-const bibtexInput = '@inproceedings{Reng10c,\n'
+const bibtexInput =
+    '@inproceedings{Reng10c,\n'
     '\tTitle = "Practical Dynamic Grammars for Dynamic Languages",\n'
     '\tAuthor = {Lukas Renggli and St\\\'ephane Ducasse and Tudor G\\^irba and Oscar Nierstrasz},\n'
     '\tMonth = jun,\n'
@@ -20,12 +21,14 @@ const bibtexInput = '@inproceedings{Reng10c,\n'
     '\tUrl = {http://scg.unibe.ch/archive/papers/Reng10cDynamicGrammars.pdf}}';
 
 final csvParser = csv_example.CsvDefinition().build();
-const csvInput = 'Los Angeles,34°03′N,118°15′W\n'
+const csvInput =
+    'Los Angeles,34°03′N,118°15′W\n'
     'New York City,40°42′46″N,74°00′21″W\n'
     'Paris,48°51′24″N,2°21′03″E';
 
 final lispParser = lisp_example.LispParserDefinition().build();
-const lispInput = '(define (fib n)\n'
+const lispInput =
+    '(define (fib n)\n'
     '  (if (<= n 1)\n'
     '    1\n'
     '    (+ (fib (- n 1)) (fib (- n 2)))))';
@@ -47,7 +50,8 @@ const jsonInput =
     '"SHIFT_MASK": 4, "META_MASK": 8}';
 
 final prologParser = prolog_example.rulesParser;
-const prologInput = 'foo(bar, zork) :- true.\n'
+const prologInput =
+    'foo(bar, zork) :- true.\n'
     'bok(X, Y) :- foo(X, Y), foo(Y, X).';
 
 final mathParser = math_example.parser;
@@ -57,9 +61,11 @@ final uriParser = uri_example.uri;
 const uriInput =
     'https://www.lukas-renggli.ch/blog/petitparser-1?_s=Q5vcT_xEIhxf2Z4Q&_k=4pr02qyT&_n&42';
 
-final xmlParser =
-    xml_example.XmlEventParser(defaultEntityMapping).build().star().end();
-const xmlInput = '<?xml version="1.0"?>\n'
+final xmlParser = xml_example.XmlEventParser(
+  defaultEntityMapping,
+).build().star().end();
+const xmlInput =
+    '<?xml version="1.0"?>\n'
     '<!DOCTYPE name [ <!ELEMENT html (head, body)> ]>\n'
     '<ns:foo attr="not namespaced" n1:ans="namespaced 1" '
     '        n2:ans="namespace 2" >\n'

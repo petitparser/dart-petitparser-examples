@@ -24,25 +24,24 @@ class CsvDefinition extends GrammarDefinition<List<List<String>>> {
   Parser<List<String>> records() =>
       ref0(field).starSeparated(char(delimiter)).map((list) => list.elements);
 
-  Parser<String> field() => [
-        ref0(quotedField),
-        ref0(plainField),
-      ].toChoiceParser();
+  Parser<String> field() =>
+      [ref0(quotedField), ref0(plainField)].toChoiceParser();
 
-  Parser<String> quotedField() => ref0(quotedFieldContent)
-      .skip(before: char(quoteChar), after: char(quoteChar));
+  Parser<String> quotedField() => ref0(
+    quotedFieldContent,
+  ).skip(before: char(quoteChar), after: char(quoteChar));
   Parser<String> quotedFieldContent() =>
       ref0(quotedFieldChar).star().map((list) => list.join());
   Parser<String> quotedFieldChar() => [
-        seq2(char(escapeChar), any()).map2((_, char) => char),
-        pattern('^$quoteChar'),
-      ].toChoiceParser();
+    seq2(char(escapeChar), any()).map2((_, char) => char),
+    pattern('^$quoteChar'),
+  ].toChoiceParser();
 
   Parser<String> plainField() => ref0(plainFieldContent);
   Parser<String> plainFieldContent() =>
       ref0(plainFieldChar).star().map((list) => list.join());
   Parser<String> plainFieldChar() => [
-        seq2(char(escapeChar), any()).map2((_, char) => char),
-        pattern("^$delimiter$newline")
-      ].toChoiceParser();
+    seq2(char(escapeChar), any()).map2((_, char) => char),
+    pattern("^$delimiter$newline"),
+  ].toChoiceParser();
 }

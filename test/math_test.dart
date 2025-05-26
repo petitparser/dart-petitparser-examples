@@ -4,8 +4,12 @@ import 'package:petitparser/reflection.dart';
 import 'package:petitparser_examples/math.dart';
 import 'package:test/test.dart';
 
-void verify(String input, num result,
-    {Map<String, num> variables = const {}, double epsilon = 0.00001}) {
+void verify(
+  String input,
+  num result, {
+  Map<String, num> variables = const {},
+  double epsilon = 0.00001,
+}) {
   final ast = parser.parse(input).value;
   expect(ast.eval(variables), closeTo(result, epsilon));
   expect(ast.toString(), isNotNull);

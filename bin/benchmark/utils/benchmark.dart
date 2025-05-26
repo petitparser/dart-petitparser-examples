@@ -20,16 +20,21 @@ Jackknife<double> benchmark(
     count *= 2;
   }
   if (count == minLoop) {
-    throw StateError('$function cannot be performed $minLoop times '
-        'in $minDuration.');
+    throw StateError(
+      '$function cannot be performed $minLoop times '
+      'in $minDuration.',
+    );
   }
   // Collect samples.
   final samples = <double>[];
   for (var i = 0; i < sampleCount; i++) {
     samples.add(_benchmark(function, count).inMicroseconds / count);
   }
-  return Jackknife(samples, (list) => list.arithmeticMean(),
-      confidenceLevel: confidenceLevel);
+  return Jackknife(
+    samples,
+    (list) => list.arithmeticMean(),
+    confidenceLevel: confidenceLevel,
+  );
 }
 
 @pragma('vm:never-inline')

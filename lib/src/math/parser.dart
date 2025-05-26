@@ -8,14 +8,17 @@ import 'common.dart';
 final parser = () {
   final builder = ExpressionBuilder<Expression>();
   builder
-    ..primitive((digit().plus() &
-            (char('.') & digit().plus()).optional() &
-            (pattern('eE') & pattern('+-').optional() & digit().plus())
-                .optional())
-        .flatten(message: 'number expected')
-        .trim()
-        .map(_createValue))
-    ..primitive(seq2(
+    ..primitive(
+      (digit().plus() &
+              (char('.') & digit().plus()).optional() &
+              (pattern('eE') & pattern('+-').optional() & digit().plus())
+                  .optional())
+          .flatten(message: 'number expected')
+          .trim()
+          .map(_createValue),
+    )
+    ..primitive(
+      seq2(
         seq2(letter(), word().star()).flatten(message: 'name expected').trim(),
         seq3(
           char('(').trim(),
@@ -23,27 +26,39 @@ final parser = () {
               .starSeparated(char(',').trim())
               .map((list) => list.elements),
           char(')').trim(),
-        )
-            .map3((_, list, __) => list)
-            .optionalWith(const <Expression>[])).map2(
-        (name, args) => _createBinding(name, args)));
+        ).map3((_, list, __) => list).optionalWith(const <Expression>[]),
+      ).map2((name, args) => _createBinding(name, args)),
+    );
   builder.group().wrapper(
-      char('(').trim(), char(')').trim(), (left, value, right) => value);
+    char('(').trim(),
+    char(')').trim(),
+    (left, value, right) => value,
+  );
   builder.group()
     ..prefix(char('+').trim(), (op, a) => a)
     ..prefix(char('-').trim(), (op, a) => Application('-', [a], (x) => -x));
   builder.group().right(
-      char('^').trim(), (a, op, b) => Application('^', [a, b], math.pow));
+    char('^').trim(),
+    (a, op, b) => Application('^', [a, b], math.pow),
+  );
   builder.group()
-    ..left(char('*').trim(),
-        (a, op, b) => Application('*', [a, b], (x, y) => x * y))
-    ..left(char('/').trim(),
-        (a, op, b) => Application('/', [a, b], (x, y) => x / y));
+    ..left(
+      char('*').trim(),
+      (a, op, b) => Application('*', [a, b], (x, y) => x * y),
+    )
+    ..left(
+      char('/').trim(),
+      (a, op, b) => Application('/', [a, b], (x, y) => x / y),
+    );
   builder.group()
-    ..left(char('+').trim(),
-        (a, op, b) => Application('+', [a, b], (x, y) => x + y))
-    ..left(char('-').trim(),
-        (a, op, b) => Application('-', [a, b], (x, y) => x - y));
+    ..left(
+      char('+').trim(),
+      (a, op, b) => Application('+', [a, b], (x, y) => x + y),
+    )
+    ..left(
+      char('-').trim(),
+      (a, op, b) => Application('-', [a, b], (x, y) => x - y),
+    );
   return resolve(builder.build()).end();
 }();
 

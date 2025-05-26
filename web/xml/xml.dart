@@ -50,31 +50,35 @@ void update() {
         onCDATA: (event) => appendSax('CDATA', event.value),
         onComment: (event) => appendSax('Comment', event.value),
         onDeclaration: (event) => appendSax(
-            'Declaration',
-            event.attributes
-                .map((attr) => '${attr.name}=${attr.value}')
-                .join('\n')),
+          'Declaration',
+          event.attributes
+              .map((attr) => '${attr.name}=${attr.value}')
+              .join('\n'),
+        ),
         onDoctype: (event) =>
             appendSax('Doctype', event.name, event.externalId?.toString()),
         onEndElement: (event) => appendSax('End Element', event.name),
         onProcessing: (event) =>
             appendSax('Processing', event.target, event.value),
         onStartElement: (event) => appendSax(
-            'Element${event.isSelfClosing ? ' (self-closing)' : ''}',
-            event.name,
-            event.attributes
-                .map((attr) => '${attr.name}=${attr.value}')
-                .join('\n')),
+          'Element${event.isSelfClosing ? ' (self-closing)' : ''}',
+          event.name,
+          event.attributes
+              .map((attr) => '${attr.name}=${attr.value}')
+              .join('\n'),
+        ),
         onText: (event) => appendSax('Text', event.value),
       )
-      .handleError((error) =>
-          appendLine(saxOutput, error.toString(), classes: ['error']));
+      .handleError(
+        (error) => appendLine(saxOutput, error.toString(), classes: ['error']),
+      );
 
   // Process the DOM stream
   eventStream.toXmlNodes().flatten().toList().then(
-      (elements) => updateDom(XmlDocument(elements)..normalize()),
-      onError: (error) =>
-          appendLine(saxOutput, error.toString(), classes: ['error']));
+    (elements) => updateDom(XmlDocument(elements)..normalize()),
+    onError: (error) =>
+        appendLine(saxOutput, error.toString(), classes: ['error']),
+  );
 }
 
 void updateDom(XmlDocument document) {
@@ -95,9 +99,11 @@ void updateDom(XmlDocument document) {
 }
 
 void selectDom(MouseEvent event) {
-  for (var node = event.target as Node?;
-      node != null && node != domOutput;
-      node = node.parentNode) {
+  for (
+    var node = event.target as Node?;
+    node != null && node != domOutput;
+    node = node.parentNode
+  ) {
     if (node.isA<HTMLElement>()) {
       final element = node as HTMLElement;
       final path = element.getAttribute('title');
@@ -160,9 +166,9 @@ class HighlightWriter extends XmlWriter {
 
   @override
   void visit(XmlHasVisitor node) => htmlBuffer.nest({
-        'class': matches.contains(node) ? 'selection' : null,
-        'title': node is XmlNode ? node.xpathGenerate() : null,
-      }, () => super.visit(node));
+    'class': matches.contains(node) ? 'selection' : null,
+    'title': node is XmlNode ? node.xpathGenerate() : null,
+  }, () => super.visit(node));
 }
 
 void main() {

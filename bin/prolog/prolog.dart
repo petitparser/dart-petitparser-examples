@@ -37,6 +37,7 @@ void main(List<String> arguments) {
       .transform(const LineSplitter())
       .map(Term.parse)
       .map((goal) {
-    db.query(goal).forEach(stdout.writeln);
-  }).forEach((each) => stdout.write('?- '));
+        db.query(goal).forEach(stdout.writeln);
+      })
+      .forEach((each) => stdout.write('?- '));
 }

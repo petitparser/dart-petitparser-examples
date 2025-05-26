@@ -42,7 +42,9 @@ class Application extends Expression {
 
   @override
   num eval(Map<String, num> variables) => Function.apply(
-      function, arguments.map((argument) => argument.eval(variables)).toList());
+    function,
+    arguments.map((argument) => argument.eval(variables)).toList(),
+  );
 
   @override
   String toString() => 'Application{$name}';

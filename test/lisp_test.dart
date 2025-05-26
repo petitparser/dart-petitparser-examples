@@ -83,27 +83,35 @@ void main() {
     });
     test('String', () {
       expect(
-          grammar,
-          isSuccess('"foo"', value: [
+        grammar,
+        isSuccess(
+          '"foo"',
+          value: [
             [
               '"',
               ['f', 'o', 'o'],
-              '"'
-            ]
-          ]));
+              '"',
+            ],
+          ],
+        ),
+      );
     });
     test('String with escape', () {
       expect(
-          grammar,
-          isSuccess('"\\""', value: [
+        grammar,
+        isSuccess(
+          '"\\""',
+          value: [
             [
               '"',
               [
-                ['\\', '"']
+                ['\\', '"'],
               ],
-              '"'
-            ]
-          ]));
+              '"',
+            ],
+          ],
+        ),
+      );
     });
     test('Number integer', () {
       expect(grammar, isSuccess('123', value: ['123']));
@@ -122,66 +130,90 @@ void main() {
     });
     test('List empty', () {
       expect(
-          grammar,
-          isSuccess('()', value: [
-            ['(', [], ')']
-          ]));
+        grammar,
+        isSuccess(
+          '()',
+          value: [
+            ['(', [], ')'],
+          ],
+        ),
+      );
     });
     test('List empty []', () {
       expect(
-          grammar,
-          isSuccess('[]', value: [
-            ['[', [], ']']
-          ]));
+        grammar,
+        isSuccess(
+          '[]',
+          value: [
+            ['[', [], ']'],
+          ],
+        ),
+      );
     });
     test('List empty {}', () {
       expect(
-          grammar,
-          isSuccess('{}', value: [
-            ['{', [], '}']
-          ]));
+        grammar,
+        isSuccess(
+          '{}',
+          value: [
+            ['{', [], '}'],
+          ],
+        ),
+      );
     });
     test('List one element', () {
       expect(
-          grammar,
-          isSuccess('(1)', value: [
+        grammar,
+        isSuccess(
+          '(1)',
+          value: [
             [
               '(',
               ['1', []],
-              ')'
-            ]
-          ]));
+              ')',
+            ],
+          ],
+        ),
+      );
     });
     test('List two elements', () {
       expect(
-          grammar,
-          isSuccess('(1 2)', value: [
+        grammar,
+        isSuccess(
+          '(1 2)',
+          value: [
             [
               '(',
               [
                 '1',
-                ['2', []]
+                ['2', []],
               ],
-              ')'
-            ]
-          ]));
+              ')',
+            ],
+          ],
+        ),
+      );
     });
     test('List three elements', () {
       expect(
-          grammar,
-          isSuccess('(+ 1 2)', value: [
+        grammar,
+        isSuccess(
+          '(+ 1 2)',
+          value: [
             [
               '(',
               [
                 '+',
                 [
                   '1',
-                  ['2', []]
-                ]
+                  ['2', []],
+                ],
               ],
-              ')'
-            ]
-          ]));
+              ')',
+            ],
+          ],
+        ),
+      );
     });
   });
   group('Parser', () {
@@ -233,17 +265,24 @@ void main() {
     });
     test('List two elements', () {
       expect(
-          atom,
-          isSuccess('(1 2)',
-              value: isCons(head: 1, tail: isCons(head: 2, tail: isNull))));
+        atom,
+        isSuccess(
+          '(1 2)',
+          value: isCons(head: 1, tail: isCons(head: 2, tail: isNull)),
+        ),
+      );
     });
     test('List three elements', () {
       expect(
-          atom,
-          isSuccess('(+ 1 2)',
-              value: isCons(
-                  head: isName('+'),
-                  tail: isCons(head: 1, tail: isCons(head: 2, tail: isNull)))));
+        atom,
+        isSuccess(
+          '(+ 1 2)',
+          value: isCons(
+            head: isName('+'),
+            tail: isCons(head: 1, tail: isCons(head: 2, tail: isNull)),
+          ),
+        ),
+      );
     });
   });
   group('Natives', () {
@@ -480,7 +519,9 @@ void main() {
       expect(exec('(cons null 2)'), Cons(null, 2));
       expect(exec('(cons null null)'), Cons());
       expect(
-          exec('(cons 1 (cons 2 (cons 3 null)))'), Cons(1, Cons(2, Cons(3))));
+        exec('(cons 1 (cons 2 (cons 3 null)))'),
+        Cons(1, Cons(2, Cons(3))),
+      );
     });
     test('Car', () {
       expect(exec('(car null)'), isNull);
@@ -557,11 +598,12 @@ void main() {
     test('Fibonacci', () {
       final env = standard.create();
       exec(
-          '(define (fib n)'
-          '  (if (<= n 1)'
-          '    1'
-          '    (+ (fib (- n 1)) (fib (- n 2)))))',
-          env);
+        '(define (fib n)'
+        '  (if (<= n 1)'
+        '    1'
+        '    (+ (fib (- n 1)) (fib (- n 2)))))',
+        env,
+      );
       expect(exec('(fib 0)', env), 1);
       expect(exec('(fib 1)', env), 1);
       expect(exec('(fib 2)', env), 2);
@@ -572,9 +614,10 @@ void main() {
     test('Closure', () {
       final env = standard.create();
       exec(
-          '(define (mul n)'
-          '  (lambda (x) (* n x)))',
-          env);
+        '(define (mul n)'
+        '  (lambda (x) (* n x)))',
+        env,
+      );
       expect(exec('((mul 2) 3)', env), 6);
       expect(exec('((mul 3) 4)', env), 12);
       expect(exec('((mul 4) 5)', env), 20);
@@ -582,11 +625,12 @@ void main() {
     test('Object', () {
       final env = standard.create();
       exec(
-          '(define (counter start)'
-          '  (let ((count start))'
-          '    (lambda ()'
-          '      (set! count (+ count 1)))))',
-          env);
+        '(define (counter start)'
+        '  (let ((count start))'
+        '    (lambda ()'
+        '      (set! count (+ count 1)))))',
+        env,
+      );
       exec('(define a (counter 10))', env);
       exec('(define b (counter 20))', env);
       expect(exec('(a)', env), 11);

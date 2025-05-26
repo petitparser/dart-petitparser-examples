@@ -49,7 +49,9 @@ void main() {
       expect(directives, isSuccess('library test;'));
       expect(directives, isSuccess('library test; void main() { }'));
       expect(
-          directives, isSuccess('library test; void main() { print(2 + 3); }'));
+        directives,
+        isSuccess('library test; void main() { print(2 + 3); }'),
+      );
     });
   });
   group('expression', () {
@@ -82,8 +84,10 @@ void main() {
     });
     test('literal (nested)', () {
       expect(expression, isSuccess('[1, true, [1], {"a": b}]'));
-      expect(expression,
-          isSuccess('{"a": 1, "b": true, "c": [1], "d": {"a": b}}'));
+      expect(
+        expression,
+        isSuccess('{"a": 1, "b": true, "c": [1], "d": {"a": b}}'),
+      );
     });
     test('conditional', () {
       expect(expression, isSuccess('a ? b : c'));
@@ -273,8 +277,10 @@ void main() {
       expect(statement, isSuccess('try {} catch (a b) {} finally {}'));
       expect(statement, isSuccess('try {} catch (a b, c d) {} finally {}'));
       expect(statement, isSuccess('try {} catch (a b) {} catch (c d) {}'));
-      expect(statement,
-          isSuccess('try {} catch (a b) {} catch (c d) {} finally {}'));
+      expect(
+        statement,
+        isSuccess('try {} catch (a b) {} catch (c d) {} finally {}'),
+      );
     });
     test('break', () {
       expect(statement, isSuccess('break;'));
@@ -411,9 +417,13 @@ void main() {
       expect(definition, isSuccess('class A<T> implements B<T> {}'));
       expect(definition, isSuccess('class A<T> implements B<T>, C<T> {}'));
       expect(
-          definition, isSuccess('class A<T> extends B<T> implements C<T> {}'));
-      expect(definition,
-          isSuccess('class A<T> extends B<T> implements C<T>, D<T> {}'));
+        definition,
+        isSuccess('class A<T> extends B<T> implements C<T> {}'),
+      );
+      expect(
+        definition,
+        isSuccess('class A<T> extends B<T> implements C<T>, D<T> {}'),
+      );
     });
     test('class (abstract)', () {
       expect(definition, isSuccess('abstract class A {}'));
@@ -421,9 +431,13 @@ void main() {
       expect(definition, isSuccess('abstract class A implements B {}'));
       expect(definition, isSuccess('abstract class A implements B, C {}'));
       expect(
-          definition, isSuccess('abstract class A extends B implements C {}'));
-      expect(definition,
-          isSuccess('abstract class A extends B implements C, D {}'));
+        definition,
+        isSuccess('abstract class A extends B implements C {}'),
+      );
+      expect(
+        definition,
+        isSuccess('abstract class A extends B implements C, D {}'),
+      );
     });
     test('typedef', () {
       expect(definition, isSuccess('typedef a b();'));
@@ -480,8 +494,10 @@ void main() {
     });
     test('multi-line nested', () {
       expect(whitespaces, isSuccess('/* outer /* nested */ */'));
-      expect(whitespaces,
-          isSuccess('/* outer /* nested /* deeply nested */ */ */'));
+      expect(
+        whitespaces,
+        isSuccess('/* outer /* nested /* deeply nested */ */ */'),
+      );
       expect(whitespaces, isFailure('/* outer /* not closed */'));
     });
     test('combined', () {

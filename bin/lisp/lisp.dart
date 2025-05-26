@@ -5,8 +5,13 @@ import 'package:petitparser/petitparser.dart';
 import 'package:petitparser_examples/lisp.dart';
 
 /// Read, evaluate, print loop.
-void evalInteractive(Parser parser, Environment env, Stream<String> input,
-    IOSink output, IOSink error) {
+void evalInteractive(
+  Parser parser,
+  Environment env,
+  Stream<String> input,
+  IOSink output,
+  IOSink error,
+) {
   output.write('>> ');
   input.listen((line) {
     try {
@@ -58,12 +63,14 @@ void main(List<String> arguments) {
   Environment environment = NativeEnvironment();
 
   // add additional primitives
-  environment.define(Name('exit'),
-      (Environment env, dynamic args) => exit(args == null ? 0 : args.head));
   environment.define(
-      Name('sleep'),
-      (Environment env, dynamic args) =>
-          sleep(Duration(milliseconds: args.head)));
+    Name('exit'),
+    (Environment env, dynamic args) => exit(args == null ? 0 : args.head),
+  );
+  environment.define(
+    Name('sleep'),
+    (Environment env, dynamic args) => sleep(Duration(milliseconds: args.head)),
+  );
 
   // process standard library
   if (standardLibrary) {
@@ -80,8 +87,9 @@ void main(List<String> arguments) {
 
   // process console input
   if (interactiveMode || files.isEmpty) {
-    final input =
-        stdin.transform(systemEncoding.decoder).transform(const LineSplitter());
+    final input = stdin
+        .transform(systemEncoding.decoder)
+        .transform(const LineSplitter());
     evalInteractive(lispParser, environment, input, stdout, stderr);
   }
 }

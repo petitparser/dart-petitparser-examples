@@ -15,31 +15,41 @@ import 'utils/runner.dart' as runner;
 
 final arguments = ArgParser()
   ..addFlag('help', abbr: 'h', help: 'show the help text')
-  ..addFlag('verify',
-      abbr: 'v',
-      help: 'run the verification code',
-      defaultsTo: runner.optionVerification,
-      callback: (value) => runner.optionVerification = value)
-  ..addFlag('benchmark',
-      abbr: 'b',
-      help: 'run the benchmark code',
-      defaultsTo: runner.optionBenchmark,
-      callback: (value) => runner.optionBenchmark = value)
-  ..addFlag('stderr',
-      abbr: 'e',
-      help: 'print the standard error',
-      defaultsTo: runner.optionPrintStandardError,
-      callback: (value) => runner.optionPrintStandardError = value)
-  ..addFlag('confidence',
-      abbr: 'c',
-      help: 'print the confidence intervals',
-      defaultsTo: runner.optionPrintConfidenceIntervals,
-      callback: (value) => runner.optionPrintConfidenceIntervals = value)
-  ..addOption('filter',
-      abbr: 'f',
-      help: 'filter the benchmarks',
-      defaultsTo: runner.optionFilter,
-      callback: (value) => runner.optionFilter = value);
+  ..addFlag(
+    'verify',
+    abbr: 'v',
+    help: 'run the verification code',
+    defaultsTo: runner.optionVerification,
+    callback: (value) => runner.optionVerification = value,
+  )
+  ..addFlag(
+    'benchmark',
+    abbr: 'b',
+    help: 'run the benchmark code',
+    defaultsTo: runner.optionBenchmark,
+    callback: (value) => runner.optionBenchmark = value,
+  )
+  ..addFlag(
+    'stderr',
+    abbr: 'e',
+    help: 'print the standard error',
+    defaultsTo: runner.optionPrintStandardError,
+    callback: (value) => runner.optionPrintStandardError = value,
+  )
+  ..addFlag(
+    'confidence',
+    abbr: 'c',
+    help: 'print the confidence intervals',
+    defaultsTo: runner.optionPrintConfidenceIntervals,
+    callback: (value) => runner.optionPrintConfidenceIntervals = value,
+  )
+  ..addOption(
+    'filter',
+    abbr: 'f',
+    help: 'filter the benchmarks',
+    defaultsTo: runner.optionFilter,
+    callback: (value) => runner.optionFilter = value,
+  );
 
 void main(List<String> args) {
   // Parse the command line arguments.

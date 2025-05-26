@@ -664,13 +664,14 @@ class DartGrammarDefinition extends GrammarDefinition {
       ref1(token, '(') & ref0(expression) & ref1(token, ')');
 
   Parser literal() => ref1(
-      token,
-      ref0(nullToken) |
-          ref0(trueToken) |
-          ref0(falseToken) |
-          ref0(hexNumberLexicalToken) |
-          ref0(numberLexicalToken) |
-          ref0(stringLexicalToken));
+    token,
+    ref0(nullToken) |
+        ref0(trueToken) |
+        ref0(falseToken) |
+        ref0(hexNumberLexicalToken) |
+        ref0(numberLexicalToken) |
+        ref0(stringLexicalToken),
+  );
 
   Parser compoundLiteral() => ref0(listLiteral) | ref0(mapLiteral);
 
@@ -735,9 +736,9 @@ class DartGrammarDefinition extends GrammarDefinition {
       char('.') & ref0(digitLexicalToken).plus() | epsilon();
 
   Parser numberOptIllegalEndLexicalToken() => epsilon();
-//        ref0(IDENTIFIER_START).end()
-//      | epsilon()
-//      ;
+  //        ref0(IDENTIFIER_START).end()
+  //      | epsilon()
+  //      ;
 
   Parser hexDigitLexicalToken() => pattern('0-9a-fA-F');
 

@@ -28,8 +28,9 @@ void execute(
   timingElement.innerText = '$timingμs';
   if (result is Exception) {
     outputElement.classList.add('error');
-    outputElement.innerText =
-        result is FormatException ? result.message : result.toString();
+    outputElement.innerText = result is FormatException
+        ? result.message
+        : result.toString();
   } else {
     outputElement.classList.remove('error');
     outputElement.innerText = convert.json.encode(result);

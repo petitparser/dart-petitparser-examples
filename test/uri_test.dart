@@ -44,7 +44,7 @@ void main() {
     #query: 'f&g=h',
     #params: [
       ['f', null],
-      ['g', 'h']
+      ['g', 'h'],
     ],
     #fragment: isNull,
   });
@@ -58,7 +58,7 @@ void main() {
     #path: '/foo bar/zork<>',
     #query: r'\^`{|}',
     #params: [
-      ['\\^`{|}', isNull]
+      ['\\^`{|}', isNull],
     ],
     #fragment: isNull,
   });

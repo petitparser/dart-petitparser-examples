@@ -5,8 +5,8 @@ abstract class RegexpPattern implements Pattern {
   @override
   Match? matchAsPrefix(String input, [int start = 0]) =>
       tryMatch(input.substring(start))
-          ? RegexpMatch(this, input, start, input.length)
-          : null;
+      ? RegexpMatch(this, input, start, input.length)
+      : null;
 
   @override
   Iterable<Match> allMatches(String input, [int start = 0]) sync* {

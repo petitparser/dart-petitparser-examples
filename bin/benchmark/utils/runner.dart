@@ -41,7 +41,8 @@ final List<({String name, Benchmark benchmark})> _benchmarkEntries = (() {
     }
   });
   return SortedList<({String name, Benchmark benchmark})>(
-      comparator: compareAsciiLowerCase.onResultOf((entry) => entry.name));
+    comparator: compareAsciiLowerCase.onResultOf((entry) => entry.name),
+  );
 })();
 
 final numberPrinter = FixedNumberPrinter(precision: 3);
@@ -84,14 +85,16 @@ void run(
             stdout.write(' ± ${numberPrinter(benchmark.standardError)}');
           }
           if (optionPrintConfidenceIntervals) {
-            stdout.write(' [${numberPrinter(benchmark.lowerBound)}; '
-                '${numberPrinter(benchmark.lowerBound)}]');
+            stdout.write(
+              ' [${numberPrinter(benchmark.lowerBound)}; '
+              '${numberPrinter(benchmark.lowerBound)}]',
+            );
           }
         }
       }
       // Complete.
       stdout.writeln();
-    }
+    },
   ));
 }
 
@@ -125,8 +128,12 @@ void runChars(String name, Parser<void> parser, {int? success, String? input}) {
 }
 
 /// Generic string benchmark runner.
-void runString(String name, Parser<void> parser,
-    {int? position, String? input}) {
+void runString(
+  String name,
+  Parser<void> parser, {
+  int? position,
+  String? input,
+}) {
   final input_ = input ?? defaultStringInput;
   final position_ = position ?? input_.length;
   run(
@@ -134,12 +141,16 @@ void runString(String name, Parser<void> parser,
     verify: () {
       final result = parser.parse(input_);
       if (result is Failure) {
-        throw StateError('Expected parse success, but got ${result.message} '
-            'at ${result.position}');
+        throw StateError(
+          'Expected parse success, but got ${result.message} '
+          'at ${result.position}',
+        );
       }
       if (result.position != position_) {
-        throw StateError('Expected parse success at $position_, but succeeded '
-            'at ${result.position}');
+        throw StateError(
+          'Expected parse success at $position_, but succeeded '
+          'at ${result.position}',
+        );
       }
     },
     parse: () => parser.parse(input_),

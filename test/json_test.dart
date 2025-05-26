@@ -21,10 +21,14 @@ void main() {
     });
     test('nested', () {
       expect(
-          parser,
-          isSuccess('[["a"]]', value: [
-            ['a']
-          ]));
+        parser,
+        isSuccess(
+          '[["a"]]',
+          value: [
+            ['a'],
+          ],
+        ),
+      );
     });
     test('invalid', () {
       expect(parser, isFailure('['));
@@ -44,16 +48,20 @@ void main() {
     });
     test('large', () {
       expect(
-          parser,
-          isSuccess('{"a": 1, "b": 2, "c": 3}',
-              value: {'a': 1, 'b': 2, 'c': 3}));
+        parser,
+        isSuccess('{"a": 1, "b": 2, "c": 3}', value: {'a': 1, 'b': 2, 'c': 3}),
+      );
     });
     test('nested', () {
       expect(
-          parser,
-          isSuccess('{"obj": {"a": 1}}', value: {
-            'obj': {'a': 1}
-          }));
+        parser,
+        isSuccess(
+          '{"obj": {"a": 1}}',
+          value: {
+            'obj': {'a': 1},
+          },
+        ),
+      );
     });
     test('invalid', () {
       expect(parser, isFailure('{'));
@@ -147,7 +155,8 @@ void main() {
   });
   group('browser', () {
     test('Internet Explorer', () {
-      const input = '{"recordset": null, "type": "change", '
+      const input =
+          '{"recordset": null, "type": "change", '
           '"fromElement": null, "toElement": null, "altLeft": false, '
           '"keyCode": 0, "repeat": false, "reason": 0, "behaviorCookie": 0, '
           '"contentOverflow": false, "behaviorPart": 0, "dataTransfer": null, '
@@ -161,7 +170,8 @@ void main() {
       expect(parseJson(input), isNotNull);
     });
     test('FireFox', () {
-      const input = '{"type": "change", "eventPhase": 2, "bubbles": true, '
+      const input =
+          '{"type": "change", "eventPhase": 2, "bubbles": true, '
           '"cancelable": true, "timeStamp": 0, "CAPTURING_PHASE": 1, '
           '"AT_TARGET": 2, "BUBBLING_PHASE": 3, "isTrusted": true, '
           '"MOUSEDOWN": 1, "MOUSEUP": 2, "MOUSEOVER": 4, "MOUSEOUT": 8, '
@@ -177,7 +187,8 @@ void main() {
       expect(parseJson(input), isNotNull);
     });
     test('WebKit', () {
-      const input = '{"returnValue": true, "timeStamp": 1226697417289, '
+      const input =
+          '{"returnValue": true, "timeStamp": 1226697417289, '
           '"eventPhase": 2, "type": "change", "cancelable": false, '
           '"bubbles": true, "cancelBubble": false, "MOUSEOUT": 8, '
           '"FOCUS": 4096, "CHANGE": 32768, "MOUSEMOVE": 16, "AT_TARGET": 2, '
@@ -206,22 +217,30 @@ void main() {
     });
     test('expected object value', () {
       expect(
-          parser, isFailure('{"a":', position: 0, message: 'value expected'));
+        parser,
+        isFailure('{"a":', position: 0, message: 'value expected'),
+      );
     });
     test('expected object entry', () {
       expect(
-          parser, isFailure('{"a":1,', position: 0, message: 'value expected'));
+        parser,
+        isFailure('{"a":1,', position: 0, message: 'value expected'),
+      );
     });
     test('expected string closing', () {
       expect(parser, isFailure('"', position: 0, message: 'value expected'));
     });
     test('expected number (fractional part)', () {
-      expect(parser,
-          isFailure('1.', position: 1, message: 'end of input expected'));
+      expect(
+        parser,
+        isFailure('1.', position: 1, message: 'end of input expected'),
+      );
     });
     test('expected number (exponent part)', () {
-      expect(parser,
-          isFailure('1e', position: 1, message: 'end of input expected'));
+      expect(
+        parser,
+        isFailure('1e', position: 1, message: 'end of input expected'),
+      );
     });
   });
 }
