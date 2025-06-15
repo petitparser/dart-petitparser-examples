@@ -41,7 +41,7 @@ final List<({String name, Benchmark benchmark})> _benchmarkEntries = (() {
     }
   });
   return SortedList<({String name, Benchmark benchmark})>(
-    comparator: compareAsciiLowerCase.onResultOf((entry) => entry.name),
+    comparator: compareAsciiLowerCase.keyOf((entry) => entry.name),
   );
 })();
 

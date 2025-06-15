@@ -1,5 +1,12 @@
 # Changelog
 
+## 7.0.0
+
+- Update to Dart 3.8 and PetitParser 7.0.
+- Added Pascal, CSV example grammars.
+- Numerous fixes and improvements.
+- Better testing of grammars.
+
 ## 6.0.0
 
 - Update to Dart 3.0 and PetitParser 6.0.
