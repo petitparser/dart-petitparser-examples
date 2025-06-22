@@ -26,6 +26,15 @@ const csvInput =
     'New York City,40°42′46″N,74°00′21″W\n'
     'Paris,48°51′24″N,2°21′03″E';
 
+final tsvParser = csv_example.TabularDefinition.tsv().build();
+const tsvInput =
+    'Sepal length	Sepal width	Petal length	Petal width	Species\n'
+    '5.1	3.5	1.4	0.2	I. setosa\n'
+    '4.9	3.0	1.4	0.2	I. setosa\n'
+    '4.7	3.2	1.3	0.2	I. setosa\n'
+    '4.6	3.1	1.5	0.2	I. setosa\n'
+    '5.0	3.6	1.4	0.2	I. setosa\n';
+
 final lispParser = lisp_example.LispParserDefinition().build();
 const lispInput =
     '(define (fib n)\n'
@@ -84,6 +93,7 @@ void main() {
   runString('example - lisp', lispParser, input: lispInput);
   runString('example - math', mathParser, input: mathInput);
   runString('example - prolog', prologParser, input: prologInput);
+  runString('example - tsv', tsvParser, input: tsvInput);
   runString('example - uri', uriParser, input: uriInput);
   runString('example - xml', xmlParser, input: xmlInput);
 }
