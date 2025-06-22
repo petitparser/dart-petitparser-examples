@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Tabular Text Parser</title>
+  <link rel="stylesheet"
+        href="//cdn.rawgit.com/milligram/milligram/master/dist/milligram.min.css">
+  <style>
+    select { width: 70%; }
+    textarea { width: 100%; height: 200px; }
+    #input, #output { font-family: monospace; }
+    #output { white-space: preserve nowrap; }
+    .error { color: red; }
+  </style>
+</head>
+<body>
+  <h1>Tabular Text Parser</h1>
+
+  <select id="options">
+    <option>CSV: Comma-separated values</option>
+    <option>TSV: Tab-separated values</option>
+  </select>
+
+  <button id="example">
+    Load Example
+  </button>
+
+  <h2>Input</h2>
+  <textarea id="input"></textarea>
+
+  <h2>Output</h2>
+  <div id="output"></div>
+
+  <script src="tabular.dart.js"></script>
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-QK0KCHXW3F"></script>
+  <script>window.dataLayer = window.dataLayer || [];function gtag(){dataLayer.push(arguments);}gtag('js', new Date());gtag('config', 'G-QK0KCHXW3F');</script>
+</body>
+</html>
