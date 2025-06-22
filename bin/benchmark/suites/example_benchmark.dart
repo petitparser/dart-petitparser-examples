@@ -1,10 +1,10 @@
 import 'package:petitparser/petitparser.dart';
 import 'package:petitparser_examples/bibtex.dart' as bibtex_example;
-import 'package:petitparser_examples/csv.dart' as csv_example;
 import 'package:petitparser_examples/json.dart' as json_example;
 import 'package:petitparser_examples/lisp.dart' as lisp_example;
 import 'package:petitparser_examples/math.dart' as math_example;
 import 'package:petitparser_examples/prolog.dart' as prolog_example;
+import 'package:petitparser_examples/tabular.dart' as csv_example;
 import 'package:petitparser_examples/uri.dart' as uri_example;
 import 'package:xml/src/xml_events/parser.dart' as xml_example;
 import 'package:xml/xml.dart';
@@ -20,7 +20,7 @@ const bibtexInput =
     '\tYear = 2010,\n'
     '\tUrl = {http://scg.unibe.ch/archive/papers/Reng10cDynamicGrammars.pdf}}';
 
-final csvParser = csv_example.CsvDefinition().build();
+final csvParser = csv_example.TabularDefinition.csv().build();
 const csvInput =
     'Los Angeles,34°03′N,118°15′W\n'
     'New York City,40°42′46″N,74°00′21″W\n'
