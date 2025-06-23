@@ -12,6 +12,6 @@ fi
 # Run all the benchmarks in a separate process.
 mapfile -t NAMES < <(dart run bin/benchmark/benchmark.dart --no-benchmark --no-verify)
 for NAME in "${NAMES[@]}"; do
-  dart run --no-enable-asserts bin/benchmark/benchmark.dart --filter="$NAME"
+  dart run --no-enable-asserts bin/benchmark/benchmark.dart --filter="$NAME" --separator=";" --no-human --confidence
   sleep 1
 done

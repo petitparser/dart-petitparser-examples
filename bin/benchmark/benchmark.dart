@@ -49,6 +49,20 @@ final arguments = ArgParser()
     help: 'filter the benchmarks',
     defaultsTo: runner.optionFilter,
     callback: (value) => runner.optionFilter = value,
+  )
+  ..addOption(
+    'separator',
+    abbr: 's',
+    help: 'separator between benchmark values',
+    defaultsTo: runner.optionSeparator,
+    callback: (value) => runner.optionSeparator = value,
+  )
+  ..addFlag(
+    'human',
+    abbr: 'u',
+    help: 'print extras in human-readable format',
+    defaultsTo: runner.optionHumanReadable,
+    callback: (value) => runner.optionHumanReadable = value,
   );
 
 void main(List<String> args) {

@@ -24,6 +24,12 @@ var optionPrintConfidenceIntervals = false;
 /// Whether to filter to a specific benchmark.
 String? optionFilter;
 
+/// Separator character for output.
+String? optionSeparator = '\t';
+
+/// if the output should be human readable.
+var optionHumanReadable = true;
+
 final defaultCharsInput = [
   // ASCII characters (265 times)
   ...List.generate(0xff, String.fromCharCode),
@@ -80,15 +86,28 @@ void run(
           native?.also(benchmark),
         ].whereType<Jackknife<double>>();
         for (final benchmark in benchmarks) {
-          stdout.write('\t${numberPrinter(benchmark.estimate)}');
+          stdout.write(optionSeparator);
+          stdout.write(numberPrinter(benchmark.estimate));
           if (optionPrintStandardError) {
-            stdout.write(' ± ${numberPrinter(benchmark.standardError)}');
+            if (optionHumanReadable) {
+              stdout.write(' ± ');
+            } else {
+              stdout.write(optionSeparator);
+            }
+            stdout.writeln(numberPrinter(benchmark.standardError));
           }
           if (optionPrintConfidenceIntervals) {
-            stdout.write(
-              ' [${numberPrinter(benchmark.lowerBound)}; '
-              '${numberPrinter(benchmark.lowerBound)}]',
-            );
+            if (optionHumanReadable) {
+              stdout.write(
+                ' [${numberPrinter(benchmark.lowerBound)}; '
+                '${numberPrinter(benchmark.upperBound)}]',
+              );
+            } else {
+              stdout.write(optionSeparator);
+              stdout.write(numberPrinter(benchmark.lowerBound));
+              stdout.write(optionSeparator);
+              stdout.write(numberPrinter(benchmark.upperBound));
+            }
           }
         }
       }
