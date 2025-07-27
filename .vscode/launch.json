@@ -1,0 +1,37 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Run all Tests",
+      "type": "dart",
+      "request": "launch",
+      "program": "./test/all_test.dart"
+    },
+    {
+      "name": "Run Benchmark Tests",
+      "type": "dart",
+      "request": "launch",
+      "program": "bin/benchmark/benchmark.dart",
+      "args": [
+        "--no-benchmark"
+      ]
+    },
+    {
+      "name": "Lisp",
+      "type": "dart",
+      "request": "launch",
+      "console": "terminal",
+      "program": "bin/lisp/lisp.dart"
+    },
+    {
+      "name": "Prolog",
+      "type": "dart",
+      "request": "launch",
+      "console": "terminal",
+      "program": "bin/prolog/prolog.dart",
+      "args": [
+        "bin/prolog/family.pl"
+      ]
+    },
+  ]
+}
