@@ -19,7 +19,7 @@ dependencies:
   collection: ^1.19.0
   data: ^0.15.0
   http: ^1.4.0
-  meta: ^1.17.0
+  meta: ^1.16.0
   more: ^4.6.0
   petitparser: ^7.0.0
   web: ^1.1.0
