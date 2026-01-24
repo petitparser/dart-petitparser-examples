@@ -2,6 +2,13 @@
 ///
 /// The accepted inputs and decomposition matches the example given in
 /// Appendix B of the standard: https://tools.ietf.org/html/rfc3986#appendix-B.
+///
+/// For example:
+///
+/// ```dart
+/// final result = uri.parse('https://example.com/foo?bar=baz#frag');
+/// print(result.value);
+/// ```
 library;
 
 import 'package:petitparser/petitparser.dart';

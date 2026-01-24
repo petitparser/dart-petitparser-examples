@@ -1,10 +1,18 @@
-/// A simple CSV (comma seperated text) parser.
+/// A simple CSV (comma separated text) parser.
+///
+/// For example:
+///
+/// ```dart
+/// final parser = TabularDefinition.csv().build();
+/// final result = parser.parse('a,b,c\n1,2,3');
+/// print(result.value); // [['a', 'b', 'c'], ['1', '2', '3']]
+/// ```
 library;
 
 import 'package:petitparser/petitparser.dart';
 import 'package:petitparser/petitparser.dart' as pp;
 
-/// Customizable parser defintion for tabular text files.
+/// Customizable parser definition for tabular text files.
 class TabularDefinition extends GrammarDefinition<List<List<String>>> {
   /// Definition for "Comma-separated values" (CSV) input.
   factory TabularDefinition.csv() => TabularDefinition(
@@ -43,7 +51,7 @@ class TabularDefinition extends GrammarDefinition<List<List<String>>> {
   /// Specifies how characters are escaped.
   final Parser<String> escape;
 
-  /// Sepcifies how values are delimited in a row.
+  /// Specifies how values are delimited in a row.
   final Parser<String> delimiter;
 
   /// Specifies how rows are delimited in a file.

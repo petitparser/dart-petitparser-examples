@@ -1,6 +1,14 @@
-/// This package contains the complete grammar of Smalltalk.
+/// This library contains the complete grammar of Smalltalk.
 ///
 /// It was automatically exported from PetitParser for Smalltalk.
+///
+/// For example:
+///
+/// ```dart
+/// final parser = SmalltalkParserDefinition().build();
+/// final result = parser.parse('1 + 2');
+/// print(result.value);
+/// ```
 library;
 
 export 'src/smalltalk/ast.dart';

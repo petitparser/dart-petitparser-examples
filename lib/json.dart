@@ -1,4 +1,4 @@
-/// This package contains a complete implementation of [JSON](https://json.org/).
+/// This library contains a complete implementation of [JSON](https://json.org/).
 library;
 
 import 'src/json/definition.dart';
@@ -10,7 +10,7 @@ export 'src/json/types.dart';
 /// Internal JSON parser.
 final _jsonParser = JsonDefinition().build();
 
-/// Converts the given JSON-string [input] to its corresponding object.
+/// Converts the given JSON [input] string to its corresponding object.
 ///
 /// For example:
 ///

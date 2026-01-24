@@ -1,7 +1,14 @@
-/// This package contains a simple grammar and evaluator for LISP.
+/// This library contains a simple grammar and evaluator for LISP.
 ///
 /// The code is reasonably complete to run and evaluate reasonably complex
 /// programs from the console or the web browser.
+///
+/// For example:
+///
+/// ```dart
+/// final env = NativeEnvironment();
+/// evalString(lispParser, env, '(print "Hello World")');
+/// ```
 library;
 
 export 'src/lisp/cons.dart';
