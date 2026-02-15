@@ -89,6 +89,7 @@ void updateDom(XmlDocument document) {
   // Find the XPath matches.
   final matches = <XmlNode>{};
   try {
+    // ignore: experimental_member_use
     matches.addAll(document.xpath(xpathInput.value));
     xpathError.innerText = '';
   } catch (error) {
