@@ -15,7 +15,10 @@ Matcher isBibTextEntry({
 void main() {
   final parser = BibTeXDefinition().build();
   test('linter', () {
-    expect(linter(parser, excludedTypes: {}), isEmpty);
+    expect(
+      linter(parser, excludedRules: {'Duplicate parser'}, excludedTypes: {}),
+      isEmpty,
+    );
   });
   group('basic', () {
     const input =

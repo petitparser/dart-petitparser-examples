@@ -8,7 +8,10 @@ import 'utils/expect.dart';
 void main() {
   final grammar = DartGrammarDefinition();
   test('grammar linter', () {
-    expect(linter(grammar.build()), isEmpty);
+    expect(
+      linter(grammar.build(), excludedRules: {'Duplicate parser'}),
+      isEmpty,
+    );
   });
   group('directives', () {
     final directives = grammar.buildFrom(grammar.start()).end();

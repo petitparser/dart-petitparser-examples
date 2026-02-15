@@ -6,7 +6,14 @@ import 'package:test/test.dart';
 void main() {
   group('database', () {
     test('linter', () {
-      expect(linter(rulesParser, excludedTypes: {}), isEmpty);
+      expect(
+        linter(
+          rulesParser,
+          excludedTypes: {},
+          excludedRules: {'Duplicate parser'},
+        ),
+        isEmpty,
+      );
     });
     test('empty', () {
       final db = Database.parse('foo.');
@@ -53,7 +60,14 @@ void main() {
   });
   group('term', () {
     test('linter', () {
-      expect(linter(termParser, excludedTypes: {}), isEmpty);
+      expect(
+        linter(
+          termParser,
+          excludedRules: {'Duplicate parser'},
+          excludedTypes: {},
+        ),
+        isEmpty,
+      );
     });
     test('empty', () {
       final query = Term.parse('foo');

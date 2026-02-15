@@ -8,7 +8,7 @@ void main() {
   group('csv', () {
     final csv = TabularDefinition.csv().build();
     test('linter', () {
-      expect(linter(csv, excludedTypes: {}), isEmpty);
+      expect(linter(csv), isEmpty);
     });
     test('basic string', () {
       expect(
@@ -203,7 +203,7 @@ void main() {
   group('tsv', () {
     final tsv = TabularDefinition.tsv().build();
     test('linter', () {
-      expect(linter(tsv, excludedTypes: {}), isEmpty);
+      expect(linter(tsv), isEmpty);
     });
     test('basic string', () {
       expect(

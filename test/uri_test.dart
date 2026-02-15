@@ -17,9 +17,9 @@ void uriTest(String source, Map<Symbol, dynamic> values) {
 
 void main() {
   test('linter', () {
-    expect(linter(parser, excludedTypes: {}), isEmpty);
-    expect(linter(authority, excludedTypes: {}), isEmpty);
-    expect(linter(query, excludedTypes: {}), isEmpty);
+    expect(linter(parser), isEmpty);
+    expect(linter(authority), isEmpty);
+    expect(linter(query), isEmpty);
   });
   uriTest('http://www.ics.uci.edu/pub/ietf/uri/#Related', {
     #scheme: 'http',

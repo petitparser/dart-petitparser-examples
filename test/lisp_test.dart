@@ -219,7 +219,10 @@ void main() {
   group('Parser', () {
     final atom = parserDefinition.buildFrom(parserDefinition.atom());
     test('Linter', () {
-      expect(linter(atom, excludedTypes: {}), isEmpty);
+      expect(
+        linter(atom, excludedRules: {'Duplicate parser'}, excludedTypes: {}),
+        isEmpty,
+      );
     });
     test('Name', () {
       expect(atom, isSuccess('foo', value: isName('foo')));

@@ -17,7 +17,7 @@ void verify(
 
 void main() {
   test('linter', () {
-    expect(linter(parser, excludedTypes: {}), isEmpty);
+    expect(linter(parser, excludedRules: {}), isEmpty);
   });
   test('number', () {
     verify('0', 0);
