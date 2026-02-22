@@ -12,6 +12,7 @@ final xpathError = document.querySelector('#xpath-error') as HTMLElement;
 final domPretty = document.querySelector('#dom-pretty') as HTMLInputElement;
 final saxOutput = document.querySelector('#sax-output') as HTMLElement;
 final domOutput = document.querySelector('#dom-output') as HTMLElement;
+final xpathOutput = document.querySelector('#xpath-output') as HTMLElement;
 
 Element appendString(Element element, String object) {
   object
@@ -87,16 +88,31 @@ void updateDom(XmlDocument document) {
     document = XmlDocument.parse(document.toXmlString(pretty: true));
   }
   // Find the XPath matches.
-  final matches = <XmlNode>{};
+  late final List<Object> results;
   try {
     // ignore: experimental_member_use
-    matches.addAll(document.xpath(xpathInput.value));
+    results = document.xpathEvaluate(xpathInput.value).toList();
     xpathError.innerText = '';
   } catch (error) {
     xpathError.innerText = error.toString();
   }
   // Render the highlighted document.
-  HighlightWriter(HtmlBuffer(domOutput), matches).visit(document);
+  HighlightWriter(
+    HtmlBuffer(domOutput),
+    results.whereType<XmlNode>().toSet(),
+  ).visit(document);
+  // Render the XPath results.
+  updateXPath(results);
+}
+
+void updateXPath(List<Object> results) {
+  final list = document.createElement('ol');
+  for (final result in results) {
+    final element = document.createElement('li');
+    element.appendChild(document.createTextNode(result.toString()));
+    list.appendChild(element);
+  }
+  xpathOutput.replaceChildren(list);
 }
 
 void selectDom(MouseEvent event) {

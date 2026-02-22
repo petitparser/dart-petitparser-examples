@@ -1,30 +1,62 @@
 <!DOCTYPE html>
 <html>
+
 <head>
   <meta charset="utf-8">
   <title>XML Parser</title>
-  <link rel="stylesheet"
-        href="//cdn.rawgit.com/milligram/milligram/master/dist/milligram.min.css">
+  <link rel="stylesheet" href="//cdn.rawgit.com/milligram/milligram/master/dist/milligram.min.css">
   <style>
-    textarea { width: 100%; height: 200px; }
-    textarea, input { font-family: monospace; }
-    #sax-output, #dom-output { font-family: monospace; vertical-align: top; width: 50%; }
-    #sax-output div { display: flex; }
-    #sax-output div span { flex: 1; }
-    #dom-output { white-space: pre; }
-    #dom-output .selection { background-color: #9b4dca; color: #fff; }
-    .error { color: red; font-weight: normal; }
+    textarea {
+      width: 100%;
+      height: 200px;
+    }
+
+    textarea,
+    input {
+      font-family: monospace;
+    }
+
+    #sax-output,
+    #dom-output,
+    #xpath-output {
+      font-family: monospace;
+      vertical-align: top;
+      width: 33%;
+    }
+
+    #sax-output div {
+      display: flex;
+    }
+
+    #sax-output div span {
+      flex: 1;
+    }
+
+    #dom-output {
+      white-space: pre;
+    }
+
+    #dom-output .selection {
+      background-color: #9b4dca;
+      color: #fff;
+    }
+
+    .error {
+      color: red;
+      font-weight: normal;
+    }
   </style>
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-QK0KCHXW3F"></script>
-  <script>window.dataLayer = window.dataLayer || [];function gtag(){dataLayer.push(arguments);}gtag('js', new Date());gtag('config', 'G-QK0KCHXW3F');</script>
+  <script>window.dataLayer = window.dataLayer || []; function gtag() { dataLayer.push(arguments); } gtag('js', new Date()); gtag('config', 'G-QK0KCHXW3F');</script>
 </head>
-<body>
-<h1>XML Parser</h1>
 
-<h2>Input</h2>
-<fieldset>
-  <label for="xml-input">XML</label>
-  <textarea id="xml-input"><?xml version="1.0"?>
+<body>
+  <h1>XML Parser</h1>
+
+  <h2>Input</h2>
+  <fieldset>
+    <label for="xml-input">XML</label>
+    <textarea id="xml-input"><?xml version="1.0"?>
 <bookshelf>
   <book>
     <title lang="en" pages="328" year="1949">Nineteen Eighty-Four</title>
@@ -42,31 +74,34 @@
   </book>
 </bookshelf></textarea>
 
-  <label for="xpath-input">XPath <span id="xpath-error" class="error"></span></label>
-  <input id="xpath-input" value="//book[title/@lang=&quot;en&quot;]/author/text()">
+    <label for="xpath-input">XPath <span id="xpath-error" class="error"></span></label>
+    <input id="xpath-input" value="//book[title/@lang=&quot;en&quot;]/author/text()">
 
-  <input id="dom-pretty" type="checkbox">
-  <label for="dom-pretty" class="label-inline">Pretty-print DOM</label>
-</fieldset>
+    <input id="dom-pretty" type="checkbox">
+    <label for="dom-pretty" class="label-inline">Pretty-print DOM</label>
+  </fieldset>
 
-<h2>Output</h2>
-<table>
-  <thead>
-  <tr>
-    <th>Events (SAX)</th>
-    <th>DOM with XPath</th>
-  </tr>
-  </thead>
-  <tbody>
-  <tr>
-    <td id="sax-output"></td>
-    <td id="dom-output"></td>
-  </tr>
-  </tbody>
-</table>
+  <h2>Output</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>XML Events (SAX)</th>
+        <th>XML DOM</th>
+        <th>XPath</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td id="sax-output"></td>
+        <td id="dom-output"></td>
+        <td id="xpath-output"></td>
+      </tr>
+    </tbody>
+  </table>
 
-<script src="xml.dart.js"></script>
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-QK0KCHXW3F"></script>
-<script>window.dataLayer = window.dataLayer || [];function gtag(){dataLayer.push(arguments);}gtag('js', new Date());gtag('config', 'G-QK0KCHXW3F');</script>
+  <script src="xml.dart.js"></script>
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-QK0KCHXW3F"></script>
+  <script>window.dataLayer = window.dataLayer || []; function gtag() { dataLayer.push(arguments); } gtag('js', new Date()); gtag('config', 'G-QK0KCHXW3F');</script>
 </body>
+
 </html>
