@@ -32,3 +32,5 @@ dev_dependencies:
 dependency_overrides:
   xml:
     git: https://github.com/renggli/dart-xml.git
+  petitparser:
+    git: https://github.com/petitparser/dart-petitparser.git

@@ -42,9 +42,27 @@ void runJson(String name, String input) => run(
       throw StateError('Parsers provide inconsistent results');
     }
   },
-  parse: () => jsonParser.parse(input),
-  accept: () => jsonParser.accept(input),
-  native: () => convert.json.decode(input),
+  parse: (count) {
+    var result = 0;
+    for (var c = 0; c < count; c++) {
+      result ^= jsonParser.parse(input).hashCode;
+    }
+    return result;
+  },
+  accept: (count) {
+    var result = 0;
+    for (var c = 0; c < count; c++) {
+      result ^= jsonParser.accept(input).hashCode;
+    }
+    return result;
+  },
+  native: (count) {
+    var result = 0;
+    for (var c = 0; c < count; c++) {
+      result ^= convert.json.decode(input).hashCode;
+    }
+    return result;
+  },
 );
 
 void main() {

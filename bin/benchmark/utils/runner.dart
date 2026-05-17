@@ -40,13 +40,13 @@ final defaultCharsInput = [
 ].shuffled(Random(42));
 final defaultStringInput = defaultCharsInput.join();
 
-final List<({String name, Benchmark benchmark})> _benchmarkEntries = (() {
+final List<({String name, void Function() benchmark})> _benchmarkEntries = (() {
   Future.delayed(const Duration(milliseconds: 1)).then((_) {
     for (final (:name, :benchmark) in _benchmarkEntries) {
       if (optionFilter == null || optionFilter == name) benchmark();
     }
   });
-  return SortedList<({String name, Benchmark benchmark})>(
+  return SortedList<({String name, void Function() benchmark})>(
     comparator: compareAsciiLowerCase.keyOf((entry) => entry.name),
   );
 })();
@@ -56,7 +56,7 @@ final numberPrinter = FixedNumberPrinter(precision: 3);
 /// Generic benchmark runner.
 void run(
   String name, {
-  required Benchmark verify,
+  required void Function() verify,
   required Benchmark parse,
   required Benchmark accept,
   Benchmark? native,
@@ -83,7 +83,7 @@ void run(
         final benchmarks = [
           benchmark(parse),
           benchmark(accept),
-          native?.also(benchmark),
+          if (native != null) benchmark(native),
         ].whereType<Jackknife<double>>();
         for (final benchmark in benchmarks) {
           stdout.write(optionSeparator);
@@ -133,15 +133,23 @@ void runChars(String name, Parser<void> parser, {int? success, String? input}) {
         throw StateError('Expected $success_ successes, but got $count');
       }
     },
-    parse: () {
-      for (var i = 0; i < inputLength; i++) {
-        parser.parse(input_, start: i);
+    parse: (count) {
+      var result = 0;
+      for (var c = 0; c < count; c++) {
+        for (var i = 0; i < inputLength; i++) {
+          result ^= parser.parse(input_, start: i).hashCode;
+        }
       }
+      return result;
     },
-    accept: () {
-      for (var i = 0; i < inputLength; i++) {
-        parser.accept(input_, start: i);
+    accept: (count) {
+      var result = 0;
+      for (var c = 0; c < count; c++) {
+        for (var i = 0; i < inputLength; i++) {
+          result ^= parser.accept(input_, start: i).hashCode;
+        }
       }
+      return result;
     },
   );
 }
@@ -172,7 +180,19 @@ void runString(
         );
       }
     },
-    parse: () => parser.parse(input_),
-    accept: () => parser.accept(input_),
+    parse: (count) {
+      var result = 0;
+      for (var c = 0; c < count; c++) {
+        result ^= parser.parse(input_).hashCode;
+      }
+      return result;
+    },
+    accept: (count) {
+      var result = 0;
+      for (var c = 0; c < count; c++) {
+        result ^= parser.accept(input_) ? 1 : 0;
+      }
+      return result;
+    },
   );
 }

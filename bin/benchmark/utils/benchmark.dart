@@ -1,7 +1,7 @@
 import 'package:data/stats.dart';
 
 /// Function type to be benchmarked.
-typedef Benchmark = void Function();
+typedef Benchmark = int Function(int count);
 
 /// Measures the time it takes to run [function] in microseconds.
 ///
@@ -11,6 +11,7 @@ Jackknife<double> benchmark(
   Benchmark function, {
   int minLoop = 25,
   Duration minDuration = const Duration(milliseconds: 100),
+  Duration warmupDuration = const Duration(seconds: 1),
   int sampleCount = 25,
   double confidenceLevel = 0.95,
 }) {
@@ -25,6 +26,11 @@ Jackknife<double> benchmark(
       'in $minDuration.',
     );
   }
+  // Warmup phase.
+  final warmupWatch = Stopwatch()..start();
+  while (warmupWatch.elapsed < warmupDuration) {
+    _benchmark(function, count);
+  }
   // Collect samples.
   final samples = <double>[];
   for (var i = 0; i < sampleCount; i++) {
@@ -37,15 +43,16 @@ Jackknife<double> benchmark(
   );
 }
 
+/// Blackhole variable to prevent dead code elimination.
+int blackhole = 0;
+
 @pragma('vm:never-inline')
 @pragma('vm:unsafe:no-interrupts')
 Duration _benchmark(Benchmark function, int count) {
   final watch = Stopwatch();
   watch.start();
-  var n = count + 0;
-  while (n-- > 0) {
-    function();
-  }
+  final result = function(count);
   watch.stop();
+  blackhole ^= result;
   return watch.elapsed;
 }

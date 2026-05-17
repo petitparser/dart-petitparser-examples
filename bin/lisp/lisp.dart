@@ -40,7 +40,7 @@ void main(List<String> arguments) {
       } else if (option == '-i') {
         interactiveMode = true;
       } else if (option == '-?') {
-        stdout.writeln('${Platform.executable} smalltalk.dart -n -i [files]');
+        stdout.writeln('${Platform.executable} lisp.dart -n -i [files]');
         stdout.writeln(' -i enforces the interactive mode');
         stdout.writeln(' -n does not load the standard library');
         exit(0);

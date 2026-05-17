@@ -25,9 +25,27 @@ void runRegExp(String regexp, Parser<void> parser, String input) {
         throw StateError('Expressions provide inconsistent results');
       }
     },
-    parse: () => parserPattern.allMatches(input).toList(),
-    accept: () => parserPattern.allMatches(input).isNotEmpty,
-    native: () => nativePattern.allMatches(input).toList(),
+    parse: (count) {
+      var result = 0;
+      for (var c = 0; c < count; c++) {
+        result ^= parserPattern.allMatches(input).hashCode;
+      }
+      return result;
+    },
+    accept: (count) {
+      var result = 0;
+      for (var c = 0; c < count; c++) {
+        result ^= parserPattern.allMatches(input).hashCode;
+      }
+      return result;
+    },
+    native: (count) {
+      var result = 0;
+      for (var c = 0; c < count; c++) {
+        result ^= nativePattern.allMatches(input).hashCode;
+      }
+      return result;
+    },
   );
 }
 
