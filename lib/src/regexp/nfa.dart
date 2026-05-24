@@ -14,13 +14,14 @@ class Nfa extends RegexpPattern {
   int tryMatch(String input, int start, int end) {
     var result = -1;
     var currentStates = <NfaState>{};
+    var nextStates = <NfaState>{};
     _addStates(this.start, currentStates);
     if (currentStates.any((state) => state.isEnd)) {
       result = start;
     }
     for (var i = start; i < end; i++) {
       final value = input.codeUnitAt(i);
-      final nextStates = <NfaState>{};
+      nextStates.clear();
       for (final state in currentStates) {
         final nextState = state.transitions[value];
         if (nextState != null) {
@@ -33,7 +34,7 @@ class Nfa extends RegexpPattern {
       if (nextStates.isEmpty) {
         break;
       }
-      currentStates = nextStates;
+      (currentStates, nextStates) = (nextStates, currentStates);
       if (currentStates.any((state) => state.isEnd)) {
         result = i + 1;
       }
