@@ -105,6 +105,9 @@ void main() {
         QuantificationNode(la, 34, 567),
       );
     });
+    test('repeat invalid', () {
+      expect(() => Node.fromString('a{3,2}'), throwsRangeError);
+    });
     test('concat and or', () {
       expectedEqual(
         Node.fromString(r'ab|cd'),

@@ -151,7 +151,16 @@ class IntersectionNode extends Node {
 }
 
 class QuantificationNode extends Node {
-  QuantificationNode(this.child, this.min, [this.max]);
+  QuantificationNode(this.child, this.min, [this.max]) {
+    RangeError.checkNotNegative(min, 'min', 'Minimum must be non-negative');
+    if (max != null && max! < min) {
+      throw RangeError.value(
+        max!,
+        'max',
+        'Maximum must be greater than or equal to minimum ($min)',
+      );
+    }
+  }
 
   final Node child;
   final int min;
