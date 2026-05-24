@@ -159,29 +159,50 @@ class QuantificationNode extends Node {
 
   @override
   Nfa toNfa() {
-    final start = NfaState(isEnd: false);
-    final end = NfaState(isEnd: true);
-    final childNfa = child.toNfa();
     if (min == 0 && max == null) {
+      final start = NfaState(isEnd: false);
+      final end = NfaState(isEnd: true);
+      final childNfa = child.toNfa();
       start.epsilons.add(end);
       start.epsilons.add(childNfa.start);
       childNfa.end.epsilons.add(end);
       childNfa.end.epsilons.add(childNfa.start);
       childNfa.end.isEnd = false;
+      return Nfa(start: start, end: end);
     } else if (min == 0 && max == 1) {
+      final start = NfaState(isEnd: false);
+      final end = NfaState(isEnd: true);
+      final childNfa = child.toNfa();
       start.epsilons.add(end);
       start.epsilons.add(childNfa.start);
       childNfa.end.epsilons.add(end);
       childNfa.end.isEnd = false;
-    } else if (min == 1 && max == null) {
-      start.epsilons.add(childNfa.start);
-      childNfa.end.epsilons.add(end);
-      childNfa.end.epsilons.add(childNfa.start);
-      childNfa.end.isEnd = false;
-    } else {
-      throw UnsupportedError(toString());
+      return Nfa(start: start, end: end);
     }
-    return Nfa(start: start, end: end);
+    final nfas = <Nfa>[];
+    for (var i = 0; i < min; i++) {
+      nfas.add(child.toNfa());
+    }
+    if (max == null) {
+      nfas.add(QuantificationNode(child, 0, null).toNfa());
+    } else {
+      for (var i = 0; i < max! - min; i++) {
+        nfas.add(QuantificationNode(child, 0, 1).toNfa());
+      }
+    }
+    if (nfas.isEmpty) {
+      final start = NfaState(isEnd: false);
+      final end = NfaState(isEnd: true);
+      start.epsilons.add(end);
+      return Nfa(start: start, end: end);
+    }
+    for (var i = 0; i < nfas.length - 1; i++) {
+      final current = nfas[i];
+      final next = nfas[i + 1];
+      current.end.epsilons.add(next.start);
+      current.end.isEnd = false;
+    }
+    return Nfa(start: nfas.first.start, end: nfas.last.end);
   }
 
   @override

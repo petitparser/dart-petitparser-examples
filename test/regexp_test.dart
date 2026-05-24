@@ -136,7 +136,6 @@ void main() {
       });
     }
     test('unsupported', () {
-      expect(() => Node.fromString(r'a{2,}').toNfa(), throwsUnsupportedError);
       expect(() => Node.fromString(r'a&b').toNfa(), throwsUnsupportedError);
       expect(() => Node.fromString(r'!a').toNfa(), throwsUnsupportedError);
     });
@@ -376,6 +375,34 @@ const tests = [
     Expect('aaaabba', false),
     Expect('aababab', false),
     Expect('aabbbbb', false),
+  ]),
+  // Arbitrary ranges
+  Test(r'a{3}', [
+    Expect('', false),
+    Expect('a', false),
+    Expect('aa', false),
+    Expect('aaa', true),
+    Expect('aaaa', false),
+  ]),
+  Test(r'a{2,}', [
+    Expect('', false),
+    Expect('a', false),
+    Expect('aa', true),
+    Expect('aaa', true),
+    Expect('aaaa', true),
+  ]),
+  Test(r'a{1,3}', [
+    Expect('', false),
+    Expect('a', true),
+    Expect('aa', true),
+    Expect('aaa', true),
+    Expect('aaaa', false),
+  ]),
+  Test(r'a{,2}', [
+    Expect('', true),
+    Expect('a', true),
+    Expect('aa', true),
+    Expect('aaa', false),
   ]),
   // https://github.com/xysun/regex/blob/master/testing.py
   Test(r'(ab|a)(bc|c)', [Expect('abc', true), Expect('acb', false)]),
