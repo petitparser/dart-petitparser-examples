@@ -11,10 +11,15 @@ class Nfa extends RegexpPattern {
   final NfaState end;
 
   @override
-  bool tryMatch(String input) {
+  int tryMatch(String input, int start, int end) {
+    var result = -1;
     var currentStates = <NfaState>{};
-    _addStates(start, currentStates);
-    for (final value in input.runes) {
+    _addStates(this.start, currentStates);
+    if (currentStates.any((state) => state.isEnd)) {
+      result = start;
+    }
+    for (var i = start; i < end; i++) {
+      final value = input.codeUnitAt(i);
       final nextStates = <NfaState>{};
       for (final state in currentStates) {
         final nextState = state.transitions[value];
@@ -25,10 +30,15 @@ class Nfa extends RegexpPattern {
           _addStates(nextState, nextStates);
         }
       }
-      if (nextStates.isEmpty) return false;
+      if (nextStates.isEmpty) {
+        break;
+      }
       currentStates = nextStates;
+      if (currentStates.any((state) => state.isEnd)) {
+        result = i + 1;
+      }
     }
-    return currentStates.any((state) => state.isEnd);
+    return result;
   }
 
   void _addStates(NfaState state, Set<NfaState> states) {
@@ -43,10 +53,7 @@ class NfaState {
   NfaState({required this.isEnd});
 
   bool isEnd;
-
   final Map<int, NfaState> transitions = {};
-
   final List<NfaState> epsilons = [];
-
   final List<NfaState> dots = [];
 }

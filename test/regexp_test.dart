@@ -124,7 +124,8 @@ void main() {
         final pattern = Nfa.fromString(testData.pattern);
         for (final expectData in testData.expects) {
           expect(
-            pattern.tryMatch(expectData.input),
+            pattern.tryMatch(expectData.input, 0, expectData.input.length) ==
+                expectData.input.length,
             expectData.match,
             reason:
                 '"${testData.pattern}" '
@@ -153,11 +154,40 @@ void main() {
       expect(match[0], 'aaa');
       expect(match.groups([0, 1]), ['aaa', null]);
     });
+    test('matchAsPrefix with non-matching input', () {
+      final noMatch = pattern.matchAsPrefix('baaa');
+      expect(noMatch, isNull);
+    });
+    test('matchAsPrefix with start index', () {
+      final match = pattern.matchAsPrefix('baaa', 1)!;
+      expect(match.pattern, pattern);
+      expect(match.input, 'baaa');
+      expect(match.start, 1);
+      expect(match.end, 4);
+      expect(match.group(0), 'aaa');
+    });
     test('allMatches', () {
-      expect(pattern.allMatches('aaa').map((each) => each[0]), [
-        'aaa',
+      expect(pattern.allMatches('').map((each) => each[0]), []);
+      expect(pattern.allMatches('a').map((each) => each[0]), ['a']);
+      expect(pattern.allMatches('aa').map((each) => each[0]), ['aa']);
+      expect(pattern.allMatches('aaa').map((each) => each[0]), ['aaa']);
+      expect(pattern.allMatches('baab').map((each) => each[0]), ['aa']);
+      expect(pattern.allMatches('babaab').map((each) => each[0]), ['a', 'aa']);
+    });
+    test('allMatches with start index', () {
+      expect(pattern.allMatches('babaab', 2).map((each) => each[0]), ['aa']);
+      expect(pattern.allMatches('babaab', 3).map((each) => each[0]), ['aa']);
+      expect(pattern.allMatches('babaab', 4).map((each) => each[0]), ['a']);
+    });
+    test('allMatches with zero-length matches', () {
+      final starPattern = Node.fromString(r'a*').toNfa();
+      expect(starPattern.allMatches('').map((each) => each[0]), ['']);
+      expect(starPattern.allMatches('b').map((each) => each[0]), ['', '']);
+      expect(starPattern.allMatches('baab').map((each) => each[0]), [
+        '',
         'aa',
-        'a',
+        '',
+        '',
       ]);
     });
   });

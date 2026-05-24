@@ -1,23 +1,33 @@
 import 'package:meta/meta.dart';
 
 abstract class RegexpPattern implements Pattern {
-  // TODO: make it correctly match sub-strings
-  @override
-  Match? matchAsPrefix(String input, [int start = 0]) =>
-      tryMatch(input.substring(start))
-      ? RegexpMatch(this, input, start, input.length)
-      : null;
-
   @override
   Iterable<Match> allMatches(String input, [int start = 0]) sync* {
-    for (var i = start; i < input.length; i++) {
-      final match = matchAsPrefix(input, i);
-      if (match != null) yield match;
+    while (start <= input.length) {
+      final match = matchAsPrefix(input, start);
+      if (match == null) {
+        start++;
+      } else {
+        yield match;
+        start = match.start < match.end ? match.end : match.start + 1;
+      }
     }
   }
 
+  @override
+  Match? matchAsPrefix(String input, [int start = 0]) {
+    RangeError.checkValueInInterval(start, 0, input.length, 'start');
+    final end = tryMatch(input, start, input.length);
+    if (end >= start) {
+      return RegexpMatch(this, input, start, end);
+    }
+    return null;
+  }
+
+  /// Returns the end index (exclusive) of the longest prefix of [input] matched
+  /// by this pattern, or `-1` if no prefix of [input] matches.
   @internal
-  bool tryMatch(String input);
+  int tryMatch(String input, int start, int end);
 }
 
 class RegexpMatch implements Match {
