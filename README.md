@@ -48,6 +48,10 @@ This example contains a simple grammar and evaluator for Prolog programs. The co
 dart run bin/prolog/prolog.dart
 ```
 
+### Regular Expressions
+
+This example contains a simple parser and evaluator for regular expressions. It parses patterns, compiles them to Non-deterministic Finite Automata (NFA), and matches them against input text. An interactive playground is provided for the web browser.
+
 ### Smalltalk
 
 This example contains a complete implementation of the Smalltalk grammar. This is a verbatim export of a grammar that was originally developed for the PetitParser infrastructure in Smalltalk and that was the base of the [Helvetia Language Workbench](https://www.lukas-renggli.ch/smalltalk/helvetia).

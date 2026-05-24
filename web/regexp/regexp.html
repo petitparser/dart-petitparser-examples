@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Regular Expression Playground</title>
+  <link rel="stylesheet" href="//cdn.rawgit.com/milligram/milligram/master/dist/milligram.min.css">
+  <style>
+    /* Styling overrides and custom design for playground */
+    body {
+      padding: 2rem 0;
+      background-color: #fbfbfb;
+      color: #333;
+    }
+    .header-container {
+      margin-bottom: 3rem;
+      border-bottom: 1px solid #e1e1e1;
+      padding-bottom: 1.5rem;
+    }
+    .header-container h1 {
+      margin-bottom: 0.5rem;
+      color: #9b4dca;
+      font-weight: 700;
+    }
+    .example-btn {
+      margin-right: 0.5rem;
+      margin-bottom: 0.5rem;
+    }
+    .error {
+      color: #d9534f;
+      background-color: #fdf7f7;
+      border: 1px solid #d9534f;
+      padding: 1rem;
+      border-radius: 4px;
+      font-family: monospace;
+      white-space: pre-wrap;
+    }
+    .card {
+      background: #fff;
+      border: 1px solid #e1e1e1;
+      border-radius: 6px;
+      padding: 2rem;
+      margin-bottom: 2rem;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04);
+    }
+    .card h3 {
+      border-bottom: 1px solid #f0f0f0;
+      padding-bottom: 0.5rem;
+      margin-bottom: 1.5rem;
+      color: #444;
+      font-size: 2rem;
+    }
+    /* Match highlight styles */
+    #highlight-container {
+      font-family: 'Courier New', Courier, monospace;
+      font-size: 1.6rem;
+      line-height: 1.6;
+      border: 1px solid #d1d1d1;
+      padding: 1.5rem;
+      border-radius: 4px;
+      background-color: #fdfdfd;
+      white-space: pre-wrap;
+      word-break: break-all;
+      min-height: 8rem;
+    }
+    .match-highlight {
+      background-color: rgba(155, 77, 202, 0.25);
+      border-bottom: 2px solid #9b4dca;
+      cursor: pointer;
+      transition: background-color 0.2s;
+    }
+    .match-highlight:hover {
+      background-color: rgba(155, 77, 202, 0.45);
+    }
+    .match-highlight.active {
+      background-color: rgba(155, 77, 202, 0.6);
+      outline: 1px solid #9b4dca;
+    }
+    /* AST visualizer styles */
+    .ast-node {
+      font-family: 'Courier New', Courier, monospace;
+      margin-left: 2rem;
+      position: relative;
+    }
+    .ast-node::before {
+      content: "├─";
+      position: absolute;
+      left: -1.5rem;
+      color: #ccc;
+    }
+    .ast-node:last-child::before {
+      content: "└─";
+    }
+    .ast-badge {
+      display: inline-block;
+      padding: 0.2rem 0.6rem;
+      margin: 0.2rem;
+      border-radius: 4px;
+      font-size: 1.2rem;
+      font-weight: bold;
+      color: #fff;
+    }
+    .badge-empty { background-color: #777; }
+    .badge-literal { background-color: #428bca; }
+    .badge-range { background-color: #5cb85c; }
+    .badge-dot { background-color: #f0ad4e; }
+    .badge-anchor { background-color: #d9534f; }
+    .badge-quantifier { background-color: #9b4dca; }
+    .badge-alternation { background-color: #5bc0de; }
+    .badge-concatenation { background-color: #337ab7; }
+    .badge-complement { background-color: #f39c12; }
+    .badge-intersection { background-color: #1abc9c; }
+    
+    /* Table styles for NFA */
+    .nfa-table-container {
+      max-height: 400px;
+      overflow-y: auto;
+      border: 1px solid #e1e1e1;
+      border-radius: 4px;
+    }
+    table.nfa-table {
+      margin-bottom: 0;
+    }
+    table.nfa-table th, table.nfa-table td {
+      padding: 0.8rem 1rem;
+      font-size: 1.4rem;
+    }
+    .state-badge {
+      font-family: monospace;
+      font-weight: bold;
+      padding: 0.2rem 0.5rem;
+      border-radius: 3px;
+      font-size: 1.3rem;
+    }
+    .state-badge.normal {
+      background-color: #e1e1e1;
+      color: #333;
+    }
+    .state-badge.start {
+      background-color: #4caf50;
+      color: white;
+    }
+    .state-badge.end {
+      background-color: #2196f3;
+      color: white;
+    }
+    .transition-list {
+      font-family: monospace;
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+    .transition-item {
+      display: inline-block;
+      margin-right: 0.8rem;
+      background-color: #f4f4f4;
+      padding: 0.1rem 0.4rem;
+      border-radius: 3px;
+      border: 1px solid #e1e1e1;
+      cursor: pointer;
+      transition: background-color 0.2s, border-color 0.2s;
+    }
+    .transition-item:hover {
+      background-color: rgba(155, 77, 202, 0.15);
+      border-color: #9b4dca;
+    }
+    tr.state-row-active {
+      background-color: rgba(155, 77, 202, 0.15) !important;
+      transition: background-color 0.3s;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header-container">
+      <h1>Regular Expression Playground</h1>
+      <p>Interactive playground for the PetitParser-based regular expression engine. Write patterns, inspect the AST, trace NFA state transitions, and test matching strings in real time.</p>
+    </div>
+
+    <div class="row">
+      <div class="column column-50">
+        <div class="card">
+          <h3>1. Inputs</h3>
+          
+          <label for="regexp-input">Regular Expression</label>
+          <input type="text" id="regexp-input" value="(a|b)*abb" placeholder="e.g. (a|b)*abb" autofocus>
+          
+          <label for="test-input">Test String</label>
+          <textarea id="test-input" placeholder="Type test string here..." style="min-height: 10rem;">ababb</textarea>
+
+          <label>Quick Examples</label>
+          <div>
+            <button class="button button-outline example-btn" data-regex="(a|b)*abb" data-test="ababb">ababb</button>
+            <button class="button button-outline example-btn" data-regex="\d+" data-test="12345">Digits</button>
+            <button class="button button-outline example-btn" data-regex="[a-zA-Z_]\w*" data-test="my_variable_12">Identifiers</button>
+            <button class="button button-outline example-btn" data-regex="[a-z]+@[a-z]+\.[a-z]+" data-test="hello@world.com">Simple Email</button>
+            <button class="button button-outline example-btn" data-regex="^a*b$" data-test="aaab">Anchored</button>
+            <button class="button button-outline example-btn" data-regex="a{2,4}" data-test="aaaaa">Ranges</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="column column-50">
+        <div class="card">
+          <h3>2. Match Results</h3>
+          <div id="error-box" style="display: none;" class="error"></div>
+          
+          <div id="match-results-box">
+            <label>Live Highlights</label>
+            <div id="highlight-container"></div>
+            
+            <label style="margin-top: 1.5rem;">Match Details (<span id="match-count">0</span> matches found)</label>
+            <div style="max-height: 15rem; overflow-y: auto; border: 1px solid #e1e1e1; border-radius: 4px; padding: 0.5rem 1rem; background-color: #fafafa;">
+              <ul id="match-list" style="margin: 0; padding: 0; list-style: none; font-size: 1.4rem;">
+                <!-- Populate dynamically -->
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="column column-50">
+        <div class="card">
+          <h3>3. AST Visualization</h3>
+          <p>Structural representation of the parsed regular expression:</p>
+          <div style="background-color: #fafafa; border: 1px solid #e1e1e1; border-radius: 4px; padding: 1.5rem; max-height: 400px; overflow-y: auto;">
+            <div id="ast-container"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="column column-50">
+        <div class="card">
+          <h3>4. NFA States & Transitions</h3>
+          <p>The Non-deterministic Finite Automaton state graph transitions:</p>
+          <div class="nfa-table-container">
+            <table class="nfa-table">
+              <thead>
+                <tr>
+                  <th>State</th>
+                  <th>Transitions</th>
+                </tr>
+              </thead>
+              <tbody id="nfa-table-body">
+                <!-- Populate dynamically -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="regexp.dart.js"></script>
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-QK0KCHXW3F"></script>
+  <script>window.dataLayer = window.dataLayer || [];function gtag(){dataLayer.push(arguments);}gtag('js', new Date());gtag('config', 'G-QK0KCHXW3F');</script>
+</body>
+</html>
