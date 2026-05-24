@@ -237,3 +237,41 @@ class ComplementNode extends Node {
   @override
   int get hashCode => Object.hash(runtimeType, child);
 }
+
+class StartAnchorNode extends Node {
+  @override
+  Nfa toNfa() {
+    final start = NfaState(isEnd: false);
+    final end = NfaState(isEnd: true);
+    start.startAnchors.add(end);
+    return Nfa(start: start, end: end);
+  }
+
+  @override
+  String toString() => 'StartAnchorNode()';
+
+  @override
+  bool operator ==(Object other) => other is StartAnchorNode;
+
+  @override
+  int get hashCode => runtimeType.hashCode;
+}
+
+class EndAnchorNode extends Node {
+  @override
+  Nfa toNfa() {
+    final start = NfaState(isEnd: false);
+    final end = NfaState(isEnd: true);
+    start.endAnchors.add(end);
+    return Nfa(start: start, end: end);
+  }
+
+  @override
+  String toString() => 'EndAnchorNode()';
+
+  @override
+  bool operator ==(Object other) => other is EndAnchorNode;
+
+  @override
+  int get hashCode => runtimeType.hashCode;
+}

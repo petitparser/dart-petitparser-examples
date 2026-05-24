@@ -30,6 +30,12 @@ void main() {
       expectedEqual(Node.fromString(r'(a)'), la);
       expectedEqual(Node.fromString(r'((a))'), la);
     });
+    test('anchors', () {
+      expectedEqual(Node.fromString(r'^'), StartAnchorNode());
+      expectedEqual(Node.fromString(r'(^)'), StartAnchorNode());
+      expectedEqual(Node.fromString(r'$'), EndAnchorNode());
+      expectedEqual(Node.fromString(r'($)'), EndAnchorNode());
+    });
     test('escape', () {
       expectedEqual(Node.fromString(r'\\'), LiteralNode('\\'));
       expectedEqual(Node.fromString(r'\.'), LiteralNode('.'));
@@ -41,6 +47,8 @@ void main() {
       expectedEqual(Node.fromString(r'\*'), LiteralNode('*'));
       expectedEqual(Node.fromString(r'\|'), LiteralNode('|'));
       expectedEqual(Node.fromString(r'\&'), LiteralNode('&'));
+      expectedEqual(Node.fromString(r'\^'), LiteralNode('^'));
+      expectedEqual(Node.fromString(r'\$'), LiteralNode('\$'));
     });
     test('concatenation', () {
       expectedEqual(Node.fromString(r'ab'), ConcatenationNode(la, lb));
@@ -189,6 +197,19 @@ void main() {
         '',
       ]);
     });
+    test('anchors matchAsPrefix', () {
+      final startAnchor = Node.fromString(r'^a').toNfa();
+      expect(startAnchor.allMatches('a').map((each) => each[0]), ['a']);
+      expect(startAnchor.allMatches('ba').map((each) => each[0]), []);
+      expect(startAnchor.allMatches('ab').map((each) => each[0]), ['a']);
+    });
+    test('anchors allMatches', () {
+      final endAnchor = Node.fromString(r'a$').toNfa();
+      expect(endAnchor.allMatches('a').map((each) => each[0]), ['a']);
+      expect(endAnchor.allMatches('ba').map((each) => each[0]), ['a']);
+      expect(endAnchor.allMatches('ab').map((each) => each[0]), []);
+      expect(endAnchor.allMatches('babaa').map((each) => each[0]), ['a']);
+    });
   });
   test('linter', () {
     expect(linter(nodeParser), isEmpty);
@@ -210,6 +231,7 @@ class Expect {
 }
 
 const tests = [
+  Test(r'^$', [Expect('', true), Expect('a', false)]),
   // Basics
   Test(r'', [Expect('', true), Expect('a', false), Expect('ab', false)]),
   Test(r'.', [
@@ -251,6 +273,44 @@ const tests = [
     Expect('aaa', true),
     Expect('aba', false),
     Expect('b', false),
+  ]),
+  // Arbitrary ranges
+  Test(r'a{3}', [
+    Expect('', false),
+    Expect('a', false),
+    Expect('aa', false),
+    Expect('aaa', true),
+    Expect('aaaa', false),
+  ]),
+  Test(r'a{2,}', [
+    Expect('', false),
+    Expect('a', false),
+    Expect('aa', true),
+    Expect('aaa', true),
+    Expect('aaaa', true),
+  ]),
+  Test(r'a{1,3}', [
+    Expect('', false),
+    Expect('a', true),
+    Expect('aa', true),
+    Expect('aaa', true),
+    Expect('aaaa', false),
+  ]),
+  Test(r'a{,2}', [
+    Expect('', true),
+    Expect('a', true),
+    Expect('aa', true),
+    Expect('aaa', false),
+  ]),
+  // Anchors
+  Test(r'^a', [Expect('a', true), Expect('ab', false), Expect('ba', false)]),
+  Test(r'a$', [Expect('a', true), Expect('ba', false), Expect('ab', false)]),
+  Test(r'^a$', [
+    Expect('a', true),
+    Expect('ab', false),
+    Expect('ba', false),
+    Expect('bab', false),
+    Expect('aa', false),
   ]),
   // https://regex-generate.github.io/regenerate/
   Test(r'(b(ab*a)*b|a)*', [
@@ -375,34 +435,6 @@ const tests = [
     Expect('aaaabba', false),
     Expect('aababab', false),
     Expect('aabbbbb', false),
-  ]),
-  // Arbitrary ranges
-  Test(r'a{3}', [
-    Expect('', false),
-    Expect('a', false),
-    Expect('aa', false),
-    Expect('aaa', true),
-    Expect('aaaa', false),
-  ]),
-  Test(r'a{2,}', [
-    Expect('', false),
-    Expect('a', false),
-    Expect('aa', true),
-    Expect('aaa', true),
-    Expect('aaaa', true),
-  ]),
-  Test(r'a{1,3}', [
-    Expect('', false),
-    Expect('a', true),
-    Expect('aa', true),
-    Expect('aaa', true),
-    Expect('aaaa', false),
-  ]),
-  Test(r'a{,2}', [
-    Expect('', true),
-    Expect('a', true),
-    Expect('aa', true),
-    Expect('aaa', false),
   ]),
   // https://github.com/xysun/regex/blob/master/testing.py
   Test(r'(ab|a)(bc|c)', [Expect('abc', true), Expect('acb', false)]),
