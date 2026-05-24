@@ -2,13 +2,17 @@ import 'package:petitparser/definition.dart';
 import 'package:petitparser/expression.dart';
 import 'package:petitparser/parser.dart';
 
-import 'classes.dart';
+import 'escape.dart';
 import 'node.dart';
 
 class RegexpParserDefinition extends GrammarDefinition<Node> {
   Parser<Node> escape() => any()
       .skip(before: char(r'\'))
-      .map((char) => escapeClasses[char] ?? LiteralNode(char));
+      .map(
+        (char) => escapeClasses.containsKey(char)
+            ? escapeClasses[char]!
+            : LiteralNode(escapeChars[char] ?? char),
+      );
   Parser<Node> dot() => char('.').map((_) => DotNode());
   Parser<Node> startAnchor() => char('^').map((_) => StartAnchorNode());
   Parser<Node> endAnchor() => char(r'$').map((_) => EndAnchorNode());
@@ -20,16 +24,19 @@ class RegexpParserDefinition extends GrammarDefinition<Node> {
   Parser<Node> charClassItems() => ref0(
     charClassItem,
   ).plus().map((items) => items.reduce(AlternationNode.new));
-  Parser<Node> charClassItem() => [
-    ref0(charClassRange),
-    ref0(escape),
-    noneOf(']').map((char) => LiteralNode(char)),
+  Parser<String> charClassChar() => [
+    any().skip(before: char(r'\')).map((char) => escapeChars[char] ?? char),
+    noneOf(']'),
   ].toChoiceParser();
   Parser<Node> charClassRange() => seq3(
-    any(),
+    ref0(charClassChar),
     char('-'),
-    any(),
+    ref0(charClassChar),
   ).map3((start, _, end) => RangeNode(start, end));
+  Parser<Node> charClassItem() => [
+    ref0(charClassRange),
+    ref0(charClassChar).map(LiteralNode.new),
+  ].toChoiceParser();
 
   Parser<int> integer() => digit().plusString().trim().map(int.parse);
   Parser<({int min, int? max})> range() =>

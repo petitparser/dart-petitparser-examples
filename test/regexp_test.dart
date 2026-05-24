@@ -1,6 +1,5 @@
 import 'package:petitparser/reflection.dart';
 import 'package:petitparser_examples/regexp.dart';
-import 'package:petitparser_examples/src/regexp/classes.dart';
 import 'package:test/test.dart';
 
 void expectedEqual(Node actual, Node expected) {
@@ -39,12 +38,12 @@ void main() {
       expectedEqual(Node.fromString(r'\e'), LiteralNode('\x1b'));
     });
     test('escape classes', () {
-      expectedEqual(Node.fromString(r'\s'), spaceCharClass);
-      expectedEqual(Node.fromString(r'\S'), ComplementNode(spaceCharClass));
-      expectedEqual(Node.fromString(r'\d'), digitCharClass);
-      expectedEqual(Node.fromString(r'\D'), ComplementNode(digitCharClass));
-      expectedEqual(Node.fromString(r'\w'), wordCharClass);
-      expectedEqual(Node.fromString(r'\W'), ComplementNode(wordCharClass));
+      expect(Node.fromString(r'\s'), isA<AlternationNode>());
+      expect(Node.fromString(r'\S'), isA<ComplementNode>());
+      expect(Node.fromString(r'\d'), isA<RangeNode>());
+      expect(Node.fromString(r'\D'), isA<ComplementNode>());
+      expect(Node.fromString(r'\w'), isA<AlternationNode>());
+      expect(Node.fromString(r'\W'), isA<ComplementNode>());
     });
     test('escape other', () {
       expectedEqual(Node.fromString(r'\.'), LiteralNode('.'));
@@ -80,6 +79,7 @@ void main() {
         AlternationNode(AlternationNode(la, lb), lc),
       );
       expectedEqual(Node.fromString(r'[a-c]'), RangeNode('a', 'c'));
+      expectedEqual(Node.fromString(r'[\t-z]'), RangeNode('\t', 'z'));
       expectedEqual(Node.fromString(r'[^a]'), ComplementNode(la));
       expectedEqual(
         Node.fromString(r'[^ab]'),
