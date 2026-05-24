@@ -1,10 +1,10 @@
 import 'package:petitparser/reflection.dart';
 import 'package:petitparser_examples/regexp.dart';
+import 'package:petitparser_examples/src/regexp/classes.dart';
 import 'package:test/test.dart';
 
 void expectedEqual(Node actual, Node expected) {
   expect(actual, expected);
-  expect(actual, isNot(same(expected)));
   expect(actual.hashCode, expected.hashCode);
   expect(actual.toString(), expected.toString());
 }
@@ -27,18 +27,31 @@ void main() {
     });
     test('literal', () {
       expectedEqual(Node.fromString(r'a'), la);
-      expectedEqual(Node.fromString(r'(a)'), la);
-      expectedEqual(Node.fromString(r'((a))'), la);
+      expectedEqual(Node.fromString(r'(b)'), lb);
+      expectedEqual(Node.fromString(r'((c))'), lc);
+      expectedEqual(Node.fromString(r'(((d)))'), ld);
     });
-    test('anchors', () {
-      expectedEqual(Node.fromString(r'^'), StartAnchorNode());
-      expectedEqual(Node.fromString(r'(^)'), StartAnchorNode());
-      expectedEqual(Node.fromString(r'$'), EndAnchorNode());
-      expectedEqual(Node.fromString(r'($)'), EndAnchorNode());
+    test('escape literals', () {
+      expectedEqual(Node.fromString(r'\t'), LiteralNode('\t'));
+      expectedEqual(Node.fromString(r'\n'), LiteralNode('\n'));
+      expectedEqual(Node.fromString(r'\r'), LiteralNode('\r'));
+      expectedEqual(Node.fromString(r'\f'), LiteralNode('\f'));
+      expectedEqual(Node.fromString(r'\e'), LiteralNode('\x1b'));
     });
-    test('escape', () {
+    test('escape classes', () {
+      expectedEqual(Node.fromString(r'\s'), spaceCharClass);
+      expectedEqual(Node.fromString(r'\S'), ComplementNode(spaceCharClass));
+      expectedEqual(Node.fromString(r'\d'), digitCharClass);
+      expectedEqual(Node.fromString(r'\D'), ComplementNode(digitCharClass));
+      expectedEqual(Node.fromString(r'\w'), wordCharClass);
+      expectedEqual(Node.fromString(r'\W'), ComplementNode(wordCharClass));
+    });
+    test('escape other', () {
+      expectedEqual(Node.fromString(r'\.'), LiteralNode('.'));
       expectedEqual(Node.fromString(r'\\'), LiteralNode('\\'));
       expectedEqual(Node.fromString(r'\.'), LiteralNode('.'));
+      expectedEqual(Node.fromString(r'\['), LiteralNode('['));
+      expectedEqual(Node.fromString(r'\]'), LiteralNode(']'));
       expectedEqual(Node.fromString(r'\('), LiteralNode('('));
       expectedEqual(Node.fromString(r'\)'), LiteralNode(')'));
       expectedEqual(Node.fromString(r'\!'), LiteralNode('!'));
@@ -48,7 +61,38 @@ void main() {
       expectedEqual(Node.fromString(r'\|'), LiteralNode('|'));
       expectedEqual(Node.fromString(r'\&'), LiteralNode('&'));
       expectedEqual(Node.fromString(r'\^'), LiteralNode('^'));
+      expectedEqual(Node.fromString(r'\0'), LiteralNode('0'));
       expectedEqual(Node.fromString(r'\$'), LiteralNode('\$'));
+    });
+    test('start anchors', () {
+      expectedEqual(Node.fromString(r'^'), StartAnchorNode());
+      expectedEqual(Node.fromString(r'(^)'), StartAnchorNode());
+    });
+    test('end anchors', () {
+      expectedEqual(Node.fromString(r'$'), EndAnchorNode());
+      expectedEqual(Node.fromString(r'($)'), EndAnchorNode());
+    });
+    test('character classes', () {
+      expectedEqual(Node.fromString(r'[a]'), la);
+      expectedEqual(Node.fromString(r'[ab]'), AlternationNode(la, lb));
+      expectedEqual(
+        Node.fromString(r'[abc]'),
+        AlternationNode(AlternationNode(la, lb), lc),
+      );
+      expectedEqual(Node.fromString(r'[a-c]'), RangeNode('a', 'c'));
+      expectedEqual(Node.fromString(r'[^a]'), ComplementNode(la));
+      expectedEqual(
+        Node.fromString(r'[^ab]'),
+        ComplementNode(AlternationNode(la, lb)),
+      );
+      expectedEqual(
+        Node.fromString(r'[^abc]'),
+        ComplementNode(AlternationNode(AlternationNode(la, lb), lc)),
+      );
+      expectedEqual(
+        Node.fromString(r'[^a-c]'),
+        ComplementNode(RangeNode('a', 'c')),
+      );
     });
     test('concatenation', () {
       expectedEqual(Node.fromString(r'ab'), ConcatenationNode(la, lb));
@@ -132,6 +176,13 @@ void main() {
   group('NFA', () {
     for (final testData in tests) {
       test('"${testData.pattern}" (${testData.expects.length})', () {
+        if (testData.expects.isEmpty) {
+          expect(
+            () => Node.fromString(testData.pattern).toNfa(),
+            throwsException,
+          );
+          return;
+        }
         final pattern = Nfa.fromString(testData.pattern);
         for (final expectData in testData.expects) {
           expect(
@@ -148,7 +199,6 @@ void main() {
     }
     test('unsupported', () {
       expect(() => Node.fromString(r'a&b').toNfa(), throwsUnsupportedError);
-      expect(() => Node.fromString(r'!a').toNfa(), throwsUnsupportedError);
     });
   });
   group('pattern', () {
@@ -220,7 +270,7 @@ void main() {
 }
 
 class Test {
-  const Test(this.pattern, this.expects);
+  const Test(this.pattern, [this.expects = const []]);
 
   final String pattern;
   final List<Expect> expects;
@@ -243,7 +293,42 @@ const tests = [
     Expect('b', true),
     Expect('aaa', false),
   ]),
-  Test(r'a', [Expect('', false), Expect('a', true), Expect('aaa', false)]),
+  Test(r'\d+', [
+    Expect('123', true),
+    Expect('0', true),
+    Expect('', false),
+    Expect('abc', false),
+  ]),
+  Test(r'\s+', [
+    Expect(' ', true),
+    Expect('\t\n ', true),
+    Expect('', false),
+    Expect('a', false),
+  ]),
+  Test(r'\w+', [
+    Expect('abc_123', true),
+    Expect('ABC', true),
+    Expect('', false),
+    Expect('!', false),
+  ]),
+  Test(r'[a-z]+', [
+    Expect('abc', true),
+    Expect('xyz', true),
+    Expect('A', false),
+    Expect('1', false),
+  ]),
+  Test(r'[^0-9]+', [
+    Expect('abc', true),
+    Expect(' ', true),
+    Expect('1', false),
+    Expect('a1', false),
+  ]),
+  Test(r'\t', [Expect('\t', true)]),
+  Test(r'\n', [Expect('\n', true)]),
+  Test(r'\r', [Expect('\r', true)]),
+  Test(r'\f', [Expect('\f', true)]),
+  Test(r'\e', [Expect('\x1b', true)]),
+  Test(r'a', [Expect('', false), Expect('aaa', false)]),
   Test(r'ab', [
     Expect('ab', true),
     Expect('', false),

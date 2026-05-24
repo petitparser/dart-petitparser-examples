@@ -46,7 +46,7 @@ class DotNode extends Node {
 }
 
 class LiteralNode extends Node {
-  LiteralNode(String literal) : codePoint = literal.runes.single;
+  LiteralNode(String literal) : codePoint = literal.codeUnits.single;
 
   final int codePoint;
 
@@ -67,6 +67,46 @@ class LiteralNode extends Node {
 
   @override
   int get hashCode => Object.hash(runtimeType, codePoint);
+}
+
+class RangeNode extends Node {
+  RangeNode(String start, String end)
+    : startCodePoint = start.codeUnits.single,
+      endCodePoint = end.codeUnits.single {
+    if (startCodePoint > endCodePoint) {
+      throw ArgumentError.value(
+        '$start-$end',
+        'start-end',
+        'Start must be less than or equal to end',
+      );
+    }
+  }
+
+  final int startCodePoint;
+  final int endCodePoint;
+
+  @override
+  Nfa toNfa() {
+    final start = NfaState(isEnd: false);
+    final end = NfaState(isEnd: true);
+    for (var i = startCodePoint; i <= endCodePoint; i++) {
+      start.transitions[i] = end;
+    }
+    return Nfa(start: start, end: end);
+  }
+
+  @override
+  String toString() =>
+      'RangeNode(${String.fromCharCode(startCodePoint)}-${String.fromCharCode(endCodePoint)})';
+
+  @override
+  bool operator ==(Object other) =>
+      other is RangeNode &&
+      other.startCodePoint == startCodePoint &&
+      other.endCodePoint == endCodePoint;
+
+  @override
+  int get hashCode => Object.hash(runtimeType, startCodePoint, endCodePoint);
 }
 
 class ConcatenationNode extends Node {
@@ -234,7 +274,19 @@ class ComplementNode extends Node {
   final Node child;
 
   @override
-  Nfa toNfa() => throw UnsupportedError(toString());
+  Nfa toNfa() {
+    final childNfa = child.toNfa();
+    final accepted = _collectAcceptedCodePoints(childNfa);
+
+    final start = NfaState(isEnd: false);
+    final end = NfaState(isEnd: true);
+    for (var i = 0; i <= 0xffff; i++) {
+      if (!accepted.contains(i)) {
+        start.transitions[i] = end;
+      }
+    }
+    return Nfa(start: start, end: end);
+  }
 
   @override
   String toString() => 'ComplementNode($child)';
@@ -283,4 +335,41 @@ class EndAnchorNode extends Node {
 
   @override
   int get hashCode => runtimeType.hashCode;
+}
+
+Set<int> _collectAcceptedCodePoints(Nfa childNfa) {
+  final accepted = <int>{};
+  final fromStart = <NfaState>{};
+  void traverseStart(NfaState state) {
+    if (!fromStart.add(state)) return;
+    for (final next in state.epsilons) {
+      traverseStart(next);
+    }
+  }
+
+  traverseStart(childNfa.start);
+  final reached = <NfaState, bool>{};
+  bool reachesEnd(NfaState state, Set<NfaState> visited) {
+    if (state == childNfa.end || state.isEnd) return true;
+    final cached = reached[state];
+    if (cached != null) return cached;
+    if (!visited.add(state)) return false;
+    for (final next in state.epsilons) {
+      if (reachesEnd(next, visited)) {
+        reached[state] = true;
+        return true;
+      }
+    }
+    reached[state] = false;
+    return false;
+  }
+
+  for (final s in fromStart) {
+    s.transitions.forEach((c, nextState) {
+      if (reachesEnd(nextState, {})) {
+        accepted.add(c);
+      }
+    });
+  }
+  return accepted;
 }
