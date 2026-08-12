@@ -3,7 +3,7 @@ import 'name.dart';
 /// Environment of bindings.
 class Environment {
   /// Constructor for the nested environment.
-  Environment([this._owner]) : _bindings = {};
+  new([this._owner]) : _bindings = {};
 
   /// The owning environment.
   final Environment? _owner;

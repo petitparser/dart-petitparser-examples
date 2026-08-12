@@ -270,14 +270,14 @@ void main() {
 }
 
 class Test {
-  const Test(this.pattern, [this.expects = const []]);
+  const new(this.pattern, [this.expects = const []]);
 
   final String pattern;
   final List<Expect> expects;
 }
 
 class Expect {
-  const Expect(this.input, this.match);
+  const new(this.input, this.match);
 
   final String input;
   final bool match;

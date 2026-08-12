@@ -11,7 +11,7 @@ mixin HasStatements implements Node {
   final List<Token> periods = [];
 }
 
-mixin IsStatement implements Node {}
+mixin IsStatement implements Node;
 
 mixin IsSurrounded implements Node {
   final List<Token> beforeToken = [];
@@ -40,7 +40,7 @@ mixin HasSelector implements Node {
 }
 
 class MethodNode extends Node with HasSelector {
-  MethodNode();
+  new();
 
   @override
   final List<VariableNode> arguments = [];
@@ -52,7 +52,7 @@ class MethodNode extends Node with HasSelector {
 }
 
 class PragmaNode extends Node with HasSelector, IsSurrounded {
-  PragmaNode();
+  new();
 
   @override
   final List<LiteralNode> arguments = [];
@@ -62,7 +62,7 @@ class PragmaNode extends Node with HasSelector, IsSurrounded {
 }
 
 class SequenceNode extends Node with HasStatements {
-  SequenceNode();
+  new();
 
   final List<VariableNode> temporaries = [];
 
@@ -71,7 +71,7 @@ class SequenceNode extends Node with HasStatements {
 }
 
 class ReturnNode extends Node with IsStatement {
-  ReturnNode(this.caret, this.value);
+  new(this.caret, this.value);
 
   final Token caret;
   final ValueNode value;
@@ -81,18 +81,18 @@ class ReturnNode extends Node with IsStatement {
 }
 
 abstract class ValueNode extends Node with IsStatement, IsSurrounded {
-  ValueNode();
+  new();
 }
 
 class ArrayNode extends ValueNode with HasStatements {
-  ArrayNode();
+  new();
 
   @override
   void accept(Visitor visitor) => visitor.visitArrayNode(this);
 }
 
 class AssignmentNode extends ValueNode {
-  AssignmentNode(this.variable, this.assignment, this.value);
+  new(this.variable, this.assignment, this.value);
 
   final VariableNode variable;
   final Token assignment;
@@ -103,7 +103,7 @@ class AssignmentNode extends ValueNode {
 }
 
 class BlockNode extends ValueNode {
-  BlockNode(this.body);
+  new(this.body);
 
   final List<VariableNode> arguments = [];
   final List<Token> separators = [];
@@ -114,7 +114,7 @@ class BlockNode extends ValueNode {
 }
 
 class CascadeNode extends ValueNode {
-  CascadeNode();
+  new();
 
   final List<MessageNode> messages = [];
   final List<Token> semicolons = [];
@@ -126,14 +126,13 @@ class CascadeNode extends ValueNode {
 }
 
 abstract class LiteralNode<T> extends ValueNode {
-  LiteralNode(this.value);
+  new(this.value);
 
   final T value;
 }
 
 class LiteralArrayNode<T> extends LiteralNode<List<T>> {
-  LiteralArrayNode(this.values)
-    : super(values.map((value) => value.value).toList());
+  new(this.values) : super(values.map((value) => value.value).toList());
 
   final List<LiteralNode<T>> values;
 
@@ -142,7 +141,7 @@ class LiteralArrayNode<T> extends LiteralNode<List<T>> {
 }
 
 class LiteralValueNode<T> extends LiteralNode<T> {
-  LiteralValueNode(this.token, T value) : super(value);
+  new(this.token, T value) : super(value);
 
   final Token token;
 
@@ -151,7 +150,7 @@ class LiteralValueNode<T> extends LiteralNode<T> {
 }
 
 class MessageNode extends ValueNode with HasSelector {
-  MessageNode(this.receiver);
+  new(this.receiver);
 
   final ValueNode receiver;
   @override
@@ -162,7 +161,7 @@ class MessageNode extends ValueNode with HasSelector {
 }
 
 class VariableNode extends ValueNode {
-  VariableNode(this.token);
+  new(this.token);
 
   final Token token;
 

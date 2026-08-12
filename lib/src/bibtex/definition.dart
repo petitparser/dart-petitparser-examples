@@ -12,9 +12,10 @@ class BibTeXDefinition extends GrammarDefinition<List<BibTeXEntry>> {
   Parser<List<BibTeXEntry>> start() => ref0(entries).end();
 
   // Entries
-  Parser<List<BibTeXEntry>> entries() => ref0(
-    entry,
-  ).starSeparated(whitespace().star()).map((list) => list.elements);
+  Parser<List<BibTeXEntry>> entries() =>
+      ref0(entry)
+          .starSeparated(whitespace().star())
+          .map((list) => list.elements);
   Parser<BibTeXEntry> entry() =>
       seq6(
         type.trim(),
@@ -29,9 +30,10 @@ class BibTeXDefinition extends GrammarDefinition<List<BibTeXEntry>> {
       );
 
   // Fields
-  Parser<Map<String, String>> fields() => ref0(field)
-      .starSeparated(char(',').trim())
-      .map((list) => Map.fromEntries(list.elements));
+  Parser<Map<String, String>> fields() =>
+      ref0(field)
+          .starSeparated(char(',').trim())
+          .map((list) => Map.fromEntries(list.elements));
   Parser<MapEntry<String, String>> field() => seq3(
     fieldName.trim(),
     char('=').trim(),
@@ -72,15 +74,12 @@ class BibTeXDefinition extends GrammarDefinition<List<BibTeXEntry>> {
   final type = letter()
       .plusString(message: "type expected")
       .skip(before: char('@'));
-  final citeKey = pattern(
-    'a-zA-Z0-9_:-',
-  ).plusString(message: "citation key expected");
-  final fieldName = pattern(
-    'a-zA-Z0-9_-',
-  ).plusString(message: "field name expected");
-  final rawString = pattern(
-    'a-zA-Z0-9',
-  ).plusString(message: "raw string expected");
+  final citeKey = pattern('a-zA-Z0-9_:-')
+      .plusString(message: "citation key expected");
+  final fieldName = pattern('a-zA-Z0-9_-')
+      .plusString(message: "field name expected");
+  final rawString = pattern('a-zA-Z0-9')
+      .plusString(message: "raw string expected");
 
   // Other tokens
   final escapeChar = seq2(char(r'\'), any());

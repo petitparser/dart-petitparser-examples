@@ -35,10 +35,9 @@ Map<Variable, Node>? mergeBindings(
 
 @immutable
 final class Database {
-  factory Database.parse(String rules) =>
-      Database(rulesParser.parse(rules).value);
+  factory parse(String rules) => Database(rulesParser.parse(rules).value);
 
-  Database(Iterable<Rule> rules) {
+  new(Iterable<Rule> rules) {
     for (final rule in rules) {
       this.rules.putIfAbsent(rule.head.name, () => []).add(rule);
     }
@@ -59,7 +58,7 @@ final class Database {
 
 @immutable
 final class Rule {
-  const Rule(this.head, this.body);
+  const new(this.head, this.body);
 
   final Term head;
   final Term body;
@@ -80,7 +79,7 @@ final class Rule {
 
 @immutable
 abstract class Node {
-  const Node();
+  const new();
 
   Map<Variable, Node>? match(Node other);
 
@@ -89,7 +88,7 @@ abstract class Node {
 
 @immutable
 class Variable extends Node {
-  const Variable(this.name);
+  const new(this.name);
 
   final String name;
 
@@ -125,12 +124,12 @@ class Variable extends Node {
 
 @immutable
 class Term extends Node {
-  factory Term.parse(String rules) => termParser.parse(rules).value;
+  factory parse(String rules) => termParser.parse(rules).value;
 
-  factory Term(String name, Iterable<Node> list) =>
+  factory(String name, Iterable<Node> list) =>
       Term._(name, list.toList(growable: false));
 
-  const Term._(this.name, this.arguments);
+  const new _(this.name, this.arguments);
 
   final String name;
   final List<Node> arguments;
@@ -174,7 +173,7 @@ class Term extends Node {
 
 @immutable
 class True extends Term {
-  const True() : super._('true', const []);
+  const new() : super._('true', const []);
 
   @override
   Term substitute(Map<Variable, Node>? bindings) => this;
@@ -185,7 +184,7 @@ class True extends Term {
 
 @immutable
 class Value extends Term {
-  const Value(String name) : super._(name, const []);
+  const new(String name) : super._(name, const []);
 
   @override
   Iterable<Node> query(Database database) => [this];
@@ -205,10 +204,9 @@ class Value extends Term {
 
 @immutable
 class Conjunction extends Term {
-  factory Conjunction(Iterable<Node> list) =>
-      Conjunction._(list.toList(growable: false));
+  factory(Iterable<Node> list) => Conjunction._(list.toList(growable: false));
 
-  const Conjunction._(List<Node> args) : super._(',', args);
+  const new _(List<Node> args) : super._(',', args);
 
   @override
   Iterable<Node> query(Database database) {

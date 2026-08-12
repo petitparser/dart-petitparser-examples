@@ -3,9 +3,9 @@ import 'pattern.dart';
 
 /// Nondeterministic Finite Automaton
 class Nfa extends RegexpPattern {
-  Nfa({required this.start, required this.end});
+  new({required this.start, required this.end});
 
-  factory Nfa.fromString(String regexp) => Node.fromString(regexp).toNfa();
+  factory fromString(String regexp) => Node.fromString(regexp).toNfa();
 
   final NfaState start;
   final NfaState end;
@@ -61,7 +61,7 @@ class Nfa extends RegexpPattern {
 }
 
 class NfaState {
-  NfaState({required this.isEnd});
+  new({required this.isEnd});
 
   bool isEnd;
   final Map<int, NfaState> transitions = {};

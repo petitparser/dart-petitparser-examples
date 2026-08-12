@@ -46,7 +46,7 @@ class DotNode extends Node {
 }
 
 class LiteralNode extends Node {
-  LiteralNode(String literal) : codePoint = literal.codeUnits.single;
+  new(String literal) : codePoint = literal.codeUnits.single;
 
   final int codePoint;
 
@@ -70,7 +70,7 @@ class LiteralNode extends Node {
 }
 
 class RangeNode extends Node {
-  RangeNode(String start, String end)
+  new(String start, String end)
     : startCodePoint = start.codeUnits.single,
       endCodePoint = end.codeUnits.single {
     if (startCodePoint > endCodePoint) {
@@ -110,7 +110,7 @@ class RangeNode extends Node {
 }
 
 class ConcatenationNode extends Node {
-  ConcatenationNode(this.left, this.right);
+  new(this.left, this.right);
 
   final Node left;
   final Node right;
@@ -136,7 +136,7 @@ class ConcatenationNode extends Node {
 }
 
 class AlternationNode extends Node {
-  AlternationNode(this.left, this.right);
+  new(this.left, this.right);
 
   final Node left;
   final Node right;
@@ -171,7 +171,7 @@ class AlternationNode extends Node {
 }
 
 class IntersectionNode extends Node {
-  IntersectionNode(this.left, this.right);
+  new(this.left, this.right);
 
   final Node left;
   final Node right;
@@ -191,7 +191,7 @@ class IntersectionNode extends Node {
 }
 
 class QuantificationNode extends Node {
-  QuantificationNode(this.child, this.min, [this.max]) {
+  new(this.child, this.min, [this.max]) {
     RangeError.checkNotNegative(min, 'min', 'Minimum must be non-negative');
     if (max != null && max! < min) {
       throw RangeError.value(
@@ -269,7 +269,7 @@ class QuantificationNode extends Node {
 }
 
 class ComplementNode extends Node {
-  ComplementNode(this.child);
+  new(this.child);
 
   final Node child;
 

@@ -24,9 +24,10 @@ class JsonDefinition extends GrammarDefinition<JSON> {
     ref0(objectElements),
     char('}').trim(),
   ).map3((_, elements, _) => elements);
-  Parser<Map<String, JSON>> objectElements() => ref0(objectElement)
-      .starSeparated(char(',').trim())
-      .map((list) => Map.fromEntries(list.elements));
+  Parser<Map<String, JSON>> objectElements() =>
+      ref0(objectElement)
+          .starSeparated(char(',').trim())
+          .map((list) => Map.fromEntries(list.elements));
   Parser<MapEntry<String, JSON>> objectElement() => seq3(
     ref0(stringToken),
     char(':').trim(),
@@ -65,9 +66,11 @@ class JsonDefinition extends GrammarDefinition<JSON> {
     pattern('0-9A-Fa-f').timesString(4, message: '4-digit hex number expected'),
   ).map2((_, value) => String.fromCharCode(int.parse(value, radix: 16)));
 
-  Parser<num> numberToken() => ref0(
-    numberPrimitive,
-  ).flatten(message: 'number expected').trim().map(num.parse);
+  Parser<num> numberToken() =>
+      ref0(numberPrimitive)
+          .flatten(message: 'number expected')
+          .trim()
+          .map(num.parse);
   Parser<void> numberPrimitive() => <Parser<void>>[
     char('-').optional(),
     [char('0'), digit().plus()].toChoiceParser(),

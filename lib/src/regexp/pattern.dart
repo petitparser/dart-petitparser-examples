@@ -31,7 +31,7 @@ abstract class RegexpPattern implements Pattern {
 }
 
 class RegexpMatch implements Match {
-  RegexpMatch(this.pattern, this.input, this.start, this.end);
+  new(this.pattern, this.input, this.start, this.end);
 
   @override
   final Pattern pattern;

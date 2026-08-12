@@ -21,9 +21,10 @@ class RegexpParserDefinition extends GrammarDefinition<Node> {
   Parser<Node> charClass() => seq2(char('^').optional(), ref0(charClassItems))
       .map2((negate, items) => negate != null ? ComplementNode(items) : items)
       .skip(before: char('['), after: char(']'));
-  Parser<Node> charClassItems() => ref0(
-    charClassItem,
-  ).plus().map((items) => items.reduce(AlternationNode.new));
+  Parser<Node> charClassItems() =>
+      ref0(charClassItem)
+          .plus()
+          .map((items) => items.reduce(AlternationNode.new));
   Parser<String> charClassChar() => [
     any().skip(before: char(r'\')).map((char) => escapeChars[char] ?? char),
     noneOf(']'),

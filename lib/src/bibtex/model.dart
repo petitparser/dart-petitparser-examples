@@ -3,11 +3,7 @@ import 'package:meta/meta.dart';
 /// Models a single BibTeX entry.
 @immutable
 class BibTeXEntry {
-  const BibTeXEntry({
-    required this.type,
-    required this.key,
-    required this.fields,
-  });
+  const new({required this.type, required this.key, required this.fields});
 
   final String type;
   final String key;

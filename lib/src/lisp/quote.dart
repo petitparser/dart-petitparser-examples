@@ -1,7 +1,7 @@
 /// A quoted datum.
 class Quote {
   /// Constructs as a quote.
-  Quote(this.datum);
+  new(this.datum);
 
   /// The quoted datum.
   dynamic datum;

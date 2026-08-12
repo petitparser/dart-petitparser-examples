@@ -1,7 +1,7 @@
 /// The basic data structure of LISP.
 class Cons {
   /// Constructs a cons.
-  Cons([this.car, this.cdr]);
+  new([this.car, this.cdr]);
 
   /// The first object.
   dynamic car;

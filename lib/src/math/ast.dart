@@ -6,7 +6,7 @@ abstract class Expression {
 
 /// A value expression.
 class Value extends Expression {
-  Value(this.value);
+  new(this.value);
 
   final num value;
 
@@ -19,7 +19,7 @@ class Value extends Expression {
 
 /// A variable expression.
 class Variable extends Expression {
-  Variable(this.name);
+  new(this.name);
 
   final String name;
 
@@ -34,7 +34,7 @@ class Variable extends Expression {
 
 /// A function application.
 class Application extends Expression {
-  Application(this.name, this.arguments, this.function);
+  new(this.name, this.arguments, this.function);
 
   final String name;
   final List<Expression> arguments;

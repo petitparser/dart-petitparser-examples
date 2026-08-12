@@ -4,11 +4,11 @@
 /// allows access and printing of the underlying string.
 class Name {
   /// Factory for new symbol cells.
-  factory Name(String name) =>
+  factory(String name) =>
       _interned.putIfAbsent(name, () => Name._internal(name));
 
   /// Internal constructor for symbol.
-  Name._internal(this._name);
+  new _internal(this._name);
 
   /// The interned symbols.
   static final Map<String, Name> _interned = {};

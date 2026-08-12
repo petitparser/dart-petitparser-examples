@@ -70,9 +70,10 @@ final uriParser = uri_example.uri;
 const uriInput =
     'https://www.lukas-renggli.ch/blog/petitparser-1?_s=Q5vcT_xEIhxf2Z4Q&_k=4pr02qyT&_n&42';
 
-final xmlParser = xml_example.XmlEventParser(
-  defaultEntityMapping,
-).build().star().end();
+final xmlParser = xml_example.XmlEventParser(defaultEntityMapping)
+    .build()
+    .star()
+    .end();
 const xmlInput =
     '<?xml version="1.0"?>\n'
     '<!DOCTYPE name [ <!ELEMENT html (head, body)> ]>\n'

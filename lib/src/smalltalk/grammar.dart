@@ -49,9 +49,10 @@ class SmalltalkGrammarDefinition extends GrammarDefinition {
   Parser exponent() => char('-').seq(ref0(decimalInteger));
   Parser exponentLetter() => pattern('edq');
 
-  Parser scaledDecimal() => ref0(
-    scaledMantissa,
-  ).seq(char('s')).seq(ref0(fractionalDigits).optional());
+  Parser scaledDecimal() =>
+      ref0(scaledMantissa)
+          .seq(char('s'))
+          .seq(ref0(fractionalDigits).optional());
   Parser scaledMantissa() => ref0(decimalInteger).or(ref0(mantissa));
   Parser fractionalDigits() => ref0(decimalInteger);
 
@@ -64,10 +65,11 @@ class SmalltalkGrammarDefinition extends GrammarDefinition {
             .map((list) => list.elements),
       )
       .seq(ref1(token, '}'));
-  Parser arrayItem() => ref0(literal)
-      .or(ref0(symbolLiteralArray))
-      .or(ref0(arrayLiteralArray))
-      .or(ref0(byteLiteralArray));
+  Parser arrayItem() =>
+      ref0(literal)
+          .or(ref0(symbolLiteralArray))
+          .or(ref0(arrayLiteralArray))
+          .or(ref0(byteLiteralArray));
   Parser arrayLiteral() =>
       ref1(token, '#(').seq(ref0(arrayItem).star()).seq(ref1(token, ')'));
   Parser arrayLiteralArray() =>
@@ -88,9 +90,10 @@ class SmalltalkGrammarDefinition extends GrammarDefinition {
   Parser blockArgument() => ref1(token, ':').seq(ref0(variable));
   Parser blockArguments() =>
       ref0(blockArgumentsWith).or(ref0(blockArgumentsWithout));
-  Parser blockArgumentsWith() => ref0(
-    blockArgument,
-  ).plus().seq(ref1(token, '|').or(ref1(token, ']').and()));
+  Parser blockArgumentsWith() =>
+      ref0(blockArgument)
+          .plus()
+          .seq(ref1(token, '|').or(ref1(token, ']').and()));
   Parser blockArgumentsWithout() => epsilonWith([]);
   Parser blockBody() => ref0(blockArguments).seq(ref0(sequence));
   Parser byteLiteral() =>
@@ -120,29 +123,31 @@ class SmalltalkGrammarDefinition extends GrammarDefinition {
   Parser keywordPragma() =>
       ref0(keywordToken).seq(ref0(arrayItem)).plus().map(buildKeyword);
   Parser keywordToken() => ref2(token, ref0(keyword), 'keyword selector');
-  Parser literal() => ref0(numberLiteral)
-      .or(ref0(stringLiteral))
-      .or(ref0(characterLiteral))
-      .or(ref0(arrayLiteral))
-      .or(ref0(byteLiteral))
-      .or(ref0(symbolLiteral))
-      .or(ref0(nilLiteral))
-      .or(ref0(trueLiteral))
-      .or(ref0(falseLiteral));
+  Parser literal() =>
+      ref0(numberLiteral)
+          .or(ref0(stringLiteral))
+          .or(ref0(characterLiteral))
+          .or(ref0(arrayLiteral))
+          .or(ref0(byteLiteral))
+          .or(ref0(symbolLiteral))
+          .or(ref0(nilLiteral))
+          .or(ref0(trueLiteral))
+          .or(ref0(falseLiteral));
   Parser message() =>
       ref0(keywordMessage).or(ref0(binaryMessage)).or(ref0(unaryMessage));
   Parser method() => ref0(methodDeclaration).seq(ref0(methodSequence));
   Parser methodDeclaration() =>
       ref0(keywordMethod).or(ref0(unaryMethod)).or(ref0(binaryMethod));
-  Parser methodSequence() => ref0(periodToken)
-      .star()
-      .seq(ref0(pragmas))
-      .seq(ref0(periodToken).star())
-      .seq(ref0(temporaries))
-      .seq(ref0(periodToken).star())
-      .seq(ref0(pragmas))
-      .seq(ref0(periodToken).star())
-      .seq(ref0(statements));
+  Parser methodSequence() =>
+      ref0(periodToken)
+          .star()
+          .seq(ref0(pragmas))
+          .seq(ref0(periodToken).star())
+          .seq(ref0(temporaries))
+          .seq(ref0(periodToken).star())
+          .seq(ref0(pragmas))
+          .seq(ref0(periodToken).star())
+          .seq(ref0(statements));
   Parser multiword() => ref0(keyword).plus();
   Parser nilLiteral() => ref0(nilToken);
   Parser nilToken() => ref2(token, 'nil'.toParser() & word().not(), 'nil');
@@ -157,17 +162,21 @@ class SmalltalkGrammarDefinition extends GrammarDefinition {
   Parser pragmaMessage() =>
       ref0(keywordPragma).or(ref0(unaryPragma)).or(ref0(binaryPragma));
   Parser pragmas() => ref0(pragma).star();
-  Parser primary() => ref0(
-    literal,
-  ).or(ref0(variable)).or(ref0(block)).or(ref0(parens)).or(ref0(array));
+  Parser primary() =>
+      ref0(literal)
+          .or(ref0(variable))
+          .or(ref0(block))
+          .or(ref0(parens))
+          .or(ref0(array));
   Parser sequence() =>
       ref0(temporaries).seq(ref0(periodToken).star()).seq(ref0(statements));
   Parser startMethod() => ref0(method).end();
-  Parser statements() => ref0(expressionReturn)
-      .or(ref0(expression))
-      .starSeparated(ref0(periodToken).plus())
-      .skip(after: ref0(periodToken).star())
-      .map((list) => list.elements);
+  Parser statements() =>
+      ref0(expressionReturn)
+          .or(ref0(expression))
+          .starSeparated(ref0(periodToken).plus())
+          .skip(after: ref0(periodToken).star())
+          .map((list) => list.elements);
   Parser _string() =>
       char("'").seq(string("''").or(pattern("^'")).star()).seq(char("'"));
   Parser stringLiteral() => ref0(stringToken);

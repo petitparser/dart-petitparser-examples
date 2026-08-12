@@ -15,7 +15,7 @@ import 'package:petitparser/petitparser.dart' as pp;
 /// Customizable parser definition for tabular text files.
 class TabularDefinition extends GrammarDefinition<List<List<String>>> {
   /// Definition for "Comma-separated values" (CSV) input.
-  factory TabularDefinition.csv() => TabularDefinition(
+  factory csv() => TabularDefinition(
     quote: '"'.toParser(),
     escape: '""'.toParser().map((_) => '"'),
     delimiter: ','.toParser(),
@@ -23,7 +23,7 @@ class TabularDefinition extends GrammarDefinition<List<List<String>>> {
   );
 
   /// Definition for "Tab-separated values" (TSV) input.
-  factory TabularDefinition.tsv() => TabularDefinition(
+  factory tsv() => TabularDefinition(
     quote: failure(),
     escape: seq2(char(r'\'), any()).map2(
       (_, value) => switch (value) {
@@ -38,7 +38,7 @@ class TabularDefinition extends GrammarDefinition<List<List<String>>> {
   );
 
   /// Generic constructor for tabular text files.
-  TabularDefinition({
+  new({
     required this.quote,
     required this.escape,
     required this.delimiter,

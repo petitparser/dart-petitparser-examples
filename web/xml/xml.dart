@@ -134,7 +134,7 @@ void selectDom(MouseEvent event) {
 }
 
 class HtmlBuffer implements StringSink {
-  HtmlBuffer(Element root) {
+  new(Element root) {
     stack.add(root);
   }
 
@@ -175,7 +175,7 @@ class HtmlBuffer implements StringSink {
 }
 
 class HighlightWriter extends XmlWriter {
-  HighlightWriter(this.htmlBuffer, this.matches) : super(htmlBuffer);
+  new(this.htmlBuffer, this.matches) : super(htmlBuffer);
 
   final HtmlBuffer htmlBuffer;
 

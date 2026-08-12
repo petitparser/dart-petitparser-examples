@@ -5,7 +5,7 @@ import 'name.dart';
 import 'types.dart';
 
 class NativeEnvironment extends Environment {
-  NativeEnvironment([super.owner]) {
+  new([super.owner]) {
     // basic functions
     define(Name('define'), _define);
     define(Name('lambda'), _lambda);

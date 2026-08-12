@@ -5,7 +5,7 @@ import 'package:petitparser_examples/math.dart';
 import 'package:web/web.dart';
 
 class Viewport {
-  Viewport(
+  new(
     this.canvas, {
     required this.minX,
     required this.maxX,
