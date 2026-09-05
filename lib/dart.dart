@@ -1,15 +1,24 @@
-/// This library contains the grammar of the Dart programming language.
+/// This library contains the grammar and AST parser for the Dart programming language.
 ///
-/// The grammar is adapted from [Dart programming language specification](https://www.ecma-international.org/publications-and-standards/standards/ecma-408/).
-/// Unfortunately, it is unable to parse all valid Dart programs yet.
+/// Supports modern Dart 3.x features including records, patterns, switch expressions,
+/// enhanced enums, extension types, class modifiers, and null safety.
 ///
 /// For example:
 ///
 /// ```dart
-/// final parser = DartGrammarDefinition().build();
-/// final result = parser.parse('void main() {}');
-/// print(result.value);
+/// final unit = parseDart('void main() => print("Hello, Dart!");');
+/// print(unit.declarations.first);
 /// ```
 library;
 
+import 'src/dart/ast.dart';
+import 'src/dart/grammar.dart';
+
+export 'src/dart/ast.dart';
 export 'src/dart/grammar.dart';
+
+final _defaultParser = DartGrammarDefinition().build();
+
+/// Parses the [input] Dart source code into a [CompilationUnitNode].
+CompilationUnitNode parseDart(String input) =>
+    _defaultParser.parse(input).value;
