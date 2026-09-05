@@ -7,7 +7,10 @@
 ///
 /// ```dart
 /// final result = uri.parse('https://example.com/foo?bar=baz#frag');
-/// print(result.value);
+/// print(result.value.scheme); // https
+/// print(result.value.hostname); // example.com
+/// print(result.value.path); // /foo
+/// print(result.value.fragment); // frag
 /// ```
 library;
 
@@ -18,22 +21,27 @@ import 'src/uri/query.dart' as lib_query;
 
 final uri =
     seq5(
-      seq2(_scheme, ':'.toParser()).optional(),
-      seq2('//'.toParser(), _authority).optional(),
+      _scheme.skip(after: ':'.toParser()).optional(),
+      _authority.skip(before: '//'.toParser()).optional(),
       _path,
-      seq2('?'.toParser(), _query).optional(),
-      seq2('#'.toParser(), _fragment).optional(),
-    ).map5(
-      (scheme, authority, path, query, fragment) => <Symbol, dynamic>{
-        #scheme: scheme?.$1,
-        #authority: authority?.$2,
-        ...lib_authority.authority.parse(authority?.$2 ?? '').value,
-        #path: path,
-        #query: query?.$2,
-        #params: lib_query.query.parse(query?.$2 ?? '').value,
-        #fragment: fragment?.$2,
-      },
-    );
+      _query.skip(before: '?'.toParser()).optional(),
+      _fragment.skip(before: '#'.toParser()).optional(),
+    ).map5((scheme, authority, path, query, fragment) {
+      final auth = lib_authority.authority.parse(authority ?? '').value;
+      final params = lib_query.query.parse(query ?? '').value;
+      return (
+        scheme: scheme,
+        authority: authority,
+        username: auth.username,
+        password: auth.password,
+        hostname: auth.hostname,
+        port: auth.port,
+        path: path,
+        query: query,
+        params: params,
+        fragment: fragment,
+      );
+    });
 
 final _scheme = pattern('^:/?#').plusString(message: 'scheme');
 

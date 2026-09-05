@@ -15,14 +15,14 @@ void main() {
     final lc = LiteralNode('c');
     final ld = LiteralNode('d');
     test('empty', () {
-      expectedEqual(Node.fromString(r''), EmptyNode());
-      expectedEqual(Node.fromString(r'()'), EmptyNode());
-      expectedEqual(Node.fromString(r'(())'), EmptyNode());
+      expectedEqual(Node.fromString(r''), const EmptyNode());
+      expectedEqual(Node.fromString(r'()'), const EmptyNode());
+      expectedEqual(Node.fromString(r'(())'), const EmptyNode());
     });
     test('dot', () {
-      expectedEqual(Node.fromString(r'.'), DotNode());
-      expectedEqual(Node.fromString(r'(.)'), DotNode());
-      expectedEqual(Node.fromString(r'((.))'), DotNode());
+      expectedEqual(Node.fromString(r'.'), const DotNode());
+      expectedEqual(Node.fromString(r'(.)'), const DotNode());
+      expectedEqual(Node.fromString(r'((.))'), const DotNode());
     });
     test('literal', () {
       expectedEqual(Node.fromString(r'a'), la);
@@ -64,12 +64,12 @@ void main() {
       expectedEqual(Node.fromString(r'\$'), LiteralNode('\$'));
     });
     test('start anchors', () {
-      expectedEqual(Node.fromString(r'^'), StartAnchorNode());
-      expectedEqual(Node.fromString(r'(^)'), StartAnchorNode());
+      expectedEqual(Node.fromString(r'^'), const StartAnchorNode());
+      expectedEqual(Node.fromString(r'(^)'), const StartAnchorNode());
     });
     test('end anchors', () {
-      expectedEqual(Node.fromString(r'$'), EndAnchorNode());
-      expectedEqual(Node.fromString(r'($)'), EndAnchorNode());
+      expectedEqual(Node.fromString(r'$'), const EndAnchorNode());
+      expectedEqual(Node.fromString(r'($)'), const EndAnchorNode());
     });
     test('character classes', () {
       expectedEqual(Node.fromString(r'[a]'), la);

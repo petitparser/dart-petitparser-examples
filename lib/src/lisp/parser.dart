@@ -8,7 +8,7 @@ import 'quote.dart';
 /// The standard lisp parser definition.
 final _definition = LispParserDefinition();
 
-/// The standard prolog parser to read rules.
+/// The standard lisp parser.
 final lispParser = _definition.build();
 
 /// LISP parser definition.

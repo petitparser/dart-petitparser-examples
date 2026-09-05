@@ -20,13 +20,11 @@ final parser = () {
     ..primitive(
       seq2(
         seq2(letter(), word().star()).flatten(message: 'name expected').trim(),
-        seq3(
-          char('(').trim(),
-          builder.loopback
-              .starSeparated(char(',').trim())
-              .map((list) => list.elements),
-          char(')').trim(),
-        ).map3((_, list, _) => list).optionalWith(const <Expression>[]),
+        builder.loopback
+            .starSeparated(char(',').trim())
+            .map((list) => list.elements)
+            .skip(before: char('(').trim(), after: char(')').trim())
+            .optionalWith(const <Expression>[]),
       ).map2((name, args) => _createBinding(name, args)),
     );
   builder.group().wrapper(
@@ -64,21 +62,16 @@ final parser = () {
 
 Expression _createValue(String value) => Value(num.parse(value));
 
-Expression _createBinding(String name, List<Expression> arguments) {
-  switch (arguments.length) {
-    case 0:
-      final value = constants[name];
-      return value == null ? Variable(name) : Value(value);
-    case 1:
-      final function = checkValue(name, functions1[name]);
-      return Application(name, arguments, function);
-    case 2:
-      final function = checkValue(name, functions2[name]);
-      return Application(name, arguments, function);
-    default:
-      throwUnknown(name);
-  }
-}
+Expression _createBinding(String name, List<Expression> arguments) =>
+    switch (arguments.length) {
+      0 => switch (constants[name]) {
+        final num value => Value(value),
+        _ => Variable(name),
+      },
+      1 => Application(name, arguments, checkValue(name, functions1[name])),
+      2 => Application(name, arguments, checkValue(name, functions2[name])),
+      _ => throwUnknown(name),
+    };
 
 T checkValue<T>(String name, T? value) => value ?? throwUnknown(name);
 

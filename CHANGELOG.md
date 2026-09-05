@@ -1,5 +1,15 @@
 # Changelog
 
+## 7.1.0 (unpublished)
+
+- Dart 3.13 requirement.
+- Rewrite and modernize README.md with tested examples and documentation.
+- Update URI parser to return strongly typed records with auto-inferred fields.
+- Modernize example grammars to use Dart 3 pattern matching, switch expressions, and modern combinators.
+- RegExp: add web demo, support `^` and `$` anchors, arbitrary repetition ranges, character classes, and NFA execution optimizations.
+- Tabular: generalize to `TabularDefinition` with CSV and TSV support, and add web demo.
+- XML/XPath: showcase latest XPath features in web demo.
+
 ## 7.0.0
 
 - Update to Dart 3.8 and PetitParser 7.0.
@@ -33,4 +43,4 @@
 
 ## 4.4.0
 
-- Initial version extracted from https://github.com/petitparser/dart-petitparser.
+- Initial version extracted from <https://github.com/petitparser/dart-petitparser>.

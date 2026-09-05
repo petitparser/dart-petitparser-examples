@@ -6,18 +6,12 @@ import 'name.dart';
 import 'quote.dart';
 
 /// The evaluation function.
-dynamic eval(Environment env, dynamic expr) {
-  if (expr is Quote) {
-    return expr.datum;
-  } else if (expr is Cons) {
-    final Function function = eval(env, expr.head);
-    return function(env, expr.tail);
-  } else if (expr is Name) {
-    return env[expr];
-  } else {
-    return expr;
-  }
-}
+dynamic eval(Environment env, dynamic expr) => switch (expr) {
+  final Quote quote => quote.datum,
+  final Cons cons => (eval(env, cons.head) as Function)(env, cons.tail),
+  final Name name => env[name],
+  _ => expr,
+};
 
 /// Evaluate a cons of instructions.
 dynamic evalList(Environment env, dynamic expr) {
@@ -30,13 +24,10 @@ dynamic evalList(Environment env, dynamic expr) {
 }
 
 /// The arguments evaluation function.
-dynamic evalArguments(Environment env, dynamic args) {
-  if (args is Cons) {
-    return Cons(eval(env, args.head), evalArguments(env, args.tail));
-  } else {
-    return null;
-  }
-}
+dynamic evalArguments(Environment env, dynamic args) => switch (args) {
+  final Cons cons => Cons(eval(env, cons.head), evalArguments(env, cons.tail)),
+  _ => null,
+};
 
 /// Reads and evaluates a [script].
 dynamic evalString(Parser parser, Environment env, String script) {

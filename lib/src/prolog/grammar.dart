@@ -20,7 +20,7 @@ class PrologGrammarDefinition extends GrammarDefinition {
               ref0(parameter)
                   .plusSeparated(ref0(commaToken))
                   .map((list) => list.elements) &
-              ref0(closeParentToken))
+              ref0(closeParenToken))
           .optional();
   Parser parameter() =>
       ref0(atom) &
@@ -28,7 +28,7 @@ class PrologGrammarDefinition extends GrammarDefinition {
               ref0(parameter)
                   .plusSeparated(ref0(commaToken))
                   .map((list) => list.elements) &
-              ref0(closeParentToken))
+              ref0(closeParenToken))
           .optional();
   Parser atom() => ref0(variable) | ref0(value);
 
@@ -39,17 +39,12 @@ class PrologGrammarDefinition extends GrammarDefinition {
   Parser commentSingle() => char('%') & Token.newlineParser().neg().star();
   Parser commentMulti() => string('/*').starLazy(string('*/')) & string('*/');
 
-  Parser<String> token(Object parser, [String? message]) {
-    if (parser is Parser) {
-      return parser.flatten(message: message).trim(ref0(space));
-    } else if (parser is String) {
-      return parser
-          .toParser(message: message ?? '$parser expected')
-          .trim(ref0(space));
-    } else {
-      throw ArgumentError.value(parser, 'parser', 'Invalid parser type');
-    }
-  }
+  Parser<String> token(Object parser, [String? message]) => switch (parser) {
+    final Parser parser => parser.flatten(message: message).trim(ref0(space)),
+    final String string =>
+      string.toParser(message: message ?? '$string expected').trim(ref0(space)),
+    _ => throw ArgumentError.value(parser, 'parser', 'Invalid parser type'),
+  };
 
   Parser<String> variableToken() => ref2(
     token,
@@ -62,7 +57,7 @@ class PrologGrammarDefinition extends GrammarDefinition {
     'Value expected',
   );
   Parser<String> openParenToken() => ref1(token, '(');
-  Parser<String> closeParentToken() => ref1(token, ')');
+  Parser<String> closeParenToken() => ref1(token, ')');
   Parser<String> commaToken() => ref1(token, ',');
   Parser<String> terminatorToken() => ref1(token, '.');
   Parser<String> definitionToken() => ref1(token, ':-');

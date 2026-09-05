@@ -1,5 +1,4 @@
-import 'package:petitparser/definition.dart';
-import 'package:petitparser/parser.dart';
+import 'package:petitparser/petitparser.dart';
 
 import 'model.dart';
 

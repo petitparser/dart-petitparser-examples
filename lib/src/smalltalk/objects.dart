@@ -10,27 +10,17 @@ final stringBehavior = Behavior('String');
 final trueBehavior = Behavior('True');
 final undefinedBehavior = Behavior('Undefined');
 
-extension BehaviorAccessor on dynamic {
-  Behavior get behavior {
-    final self = this;
-    if (self == null) {
-      return undefinedBehavior;
-    } else if (self == true) {
-      return trueBehavior;
-    } else if (self == false) {
-      return falseBehavior;
-    } else if (self is num) {
-      return numberBehavior;
-    } else if (self is String) {
-      return stringBehavior;
-    } else if (self is List) {
-      return arrayBehavior;
-    } else if (self is SmalltalkObject) {
-      return self.behavior;
-    } else {
-      throw UnsupportedError('Unsupported object type: ${self.runtimeType}');
-    }
-  }
+extension BehaviorAccessor on Object? {
+  Behavior get behavior => switch (this) {
+    null => undefinedBehavior,
+    true => trueBehavior,
+    false => falseBehavior,
+    num _ => numberBehavior,
+    String _ => stringBehavior,
+    List _ => arrayBehavior,
+    final SmalltalkObject object => object.behavior,
+    _ => throw UnsupportedError('Unsupported object type: $runtimeType'),
+  };
 }
 
 class SmalltalkObject {

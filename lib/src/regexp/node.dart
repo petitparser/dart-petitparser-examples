@@ -2,12 +2,16 @@ import 'nfa.dart';
 import 'parser.dart';
 
 abstract class Node {
+  const new();
+
   static Node fromString(String regexp) => nodeParser.parse(regexp).value;
 
   Nfa toNfa();
 }
 
 class EmptyNode extends Node {
+  const new();
+
   @override
   Nfa toNfa() {
     final start = NfaState(isEnd: false);
@@ -27,6 +31,8 @@ class EmptyNode extends Node {
 }
 
 class DotNode extends Node {
+  const new();
+
   @override
   Nfa toNfa() {
     final start = NfaState(isEnd: false);
@@ -300,6 +306,8 @@ class ComplementNode extends Node {
 }
 
 class StartAnchorNode extends Node {
+  const new();
+
   @override
   Nfa toNfa() {
     final start = NfaState(isEnd: false);
@@ -319,6 +327,8 @@ class StartAnchorNode extends Node {
 }
 
 class EndAnchorNode extends Node {
+  const new();
+
   @override
   Nfa toNfa() {
     final start = NfaState(isEnd: false);

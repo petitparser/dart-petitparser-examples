@@ -1,6 +1,4 @@
-import 'package:petitparser/definition.dart';
-import 'package:petitparser/expression.dart';
-import 'package:petitparser/parser.dart';
+import 'package:petitparser/petitparser.dart';
 
 import 'escape.dart';
 import 'node.dart';
@@ -13,9 +11,9 @@ class RegexpParserDefinition extends GrammarDefinition<Node> {
             ? escapeClasses[char]!
             : LiteralNode(escapeChars[char] ?? char),
       );
-  Parser<Node> dot() => char('.').map((_) => DotNode());
-  Parser<Node> startAnchor() => char('^').map((_) => StartAnchorNode());
-  Parser<Node> endAnchor() => char(r'$').map((_) => EndAnchorNode());
+  Parser<Node> dot() => char('.').map((_) => const DotNode());
+  Parser<Node> startAnchor() => char('^').map((_) => const StartAnchorNode());
+  Parser<Node> endAnchor() => char(r'$').map((_) => const EndAnchorNode());
   Parser<Node> other() => noneOf('()!|&').map((char) => LiteralNode(char));
 
   Parser<Node> charClass() => seq2(char('^').optional(), ref0(charClassItems))
@@ -78,7 +76,7 @@ class RegexpParserDefinition extends GrammarDefinition<Node> {
 
     builder.group()
       ..left(epsilon(), (left, _, right) => ConcatenationNode(left, right))
-      ..optional(EmptyNode());
+      ..optional(const EmptyNode());
 
     builder.group()
       ..left(char('|'), (left, _, right) => AlternationNode(left, right))

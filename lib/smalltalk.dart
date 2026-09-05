@@ -6,7 +6,7 @@
 ///
 /// ```dart
 /// final parser = SmalltalkParserDefinition().build();
-/// final result = parser.parse('1 + 2');
+/// final result = parser.parse('example ^ 1 + 2');
 /// print(result.value);
 /// ```
 library;

@@ -400,25 +400,21 @@ class PascalGrammarDefinition extends GrammarDefinition {
 
   final _keywords = <String>{};
 
-  Parser token(Object source) {
-    if (source is String) {
-      final message = '"$source" expected';
-      if (_isKeyword.accept(source)) {
-        _keywords.add(source);
-        return token(
-          source
-              .toParser(message: message, ignoreCase: true)
-              .skip(after: word().not()),
-        );
-      } else {
-        return token(source.toParser(message: message));
-      }
-    } else if (source is Parser) {
-      return source.trim(ref0(spacer));
-    } else {
-      throw ArgumentError('Unknown token type: $source.');
-    }
-  }
+  Parser token(Object source) => switch (source) {
+    final String string when _isKeyword.accept(string) => () {
+      _keywords.add(string);
+      return token(
+        string
+            .toParser(message: '"$string" expected', ignoreCase: true)
+            .skip(after: word().not()),
+      );
+    }(),
+    final String string => token(
+      string.toParser(message: '"$string" expected'),
+    ),
+    final Parser parser => parser.trim(ref0(spacer)),
+    _ => throw ArgumentError.value(source, 'source', 'Unknown token type'),
+  };
 }
 
 final _isKeyword = word().plusString().end();

@@ -11,8 +11,34 @@ import 'utils/expect.dart';
 final parser = uri.end();
 
 @isTest
-void uriTest(String source, Map<Symbol, dynamic> values) {
-  test(source, () => expect(parser, isSuccess(source, value: values)));
+void uriTest(
+  String source, {
+  String? scheme,
+  String? authority,
+  String? username,
+  String? password,
+  String? hostname,
+  String? port,
+  required String path,
+  String? query,
+  List<(String, String?)> params = const [],
+  String? fragment,
+}) {
+  test(source, () {
+    final result = parser.parse(source);
+    expect(result.position, source.length);
+    final value = result.value;
+    expect(value.scheme, scheme);
+    expect(value.authority, authority);
+    expect(value.username, username);
+    expect(value.password, password);
+    expect(value.hostname, hostname);
+    expect(value.port, port);
+    expect(value.path, path);
+    expect(value.query, query);
+    expect(value.params, params);
+    expect(value.fragment, fragment);
+  });
 }
 
 void main() {
@@ -21,107 +47,60 @@ void main() {
     expect(linter(authority), isEmpty);
     expect(linter(query), isEmpty);
   });
-  uriTest('http://www.ics.uci.edu/pub/ietf/uri/#Related', {
-    #scheme: 'http',
-    #authority: 'www.ics.uci.edu',
-    #username: isNull,
-    #password: isNull,
-    #hostname: 'www.ics.uci.edu',
-    #port: isNull,
-    #path: '/pub/ietf/uri/',
-    #query: isNull,
-    #params: [],
-    #fragment: 'Related',
-  });
-  uriTest('http://a/b/c/d;e?f&g=h', {
-    #scheme: 'http',
-    #authority: 'a',
-    #username: isNull,
-    #password: isNull,
-    #hostname: 'a',
-    #port: isNull,
-    #path: '/b/c/d;e',
-    #query: 'f&g=h',
-    #params: [
-      ['f', null],
-      ['g', 'h'],
-    ],
-    #fragment: isNull,
-  });
-  uriTest(r'ftp://www.example.org:22/foo bar/zork<>?\^`{|}', {
-    #scheme: 'ftp',
-    #authority: 'www.example.org:22',
-    #username: isNull,
-    #password: isNull,
-    #hostname: 'www.example.org',
-    #port: '22',
-    #path: '/foo bar/zork<>',
-    #query: r'\^`{|}',
-    #params: [
-      ['\\^`{|}', isNull],
-    ],
-    #fragment: isNull,
-  });
-  uriTest('data:text/plain;charset=iso-8859-7,hallo', {
-    #scheme: 'data',
-    #authority: isNull,
-    #username: isNull,
-    #password: isNull,
-    #hostname: isNull,
-    #port: isNull,
-    #path: 'text/plain;charset=iso-8859-7,hallo',
-    #query: isNull,
-    #params: [],
-    #fragment: isNull,
-  });
-  uriTest('https://www.übermäßig.de/müßiggänger', {
-    #scheme: 'https',
-    #authority: 'www.übermäßig.de',
-    #username: isNull,
-    #password: isNull,
-    #hostname: 'www.übermäßig.de',
-    #port: isNull,
-    #path: '/müßiggänger',
-    #query: isNull,
-    #params: [],
-    #fragment: isNull,
-  });
-  uriTest('http:test', {
-    #scheme: 'http',
-    #authority: isNull,
-    #username: isNull,
-    #password: isNull,
-    #hostname: isNull,
-    #port: isNull,
-    #path: 'test',
-    #query: isNull,
-    #params: [],
-    #fragment: isNull,
-  });
-  uriTest(r'file:c:\\foo\\bar.html', {
-    #scheme: 'file',
-    #authority: isNull,
-    #username: isNull,
-    #password: isNull,
-    #hostname: isNull,
-    #port: isNull,
-    #path: r'c:\\foo\\bar.html',
-    #query: isNull,
-    #params: [],
-    #fragment: isNull,
-  });
-  uriTest('file://foo:bar@localhost/test', {
-    #scheme: 'file',
-    #authority: 'foo:bar@localhost',
-    #username: 'foo',
-    #password: 'bar',
-    #hostname: 'localhost',
-    #port: isNull,
-    #path: '/test',
-    #query: isNull,
-    #params: [],
-    #fragment: isNull,
-  });
+  uriTest(
+    'http://www.ics.uci.edu/pub/ietf/uri/#Related',
+    scheme: 'http',
+    authority: 'www.ics.uci.edu',
+    hostname: 'www.ics.uci.edu',
+    path: '/pub/ietf/uri/',
+    fragment: 'Related',
+  );
+  uriTest(
+    'http://a/b/c/d;e?f&g=h',
+    scheme: 'http',
+    authority: 'a',
+    hostname: 'a',
+    path: '/b/c/d;e',
+    query: 'f&g=h',
+    params: [('f', null), ('g', 'h')],
+  );
+  uriTest(
+    r'ftp://www.example.org:22/foo bar/zork<>?\^`{|}',
+    scheme: 'ftp',
+    authority: 'www.example.org:22',
+    hostname: 'www.example.org',
+    port: '22',
+    path: '/foo bar/zork<>',
+    query: r'\^`{|}',
+    params: [(r'\^`{|}', null)],
+  );
+  uriTest(
+    'data:text/plain;charset=iso-8859-7,hallo',
+    scheme: 'data',
+    path: 'text/plain;charset=iso-8859-7,hallo',
+  );
+  uriTest(
+    'https://www.übermäßig.de/müßiggänger',
+    scheme: 'https',
+    authority: 'www.übermäßig.de',
+    hostname: 'www.übermäßig.de',
+    path: '/müßiggänger',
+  );
+  uriTest('http:test', scheme: 'http', path: 'test');
+  uriTest(
+    r'file:c:\\foo\\bar.html',
+    scheme: 'file',
+    path: r'c:\\foo\\bar.html',
+  );
+  uriTest(
+    'file://foo:bar@localhost/test',
+    scheme: 'file',
+    authority: 'foo:bar@localhost',
+    username: 'foo',
+    password: 'bar',
+    hostname: 'localhost',
+    path: '/test',
+  );
   group('https://mathiasbynens.be/demo/url-regex', () {
     for (final input in const [
       'http://foo.com/blah_blah',

@@ -7,22 +7,22 @@ class SmalltalkGrammarDefinition extends GrammarDefinition {
 
   // the original implementation used a handwritten parser to
   // build special token objects
-  Parser token(Object source, [String? message]) {
-    if (source is String) {
-      return source
-          .toParser(message: 'Expected ${message ?? source}')
+  Parser token(Object source, [String? message]) => switch (source) {
+    final String string =>
+      string
+          .toParser(message: 'Expected ${message ?? string}')
           .token()
-          .trim(ref0(spacer));
-    } else if (source is Parser) {
-      ArgumentError.checkNotNull(message, 'message');
-      return source
-          .flatten(message: 'Expected $message')
+          .trim(ref0(spacer)),
+    final Parser parser =>
+      parser
+          .flatten(
+            message:
+                'Expected ${message ?? (throw ArgumentError.notNull('message'))}',
+          )
           .token()
-          .trim(ref0(spacer));
-    } else {
-      throw ArgumentError('Unknown token type: $source.');
-    }
-  }
+          .trim(ref0(spacer)),
+    _ => throw ArgumentError.value(source, 'source', 'Unknown token type'),
+  };
 
   // the original implementation uses a handwritten parser to
   // efficiently consume whitespace and comments

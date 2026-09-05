@@ -10,50 +10,51 @@ final output = document.querySelector('#output') as HTMLElement;
 void update() {
   final result = uri.parse(input.value);
   if (result is Success) {
+    final parsed = result.value;
     output.innerHTML =
         '''
     <table>
       <tr>
         <th>Scheme</th>
-        <td>${result.value[#scheme]}</td>
+        <td>${parsed.scheme}</td>
       </tr>
       <tr>  
         <th>Authority</th>
-        <td>${result.value[#authority]}</td>
+        <td>${parsed.authority}</td>
       </tr>
       <tr class="sub">  
         <th>Username</th>
-        <td>${result.value[#username]}</td>
+        <td>${parsed.username}</td>
       </tr>
       <tr class="sub">  
         <th>Password</th>
-        <td>${result.value[#password]}</td>
+        <td>${parsed.password}</td>
       </tr>
       <tr class="sub">  
         <th>Hostname</th>
-        <td>${result.value[#hostname]}</td>
+        <td>${parsed.hostname}</td>
       </tr>
       <tr class="sub">  
         <th>Port</th>
-        <td>${result.value[#port]}</td>
+        <td>${parsed.port}</td>
       </tr>
       <tr>  
         <th>Path</th>
-        <td>${result.value[#path]}</td>
+        <td>${parsed.path}</td>
       </tr>
       <tr>  
         <th>Query</th>
-        <td>${result.value[#query]}</td>
+        <td>${parsed.query}</td>
       </tr>
-      ${result.value[#params].map((each) => '''
+      ${parsed.params.map((each) => '''
       <tr class="sub">  
-        <th>${each[0]}</th>
-        <td>${each[1]}</td>
+        <th>${each.$1}</th>
+        <td>${each.$2}</td>
       </tr>
       ''').join()}
       <tr>  
         <th>Fragment</th>
-        <td>${result.value[#fragment]}</td>
+        <td>${parsed.fragment}</td>
       </tr>
     </table>
     '''

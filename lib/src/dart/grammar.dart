@@ -2,14 +2,11 @@ import 'package:petitparser/petitparser.dart';
 
 /// Dart grammar definition.
 class DartGrammarDefinition extends GrammarDefinition {
-  Parser token(Object input) {
-    if (input is Parser) {
-      return input.token().trim(ref0(hiddenStuffWhitespace));
-    } else if (input is String) {
-      return token(input.toParser());
-    }
-    throw ArgumentError.value(input, 'Invalid token parser');
-  }
+  Parser token(Object input) => switch (input) {
+    final Parser parser => parser.token().trim(ref0(hiddenStuffWhitespace)),
+    final String string => token(string.toParser()),
+    _ => throw ArgumentError.value(input, 'input', 'Invalid token parser'),
+  };
 
   // Copyright (c) 2011, the Dart project authors. Please see the AUTHORS file
   // for details. All rights reserved. Use of this source code is governed by a

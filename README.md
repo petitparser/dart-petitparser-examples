@@ -8,25 +8,95 @@
 [![GitHub Stars](https://img.shields.io/github/stars/petitparser/dart-petitparser-examples.svg)](https://github.com/petitparser/dart-petitparser-examples/stargazers)
 [![GitHub License](https://img.shields.io/badge/license-MIT-blue.svg)](https://raw.githubusercontent.com/petitparser/dart-petitparser-examples/main/LICENSE)
 
-This package contains examples to illustrate the use of [PetitParser](https://github.com/petitparser/dart-petitparser). A tutorial and full documentation is contained in the [package description](https://pub.dev/packages/petitparser) and [API documentation](https://pub.dev/documentation/petitparser/latest/). [petitparser.github.io](https://petitparser.github.io/) contains more information about PetitParser, running examples in the browser, and links to ports to other languages.
+A collection of real-world grammars, evaluators, interactive tools, and performance benchmarks illustrating [PetitParser for Dart](https://pub.dev/packages/petitparser).
 
-## Examples
+This package showcases how to model domain-specific notations, standard interchange formats, and full programming languages directly in plain Dart.
+
+## Highlights
+
+- **Grammar Catalog**: Practical parser definitions ranging from small data formats like JSON, BibTeX, CSV, and URIs to full programming languages such as Pascal, Smalltalk, and Dart.
+- **Interpreters and Evaluators**: Working interpreters for Prolog with resolution search and Lisp with lexical scoping and native functions.
+- **Automata Engine**: Regular expression parser compiling abstract syntax trees directly into non-deterministic finite automata for pattern matching.
+- **Interactive Tools**: Ready to use console command line REPLs and browser applications.
+- **Performance Benchmarks**: Microbenchmarks measuring standard parsing, fast non-capturing parsing, and comparisons with native platform parsers.
+
+## Installation
+
+Add PetitParser and the examples package to your project dependencies:
+
+```bash
+dart pub add petitparser petitparser_examples
+```
+
+## Grammars
 
 ### BibTeX
 
-A simple parser that reads a [BibTeX](https://en.wikipedia.org/wiki/BibTeX) file into a list of BibTeX entries with a list of fields.
+Parses [BibTeX](https://en.wikipedia.org/wiki/BibTeX) files into strongly typed entry objects with citation keys and key-value fields.
+
+```dart
+import 'package:petitparser_examples/bibtex.dart';
+
+void main() {
+  final parser = BibTeXDefinition().build();
+  final result = parser.parse(r'''
+@inproceedings{Reng10c,
+  title = "Practical Dynamic Grammars for Dynamic Languages",
+  author = "Lukas Renggli and Stéphane Ducasse and Tudor Gîrba and Oscar Nierstrasz",
+  year = 2010
+}''');
+
+  final entry = result.value.single;
+  print(entry.key);    // Reng10c
+  print(entry.type);   // inproceedings
+  print(entry.fields); // {title: "Practical Dynamic Grammars for Dynamic Languages", ...}
+}
+```
 
 ### Dart
 
-This example contains the grammar of the Dart programming language. This is based on an early Dart 1.0 grammar specification and unfortunately does not support all valid Dart programs yet.
+An implementation of the Dart grammar based on the early ECMA-408 specification.
+
+```dart
+import 'package:petitparser_examples/dart.dart';
+
+void main() {
+  final parser = DartGrammarDefinition().build();
+  final result = parser.parse('void main() => print("Hello, Dart!");');
+  print(result is Success); // true
+}
+```
 
 ### JSON
 
-This example contains a complete implementation of [JSON](https://json.org/). It is a simple grammar that can be used for benchmarking with the native implementation.
+A complete implementation of the [JSON specification](https://json.org/). Transforms JSON text into native Dart maps, lists, strings, numbers, booleans, and null values.
+
+```dart
+import 'package:petitparser_examples/json.dart';
+
+void main() {
+  final data = parseJson(
+    '{"name": "PetitParser", "tags": ["dart", "parser"], "active": true}',
+  );
+  print(data); // {name: PetitParser, tags: [dart, parser], active: true}
+}
+```
 
 ### Lisp
 
-This example contains a simple grammar and evaluator for LISP. The code is reasonably complete to run and evaluate complex programs. Binaries for a Read–Eval–Print Loop (REPL) are provided for the console and the web browser.
+A Lisp grammar and tree-walking evaluator supporting symbols, numbers, strings, quoted forms, lexical closures, and native functions.
+
+```dart
+import 'package:petitparser_examples/lisp.dart';
+
+void main() {
+  final environment = NativeEnvironment();
+  final result = evalString(lispParser, environment, '(+ 1 (* 2 3))');
+  print(result); // 7
+}
+```
+
+Run the interactive console REPL:
 
 ```bash
 dart run bin/lisp/lisp.dart
@@ -34,15 +104,57 @@ dart run bin/lisp/lisp.dart
 
 ### Math
 
-This example contains a simple evaluator for mathematical expressions, it builds a parse-tree that can then be used to print or evaluate expressions.
+A mathematical expression evaluator built using `ExpressionBuilder`. Handles operator precedence, associativity, parentheses, variables, and standard mathematical functions.
+
+```dart
+import 'package:petitparser_examples/math.dart';
+
+void main() {
+  final expression = parser.parse('sqrt(16) + 2 ^ 3').value;
+  print(expression.eval({})); // 12.0
+}
+```
 
 ### Pascal
 
-A complete pascal grammar following the Apple Pascal Standard from 1978.
+A grammar for Pascal following the 1978 Apple Pascal Standard.
+
+```dart
+import 'package:petitparser_examples/pascal.dart';
+
+void main() {
+  final parser = PascalGrammarDefinition().build();
+  final result = parser.parse('''
+program HelloWorld;
+begin
+  writeln('Hello, World!');
+end.
+''');
+  print(result is Success); // true
+}
+```
 
 ### Prolog
 
-This example contains a simple grammar and evaluator for Prolog programs. The code is reasonably complete to run and evaluate basic prolog programs. Binaries for a Read–Eval–Print Loop (REPL) are provided for the console and the web browser.
+A Prolog grammar and inference engine supporting facts, rules, unification, and variable substitution.
+
+```dart
+import 'package:petitparser_examples/prolog.dart';
+
+void main() {
+  final db = Database.parse('''
+parent(bob, ann).
+parent(bob, pat).
+sibling(X, Y) :- parent(Z, X), parent(Z, Y).
+''');
+  final query = Term.parse('sibling(ann, S)');
+  for (final solution in db.query(query)) {
+    print(solution); // sibling(ann, ann), sibling(ann, pat)
+  }
+}
+```
+
+Run the interactive console REPL:
 
 ```bash
 dart run bin/prolog/prolog.dart
@@ -50,41 +162,107 @@ dart run bin/prolog/prolog.dart
 
 ### Regular Expressions
 
-This example contains a simple parser and evaluator for regular expressions. It parses patterns, compiles them to Non-deterministic Finite Automata (NFA), and matches them against input text. An interactive playground is provided for the web browser.
+A parser and compiler for regular expressions. Compiles parsed patterns into non-deterministic finite automata supporting concatenation, alternation, repetition, and character classes.
+
+```dart
+import 'package:petitparser_examples/regexp.dart';
+
+void main() {
+  final nfa = Nfa.fromString(r'a*b+');
+  print(nfa.matchAsPrefix('aaab') != null); // true
+  print(nfa.matchAsPrefix('b') != null);    // true
+  print(nfa.matchAsPrefix('a') != null);    // false
+}
+```
 
 ### Smalltalk
 
-This example contains a complete implementation of the Smalltalk grammar. This is a verbatim export of a grammar that was originally developed for the PetitParser infrastructure in Smalltalk and that was the base of the [Helvetia Language Workbench](https://www.lukas-renggli.ch/smalltalk/helvetia).
+A complete Smalltalk grammar exported from the original PetitParser implementation in Smalltalk, foundational to the [Helvetia Language Workbench](https://www.lukas-renggli.ch/smalltalk/helvetia).
+
+```dart
+import 'package:petitparser_examples/smalltalk.dart';
+
+void main() {
+  final parser = SmalltalkParserDefinition().build();
+  final result = parser.parse('''
+example
+  1 to: 10 do: [ :i | Transcript show: i printString ]
+''');
+  print(result is Success); // true
+}
+```
+
+### Tabular (CSV and TSV)
+
+A configurable parser definition for delimited text formats with support for custom delimiters, quotation characters, and escaping rules.
+
+```dart
+import 'package:petitparser_examples/tabular.dart';
+
+void main() {
+  final csv = TabularDefinition.csv().build();
+  final result = csv.parse(
+    'language,paradigm\nDart,multi-paradigm\nSmalltalk,object-oriented',
+  );
+  print(result.value);
+  // [[language, paradigm], [Dart, multi-paradigm], [Smalltalk, object-oriented]]
+}
+```
 
 ### URI
 
-This is a simple grammar that takes an URL string and decomposes it into scheme, authority (including username, password, hostname, and port), path, query (including parameters as key-value pairs), and fragment.
+Decomposes RFC-3986 URI strings into structured components including scheme, authority, user info, host, port, path, query parameters, and fragments.
+
+```dart
+import 'package:petitparser_examples/uri.dart';
+
+void main() {
+  final result = uri.parse(
+    'https://user:pass@example.com:8080/path/to/page?lang=en#heading',
+  );
+  print(result.value.scheme);   // https
+  print(result.value.hostname); // example.com
+  print(result.value.port);     // 8080
+  print(result.value.path);     // /path/to/page
+}
+```
 
 ### XML
 
-This examples parses XML files to events, creates and pretty-prints a DOM tree, and evaluates XPath expressions. Depends on [xml](https://github.com/renggli/dart-xml) package.
+The `web/xml` directory demonstrates parsing XML documents into event streams, constructing DOM trees, pretty printing, and evaluating XPath expressions using the [xml](https://pub.dev/packages/xml) package.
 
-## Web
+## Web Applications
 
-To run the web examples execute the following commands from the command line and navigate to http://localhost:8080/:
+Interactive browser playgrounds and visualization tools are located in the `web/` directory.
+
+To run the web applications locally:
 
 ```bash
 dart pub global activate webdev
 webdev serve --release
 ```
 
+Open <http://localhost:8080/> to browse the interactive playgrounds for JSON, Lisp, Math evaluation, Math plotting, Prolog, Regular Expressions, Smalltalk, Tabular data, URI parsing, and XML.
+
 ## Benchmarks
 
-To run the benchmarks execute the following command from the command line:
+Run performance benchmarks directly with the Dart CLI:
 
 ```bash
 dart run --no-enable-asserts bin/benchmark/benchmark.dart
 ```
 
-Each benchmark prints the standard parsing performance, then the fast parsing performance (where return results are ignored), and possibly a native comparison (i.e. with regular expressions or native JSON parser). With the arguments `--confidence` or `--stderr` the respective variations are printed.
+Each suite measures standard parsing throughput, fast non-capturing parse performance, and compares results against native implementations where available.
 
-To only run the verification code use:
+To run correctness verification without running the performance suite:
 
 ```bash
 dart run bin/benchmark/benchmark.dart --no-benchmark
 ```
+
+## Resources
+
+- [PetitParser on pub.dev](https://pub.dev/packages/petitparser)
+- [PetitParser GitHub Repository](https://github.com/petitparser/dart-petitparser)
+- [API Documentation](https://pub.dev/documentation/petitparser_examples/latest/)
+- [Project Website](https://petitparser.github.io/)

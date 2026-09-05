@@ -1,5 +1,4 @@
-import 'package:petitparser/definition.dart';
-import 'package:petitparser/parser.dart';
+import 'package:petitparser/petitparser.dart';
 
 import 'encoding.dart';
 import 'types.dart';
@@ -19,11 +18,9 @@ class JsonDefinition extends GrammarDefinition<JSON> {
     failure(message: 'value expected'),
   ].toChoiceParser();
 
-  Parser<Map<String, JSON>> object() => seq3(
-    char('{').trim(),
-    ref0(objectElements),
-    char('}').trim(),
-  ).map3((_, elements, _) => elements);
+  Parser<Map<String, JSON>> object() =>
+      ref0(objectElements)
+          .skip(before: char('{').trim(), after: char('}').trim());
   Parser<Map<String, JSON>> objectElements() =>
       ref0(objectElement)
           .starSeparated(char(',').trim())
@@ -34,11 +31,9 @@ class JsonDefinition extends GrammarDefinition<JSON> {
     ref0(value),
   ).map3((key, _, value) => MapEntry(key, value));
 
-  Parser<List<JSON>> array() => seq3(
-    char('[').trim(),
-    ref0(arrayElements),
-    char(']').trim(),
-  ).map3((_, elements, _) => elements);
+  Parser<List<JSON>> array() =>
+      ref0(arrayElements)
+          .skip(before: char('[').trim(), after: char(']').trim());
   Parser<List<JSON>> arrayElements() =>
       ref0(value).starSeparated(char(',').trim()).map((list) => list.elements);
 
@@ -46,11 +41,12 @@ class JsonDefinition extends GrammarDefinition<JSON> {
   Parser<bool> falseToken() => string('false').trim().map((_) => false);
   Parser<Object?> nullToken() => string('null').trim().map((_) => null);
 
-  Parser<String> stringToken() => seq3(
-    char('"'),
-    ref0(characterPrimitive).star(),
-    char('"'),
-  ).trim().map3((_, chars, _) => chars.join());
+  Parser<String> stringToken() =>
+      ref0(characterPrimitive)
+          .star()
+          .skip(before: char('"'), after: char('"'))
+          .trim()
+          .map((chars) => chars.join());
   Parser<String> characterPrimitive() => [
     ref0(characterNormal),
     ref0(characterEscape),
