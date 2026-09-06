@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Dart Grammar Visualizer</title>
+  <link rel="stylesheet"
+        href="//cdn.rawgit.com/milligram/milligram/master/dist/milligram.min.css">
+  <style>
+    body {
+      padding: 2rem 0;
+      color: #333;
+    }
+    textarea {
+      width: 100%;
+      height: 260px;
+      font-family: monospace;
+      font-size: 1.4rem;
+      line-height: 1.5;
+    }
+    .preset-btn {
+      margin-right: 0.5rem;
+      margin-bottom: 0.5rem;
+    }
+    .stats {
+      font-size: 1.4rem;
+      color: #666;
+      margin-bottom: 1rem;
+    }
+    .stats span {
+      font-weight: bold;
+      color: #9b4dca;
+    }
+    .error {
+      color: #d9534f;
+      background-color: #fdf7f7;
+      border: 1px solid #d9534f;
+      padding: 1rem;
+      border-radius: 4px;
+      font-family: monospace;
+      white-space: pre-wrap;
+      font-size: 1.4rem;
+    }
+    #ast-output {
+      font-family: monospace;
+      font-size: 1.3rem;
+      line-height: 1.6;
+      background-color: #f8f9fa;
+      border: 1px solid #e1e1e1;
+      padding: 1.5rem;
+      border-radius: 4px;
+      max-height: 500px;
+      overflow-y: auto;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+    .node-type {
+      color: #9b4dca;
+      font-weight: bold;
+    }
+    .node-prop {
+      color: #606c76;
+    }
+    .node-val {
+      color: #2b7489;
+    }
+    .node-str {
+      color: #d14;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Dart Grammar Visualizer</h1>
+    <p>
+      Parses Dart source code using the Dart grammar written with PetitParser,
+      producing an interactive, strongly-typed Abstract Syntax Tree (AST).
+    </p>
+
+    <h2>Presets</h2>
+    <div>
+      <button class="button button-outline preset-btn" id="btn-class">Class & Extension</button>
+      <button class="button button-outline preset-btn" id="btn-patterns">Dart 3 Patterns</button>
+      <button class="button button-outline preset-btn" id="btn-enums">Enhanced Enum</button>
+      <button class="button button-outline preset-btn" id="btn-records">Records & Functions</button>
+    </div>
+
+    <h2>Input Source Code</h2>
+    <p>
+      <textarea id="input" spellcheck="false"></textarea>
+    </p>
+
+    <div class="row">
+      <div class="column column-50">
+        <label for="production">Target Grammar Production</label>
+        <select id="production">
+          <option value="compilationUnit" selected>Compilation Unit (Full File)</option>
+          <option value="statement">Statement</option>
+          <option value="expression">Expression</option>
+          <option value="dartPattern">Pattern</option>
+          <option value="type">Type</option>
+        </select>
+      </div>
+      <div class="column column-50" style="text-align: right; margin-top: 3rem;">
+        <button id="action" class="button">Parse Code</button>
+      </div>
+    </div>
+
+    <div class="stats" id="stats"></div>
+
+    <h2>Abstract Syntax Tree</h2>
+    <div id="output"></div>
+  </div>
+
+  <script src="dart.dart.js"></script>
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-QK0KCHXW3F"></script>
+  <script>window.dataLayer = window.dataLayer || [];function gtag(){dataLayer.push(arguments);}gtag('js', new Date());gtag('config', 'G-QK0KCHXW3F');</script>
+</body>
+</html>

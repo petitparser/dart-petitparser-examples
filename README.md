@@ -55,15 +55,14 @@ void main() {
 
 ### Dart
 
-An implementation of the Dart grammar based on the early ECMA-408 specification.
+A comprehensive implementation of the Dart 3 grammar and parser producing strongly-typed Abstract Syntax Trees (ASTs). Supports records, patterns, switch expressions, class modifiers, enhanced enums, extension types, and null safety.
 
 ```dart
 import 'package:petitparser_examples/dart.dart';
 
 void main() {
-  final parser = DartGrammarDefinition().build();
-  final result = parser.parse('void main() => print("Hello, Dart!");');
-  print(result is Success); // true
+  final unit = parseDart('void main() => print("Hello, Dart!");');
+  print(unit.declarations.first); // FunctionDeclarationNode(main)
 }
 ```
 
@@ -242,7 +241,7 @@ dart pub global activate webdev
 webdev serve --release
 ```
 
-Open <http://localhost:8080/> to browse the interactive playgrounds for JSON, Lisp, Math evaluation, Math plotting, Prolog, Regular Expressions, Smalltalk, Tabular data, URI parsing, and XML.
+Open <http://localhost:8080/> to browse the interactive playgrounds for Dart grammar visualization, JSON, Lisp, Math evaluation, Math plotting, Prolog, Regular Expressions, Smalltalk, Tabular data, URI parsing, and XML.
 
 ## Benchmarks
 
