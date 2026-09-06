@@ -73,34 +73,62 @@ mixin DartDeclarationGrammar
     ref1(token, ';'),
   ).map3((_, uri, _) => PartDirectiveNode(uri.value));
 
+  Parser<ConfigurationUriNode> configurationUri() =>
+      seq4(
+        ref0(ifToken),
+        seq4(
+          ref1(token, '('),
+          ref0(qualifiedIdentifier),
+          (ref1(token, '==') & ref0(simpleStringLiteral))
+              .map((l) => (l[1] as StringLiteralNode).value)
+              .optional(),
+          ref1(token, ')'),
+        ).map4((_, name, value, _) => (name: name, value: value)),
+        ref0(simpleStringLiteral),
+        epsilon(),
+      ).map4(
+        (_, test, uri, _) => ConfigurationUriNode(
+          name: test.name,
+          value: test.value,
+          uri: uri.value,
+        ),
+      );
+
   Parser<ImportDirectiveNode> importDirective() =>
-      seq6(
+      seq7(
         ref0(importToken),
         ref0(simpleStringLiteral),
+        ref0(configurationUri).star(),
         ref0(deferredToken).optional(),
         (ref0(asToken) & ref0(identifier))
             .map((l) => l[1] as String)
             .optional(),
         ref0(combinator).star(),
         ref1(token, ';'),
-      ).map6(
-        (_, uri, deferred, asName, combinators, _) => ImportDirectiveNode(
-          uri: uri.value,
-          isDeferred: deferred != null,
-          asName: asName,
-          combinators: combinators,
-        ),
+      ).map7(
+        (_, uri, configs, deferred, asName, combinators, _) =>
+            ImportDirectiveNode(
+              uri: uri.value,
+              configurations: configs,
+              isDeferred: deferred != null,
+              asName: asName,
+              combinators: combinators,
+            ),
       );
 
   Parser<ExportDirectiveNode> exportDirective() =>
-      seq4(
+      seq5(
         ref0(exportToken),
         ref0(simpleStringLiteral),
+        ref0(configurationUri).star(),
         ref0(combinator).star(),
         ref1(token, ';'),
-      ).map4(
-        (_, uri, combinators, _) =>
-            ExportDirectiveNode(uri: uri.value, combinators: combinators),
+      ).map5(
+        (_, uri, configs, combinators, _) => ExportDirectiveNode(
+          uri: uri.value,
+          configurations: configs,
+          combinators: combinators,
+        ),
       );
 
   Parser<CombinatorNode> combinator() => [
@@ -259,31 +287,45 @@ mixin DartDeclarationGrammar
       );
 
   Parser<ExtensionTypeDeclarationNode> extensionTypeDeclaration() =>
-      seq9(
-        ref0(extensionToken),
-        ref0(typeToken),
-        ref0(constToken).optional(),
+      seq8(
+        seq3(
+          ref0(extensionToken),
+          ref0(typeToken),
+          ref0(constToken).optional(),
+        ),
         ref0(identifier),
         ref0(typeParameters).optionalWith(const <TypeParameterNode>[]),
-        seq3(
+        (ref1(token, '.') &
+                [
+                  ref0(identifier),
+                  ref0(newToken).map((t) => t.value),
+                ].toChoiceParser())
+            .map((l) => l[1] as String)
+            .optional(),
+        seq4(
           ref1(token, '('),
+          ref0(metadataList),
           seq2(ref0(type), ref0(identifier)),
           ref1(token, ')'),
-        ).map3((_, rep, _) => rep),
+        ).map4((_, _, rep, _) => rep),
         (ref0(implementsToken) & ref0(typeList))
             .map((l) => l[1] as List<TypeNode>)
             .optionalWith(const <TypeNode>[]),
-        seq3(
-          ref1(token, '{'),
-          ref0(classMemberDefinition).star(),
-          ref1(token, '}'),
-        ).map3((_, members, _) => members),
+        [
+          seq3(
+            ref1(token, '{'),
+            ref0(classMemberDefinition).star(),
+            ref1(token, '}'),
+          ).map3((_, members, _) => members),
+          ref1(token, ';').map((_) => const <DeclarationNode>[]),
+        ].toChoiceParser(),
         epsilon(),
-      ).map9(
-        (_, _, constKw, name, typeParams, rep, interfaces, members, _) =>
+      ).map8(
+        (header, name, typeParams, ctorName, rep, interfaces, members, _) =>
             ExtensionTypeDeclarationNode(
               name: name,
-              isConst: constKw != null,
+              constructorName: ctorName,
+              isConst: header.$3 != null,
               typeParameters: typeParams,
               representationType: rep.$1,
               representationName: rep.$2,

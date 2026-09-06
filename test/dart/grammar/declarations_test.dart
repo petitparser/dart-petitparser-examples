@@ -24,12 +24,38 @@ void main() {
       expect(directive, isSuccess("import 'foo.dart' show A, B;"));
       expect(directive, isSuccess("import 'foo.dart' hide C, D;"));
       expect(directive, isSuccess("import 'foo.dart' as f show A hide B;"));
+      expect(
+        directive,
+        isSuccess("import 'foo.dart' if (dart.library.io) 'bar.dart';"),
+      );
+      expect(
+        directive,
+        isSuccess(
+          "import 'foo.dart' if (dart.library.io == 'true') 'bar.dart';",
+        ),
+      );
+      expect(
+        directive,
+        isSuccess(
+          "import 'foo.dart' if (dart.library.io) 'bar.dart' if (dart.library.html) 'baz.dart' as f show A;",
+        ),
+      );
     });
 
     test('export', () {
       expect(directive, isSuccess("export 'src/foo.dart';"));
       expect(directive, isSuccess("export 'src/foo.dart' show A, B;"));
       expect(directive, isSuccess("export 'src/foo.dart' hide C;"));
+      expect(
+        directive,
+        isSuccess("export 'src/foo.dart' if (dart.library.io) 'src/bar.dart';"),
+      );
+      expect(
+        directive,
+        isSuccess(
+          "export 'src/foo.dart' if (dart.library.io == 'true') 'src/bar.dart' show A;",
+        ),
+      );
     });
 
     test('part and part of', () {
@@ -126,6 +152,27 @@ void main() {
         extTypeDecl,
         isSuccess('extension type Id<T>(T value) implements Object {}'),
       );
+      expect(
+        extTypeDecl,
+        isSuccess(
+          'extension type PrivateToken._(JSObject _) implements JSObject {}',
+        ),
+      );
+      expect(
+        extTypeDecl,
+        isSuccess('extension type PrivateToken.named(JSObject _) {}'),
+      );
+      expect(
+        extTypeDecl,
+        isSuccess('extension type PrivateToken.new(JSObject _) {}'),
+      );
+      expect(
+        extTypeDecl,
+        isSuccess('extension type PrivateToken<T>._(T val) {}'),
+      );
+      expect(extTypeDecl, isSuccess('extension type Id(int i);'));
+      expect(extTypeDecl, isSuccess('extension type Id._(int i);'));
+      expect(extTypeDecl, isSuccess('extension type const Id._(int i);'));
     });
   });
 

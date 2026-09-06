@@ -76,16 +76,31 @@ class PartDirectiveNode extends DirectiveNode {
   String toString() => 'PartDirectiveNode($uri)';
 }
 
+/// A conditional configuration in a configurable URI (`if (dart.library.io) 'foo.dart'`).
+class ConfigurationUriNode extends DartNode {
+  const new({required this.name, this.value, required this.uri});
+
+  final String name;
+  final String? value;
+  final String uri;
+
+  @override
+  String toString() =>
+      'ConfigurationUriNode(if ($name${value != null ? ' == "$value"' : ''}) $uri)';
+}
+
 /// An import directive (`import 'foo.dart' deferred as f show a, b;`).
 class ImportDirectiveNode extends DirectiveNode {
   const new({
     required this.uri,
+    this.configurations = const [],
     this.isDeferred = false,
     this.asName,
     this.combinators = const [],
   });
 
   final String uri;
+  final List<ConfigurationUriNode> configurations;
   final bool isDeferred;
   final String? asName;
   final List<CombinatorNode> combinators;
@@ -96,9 +111,14 @@ class ImportDirectiveNode extends DirectiveNode {
 
 /// An export directive (`export 'foo.dart' show a, b;`).
 class ExportDirectiveNode extends DirectiveNode {
-  const new({required this.uri, this.combinators = const []});
+  const new({
+    required this.uri,
+    this.configurations = const [],
+    this.combinators = const [],
+  });
 
   final String uri;
+  final List<ConfigurationUriNode> configurations;
   final List<CombinatorNode> combinators;
 
   @override
@@ -195,6 +215,7 @@ class ExtensionDeclarationNode extends DeclarationNode {
 class ExtensionTypeDeclarationNode extends DeclarationNode {
   const new({
     required this.name,
+    this.constructorName,
     this.isConst = false,
     this.typeParameters = const [],
     required this.representationType,
@@ -204,6 +225,7 @@ class ExtensionTypeDeclarationNode extends DeclarationNode {
   });
 
   final String name;
+  final String? constructorName;
   final bool isConst;
   final List<TypeParameterNode> typeParameters;
   final TypeNode representationType;
@@ -213,7 +235,7 @@ class ExtensionTypeDeclarationNode extends DeclarationNode {
 
   @override
   String toString() =>
-      'ExtensionTypeDeclarationNode($name, rep: $representationType $representationName)';
+      'ExtensionTypeDeclarationNode($name${constructorName != null ? '.$constructorName' : ''}, rep: $representationType $representationName)';
 }
 
 /// An enum declaration (`enum Foo { a, b; void bar() {} }`).
