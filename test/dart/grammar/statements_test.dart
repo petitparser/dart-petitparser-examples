@@ -30,6 +30,12 @@ void main() {
       expect(stmt, isSuccess('int a = 1, b = 2, c;'));
       expect(stmt, isSuccess('late int a;'));
       expect(stmt, isSuccess('late final int a;'));
+      expect(stmt, isSuccess('var f = () => 42;'));
+      expect(stmt, isSuccess('final int Function(int) addOne = (x) => x + 1;'));
+      expect(
+        stmt,
+        isSuccess('String Function(String) fn = (s) => s.toUpperCase();'),
+      );
     });
 
     test('pattern variable declarations', () {

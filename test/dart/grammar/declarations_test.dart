@@ -72,6 +72,14 @@ void main() {
       expect(typeAlias, isSuccess('typedef IntList = List<int>;'));
       expect(typeAlias, isSuccess('typedef Predicate<T> = bool Function(T);'));
       expect(typeAlias, isSuccess('typedef JSON = Map<String, dynamic>;'));
+      expect(typeAlias, isSuccess('typedef void Callback(int x);'));
+      expect(typeAlias, isSuccess('typedef T Transformation<S, T>(S input);'));
+      expect(typeAlias, isSuccess('typedef Action();'));
+      expect(
+        typeAlias,
+        isSuccess('typedef String Formatter(Object value, [String pattern]);'),
+      );
+      expect(typeAlias, isSuccess('typedef Handler({required String event});'));
     });
   });
 
@@ -241,6 +249,13 @@ void main() {
       expect(fieldDecl, isSuccess('static const double pi = 3.14;'));
       expect(fieldDecl, isSuccess('late final String name;'));
       expect(fieldDecl, isSuccess('covariant num x;'));
+      expect(
+        fieldDecl,
+        isSuccess(
+          'bool Function(Source) inferenceLoggingPredicate = (_) => false;',
+        ),
+      );
+      expect(fieldDecl, isSuccess('var fn = () => 42;'));
     });
   });
 

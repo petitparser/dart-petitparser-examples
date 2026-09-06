@@ -452,6 +452,7 @@ sealed class ParameterNode extends DartNode {
     required this.name,
     this.type,
     this.defaultValue,
+    this.metadata = const [],
     this.isNamed = false,
     this.isRequired = false,
     this.isFinal = false,
@@ -463,6 +464,7 @@ sealed class ParameterNode extends DartNode {
   final String name;
   final TypeNode? type;
   final ExpressionNode? defaultValue;
+  final List<AnnotationNode> metadata;
   final bool isNamed;
   final bool isRequired;
   final bool isFinal;
@@ -480,6 +482,7 @@ class SimpleParameterNode extends ParameterNode {
     required super.name,
     super.type,
     super.defaultValue,
+    super.metadata,
     super.isNamed,
     super.isRequired,
     super.isFinal,
@@ -496,6 +499,7 @@ class FunctionTypedParameterNode extends ParameterNode {
     super.type,
     this.parameters = const [],
     super.defaultValue,
+    super.metadata,
     super.isNamed,
     super.isRequired,
   });

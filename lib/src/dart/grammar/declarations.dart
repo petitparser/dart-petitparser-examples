@@ -393,20 +393,51 @@ mixin DartDeclarationGrammar
   // Type Alias (typedef)
   // ---------------------------------------------------------------------------
 
-  Parser<TypeAliasDeclarationNode> typeAliasDeclaration() =>
-      seq5(
-        ref0(typedefToken),
-        ref0(identifier),
-        ref0(typeParameters).optionalWith(const <TypeParameterNode>[]),
-        ref1(token, '='),
-        seq2(ref0(type), ref1(token, ';')),
-      ).map5(
-        (_, name, typeParams, _, typeAndSemi) => TypeAliasDeclarationNode(
-          name: name,
-          typeParameters: typeParams,
-          type: typeAndSemi.$1,
-        ),
-      );
+  Parser<TypeAliasDeclarationNode> typeAliasDeclaration() => [
+    // 1. New-style: typedef Name<T> = Type;
+    seq5(
+      ref0(typedefToken),
+      ref0(identifier),
+      ref0(typeParameters).optionalWith(const <TypeParameterNode>[]),
+      ref1(token, '='),
+      seq2(ref0(type), ref1(token, ';')),
+    ).map5(
+      (_, name, typeParams, _, typeAndSemi) => TypeAliasDeclarationNode(
+        name: name,
+        typeParameters: typeParams,
+        type: typeAndSemi.$1,
+      ),
+    ),
+    // 2. Old-style with return type: typedef Type Name<T>(params);
+    seq6(
+      ref0(typedefToken),
+      ref0(type),
+      ref0(identifier),
+      ref0(typeParameters).optionalWith(const <TypeParameterNode>[]),
+      ref0(formalParameters),
+      ref1(token, ';'),
+    ).map6(
+      (_, returnType, name, typeParams, params, _) => TypeAliasDeclarationNode(
+        name: name,
+        typeParameters: typeParams,
+        type: FunctionTypeNode(returnType: returnType, parameters: params),
+      ),
+    ),
+    // 3. Old-style untyped: typedef Name<T>(params);
+    seq5(
+      ref0(typedefToken),
+      ref0(identifier),
+      ref0(typeParameters).optionalWith(const <TypeParameterNode>[]),
+      ref0(formalParameters),
+      ref1(token, ';'),
+    ).map5(
+      (_, name, typeParams, params, _) => TypeAliasDeclarationNode(
+        name: name,
+        typeParameters: typeParams,
+        type: FunctionTypeNode(parameters: params),
+      ),
+    ),
+  ].toChoiceParser();
 
   // ---------------------------------------------------------------------------
   // Class Member Definitions
@@ -501,14 +532,11 @@ mixin DartDeclarationGrammar
         target,
       ),
     ),
-    // Initializers + body: : super(), a = 1 { ... } or ;
+    // Initializers + body: : super(), a = 1 { ... } or ; or => expr;
     seq2(
       ref0(constructorInitializers)
           .optionalWith(const <ConstructorInitializerNode>[]),
-      [
-        ref0(functionBody),
-        ref1(token, ';').map((_) => const EmptyFunctionBodyNode()),
-      ].toChoiceParser(),
+      ref0(methodBody),
     ).map2((inits, body) => (inits, body, null)),
   ].toChoiceParser();
 
@@ -697,7 +725,12 @@ mixin DartDeclarationGrammar
   ].toChoiceParser();
 
   Parser<FunctionBodyNode> methodBody() => [
-    ref0(functionBody),
+    seq3(
+      ref1(token, '=>'),
+      ref0(expression),
+      ref1(token, ';'),
+    ).map3((_, expr, _) => ExpressionFunctionBodyNode(expr)),
+    ref0(block).map(BlockFunctionBodyNode.new),
     ref1(token, ';').map((_) => const EmptyFunctionBodyNode()),
   ].toChoiceParser();
 
@@ -820,5 +853,6 @@ mixin DartDeclarationGrammar
     ref0(argumentList).optionalWith(const <ArgumentNode>[]),
   ).map3((_, name, args) => AnnotationNode(name: name, arguments: args));
 
+  @override
   Parser<List<AnnotationNode>> metadataList() => ref0(metadata).star();
 }

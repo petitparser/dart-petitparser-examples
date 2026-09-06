@@ -661,11 +661,10 @@ mixin DartExpressionGrammar
 
   Parser<FunctionBodyNode> functionBody() => [
     // Arrow body: => expr
-    seq3(
+    seq2(
       ref1(token, '=>'),
       ref0(expression),
-      ref1(token, ';').optional(),
-    ).map3((_, expr, _) => ExpressionFunctionBodyNode(expr)),
+    ).map2((_, expr) => ExpressionFunctionBodyNode(expr)),
     // Block body: { statements }
     ref0(block).map(BlockFunctionBodyNode.new),
   ].toChoiceParser();

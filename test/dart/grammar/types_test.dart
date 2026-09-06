@@ -149,4 +149,25 @@ void main() {
       expect(typeParams, isSuccess('<K, V extends List<K>>'));
     });
   });
+
+  group('formal parameters', () {
+    final formalParams = grammar.buildFrom(grammar.formalParameters()).end();
+
+    test('parameters with metadata annotations', () {
+      expect(formalParams, isSuccess('(@isTest int x)'));
+      expect(formalParams, isSuccess('(@foo @bar String s)'));
+      expect(formalParams, isSuccess('({@required @deprecated int? x})'));
+      expect(
+        formalParams,
+        isSuccess('(@Deprecated("Debug only") @doNotSubmit bool solo = false)'),
+      );
+      expect(
+        formalParams,
+        isSuccess(
+          '(Object? desc, FutureOr<dynamic> Function() body, {@Deprecated("msg") @doNotSubmit bool solo = false})',
+        ),
+      );
+      expect(formalParams, isSuccess('([@deprecated int count = 0])'));
+    });
+  });
 }

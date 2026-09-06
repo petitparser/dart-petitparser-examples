@@ -11,6 +11,9 @@ mixin DartTypeGrammar
   @override
   Parser<ExpressionNode> expression();
 
+  /// Abstract metadata reference.
+  Parser<List<AnnotationNode>> metadataList();
+
   // ---------------------------------------------------------------------------
   // Types
   // ---------------------------------------------------------------------------
@@ -323,11 +326,43 @@ mixin DartTypeGrammar
     ref1(token, '}'),
   ).map4((_, params, _, _) => params);
 
-  Parser<ParameterNode> normalFormalParameter() => [
-    ref0(functionTypedFormalParameter),
-    ref0(fieldFormalParameter),
-    ref0(simpleFormalParameter),
-  ].toChoiceParser();
+  Parser<ParameterNode> normalFormalParameter() =>
+      seq2(
+        ref0(metadataList),
+        [
+          ref0(functionTypedFormalParameter),
+          ref0(fieldFormalParameter),
+          ref0(simpleFormalParameter),
+        ].toChoiceParser(),
+      ).map2((meta, param) {
+        if (meta.isEmpty) return param;
+        if (param is SimpleParameterNode) {
+          return SimpleParameterNode(
+            name: param.name,
+            type: param.type,
+            defaultValue: param.defaultValue,
+            metadata: [...meta, ...param.metadata],
+            isNamed: param.isNamed,
+            isRequired: param.isRequired,
+            isFinal: param.isFinal,
+            isVar: param.isVar,
+            isThis: param.isThis,
+            isSuper: param.isSuper,
+          );
+        }
+        if (param is FunctionTypedParameterNode) {
+          return FunctionTypedParameterNode(
+            name: param.name,
+            type: param.type,
+            parameters: param.parameters,
+            defaultValue: param.defaultValue,
+            metadata: [...meta, ...param.metadata],
+            isNamed: param.isNamed,
+            isRequired: param.isRequired,
+          );
+        }
+        return param;
+      });
 
   Parser<SimpleParameterNode> simpleFormalParameter() => [
     // Typed with name: int x
@@ -424,40 +459,66 @@ mixin DartTypeGrammar
             .map((l) => l[1] as ExpressionNode)
             .optional(),
       ).map2((param, defaultVal) {
-        if (defaultVal != null && param is SimpleParameterNode) {
-          return SimpleParameterNode(
-            name: param.name,
-            type: param.type,
-            defaultValue: defaultVal,
-            isFinal: param.isFinal,
-            isVar: param.isVar,
-            isThis: param.isThis,
-            isSuper: param.isSuper,
-          );
+        if (defaultVal != null) {
+          if (param is SimpleParameterNode) {
+            return SimpleParameterNode(
+              name: param.name,
+              type: param.type,
+              defaultValue: defaultVal,
+              metadata: param.metadata,
+              isFinal: param.isFinal,
+              isVar: param.isVar,
+              isThis: param.isThis,
+              isSuper: param.isSuper,
+            );
+          }
+          if (param is FunctionTypedParameterNode) {
+            return FunctionTypedParameterNode(
+              name: param.name,
+              type: param.type,
+              parameters: param.parameters,
+              defaultValue: defaultVal,
+              metadata: param.metadata,
+            );
+          }
         }
         return param;
       });
 
   Parser<ParameterNode> defaultNamedFormalParameter() =>
-      seq3(
+      seq4(
+        ref0(metadataList),
         ref0(requiredToken).optional(),
         ref0(normalFormalParameter),
         ([ref1(token, '='), ref1(token, ':')].toChoiceParser() &
                 ref0(expression))
             .map((l) => l[1] as ExpressionNode)
             .optional(),
-      ).map3((req, param, defaultVal) {
+      ).map4((meta, req, param, defaultVal) {
+        final allMeta = [...meta, ...param.metadata];
         if (param is SimpleParameterNode) {
           return SimpleParameterNode(
             name: param.name,
             type: param.type,
             defaultValue: defaultVal ?? param.defaultValue,
+            metadata: allMeta,
             isNamed: true,
             isRequired: req != null,
             isFinal: param.isFinal,
             isVar: param.isVar,
             isThis: param.isThis,
             isSuper: param.isSuper,
+          );
+        }
+        if (param is FunctionTypedParameterNode) {
+          return FunctionTypedParameterNode(
+            name: param.name,
+            type: param.type,
+            parameters: param.parameters,
+            defaultValue: defaultVal ?? param.defaultValue,
+            metadata: allMeta,
+            isNamed: true,
+            isRequired: req != null,
           );
         }
         return param;
