@@ -78,6 +78,10 @@ void main() {
         stmt,
         isSuccess('switch (x) { case int y when y > 0: print(y); break; }'),
       );
+      expect(
+        stmt,
+        isSuccess('switch (x) { case Color.red when active: break; }'),
+      );
       expect(stmt, isSuccess('switch (x) { label: case 1: break; }'));
     });
   });

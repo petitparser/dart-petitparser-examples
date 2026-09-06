@@ -196,12 +196,21 @@ mixin DartPatternGrammar
     ref0(dartPattern).map((p) => PatternFieldNode(pattern: p)),
   ].toChoiceParser();
 
+  /// Wildcard token (`_` not followed by identifier characters).
+  Parser<Token<String>> wildcardToken() => token(
+    (char('_') & ref0(identifierPart).not()).flatten(message: '_ expected'),
+  );
+
+  /// Pattern variable identifier (forbidding `when` keyword).
+  Parser<String> patternVariableIdentifier() =>
+      (ref0(whenToken).not() & ref0(identifier)).map((l) => l[1] as String);
+
   /// Wildcard pattern (`_` or `Type _`).
   Parser<WildcardPatternNode> wildcardPattern() => [
-    (ref0(type) & ref1(token, '_')).map(
+    (ref0(type) & ref0(wildcardToken)).map(
       (l) => WildcardPatternNode(l[0] as TypeNode),
     ),
-    ref1(token, '_').map((_) => const WildcardPatternNode()),
+    ref0(wildcardToken).map((_) => const WildcardPatternNode()),
   ].toChoiceParser();
 
   /// Variable pattern (`var x`, `final x`, `final int x`, `int x`).
@@ -211,9 +220,9 @@ mixin DartPatternGrammar
       [
         seq2(
           ref0(type),
-          ref0(identifier),
+          ref0(patternVariableIdentifier),
         ).map2((type, name) => (type: type, name: name)),
-        ref0(identifier).map((name) => (type: null, name: name)),
+        ref0(patternVariableIdentifier).map((name) => (type: null, name: name)),
       ].toChoiceParser(),
     ).map2(
       (_, data) =>
@@ -221,11 +230,11 @@ mixin DartPatternGrammar
     ),
     seq2(
       ref0(varToken),
-      ref0(identifier),
+      ref0(patternVariableIdentifier),
     ).map2((_, name) => VariablePatternNode(name: name, isVar: true)),
     seq2(
       ref0(type),
-      ref0(identifier),
+      ref0(patternVariableIdentifier),
     ).map2((type, name) => VariablePatternNode(name: name, type: type)),
   ].toChoiceParser();
 

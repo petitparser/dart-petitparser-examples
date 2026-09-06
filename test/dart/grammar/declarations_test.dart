@@ -210,7 +210,7 @@ void main() {
 
   group('constructors and members', () {
     final ctorDecl = grammar.buildFrom(grammar.constructorDeclaration()).end();
-    final funcDecl = grammar.buildFrom(grammar.functionDeclaration()).end();
+    final memberDecl = grammar.buildFrom(grammar.classMemberDefinition()).end();
     final fieldDecl = grammar.buildFrom(grammar.fieldDeclaration()).end();
 
     test('constructors', () {
@@ -221,8 +221,14 @@ void main() {
       expect(ctorDecl, isSuccess('Point.fromSuper() : super(0);'));
       expect(ctorDecl, isSuccess('Point.fromSuper(super.x, super.y);'));
       expect(ctorDecl, isSuccess('Point.redirect() : this(0, 0);'));
+      expect(ctorDecl, isSuccess('Point._() : assert(false, "msg");'));
+      expect(ctorDecl, isSuccess('Point() : assert(1 == 1), x = 2;'));
       expect(ctorDecl, isSuccess('factory Point.create() => Point(0, 0);'));
       expect(ctorDecl, isSuccess('factory Point.redirecting() = OtherPoint;'));
+      expect(
+        ctorDecl,
+        isSuccess('factory Point() = LinkBuilderImplementation<T>;'),
+      );
       expect(ctorDecl, isSuccess('Point.new(this.x, this.y);'));
       expect(ctorDecl, isSuccess('const new();'));
       expect(ctorDecl, isSuccess('new([super.owner]);'));
@@ -231,16 +237,24 @@ void main() {
     });
 
     test('functions and methods', () {
-      expect(funcDecl, isSuccess('void main() {}'));
-      expect(funcDecl, isSuccess('int add(int a, int b) => a + b;'));
-      expect(funcDecl, isSuccess('Future<void> run() async {}'));
-      expect(funcDecl, isSuccess('Stream<int> count() async* {}'));
-      expect(funcDecl, isSuccess('Iterable<int> syncCount() sync* {}'));
-      expect(funcDecl, isSuccess('static void helper() {}'));
-      expect(funcDecl, isSuccess('external int get length;'));
-      expect(funcDecl, isSuccess('int get width => 0;'));
-      expect(funcDecl, isSuccess('set width(int w) {}'));
-      expect(funcDecl, isSuccess('bool operator ==(Object other) => true;'));
+      expect(memberDecl, isSuccess('void main() {}'));
+      expect(memberDecl, isSuccess('int add(int a, int b) => a + b;'));
+      expect(memberDecl, isSuccess('Future<void> run() async {}'));
+      expect(memberDecl, isSuccess('Stream<int> count() async* {}'));
+      expect(memberDecl, isSuccess('Iterable<int> syncCount() sync* {}'));
+      expect(memberDecl, isSuccess('static void helper() {}'));
+      expect(memberDecl, isSuccess('external int get length;'));
+      expect(memberDecl, isSuccess('get length => 0;'));
+      expect(memberDecl, isSuccess('set length(v) {}'));
+      expect(memberDecl, isSuccess('operator ==(other) => false;'));
+      expect(memberDecl, isSuccess('int get width => 0;'));
+      expect(memberDecl, isSuccess('set width(int w) {}'));
+      expect(memberDecl, isSuccess('bool operator ==(Object other) => true;'));
+      expect(memberDecl, isSuccess('@override\n()? getTagInfo() => null;'));
+      expect(
+        memberDecl,
+        isSuccess("@override\n(int, String) foo() => (1, 'a');"),
+      );
     });
 
     test('fields', () {

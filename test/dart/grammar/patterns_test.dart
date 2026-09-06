@@ -38,6 +38,8 @@ void main() {
       expect(pat, isSuccess('int x'));
       expect(pat, isSuccess('final int x'));
       expect(pat, isSuccess('final List<String> list'));
+      expect(pat, isSuccess('_Reference reference'));
+      expect(pat, isSuccess('_privateVar'));
     });
 
     test('wildcards', () {

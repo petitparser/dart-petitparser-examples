@@ -524,8 +524,15 @@ mixin DartDeclarationGrammar
 
   Parser<(List<ConstructorInitializerNode>, FunctionBodyNode?, String?)>
   constructorBodyOrInitializers() => [
-    // Redirecting factory constructor: = OtherClass.name;
-    seq3(ref1(token, '='), ref0(qualifiedIdentifier), ref1(token, ';')).map3(
+    // Redirecting factory constructor: = OtherClass.name; or = OtherClass<T>.name;
+    seq3(
+      ref1(token, '='),
+      seq2(
+        ref0(type),
+        (ref1(token, '.') & ref0(constructorIdentifier)).optional(),
+      ).flatten(),
+      ref1(token, ';'),
+    ).map3(
       (_, target, _) => (
         const <ConstructorInitializerNode>[],
         const EmptyFunctionBodyNode(),
@@ -598,7 +605,18 @@ mixin DartDeclarationGrammar
       );
 
   Parser<AssertInitializerNode> assertInitializer() =>
-      ref0(assertStatement).map(AssertInitializerNode.new);
+      seq5(
+        ref0(assertToken),
+        ref1(token, '('),
+        ref0(expression),
+        (ref1(token, ',') & ref0(expression))
+            .map((l) => l[1] as ExpressionNode)
+            .optional(),
+        seq2(ref1(token, ',').optional(), ref1(token, ')')),
+      ).map5(
+        (_, _, cond, msg, _) =>
+            AssertInitializerNode(AssertStatementNode(cond, msg)),
+      );
 
   // ---------------------------------------------------------------------------
   // Function / Method Declaration
@@ -612,72 +630,127 @@ mixin DartDeclarationGrammar
     ref0(methodOrFunctionDeclaration),
   ].toChoiceParser();
 
-  Parser<FunctionDeclarationNode> operatorDeclaration() =>
-      seq7(
-        ref0(methodModifier).star(),
-        ref0(type).optional(),
-        ref0(operatorToken),
-        ref0(userDefinableOperator),
-        ref0(formalParameters),
-        ref0(asyncOrSyncModifier).optional(),
-        ref0(methodBody),
-      ).map7(
-        (modifiers, returnType, _, opName, params, asyncMod, body) =>
-            FunctionDeclarationNode(
-              name: opName,
-              returnType: returnType,
-              parameters: params,
-              body: body,
-              isStatic: modifiers.contains('static'),
-              isAbstract: modifiers.contains('abstract'),
-              isExternal: modifiers.contains('external'),
-              isOperator: true,
-            ),
-      );
+  Parser<FunctionDeclarationNode> operatorDeclaration() => [
+    seq6(
+      ref0(methodModifier).star(),
+      ref0(operatorToken),
+      ref0(userDefinableOperator),
+      ref0(formalParameters),
+      ref0(asyncOrSyncModifier).optional(),
+      ref0(methodBody),
+    ).map6(
+      (modifiers, _, opName, params, asyncMod, body) => FunctionDeclarationNode(
+        name: opName,
+        parameters: params,
+        body: body,
+        isStatic: modifiers.contains('static'),
+        isAbstract: modifiers.contains('abstract'),
+        isExternal: modifiers.contains('external'),
+        isOperator: true,
+      ),
+    ),
+    seq7(
+      ref0(methodModifier).star(),
+      ref0(type),
+      ref0(operatorToken),
+      ref0(userDefinableOperator),
+      ref0(formalParameters),
+      ref0(asyncOrSyncModifier).optional(),
+      ref0(methodBody),
+    ).map7(
+      (modifiers, returnType, _, opName, params, asyncMod, body) =>
+          FunctionDeclarationNode(
+            name: opName,
+            returnType: returnType,
+            parameters: params,
+            body: body,
+            isStatic: modifiers.contains('static'),
+            isAbstract: modifiers.contains('abstract'),
+            isExternal: modifiers.contains('external'),
+            isOperator: true,
+          ),
+    ),
+  ].toChoiceParser();
 
-  Parser<FunctionDeclarationNode> getterDeclaration() =>
-      seq6(
-        ref0(methodModifier).star(),
-        ref0(type).optional(),
-        ref0(getToken),
-        ref0(identifier),
-        ref0(asyncOrSyncModifier).optional(),
-        ref0(methodBody),
-      ).map6(
-        (modifiers, returnType, _, name, asyncMod, body) =>
-            FunctionDeclarationNode(
-              name: name,
-              returnType: returnType,
-              body: body,
-              isStatic: modifiers.contains('static'),
-              isAbstract: modifiers.contains('abstract'),
-              isExternal: modifiers.contains('external'),
-              isGetter: true,
-            ),
-      );
+  Parser<FunctionDeclarationNode> getterDeclaration() => [
+    seq5(
+      ref0(methodModifier).star(),
+      ref0(getToken),
+      ref0(identifier),
+      ref0(asyncOrSyncModifier).optional(),
+      ref0(methodBody),
+    ).map5(
+      (modifiers, _, name, asyncMod, body) => FunctionDeclarationNode(
+        name: name,
+        body: body,
+        isStatic: modifiers.contains('static'),
+        isAbstract: modifiers.contains('abstract'),
+        isExternal: modifiers.contains('external'),
+        isGetter: true,
+      ),
+    ),
+    seq6(
+      ref0(methodModifier).star(),
+      ref0(type),
+      ref0(getToken),
+      ref0(identifier),
+      ref0(asyncOrSyncModifier).optional(),
+      ref0(methodBody),
+    ).map6(
+      (modifiers, returnType, _, name, asyncMod, body) =>
+          FunctionDeclarationNode(
+            name: name,
+            returnType: returnType,
+            body: body,
+            isStatic: modifiers.contains('static'),
+            isAbstract: modifiers.contains('abstract'),
+            isExternal: modifiers.contains('external'),
+            isGetter: true,
+          ),
+    ),
+  ].toChoiceParser();
 
-  Parser<FunctionDeclarationNode> setterDeclaration() =>
-      seq7(
-        ref0(methodModifier).star(),
-        ref0(type).optional(),
-        ref0(setToken),
-        ref0(identifier),
-        ref0(formalParameters),
-        ref0(asyncOrSyncModifier).optional(),
-        ref0(methodBody),
-      ).map7(
-        (modifiers, returnType, _, name, params, asyncMod, body) =>
-            FunctionDeclarationNode(
-              name: name,
-              returnType: returnType,
-              parameters: params,
-              body: body,
-              isStatic: modifiers.contains('static'),
-              isAbstract: modifiers.contains('abstract'),
-              isExternal: modifiers.contains('external'),
-              isSetter: true,
-            ),
-      );
+  Parser<FunctionDeclarationNode> setterDeclaration() => [
+    seq6(
+      ref0(methodModifier).star(),
+      ref0(setToken),
+      ref0(identifier),
+      ref0(formalParameters),
+      ref0(asyncOrSyncModifier).optional(),
+      ref0(methodBody),
+    ).map6(
+      (modifiers, _, name, params, asyncMod, body) => FunctionDeclarationNode(
+        name: name,
+        parameters: params,
+        body: body,
+        isStatic: modifiers.contains('static'),
+        isAbstract: modifiers.contains('abstract'),
+        isExternal: modifiers.contains('external'),
+        isSetter: true,
+      ),
+    ),
+    seq7(
+      ref0(methodModifier).star(),
+      ref0(type),
+      ref0(setToken),
+      ref0(identifier),
+      ref0(formalParameters),
+      ref0(asyncOrSyncModifier).optional(),
+      ref0(methodBody),
+    ).map7(
+      (modifiers, returnType, _, name, params, asyncMod, body) =>
+          FunctionDeclarationNode(
+            name: name,
+            returnType: returnType,
+            parameters: params,
+            body: body,
+            isStatic: modifiers.contains('static'),
+            isAbstract: modifiers.contains('abstract'),
+            isExternal: modifiers.contains('external'),
+            isSetter: true,
+          ),
+    ),
+  ].toChoiceParser();
 
   Parser<FunctionDeclarationNode> methodOrFunctionDeclaration() => [
     // 1. Explicit return type: int foo() {}
@@ -848,9 +921,14 @@ mixin DartDeclarationGrammar
   // ---------------------------------------------------------------------------
 
   Parser<AnnotationNode> metadata() => seq3(
-    ref1(token, '@'),
-    ref0(qualifiedIdentifier),
-    ref0(argumentList).optionalWith(const <ArgumentNode>[]),
+    char('@'),
+    ref0(rawIdentifier).plusSeparated(char('.')).flatten(),
+    [
+      (seq2(pattern(' \t').star(), char('(')).and() & ref0(argumentList)).map(
+        (l) => l[1] as List<ArgumentNode>,
+      ),
+      ref0(hiddenStuffWhitespace).star().map((_) => const <ArgumentNode>[]),
+    ].toChoiceParser(),
   ).map3((_, name, args) => AnnotationNode(name: name, arguments: args));
 
   @override
