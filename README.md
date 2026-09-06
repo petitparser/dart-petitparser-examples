@@ -53,6 +53,8 @@ void main() {
 }
 ```
 
+Try the interactive [BibTeX Browser & Search](web/bibtex/bibtex.html) to download, search, filter, and export citations from real-world `.bib` files directly in the browser.
+
 ### Dart
 
 A comprehensive implementation of the Dart 3 grammar and parser producing strongly-typed Abstract Syntax Trees (ASTs). Supports records, patterns, switch expressions, class modifiers, enhanced enums, extension types, and null safety.
@@ -241,7 +243,7 @@ dart pub global activate webdev
 webdev serve --release
 ```
 
-Open <http://localhost:8080/> to browse the interactive playgrounds for Dart grammar visualization, JSON, Lisp, Math evaluation, Math plotting, Prolog, Regular Expressions, Smalltalk, Tabular data, URI parsing, and XML.
+Open <http://localhost:8080/> to browse the interactive playgrounds for BibTeX search & browsing, Dart grammar visualization, JSON, Lisp, Math evaluation, Math plotting, Prolog, Regular Expressions, Smalltalk, Tabular data, URI parsing, and XML.
 
 ## Benchmarks
 

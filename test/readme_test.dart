@@ -31,6 +31,11 @@ void main() {
         'author': '"Lukas Renggli and Stéphane Ducasse and Tudor Gîrba and Oscar Nierstrasz"',
         'year': '2010',
       });
+      expect(entry.normalized, {
+        'Title': 'Practical Dynamic Grammars for Dynamic Languages',
+        'Author': 'Lukas Renggli and Stéphane Ducasse and Tudor Gîrba and Oscar Nierstrasz',
+        'Year': '2010',
+      });
     });
 
     test('Dart', () {

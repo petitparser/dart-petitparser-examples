@@ -6,6 +6,7 @@
 - Rewrite and modernize README.md with tested examples and documentation.
 - Update URI parser to return strongly typed records with auto-inferred fields.
 - Modernize example grammars to use Dart 3 pattern matching, switch expressions, and modern combinators.
+- BibTeX: add web demo downloading public `.bib` databases (like SCG bibliography with 9,600+ entries) with instant searching, filtering, and citation export.
 - Dart grammar: update to full Dart 3 syntax (records, patterns, switch expressions, enhanced enums, extension types, class modifiers) with strongly typed AST output.
 - Dart grammar: add web visualizer playground with interactive AST inspection and performance measurements.
 - RegExp: add web demo, support `^` and `$` anchors, arbitrary repetition ranges, character classes, and NFA execution optimizations.
