@@ -325,4 +325,47 @@ void main() {
     });
     test('linter', () => expect(linter(parser), isEmpty));
   });
+
+  group('ast parser', () {
+    final astParser = PascalParserDefinition().build();
+
+    test('simple program', () {
+      final prog =
+          astParser.parse('program test; begin writeln(42); end.').value
+              as ProgramNode;
+      expect(prog.name, 'test');
+      expect(prog.parameters, isEmpty);
+      expect(prog.block.statement.statements, hasLength(1));
+      final stmt =
+          prog.block.statement.statements.first as ProcedureStatementNode;
+      expect(stmt.name, 'writeln');
+      expect(stmt.arguments, hasLength(1));
+      final arg = stmt.arguments.first as LiteralExpressionNode;
+      expect(arg.value, 42);
+    });
+
+    test('program with vars and if', () {
+      const code = '''
+program calc;
+var x, y: Integer;
+begin
+  x := 10;
+  if x > 5 then
+    y := x + 1
+  else
+    y := 0;
+end.''';
+      final prog = astParser.parse(code).value as ProgramNode;
+      expect(prog.name, 'calc');
+      expect(prog.block.variables, hasLength(1));
+      expect(prog.block.variables.first.names, ['x', 'y']);
+      expect(
+        (prog.block.variables.first.type as SimpleTypeNode).name,
+        'Integer',
+      );
+      expect(prog.block.statement.statements, hasLength(2));
+    });
+
+    test('linter', () => expect(linter(astParser), isEmpty));
+  });
 }

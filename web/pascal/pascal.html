@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <title>Dart Grammar Visualizer</title>
+  <title>Pascal Grammar Visualizer</title>
   <link rel="stylesheet"
         href="//cdn.rawgit.com/milligram/milligram/master/dist/milligram.min.css">
   <style>
@@ -43,7 +43,7 @@
       white-space: pre-wrap;
       font-size: 1.4rem;
     }
-    #ast-output {
+    #output {
       font-family: monospace;
       font-size: 1.3rem;
       line-height: 1.6;
@@ -73,18 +73,18 @@
 </head>
 <body>
   <div class="container">
-    <h1>Dart Grammar Visualizer</h1>
+    <h1>Pascal Grammar Visualizer</h1>
     <p>
-      Parses Dart source code using the Dart grammar written with PetitParser,
-      producing an interactive, strongly-typed Abstract Syntax Tree (AST).
+      Parses Pascal source code using the Pascal grammar written with PetitParser,
+      producing a formatted, strongly-typed Abstract Syntax Tree (AST).
     </p>
 
     <h2>Presets</h2>
     <div>
-      <button class="button button-outline preset-btn" id="btn-class">Class & Extension</button>
-      <button class="button button-outline preset-btn" id="btn-patterns">Dart 3 Patterns</button>
-      <button class="button button-outline preset-btn" id="btn-enums">Enhanced Enum</button>
-      <button class="button button-outline preset-btn" id="btn-records">Records & Functions</button>
+      <button class="button button-outline preset-btn" id="btn-program">Full Program</button>
+      <button class="button button-outline preset-btn" id="btn-strings">String Comparison</button>
+      <button class="button button-outline preset-btn" id="btn-records">Types & Records</button>
+      <button class="button button-outline preset-btn" id="btn-expression">Expression</button>
     </div>
 
     <h2>Input Source Code</h2>
@@ -96,25 +96,24 @@
       <div class="column column-50">
         <label for="production">Target Grammar Production</label>
         <select id="production">
-          <option value="compilationUnit" selected>Compilation Unit (Full File)</option>
+          <option value="program" selected>Program (Default)</option>
+          <option value="block">Block</option>
           <option value="statement">Statement</option>
           <option value="expression">Expression</option>
-          <option value="dartPattern">Pattern</option>
           <option value="type">Type</option>
         </select>
       </div>
-      <div class="column column-50" style="text-align: right; margin-top: 3rem;">
-        <button id="action" class="button">Parse Code</button>
+      <div class="column column-50" style="display: flex; align-items: flex-end;">
+        <button class="button" id="action" style="width: 100%; margin-bottom: 1.5rem;">Parse & Visualize</button>
       </div>
     </div>
 
-    <div class="stats" id="stats"></div>
-
     <h2>Abstract Syntax Tree</h2>
-    <div id="output"></div>
+    <div class="stats" id="stats">Ready.</div>
+    <div id="output">Click "Parse & Visualize" to inspect the AST.</div>
   </div>
 
-  <script src="dart.dart.js"></script>
+  <script src="pascal.dart.js"></script>
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-QK0KCHXW3F"></script>
   <script>window.dataLayer = window.dataLayer || [];function gtag(){dataLayer.push(arguments);}gtag('js', new Date());gtag('config', 'G-QK0KCHXW3F');</script>
 </body>
