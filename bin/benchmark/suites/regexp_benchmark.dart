@@ -28,21 +28,27 @@ void runRegExp(String regexp, Parser<void> parser, String input) {
     parse: (count) {
       var result = 0;
       for (var c = 0; c < count; c++) {
-        result ^= parserPattern.allMatches(input).hashCode;
+        for (final m in parserPattern.allMatches(input)) {
+          result ^= m.hashCode;
+        }
       }
       return result;
     },
     accept: (count) {
       var result = 0;
       for (var c = 0; c < count; c++) {
-        result ^= parserPattern.allMatches(input).hashCode;
+        for (final m in parserPattern.allMatches(input)) {
+          result ^= m.hashCode;
+        }
       }
       return result;
     },
     native: (count) {
       var result = 0;
       for (var c = 0; c < count; c++) {
-        result ^= nativePattern.allMatches(input).hashCode;
+        for (final m in nativePattern.allMatches(input)) {
+          result ^= m.hashCode;
+        }
       }
       return result;
     },

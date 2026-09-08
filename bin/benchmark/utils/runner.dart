@@ -43,7 +43,7 @@ final defaultStringInput = defaultCharsInput.join();
 final List<({String name, void Function() benchmark})> _benchmarkEntries = (() {
   Future.delayed(const Duration(milliseconds: 1)).then((_) {
     for (final (:name, :benchmark) in _benchmarkEntries) {
-      if (optionFilter == null || optionFilter == name) benchmark();
+      if (optionFilter == null || name.contains(optionFilter!)) benchmark();
     }
   });
   return SortedList<({String name, void Function() benchmark})>(

@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # Verify that there are no failing benchmarks.
-mapfile -t FAILURES < <(dart run bin/benchmark/benchmark.dart --no-benchmark | grep -v OK)
+mapfile -t FAILURES < <(dart run bin/benchmark/benchmark.dart --no-benchmark "$@" | grep -v OK)
 if [[ ${#FAILURES[@]} -gt 0 ]]; then
   for NAME in "${FAILURES[@]}"; do
     echo "- $NAME"
