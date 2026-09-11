@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Markdown Parser, Syntax Highlighter &amp; HTML Renderer</title>
+  <link rel="stylesheet"
+        href="//cdn.rawgit.com/milligram/milligram/master/dist/milligram.min.css">
+  <style>
+    body {
+      padding: 2rem 0;
+      color: #333;
+    }
+    /* Editor container with syntax highlighting overlay */
+    .editor-container {
+      position: relative;
+      width: 100%;
+      height: 240px;
+      border: 1px solid #d1d5db;
+      border-radius: 4px;
+      background: #ffffff;
+      overflow: hidden;
+      margin-bottom: 1.5rem;
+    }
+    .editor-highlight,
+    .editor-input {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      margin: 0;
+      padding: 1.2rem;
+      border: none;
+      outline: none;
+      box-sizing: border-box;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      font-size: 1.4rem;
+      line-height: 1.6;
+      white-space: pre-wrap;
+      word-break: break-word;
+      overflow: auto;
+    }
+    .editor-highlight {
+      z-index: 1;
+      background: transparent;
+      pointer-events: none;
+      color: #24292f;
+    }
+    .editor-input {
+      z-index: 2;
+      background: transparent;
+      color: transparent;
+      caret-color: #0366d6;
+      resize: none;
+    }
+    .editor-input::selection {
+      background: rgba(3, 102, 214, 0.25);
+      color: transparent;
+    }
+    h2 {
+      margin-top: 2rem;
+      margin-bottom: 1rem;
+    }
+    .preset-btn {
+      margin-right: 0.5rem;
+      margin-bottom: 0.5rem;
+    }
+    .stats {
+      font-size: 1.4rem;
+      color: #666;
+      margin-bottom: 1.5rem;
+    }
+    .stats span {
+      font-weight: bold;
+      color: #0366d6;
+    }
+    .tab-bar {
+      display: flex;
+      gap: 0.5rem;
+      margin-bottom: 1.5rem;
+      border-bottom: 2px solid #e1e1e1;
+      padding-bottom: 0.5rem;
+    }
+    .tab-btn {
+      margin-bottom: 0;
+      background: transparent;
+      border: none;
+      color: #606c76;
+      font-weight: 600;
+      cursor: pointer;
+      padding: 0.5rem 1.5rem;
+      border-radius: 4px;
+    }
+    .tab-btn.active {
+      background: #0366d6;
+      color: white;
+    }
+    .output-panel {
+      display: none;
+      background-color: #f8f9fa;
+      border: 1px solid #e1e1e1;
+      padding: 2rem;
+      border-radius: 6px;
+      min-height: 250px;
+      max-height: 550px;
+      overflow-y: auto;
+    }
+    .output-panel.active {
+      display: block;
+    }
+    /* Rendered HTML styling */
+    #panel-preview blockquote {
+      border-left: 0.3rem solid #d0d7de;
+      padding-left: 1.5rem;
+      color: #57606a;
+      margin: 1rem 0;
+    }
+    #panel-preview table {
+      border-collapse: collapse;
+      width: 100%;
+      margin: 1.5rem 0;
+    }
+    #panel-preview th, #panel-preview td {
+      border: 1px solid #d0d7de;
+      padding: 0.6rem 1.2rem;
+    }
+    #panel-preview th {
+      background-color: #f6f8fa;
+    }
+    #panel-preview pre {
+      background-color: #f6f8fa;
+      padding: 1.2rem;
+      border-radius: 6px;
+      overflow-x: auto;
+    }
+    #panel-preview code {
+      background-color: #afb8c133;
+      padding: 0.2em 0.4em;
+      border-radius: 4px;
+      font-size: 85%;
+    }
+    #panel-preview pre code {
+      background-color: transparent;
+      padding: 0;
+    }
+    /* Syntax Highlighting styling */
+    .hl-heading {
+      color: #6f42c1;
+      font-weight: bold;
+    }
+    .hl-bold {
+      color: #0550ae;
+      font-weight: bold;
+    }
+    .hl-italic {
+      color: #953800;
+      font-style: italic;
+    }
+    .hl-strike {
+      color: #8c959f;
+      text-decoration: line-through;
+    }
+    .hl-code {
+      color: #cf222e;
+      background-color: rgba(175, 184, 193, 0.2);
+      padding: 0.1em 0.3em;
+      border-radius: 3px;
+    }
+    .hl-link {
+      color: #0969da;
+      text-decoration: underline;
+    }
+    .hl-url {
+      color: #0550ae;
+      text-decoration: underline;
+    }
+    .hl-punct {
+      color: #8c959f;
+    }
+    .hl-blockquote {
+      color: #116329;
+      border-left: 3px solid #2da44e;
+      padding-left: 0.4rem;
+    }
+    .hl-list {
+      color: #cf222e;
+      font-weight: bold;
+    }
+    .hl-task {
+      color: #0969da;
+      font-weight: bold;
+    }
+    .hl-table {
+      color: #0550ae;
+      font-weight: bold;
+    }
+    .hl-info {
+      color: #8250df;
+      font-style: italic;
+    }
+    /* HTML Source styling */
+    #panel-html-source, #panel-ast {
+      font-family: monospace;
+      font-size: 1.3rem;
+      line-height: 1.6;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+    /* AST Styling */
+    .node-type {
+      color: #0366d6;
+      font-weight: bold;
+    }
+    .node-prop {
+      color: #606c76;
+    }
+    .node-val {
+      color: #2b7489;
+    }
+    .node-str {
+      color: #d14;
+    }
+    .error {
+      color: #d9534f;
+      background-color: #fdf7f7;
+      border: 1px solid #d9534f;
+      padding: 1.5rem;
+      border-radius: 4px;
+      font-family: monospace;
+      white-space: pre-wrap;
+      font-size: 1.4rem;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Markdown Parser &amp; Visualizer</h1>
+    <p>
+      Parses Markdown following CommonMark 0.31.2 with GitHub Flavored Markdown (GFM) extensions
+      using PetitParser. Supports strongly-typed AST inspection, live in-editor PetitParser syntax highlighting (zero regex),
+      and HTML rendering.
+    </p>
+
+    <h2>Presets</h2>
+    <div>
+      <button class="button button-outline preset-btn" id="btn-commonmark">CommonMark Basics</button>
+      <button class="button button-outline preset-btn" id="btn-tables">GFM Tables &amp; Tasks</button>
+      <button class="button button-outline preset-btn" id="btn-code">Code Blocks &amp; Quotes</button>
+      <button class="button button-outline preset-btn" id="btn-inlines">Complex Inlines</button>
+    </div>
+
+    <h2>Markdown Editor</h2>
+    <div class="editor-container">
+      <div id="editor-highlight" class="editor-highlight"></div>
+      <textarea id="input" class="editor-input" spellcheck="false" autocomplete="off" autocapitalize="off"></textarea>
+    </div>
+
+    <div class="row">
+      <div class="column column-50">
+        <label for="production">Target Grammar Production</label>
+        <select id="production">
+          <option value="document" selected>Document (Full File)</option>
+          <option value="block">Single Block</option>
+          <option value="inlines">Inline Expressions</option>
+        </select>
+      </div>
+      <div class="column column-50" style="text-align: right; margin-top: 3rem;">
+        <button id="action" class="button">Parse &amp; Render</button>
+      </div>
+    </div>
+
+    <div class="stats" id="stats"></div>
+
+    <div class="tab-bar">
+      <button class="tab-btn active" data-tab="preview">Rendered HTML</button>
+      <button class="tab-btn" data-tab="highlight">Syntax Highlighted</button>
+      <button class="tab-btn" data-tab="html-source">HTML Source</button>
+      <button class="tab-btn" data-tab="ast">Abstract Syntax Tree</button>
+    </div>
+
+    <div id="panel-preview" class="output-panel active"></div>
+    <div id="panel-highlight" class="output-panel"></div>
+    <div id="panel-html-source" class="output-panel"></div>
+    <div id="panel-ast" class="output-panel"></div>
+  </div>
+
+  <script src="markdown.dart.js"></script>
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-QK0KCHXW3F"></script>
+  <script>window.dataLayer = window.dataLayer || [];function gtag(){dataLayer.push(arguments);}gtag('js', new Date());gtag('config', 'G-QK0KCHXW3F');</script>
+</body>
+</html>
