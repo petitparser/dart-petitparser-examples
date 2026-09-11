@@ -3,6 +3,8 @@ import 'package:petitparser/reflection.dart';
 import 'package:petitparser_examples/bibtex.dart';
 import 'package:test/test.dart';
 
+import 'utils/expect.dart';
+
 Matcher isBibTextEntry({
   dynamic type = anything,
   dynamic key = anything,
@@ -182,4 +184,24 @@ void main() {
       'js': [Skip('http.get is unsupported in JavaScript')],
     },
   );
+
+  group('failures', () {
+    test('incomplete entry', () {
+      expect(parser, isFailure('@'));
+      expect(parser, isFailure('@article'));
+      expect(parser, isFailure('@article{'));
+      expect(parser, isFailure('@article{foo,'));
+    });
+    test('missing closing brace', () {
+      expect(parser, isFailure('@article{foo, bar = "baz"'));
+    });
+    test('invalid type or key', () {
+      expect(parser, isFailure('@123{foo,}'));
+      expect(parser, isFailure('@article{, bar = "baz"}'));
+    });
+    test('unterminated string', () {
+      expect(parser, isFailure('@article{foo, bar = "baz}'));
+      expect(parser, isFailure('@article{foo, bar = {baz}'));
+    });
+  });
 }

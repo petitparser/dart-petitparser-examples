@@ -367,5 +367,12 @@ end.''';
     });
 
     test('linter', () => expect(linter(astParser), isEmpty));
+
+    test('failures', () {
+      expect(astParser, isFailure(''));
+      expect(astParser, isFailure('program;'));
+      expect(astParser, isFailure('program foo; begin end'));
+      expect(astParser, isFailure('program foo; begin writeln(42); end'));
+    });
   });
 }

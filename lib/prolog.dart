@@ -16,5 +16,4 @@
 library;
 
 export 'src/prolog/evaluator.dart';
-export 'src/prolog/grammar.dart';
 export 'src/prolog/parser.dart';

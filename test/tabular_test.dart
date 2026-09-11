@@ -199,6 +199,10 @@ void main() {
         ),
       );
     });
+    test('failures', () {
+      expect(csv, isFailure('"abc"xyz'));
+      expect(csv, isFailure('"a"b"c"'));
+    });
   });
   group('tsv', () {
     final tsv = TabularDefinition.tsv().build();

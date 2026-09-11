@@ -8,18 +8,21 @@ import 'common.dart';
 final parser = () {
   final builder = ExpressionBuilder<Expression>();
   builder
+    // Numbers
     ..primitive(
-      (digit().plus() &
-              (char('.') & digit().plus()).optional() &
-              (pattern('eE') & pattern('+-').optional() & digit().plus())
-                  .optional())
-          .flatten(message: 'number expected')
-          .trim()
-          .map(_createValue),
+      seq3(
+        digit().plus(),
+        seq2(char('.'), digit().plus()).optional(),
+        seq3(pattern('eE'), anyOf('+-').optional(), digit().plus()).optional(),
+      ).flatten(message: 'number expected').trim().map(_createValue),
     )
+    // Constant, variables, and functions
     ..primitive(
       seq2(
-        seq2(letter(), word().star()).flatten(message: 'name expected').trim(),
+        seq2(
+          letter(),
+          word().starString(),
+        ).flatten(message: 'name expected').trim(),
         builder.loopback
             .starSeparated(char(',').trim())
             .map((list) => list.elements)
@@ -27,18 +30,22 @@ final parser = () {
             .optionalWith(const <Expression>[]),
       ).map2((name, args) => _createBinding(name, args)),
     );
+  // Parentheses (highest precedence wrapper)
   builder.group().wrapper(
     char('(').trim(),
     char(')').trim(),
     (left, value, right) => value,
   );
+  // Unary prefix operators (+, -)
   builder.group()
     ..prefix(char('+').trim(), (op, a) => a)
     ..prefix(char('-').trim(), (op, a) => Application('-', [a], (x) => -x));
+  // Exponentiation (right-associative)
   builder.group().right(
     char('^').trim(),
     (a, op, b) => Application('^', [a, b], math.pow),
   );
+  // Multiplicative operators (*, /, left-associative)
   builder.group()
     ..left(
       char('*').trim(),
@@ -48,6 +55,7 @@ final parser = () {
       char('/').trim(),
       (a, op, b) => Application('/', [a, b], (x, y) => x / y),
     );
+  // Additive operators (+, -, left-associative)
   builder.group()
     ..left(
       char('+').trim(),

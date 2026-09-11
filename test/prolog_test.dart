@@ -63,8 +63,8 @@ void main() {
       expect(
         linter(
           termParser,
-          excludedRules: {'Duplicate parser'},
           excludedTypes: {},
+          excludedRules: {'Duplicate parser'},
         ),
         isEmpty,
       );

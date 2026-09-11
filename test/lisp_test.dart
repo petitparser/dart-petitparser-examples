@@ -13,7 +13,6 @@ Matcher isCons({dynamic head = anything, dynamic tail = anything}) =>
         .having((cons) => cons.tail, 'tail', tail);
 
 void main() {
-  final grammarDefinition = LispGrammarDefinition();
   final parserDefinition = LispParserDefinition();
 
   final native = NativeEnvironment();
@@ -67,158 +66,15 @@ void main() {
       expect(sub.keys, isEmpty);
     });
   });
-  group('Grammar', () {
-    final grammar = grammarDefinition.build();
-    test('Linter', () {
-      expect(linter(grammar), isEmpty);
-    });
-    test('Name', () {
-      expect(grammar, isSuccess('foo', value: ['foo']));
-    });
-    test('Name for operator', () {
-      expect(grammar, isSuccess('+', value: ['+']));
-    });
-    test('Name for special', () {
-      expect(grammar, isSuccess('set!', value: ['set!']));
-    });
-    test('String', () {
-      expect(
-        grammar,
-        isSuccess(
-          '"foo"',
-          value: [
-            [
-              '"',
-              ['f', 'o', 'o'],
-              '"',
-            ],
-          ],
-        ),
-      );
-    });
-    test('String with escape', () {
-      expect(
-        grammar,
-        isSuccess(
-          '"\\""',
-          value: [
-            [
-              '"',
-              [
-                ['\\', '"'],
-              ],
-              '"',
-            ],
-          ],
-        ),
-      );
-    });
-    test('Number integer', () {
-      expect(grammar, isSuccess('123', value: ['123']));
-    });
-    test('Number negative integer', () {
-      expect(grammar, isSuccess('-123', value: ['-123']));
-    });
-    test('Number positive integer', () {
-      expect(grammar, isSuccess('+123', value: ['+123']));
-    });
-    test('Number floating', () {
-      expect(grammar, isSuccess('123.45', value: ['123.45']));
-    });
-    test('Number floating exponential', () {
-      expect(grammar, isSuccess('1.23e4', value: ['1.23e4']));
-    });
-    test('List empty', () {
-      expect(
-        grammar,
-        isSuccess(
-          '()',
-          value: [
-            ['(', [], ')'],
-          ],
-        ),
-      );
-    });
-    test('List empty []', () {
-      expect(
-        grammar,
-        isSuccess(
-          '[]',
-          value: [
-            ['[', [], ']'],
-          ],
-        ),
-      );
-    });
-    test('List empty {}', () {
-      expect(
-        grammar,
-        isSuccess(
-          '{}',
-          value: [
-            ['{', [], '}'],
-          ],
-        ),
-      );
-    });
-    test('List one element', () {
-      expect(
-        grammar,
-        isSuccess(
-          '(1)',
-          value: [
-            [
-              '(',
-              ['1', []],
-              ')',
-            ],
-          ],
-        ),
-      );
-    });
-    test('List two elements', () {
-      expect(
-        grammar,
-        isSuccess(
-          '(1 2)',
-          value: [
-            [
-              '(',
-              [
-                '1',
-                ['2', []],
-              ],
-              ')',
-            ],
-          ],
-        ),
-      );
-    });
-    test('List three elements', () {
-      expect(
-        grammar,
-        isSuccess(
-          '(+ 1 2)',
-          value: [
-            [
-              '(',
-              [
-                '+',
-                [
-                  '1',
-                  ['2', []],
-                ],
-              ],
-              ')',
-            ],
-          ],
-        ),
-      );
-    });
-  });
   group('Parser', () {
+    final parser = parserDefinition.build();
     final atom = parserDefinition.buildFrom(parserDefinition.atom());
+
     test('Linter', () {
+      expect(
+        linter(parser, excludedRules: {'Duplicate parser'}, excludedTypes: {}),
+        isEmpty,
+      );
       expect(
         linter(atom, excludedRules: {'Duplicate parser'}, excludedTypes: {}),
         isEmpty,
@@ -226,6 +82,7 @@ void main() {
     });
     test('Name', () {
       expect(atom, isSuccess('foo', value: isName('foo')));
+      expect(parser, isSuccess('foo', value: [isName('foo')]));
     });
     test('Name for operator', () {
       expect(atom, isSuccess('+', value: isName('+')));
@@ -235,12 +92,14 @@ void main() {
     });
     test('String', () {
       expect(atom, isSuccess('"foo"', value: 'foo'));
+      expect(parser, isSuccess('"foo"', value: ['foo']));
     });
     test('String with escape', () {
       expect(atom, isSuccess('"\\""', value: '"'));
     });
     test('Number integer', () {
       expect(atom, isSuccess('123', value: 123));
+      expect(parser, isSuccess('123', value: [123]));
     });
     test('Number negative integer', () {
       expect(atom, isSuccess('-123', value: -123));
@@ -256,15 +115,17 @@ void main() {
     });
     test('List empty', () {
       expect(atom, isSuccess('()', value: isNull));
+      expect(parser, isSuccess('()', value: [isNull]));
     });
     test('List empty []', () {
-      expect(atom, isSuccess('[ ]', value: isNull));
+      expect(atom, isSuccess('[]', value: isNull));
     });
     test('List empty {}', () {
-      expect(atom, isSuccess('{   }', value: isNull));
+      expect(atom, isSuccess('{}', value: isNull));
     });
     test('List one element', () {
       expect(atom, isSuccess('(1)', value: isCons(head: 1, tail: isNull)));
+      expect(parser, isSuccess('(1)', value: [isCons(head: 1, tail: isNull)]));
     });
     test('List two elements', () {
       expect(
@@ -287,7 +148,16 @@ void main() {
         ),
       );
     });
+    test('Negative cases', () {
+      expect(parser, isFailure('('));
+      expect(parser, isFailure(')'));
+      expect(parser, isFailure('['));
+      expect(parser, isFailure('{'));
+      expect(parser, isFailure('"unterminated'));
+      expect(parser, isFailure('`123'));
+    });
   });
+
   group('Natives', () {
     test('Define', () {
       expect(exec('(define a 1)'), 1);

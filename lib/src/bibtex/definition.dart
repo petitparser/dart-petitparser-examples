@@ -11,10 +11,7 @@ class BibTeXDefinition extends GrammarDefinition<List<BibTeXEntry>> {
   Parser<List<BibTeXEntry>> start() => ref0(entries).end();
 
   // Entries
-  Parser<List<BibTeXEntry>> entries() =>
-      ref0(entry)
-          .starSeparated(whitespace().star())
-          .map((list) => list.elements);
+  Parser<List<BibTeXEntry>> entries() => ref0(entry).star();
   Parser<BibTeXEntry> entry() =>
       seq6(
         type.trim(),

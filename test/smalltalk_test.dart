@@ -1523,5 +1523,15 @@ exampleWithNumber: x
         ],
       ),
     );
+    test('parser linter', () {
+      expect(linter(parser.build()), isEmpty);
+    });
+    test('failures', () {
+      final methodParser = parser.build();
+      expect(methodParser.parse(''), isA<Failure>());
+      expect(methodParser.parse('123'), isA<Failure>());
+      expect(methodParser.parse('foo:'), isA<Failure>());
+      expect(methodParser.parse('foo ^ ( 1'), isA<Failure>());
+    });
   });
 }

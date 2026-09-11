@@ -264,7 +264,7 @@ class PascalGrammarDefinition extends GrammarDefinition {
     token,
     seq3(
       char("'"),
-      pattern("^'").star(),
+      pattern("^'").starString(),
       char("'"),
     ).flatten(message: 'string expected'),
   );

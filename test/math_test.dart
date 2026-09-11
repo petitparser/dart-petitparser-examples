@@ -4,6 +4,8 @@ import 'package:petitparser/reflection.dart';
 import 'package:petitparser_examples/math.dart';
 import 'package:test/test.dart';
 
+import 'utils/expect.dart';
+
 void verify(
   String input,
   num result, {
@@ -84,5 +86,26 @@ void main() {
     verify('1 + 2 * 3', 7);
     verify('1 + (2 * 3)', 7);
     verify('(1 + 2) * 3', 9);
+  });
+  group('failures', () {
+    test('empty', () {
+      expect(parser, isFailure(''));
+    });
+    test('trailing operator', () {
+      expect(parser, isFailure('1 +'));
+      expect(parser, isFailure('2 *'));
+      expect(parser, isFailure('2 ^'));
+    });
+    test('unbalanced parentheses', () {
+      expect(parser, isFailure('('));
+      expect(parser, isFailure('(1 + 2'));
+      expect(parser, isFailure('1 + 2)'));
+      expect(parser, isFailure('()'));
+    });
+    test('invalid tokens', () {
+      expect(parser, isFailure('1.'));
+      expect(parser, isFailure('@'));
+      expect(parser, isFailure('1 & 2'));
+    });
   });
 }
