@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Python Grammar Visualizer</title>
+  <link rel="stylesheet"
+        href="//cdn.rawgit.com/milligram/milligram/master/dist/milligram.min.css">
+  <style>
+    body {
+      padding: 2rem 0;
+      color: #333;
+    }
+    textarea {
+      width: 100%;
+      height: 280px;
+      font-family: monospace;
+      font-size: 1.4rem;
+      line-height: 1.5;
+    }
+    h2 {
+      margin-top: 3rem;
+    }
+    .preset-btn {
+      margin-right: 0.5rem;
+      margin-bottom: 0.5rem;
+    }
+    .stats {
+      font-size: 1.4rem;
+      color: #666;
+      margin-bottom: 1rem;
+    }
+    .stats span {
+      font-weight: bold;
+      color: #3572A5;
+    }
+    .error {
+      color: #d9534f;
+      background-color: #fdf7f7;
+      border: 1px solid #d9534f;
+      padding: 1rem;
+      border-radius: 4px;
+      font-family: monospace;
+      white-space: pre-wrap;
+      font-size: 1.4rem;
+    }
+    #output {
+      font-family: monospace;
+      font-size: 1.3rem;
+      line-height: 1.6;
+      background-color: #f8f9fa;
+      border: 1px solid #e1e1e1;
+      padding: 1.5rem;
+      border-radius: 4px;
+      max-height: 550px;
+      overflow-y: auto;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+    .node-type {
+      color: #3572A5;
+      font-weight: bold;
+    }
+    .node-prop {
+      color: #606c76;
+    }
+    .node-val {
+      color: #2b7489;
+    }
+    .node-str {
+      color: #d14;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Python Grammar Visualizer</h1>
+    <p>
+      Parses Python 3.12+ source code using the PetitParser Python grammar,
+      including indentation awareness and strongly-typed Abstract Syntax Tree (AST) output.
+    </p>
+
+    <h2>Presets</h2>
+    <div>
+      <button class="button button-outline preset-btn" id="btn-classes">Classes & Generics (PEP 695)</button>
+      <button class="button button-outline preset-btn" id="btn-patterns">Pattern Matching (PEP 634)</button>
+      <button class="button button-outline preset-btn" id="btn-async">Async & Decorators</button>
+      <button class="button button-outline preset-btn" id="btn-comprehensions">Comprehensions & Walrus</button>
+    </div>
+
+    <h2>Input Source Code</h2>
+    <p>
+      <textarea id="input" spellcheck="false"></textarea>
+    </p>
+
+    <div class="row">
+      <div class="column column-50">
+        <label for="production">Target Grammar Production</label>
+        <select id="production">
+          <option value="module" selected>Module (Full File)</option>
+          <option value="statement">Statement</option>
+          <option value="expression">Expression</option>
+          <option value="pattern">Pattern (PEP 634)</option>
+        </select>
+      </div>
+      <div class="column column-50" style="text-align: right; margin-top: 3rem;">
+        <button id="action" class="button">Parse Code</button>
+      </div>
+    </div>
+
+    <div class="stats" id="stats"></div>
+
+    <h2>Abstract Syntax Tree</h2>
+    <div id="output"></div>
+  </div>
+
+  <script src="python.dart.js"></script>
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-QK0KCHXW3F"></script>
+  <script>window.dataLayer = window.dataLayer || [];function gtag(){dataLayer.push(arguments);}gtag('js', new Date());gtag('config', 'G-QK0KCHXW3F');</script>
+</body>
+</html>
