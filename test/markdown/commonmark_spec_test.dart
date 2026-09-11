@@ -113,8 +113,8 @@ void main() {
           '[![Pub Package](https://img.shields.io/pub/v/petitparser_examples.svg)](https://pub.dev/packages/petitparser_examples)',
         ),
         equals(
-          '<p><a href="https://pub.dev/packages/petitparser_examples"><img src="https://img.shields.io/pub/v/petitparser_examples.svg" alt="Pub Package" /></a></p>\n'
-          '<p><a href="https://pub.dev/packages/petitparser_examples"><img src="https://img.shields.io/pub/v/petitparser_examples.svg" alt="Pub Package" /></a></p>',
+          '<p><a href="https://pub.dev/packages/petitparser_examples"><img src="https://img.shields.io/pub/v/petitparser_examples.svg" alt="Pub Package" /></a>\n'
+          '<a href="https://pub.dev/packages/petitparser_examples"><img src="https://img.shields.io/pub/v/petitparser_examples.svg" alt="Pub Package" /></a></p>',
         ),
       );
     });

@@ -185,6 +185,21 @@ void main() {
           value: const ParagraphNode(TextNode('Simple paragraph text.')),
         ),
       );
+      expect(
+        p,
+        isSuccess(
+          'Line 1\nLine 2\nLine 3',
+          value: const ParagraphNode(
+            CompositeInlineNode([
+              TextNode('Line 1'),
+              LineBreakNode(isHard: false),
+              TextNode('Line 2'),
+              LineBreakNode(isHard: false),
+              TextNode('Line 3'),
+            ]),
+          ),
+        ),
+      );
     });
   });
 }

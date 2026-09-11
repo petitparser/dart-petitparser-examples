@@ -544,35 +544,60 @@ mixin MarkdownBlockGrammar
 
   /// Inlines within a paragraph, spanning multiple lines until a blank line or block break.
   Parser<InlineNode> paragraphInlines() =>
-      ref0(paragraphInlineItem).plus().map(_combineInlines);
+      ref0(paragraphInlineLine)
+          .plusSeparated(ref0(paragraphLineBreak))
+          .map((separated) {
+            final allItems = <InlineNode>[];
+            for (var i = 0; i < separated.elements.length; i++) {
+              allItems.addAll(separated.elements[i]);
+              final sep = separated.separators.elementAtOrNull(i);
+              if (sep != null) {
+                allItems.add(sep);
+              }
+            }
+            return _combineInlines(allItems);
+          });
 
-  Parser<InlineNode> paragraphInlineItem() => seq2(
-    [
-      ref0(blankLine),
-      ref0(atxHeading),
-      ref0(thematicBreak),
-      ref0(fencedCodeBlock),
-      ref0(tableHeaderRow),
-      ref0(blockquoteLine),
-      ref0(bulletListItem),
-      ref0(orderedListItem),
-    ].toChoiceParser().not(),
-    [
-      ref0(codeSpan),
-      ref0(directImage),
-      ref0(directLink),
-      ref0(autolink),
-      ref0(strong),
-      ref0(strikethrough),
-      ref0(emphasis),
-      ref0(rawHtmlInline),
-      ref0(escapedCharNode),
-      ref0(hardLineBreak),
-      ref0(softLineBreak),
-      noneOf('*_~`[]!<\\\r\n').plusString().map((t) => TextNode(t)),
-      any().map((c) => TextNode(c)),
-    ].toChoiceParser(),
-  ).map2((_, node) => node);
+  /// A single line of inlines within a paragraph.
+  Parser<List<InlineNode>> paragraphInlineLine() =>
+      ref0(paragraphInlineItem).plus();
+
+  /// Line break separating paragraph lines, verifying the next line does not start a block.
+  Parser<LineBreakNode> paragraphLineBreak() => seq4(
+    ref0(sp),
+    ref0(lineBreakNode),
+    ref0(blankLine).not(),
+    ref0(paragraphInterruptBlock).not(),
+  ).map4((_, lb, _, _) => lb);
+
+  /// Hard or soft line break node.
+  Parser<LineBreakNode> lineBreakNode() =>
+      [ref0(hardLineBreak), ref0(softLineBreak)].toChoiceParser();
+
+  /// Block constructs that interrupt a paragraph line.
+  Parser<dynamic> paragraphInterruptBlock() => [
+    ref0(atxHeading),
+    ref0(thematicBreak),
+    ref0(fencedCodeBlock),
+    ref0(tableHeaderRow),
+    ref0(blockquoteLine),
+    ref0(bulletListItem),
+    ref0(orderedListItem),
+  ].toChoiceParser();
+
+  Parser<InlineNode> paragraphInlineItem() => [
+    ref0(codeSpan),
+    ref0(directImage),
+    ref0(directLink),
+    ref0(autolink),
+    ref0(strong),
+    ref0(strikethrough),
+    ref0(emphasis),
+    ref0(rawHtmlInline),
+    ref0(escapedCharNode),
+    noneOf('*_~`[]!<\\\r\n').plusString().map((t) => TextNode(t)),
+    noneOf('\r\n').map((c) => TextNode(c)),
+  ].toChoiceParser();
 
   /// Helper to combine inlines and merge consecutive text nodes.
   static InlineNode _combineInlines(List<InlineNode> items) {

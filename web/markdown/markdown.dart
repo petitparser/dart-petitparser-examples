@@ -124,7 +124,7 @@ String formatAst(Object? node, [int indent = 0]) {
     return '[\n$items\n$pad]';
   }
   if (node is MarkdownNode) {
-    final typeName = node.runtimeType.toString();
+    final typeName = _nodeName(node);
     final props = _nodeProperties(node);
     if (props.isEmpty) {
       return '<span class="node-type">$typeName</span>()';
@@ -145,6 +145,35 @@ String formatAst(Object? node, [int indent = 0]) {
   }
   return _escape(node.toString());
 }
+
+String _nodeName(MarkdownNode node) => switch (node) {
+  DocumentNode() => 'DocumentNode',
+  HeadingNode() => 'HeadingNode',
+  ParagraphNode() => 'ParagraphNode',
+  BlockquoteNode() => 'BlockquoteNode',
+  FencedCodeBlockNode() => 'FencedCodeBlockNode',
+  IndentedCodeBlockNode() => 'IndentedCodeBlockNode',
+  ThematicBreakNode() => 'ThematicBreakNode',
+  BulletListNode() => 'BulletListNode',
+  OrderedListNode() => 'OrderedListNode',
+  ListItemNode() => 'ListItemNode',
+  TableNode() => 'TableNode',
+  TableRowNode() => 'TableRowNode',
+  TableCellNode() => 'TableCellNode',
+  HtmlBlockNode() => 'HtmlBlockNode',
+  LinkReferenceDefinitionNode() => 'LinkReferenceDefinitionNode',
+  TextNode() => 'TextNode',
+  EmphasisNode() => 'EmphasisNode',
+  StrongNode() => 'StrongNode',
+  StrikethroughNode() => 'StrikethroughNode',
+  CodeSpanNode() => 'CodeSpanNode',
+  LinkNode() => 'LinkNode',
+  ImageNode() => 'ImageNode',
+  AutolinkNode() => 'AutolinkNode',
+  LineBreakNode() => 'LineBreakNode',
+  CompositeInlineNode() => 'CompositeInlineNode',
+  RawHtmlInlineNode() => 'RawHtmlInlineNode',
+};
 
 List<(String, Object?)> _nodeProperties(MarkdownNode node) => switch (node) {
   final DocumentNode n => [('blocks', n.blocks)],
