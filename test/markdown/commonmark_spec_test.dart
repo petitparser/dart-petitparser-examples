@@ -86,6 +86,10 @@ void main() {
         equals('<p><a href="/uri" title="title">link</a></p>'),
       );
       expect(
+        markdownToHtml('[link](https://example.com/foo_bar_baz)'),
+        equals('<p><a href="https://example.com/foo_bar_baz">link</a></p>'),
+      );
+      expect(
         markdownToHtml('![foo](/url "title")'),
         equals('<p><img src="/url" alt="foo" title="title" /></p>'),
       );
@@ -94,8 +98,24 @@ void main() {
         equals('<p><a href="https://example.com">https://example.com</a></p>'),
       );
       expect(
+        markdownToHtml('<https://example.com/foo_bar_baz>'),
+        equals(
+          '<p><a href="https://example.com/foo_bar_baz">https://example.com/foo_bar_baz</a></p>',
+        ),
+      );
+      expect(
         markdownToHtml('<foo@example.com>'),
         equals('<p><a href="mailto:foo@example.com">foo@example.com</a></p>'),
+      );
+      expect(
+        markdownToHtml(
+          '[![Pub Package](https://img.shields.io/pub/v/petitparser_examples.svg)](https://pub.dev/packages/petitparser_examples)\n'
+          '[![Pub Package](https://img.shields.io/pub/v/petitparser_examples.svg)](https://pub.dev/packages/petitparser_examples)',
+        ),
+        equals(
+          '<p><a href="https://pub.dev/packages/petitparser_examples"><img src="https://img.shields.io/pub/v/petitparser_examples.svg" alt="Pub Package" /></a></p>\n'
+          '<p><a href="https://pub.dev/packages/petitparser_examples"><img src="https://img.shields.io/pub/v/petitparser_examples.svg" alt="Pub Package" /></a></p>',
+        ),
       );
     });
 

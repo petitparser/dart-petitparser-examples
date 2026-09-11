@@ -7,8 +7,6 @@ import 'package:web/web.dart';
 final input = document.querySelector('#input') as HTMLTextAreaElement;
 final editorHighlight =
     document.querySelector('#editor-highlight') as HTMLElement;
-final production = document.querySelector('#production') as HTMLSelectElement;
-final action = document.querySelector('#action') as HTMLButtonElement;
 final stats = document.querySelector('#stats') as HTMLElement;
 
 final panelPreview = document.querySelector('#panel-preview') as HTMLElement;
@@ -24,15 +22,9 @@ final btnTables = document.querySelector('#btn-tables') as HTMLButtonElement;
 final btnCode = document.querySelector('#btn-code') as HTMLButtonElement;
 final btnInlines = document.querySelector('#btn-inlines') as HTMLButtonElement;
 
-final grammar = MarkdownGrammarDefinition();
+final parser = MarkdownGrammarDefinition.defaultParser;
 const highlighter = MarkdownHighlighter();
 const renderer = MarkdownHtmlRenderer();
-
-Parser<Object?> getParser(String prod) => switch (prod) {
-  'block' => grammar.buildFrom(grammar.block()),
-  'inlines' => grammar.buildFrom(grammar.inlines()),
-  _ => grammar.build(),
-};
 
 const presets = {
   'commonmark': '''# CommonMark Showcase
@@ -102,7 +94,7 @@ Markdown supports rich inline typography:
 - Code spans: `final x = 42;` and multiple `` `nested backticks` ``
 - Autolinks: <https://dart.dev> and <contact@example.com>
 - Escaped punctuation: \\*not italic\\*, \\# not heading, \\[not link\\]
-- Embedded images: ![Dart Logo](https://dart.dev/assets/shared/dart/logo/64.svg "Dart")''',
+- Embedded images: ![Dart Logo](https://dart.dev/assets/img/logo/dart-64.png "Dart")''',
 };
 
 String _escape(String text) => text
@@ -221,8 +213,6 @@ void updateEditorHighlight(String source, [MarkdownNode? astNode]) {
 
 void parseAndRender() {
   final source = input.value;
-  final prod = production.value;
-  final parser = getParser(prod).end();
 
   final watch = Stopwatch()..start();
   final result = parser.parse(source);
@@ -240,7 +230,7 @@ void parseAndRender() {
     return;
   }
 
-  final astNode = result.value as MarkdownNode;
+  final astNode = result.value;
   updateEditorHighlight(source, astNode);
 
   watch.reset();
@@ -287,9 +277,8 @@ void setupTabs() {
   }
 }
 
-void loadPreset(String key, String targetProd) {
+void loadPreset(String key) {
   input.value = presets[key] ?? '';
-  production.value = targetProd;
   parseAndRender();
 }
 
@@ -302,15 +291,13 @@ void main() {
     editorHighlight.scrollLeft = input.scrollLeft;
   });
 
-  btnCommonMark.onClick.listen((_) => loadPreset('commonmark', 'document'));
-  btnTables.onClick.listen((_) => loadPreset('tables', 'document'));
-  btnCode.onClick.listen((_) => loadPreset('code', 'document'));
-  btnInlines.onClick.listen((_) => loadPreset('inlines', 'document'));
+  btnCommonMark.onClick.listen((_) => loadPreset('commonmark'));
+  btnTables.onClick.listen((_) => loadPreset('tables'));
+  btnCode.onClick.listen((_) => loadPreset('code'));
+  btnInlines.onClick.listen((_) => loadPreset('inlines'));
 
-  action.onClick.listen((_) => parseAndRender());
-  production.onChange.listen((_) => parseAndRender());
   input.onInput.listen((_) => parseAndRender());
 
   // Default preset
-  loadPreset('commonmark', 'document');
+  loadPreset('commonmark');
 }

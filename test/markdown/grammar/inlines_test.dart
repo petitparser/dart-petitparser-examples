@@ -68,6 +68,19 @@ void main() {
           ),
         ),
       );
+      expect(
+        p,
+        isSuccess(
+          '[![Pub Package](https://img.shields.io/pub/v/petitparser_examples.svg)](https://pub.dev/packages/petitparser_examples)',
+          value: const LinkNode(
+            ImageNode(
+              TextNode('Pub Package'),
+              'https://img.shields.io/pub/v/petitparser_examples.svg',
+            ),
+            'https://pub.dev/packages/petitparser_examples',
+          ),
+        ),
+      );
     });
 
     test('directImage', () {

@@ -50,6 +50,22 @@ void main() {
       expect(html, contains('<span class="hl-url">logo.png</span>'));
     });
 
+    test(
+      'highlights linked badge images with underscores without emphasis',
+      () {
+        final html = highlighter.highlight(
+          '[![Pub Package](https://img.shields.io/pub/v/petitparser_examples.svg)](https://pub.dev/packages/petitparser_examples)\n'
+          '[![Pub Package](https://img.shields.io/pub/v/petitparser_examples.svg)](https://pub.dev/packages/petitparser_examples)',
+        );
+        expect(html, isNot(contains('hl-italic')));
+        expect(
+          html,
+          contains('https://img.shields.io/pub/v/petitparser_examples.svg'),
+        );
+        expect(html, contains('https://pub.dev/packages/petitparser_examples'));
+      },
+    );
+
     test('highlights autolinks', () {
       final html = highlighter.highlight('Check <https://dart.dev>');
       expect(

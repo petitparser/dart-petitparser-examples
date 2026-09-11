@@ -28,17 +28,23 @@
       left: 0;
       width: 100%;
       height: 100%;
-      margin: 0;
-      padding: 1.2rem;
-      border: none;
-      outline: none;
-      box-sizing: border-box;
-      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-      font-size: 1.4rem;
-      line-height: 1.6;
-      white-space: pre-wrap;
-      word-break: break-word;
-      overflow: auto;
+      margin: 0 !important;
+      padding: 12px !important;
+      border: none !important;
+      outline: none !important;
+      box-sizing: border-box !important;
+      font-family: "SF Mono", Monaco, Menlo, Consolas, "Courier New", monospace !important;
+      font-size: 14px !important;
+      font-weight: 400 !important;
+      line-height: 22px !important;
+      letter-spacing: 0 !important;
+      font-variant-ligatures: none !important;
+      -webkit-text-size-adjust: none !important;
+      text-rendering: optimizeSpeed !important;
+      tab-size: 4 !important;
+      white-space: pre-wrap !important;
+      word-break: break-word !important;
+      overflow: auto !important;
     }
     .editor-highlight {
       z-index: 1;
@@ -46,12 +52,23 @@
       pointer-events: none;
       color: #24292f;
     }
+    .editor-highlight span {
+      font-family: inherit !important;
+      font-size: inherit !important;
+      font-weight: inherit !important;
+      line-height: inherit !important;
+      letter-spacing: inherit !important;
+      padding: 0 !important;
+      margin: 0 !important;
+      border: none !important;
+    }
     .editor-input {
       z-index: 2;
-      background: transparent;
-      color: transparent;
-      caret-color: #0366d6;
-      resize: none;
+      background: transparent !important;
+      color: transparent !important;
+      caret-color: #0366d6 !important;
+      resize: none !important;
+      -webkit-appearance: none;
     }
     .editor-input::selection {
       background: rgba(3, 102, 214, 0.25);
@@ -255,19 +272,6 @@
       <textarea id="input" class="editor-input" spellcheck="false" autocomplete="off" autocapitalize="off"></textarea>
     </div>
 
-    <div class="row">
-      <div class="column column-50">
-        <label for="production">Target Grammar Production</label>
-        <select id="production">
-          <option value="document" selected>Document (Full File)</option>
-          <option value="block">Single Block</option>
-          <option value="inlines">Inline Expressions</option>
-        </select>
-      </div>
-      <div class="column column-50" style="text-align: right; margin-top: 3rem;">
-        <button id="action" class="button">Parse &amp; Render</button>
-      </div>
-    </div>
 
     <div class="stats" id="stats"></div>
 

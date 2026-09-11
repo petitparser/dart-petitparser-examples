@@ -149,6 +149,7 @@ mixin MarkdownInlineGrammar
   Parser<InlineNode> linkTextItem() => seq2(
     char(']').not(),
     [
+      ref0(directImage),
       ref0(codeSpan),
       ref0(strong),
       ref0(strikethrough),
