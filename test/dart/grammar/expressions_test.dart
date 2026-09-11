@@ -194,6 +194,25 @@ void main() {
       expect(expr, isSuccess('[if (x case int y when y > 0) y else 0]'));
       expect(expr, isSuccess('[for (var x in list) x]'));
       expect(expr, isSuccess('[for (final (a, b) in pairs) a + b]'));
+      expect(
+        expr,
+        isSuccess(
+          "[for (var i = 0; i < n.values.length; i++) {'key': n.keys[i], 'value': n.values[i]}]",
+        ),
+      );
+      expect(expr, isSuccess('[for (var i = 0; i < 10; i++) i]'));
+      expect(
+        expr,
+        isSuccess('[for (int i = 0, j = 10; i < j; i++, j--) i + j]'),
+      );
+      expect(expr, isSuccess('[for (;;) 1]'));
+      expect(expr, isSuccess('[for (; i < 10; i++) i]'));
+      expect(
+        expr,
+        isSuccess(
+          '<String, dynamic>{for (var i = 0; i < n.values.length; i++) n.keys[i]: n.values[i]}',
+        ),
+      );
       expect(expr, isSuccess('[?a, ?b]'));
       expect(expr, isSuccess('{?k: ?v}'));
     });

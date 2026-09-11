@@ -267,10 +267,11 @@ mixin DartStatementGrammar
         throw StateError('Invalid for loop parts');
       });
 
+  @override
   Parser<Object> forLoopParts() => [
     // Pattern for-in: for (var (a, b) in iterable)
     seq3(
-      (ref0(varToken) | ref0(finalToken)) & ref0(dartPattern),
+      (ref0(varToken) | ref0(finalToken)) & ref0(outerPattern),
       ref0(inToken),
       ref0(expression),
     ).map3(
@@ -445,18 +446,4 @@ mixin DartStatementGrammar
     ref1(token, ',').optional(),
     seq2(ref1(token, ')'), ref1(token, ';')),
   ).map6((_, _, cond, msg, _, _) => AssertStatementNode(cond, msg));
-}
-
-class ForPartsClassic {
-  new({this.init, this.condition, this.updates = const []});
-  final StatementNode? init;
-  final ExpressionNode? condition;
-  final List<ExpressionNode> updates;
-}
-
-class ForPartsIn {
-  new({this.variable, this.pattern, required this.iterable});
-  final VariableDeclarationStatementNode? variable;
-  final PatternNode? pattern;
-  final ExpressionNode iterable;
 }

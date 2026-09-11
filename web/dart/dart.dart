@@ -176,6 +176,7 @@ String _nodeName(DartNode node) => switch (node) {
   SpreadElementNode() => 'SpreadElement',
   IfElementNode() => 'IfElement',
   ForElementNode() => 'ForElement',
+  ForInElementNode() => 'ForInElement',
   RecordLiteralNode() => 'RecordLiteral',
   RecordLiteralFieldNode() => 'RecordLiteralField',
   FunctionExpressionNode() => 'FunctionExpression',
@@ -626,6 +627,12 @@ List<(String, Object?)> _nodeProperties(DartNode node) => switch (node) {
     if (n.elseElement != null) ('else', n.elseElement),
   ],
   final ForElementNode n => [
+    if (n.initialization != null) ('init', n.initialization),
+    if (n.condition != null) ('condition', n.condition),
+    if (n.updates.isNotEmpty) ('updates', n.updates),
+    ('body', n.body),
+  ],
+  final ForInElementNode n => [
     if (n.variable != null) ('variable', n.variable),
     if (n.pattern != null) ('pattern', n.pattern),
     ('iterable', n.iterable),

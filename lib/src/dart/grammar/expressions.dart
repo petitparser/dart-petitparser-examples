@@ -15,6 +15,9 @@ mixin DartExpressionGrammar
   /// Abstract block statement reference needed for function closures.
   Parser<BlockStatementNode> block();
 
+  /// Abstract for-loop parts reference needed for collection for-elements.
+  Parser<Object> forLoopParts();
+
   /// The main expression production.
   @override
   Parser<ExpressionNode> expression() => ref0(expressionBuilderParser);
@@ -555,49 +558,32 @@ mixin DartExpressionGrammar
         .map((expr) => (expr, null as PatternNode?, null as ExpressionNode?)),
   ].toChoiceParser();
 
-  Parser<ForElementNode> forElement() =>
+  Parser<CollectionElementNode> forElement() =>
       seq5(
         ref0(awaitToken).optional(),
         ref0(forToken),
         ref1(token, '('),
-        ref0(forLoopPartsInCollection),
+        ref0(forLoopParts),
         seq2(ref1(token, ')'), ref0(collectionElement)),
-      ).map5(
-        (awaitKw, _, _, parts, closeAndBody) => ForElementNode(
-          variable: parts.$1,
-          pattern: parts.$2,
-          iterable: parts.$3,
-          body: closeAndBody.$2,
-          isAsync: awaitKw != null,
-        ),
-      );
-
-  Parser<(VariableDeclarationStatementNode?, PatternNode?, ExpressionNode)>
-  forLoopPartsInCollection() => [
-    // for (var (a, b) in iterable)
-    seq3(
-      (ref0(varToken) | ref0(finalToken)) & ref0(dartPattern),
-      ref0(inToken),
-      ref0(expression),
-    ).map3((p, _, iter) => (null, p[1] as PatternNode, iter)),
-    // for (var x in iterable)
-    seq3(
-      seq3(
-        [ref0(varToken), ref0(finalToken)].toChoiceParser().optional(),
-        ref0(type).optional(),
-        ref0(identifier),
-      ).map3(
-        (finalOrVar, type, name) => VariableDeclarationStatementNode(
-          variables: [VariableDeclaratorNode(name: name)],
-          type: type,
-          isFinal: finalOrVar?.value == 'final',
-          isVar: finalOrVar?.value == 'var',
-        ),
-      ),
-      ref0(inToken),
-      ref0(expression),
-    ).map3((varDecl, _, iter) => (varDecl, null, iter)),
-  ].toChoiceParser();
+      ).map5((awaitKw, _, _, parts, closeAndBody) {
+        if (parts is ForPartsClassic) {
+          return ForElementNode(
+            initialization: parts.init,
+            condition: parts.condition,
+            updates: parts.updates,
+            body: closeAndBody.$2,
+          );
+        } else if (parts is ForPartsIn) {
+          return ForInElementNode(
+            variable: parts.variable,
+            pattern: parts.pattern,
+            iterable: parts.iterable,
+            body: closeAndBody.$2,
+            isAsync: awaitKw != null,
+          );
+        }
+        throw StateError('Invalid for loop parts');
+      });
 
   // ---------------------------------------------------------------------------
   // Switch Expression (Dart 3)

@@ -1496,8 +1496,44 @@ class IfElementNode extends CollectionElementNode {
   String toString() => 'IfElementNode($condition)';
 }
 
-/// A for-element in a collection (`for (var x in list) x * 2`).
+/// Traditional for-loop parts (`init; cond; updates`).
+class ForPartsClassic {
+  const new({this.init, this.condition, this.updates = const []});
+
+  final StatementNode? init;
+  final ExpressionNode? condition;
+  final List<ExpressionNode> updates;
+}
+
+/// For-in loop parts (`variable/pattern in iterable`).
+class ForPartsIn {
+  const new({this.variable, this.pattern, required this.iterable});
+
+  final VariableDeclarationStatementNode? variable;
+  final PatternNode? pattern;
+  final ExpressionNode iterable;
+}
+
+/// A traditional for-element in a collection (`for (init; cond; update) element`).
 class ForElementNode extends CollectionElementNode {
+  const new({
+    this.initialization,
+    this.condition,
+    this.updates = const [],
+    required this.body,
+  });
+
+  final StatementNode? initialization;
+  final ExpressionNode? condition;
+  final List<ExpressionNode> updates;
+  final CollectionElementNode body;
+
+  @override
+  String toString() => 'ForElementNode()';
+}
+
+/// A for-in element in a collection (`for (var x in iterable) element`).
+class ForInElementNode extends CollectionElementNode {
   const new({
     this.variable,
     this.pattern,
@@ -1513,7 +1549,7 @@ class ForElementNode extends CollectionElementNode {
   final bool isAsync;
 
   @override
-  String toString() => 'ForElementNode()';
+  String toString() => 'ForInElementNode()';
 }
 
 /// A record literal (`(1, 2)` or `(a: 1, b: 2)`).
