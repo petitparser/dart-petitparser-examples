@@ -90,7 +90,6 @@ void updateDom(XmlDocument document) {
   // Find the XPath matches.
   late final List<Object> results;
   try {
-    // ignore: experimental_member_use
     results = document.xpathEvaluate(xpathInput.value).toList();
     xpathError.innerText = '';
   } catch (error) {

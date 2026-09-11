@@ -29,4 +29,3 @@ The Python implementation is structured into two primary layers:
   - Test individual productions in depth under `test/python/grammar/`.
   - Maintain 100% clean output with `dart test test/python/linter_test.dart` (PetitParser grammar linter).
   - All public APIs documented with triple-slash (`///`) comments and bracketed references.
-

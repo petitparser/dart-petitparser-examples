@@ -7,7 +7,6 @@ import '../ast.dart';
 /// keywords, identifiers, and token helpers.
 mixin PythonLexicalGrammar on GrammarDefinition<ModuleNode> {
   /// The indentation manager instance.
-  // ignore: experimental_member_use
   Indent get indent;
 
   /// Abstract reference to expression parser needed for f-string interpolation.

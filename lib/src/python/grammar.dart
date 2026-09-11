@@ -17,7 +17,6 @@ class PythonGrammarDefinition extends GrammarDefinition<ModuleNode>
         PythonDeclarationGrammar,
         PythonStatementGrammar {
   @override
-  // ignore: experimental_member_use
   final Indent indent = Indent();
 
   @override
