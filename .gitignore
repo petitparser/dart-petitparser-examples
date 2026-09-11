@@ -1,9 +1,11 @@
-*.iml
-*.tex
+.agents/
+.config/
 .dart_tool/
 .DS_Store
 .idea/
 .packages
 .pub/
+.opencode/
+*.iml
 petitparser_examples/build
 pubspec.lock

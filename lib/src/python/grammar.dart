@@ -1,3 +1,4 @@
+import 'package:petitparser/indent.dart';
 import 'package:petitparser/petitparser.dart';
 
 import 'ast.dart';
@@ -6,7 +7,6 @@ import 'grammar/expressions.dart';
 import 'grammar/lexical.dart';
 import 'grammar/patterns.dart';
 import 'grammar/statements.dart';
-import 'indent.dart';
 
 /// Complete grammar and parser definition for the Python programming language (3.12+).
 class PythonGrammarDefinition extends GrammarDefinition<ModuleNode>
@@ -17,7 +17,8 @@ class PythonGrammarDefinition extends GrammarDefinition<ModuleNode>
         PythonDeclarationGrammar,
         PythonStatementGrammar {
   @override
-  final PythonIndent indent = PythonIndent();
+  // ignore: experimental_member_use
+  final Indent indent = Indent();
 
   @override
   Parser<ModuleNode> start() => seq4(

@@ -198,4 +198,45 @@ void main() {
       );
     });
   });
+
+  group('indentation in suites', () {
+    final parser = PythonGrammarDefinition();
+    final mod = parser.build();
+
+    test('simple indentation', () {
+      expect(mod, isSuccess('def foo():\n  x = 1\n  y = 2\n'));
+    });
+
+    test('blank lines and comments within indented block', () {
+      expect(
+        mod,
+        isSuccess(
+          'def foo():\n'
+          '  x = 1\n'
+          '\n'
+          '  # comment\n'
+          '  y = 2\n',
+        ),
+      );
+    });
+
+    test('nested indentation blocks', () {
+      expect(
+        mod,
+        isSuccess(
+          'if True:\n'
+          '  if False:\n'
+          '    pass\n'
+          '  x = 1\n',
+        ),
+      );
+    });
+
+    test('inconsistent indentation fails', () {
+      expect(
+        parser.buildFrom(parser.statementLine()).end(),
+        isFailure('if True:\n  x = 1\n    y = 2\n'),
+      );
+    });
+  });
 }

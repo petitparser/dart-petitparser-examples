@@ -1,13 +1,14 @@
+import 'package:petitparser/indent.dart';
 import 'package:petitparser/petitparser.dart';
 
 import '../ast.dart';
-import '../indent.dart';
 
 /// Mixin for Python lexical syntax: comments, whitespace, numbers, strings,
 /// keywords, identifiers, and token helpers.
 mixin PythonLexicalGrammar on GrammarDefinition<ModuleNode> {
   /// The indentation manager instance.
-  PythonIndent get indent;
+  // ignore: experimental_member_use
+  Indent get indent;
 
   /// Abstract reference to expression parser needed for f-string interpolation.
   Parser<ExpressionNode> expression();
@@ -62,8 +63,15 @@ mixin PythonLexicalGrammar on GrammarDefinition<ModuleNode> {
     epsilon().map((_) => _bracketNesting--, hasSideEffects: true),
   ).map3((_, body, _) => body);
 
+  /// A parser that matches a blank or comment-only line.
+  Parser<String> blankLine() => seq3(
+    pattern(' \t').star(),
+    ref0(comment).optional(),
+    Token.newlineParser(),
+  ).flatten();
+
   /// A parser that skips zero or more blank or comment-only lines.
-  Parser<void> blankLines() => indent.blankOrComment.star();
+  Parser<void> blankLines() => ref0(blankLine).star();
 
   // ---------------------------------------------------------------------------
   // Keywords

@@ -34,11 +34,13 @@ mixin PythonStatementGrammar
       [ref0(indentedBlock), ref0(simpleStatements)].toChoiceParser();
 
   /// Indented block of statements.
-  Parser<List<StatementNode>> indentedBlock() => seq3(
+  Parser<List<StatementNode>> indentedBlock() => seq5(
     ref0(newlineToken),
     ref0(blankLines),
-    indent.guard(ref0(indentedStatements)),
-  ).map3((_, _, stmts) => stmts);
+    indent.increase,
+    ref0(indentedStatements),
+    indent.decrease,
+  ).map5((_, _, _, stmts, _) => stmts);
 
   Parser<List<StatementNode>> indentedStatements() =>
       ref0(indentedStatementLine)
@@ -256,10 +258,12 @@ mixin PythonStatementGrammar
     ref0(matchToken),
     ref0(expression),
     seq2(ref1(token, ':'), ref0(newlineToken)).map2((_, _) => null),
-    seq2(
+    seq4(
       ref0(blankLines),
-      indent.guard(ref0(caseBlock).plus()),
-    ).map2((_, cases) => cases),
+      indent.increase,
+      ref0(caseBlock).plus(),
+      indent.decrease,
+    ).map4((_, _, cases, _) => cases),
   ).map4((_, subject, _, cases) => MatchNode(subject: subject, cases: cases));
 
   Parser<MatchCaseNode> caseBlock() =>

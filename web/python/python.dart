@@ -318,10 +318,10 @@ List<(String, Object?)> _nodeProperties(PythonNode node) => switch (node) {
   final DictNode n => [
     (
       'pairs',
-      [
-        for (var i = 0; i < n.values.length; i++)
-          {'key': n.keys[i], 'value': n.values[i]},
-      ],
+      List.generate(
+        n.values.length,
+        (i) => {'key': n.keys[i], 'value': n.values[i]},
+      ),
     ),
   ],
   final SetNode n => [('elements', n.elements)],

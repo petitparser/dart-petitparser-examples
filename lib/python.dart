@@ -17,7 +17,6 @@ import 'src/python/grammar.dart';
 
 export 'src/python/ast.dart';
 export 'src/python/grammar.dart';
-export 'src/python/indent.dart';
 
 /// Parses the [input] Python source code into a [ModuleNode].
 ModuleNode parsePython(String input) =>
