@@ -1,87 +1,289 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>PetitParser Examples</title>
-    <link rel="stylesheet" href="//cdn.rawgit.com/milligram/milligram/master/dist/milligram.min.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>PetitParser Interactive Examples</title>
+  <link rel="stylesheet" href="shared/style.css">
 </head>
 <body>
-    <h1>Interactive PetitParser Examples</h1>
-    <dl>
-        <dt><a href="bibtex/bibtex.html">BibTeX Browser & Search</a></dt>
-        <dd>
-            Downloads and parses real-world BibTeX databases directly in your browser with filtering, full-text search, and citation export.
-        </dd>
+  <header class="page-header">
+    <h1 class="project-name">PetitParser Examples</h1>
+    <h2 class="project-tagline">Interactive browser playgrounds, parsers, and AST visualizers built with PetitParser.</h2>
+    <div class="header-nav">
+      <a class="btn-banner" href="/">Website</a>
+      <a class="btn-banner" href="https://github.com/petitparser/dart-petitparser-examples" target="_blank" rel="noopener">GitHub</a>
+    </div>
+  </header>
 
-        <dt><a href="dart/dart.html">Dart Grammar Visualizer</a></dt>
-        <dd>
-            Parses Dart source code into typed ASTs, highlighting language features and measuring parsing performance.
-        </dd>
+  <main class="container">
+    <!-- Programming Languages -->
+    <h2 class="showcase-section-title">Programming Languages</h2>
+    <div class="showcase-grid">
+      <div class="showcase-card" data-keywords="dart grammar visualizer ast records patterns switch classes">
+        <div class="showcase-card-header">
+          <h3 class="showcase-card-title">Dart</h3>
+          <span class="badge badge-primary">AST Visualizer</span>
+        </div>
+        <p class="showcase-card-desc">
+          Parses Dart 3+ source code into strongly-typed ASTs, supporting records, patterns, switch expressions, and enhanced enums.
+        </p>
+        <div class="showcase-card-footer">
+          <div class="showcase-card-actions">
+            <a href="dart/dart.html" class="button button-sm">Open Demo</a>
+            <a href="https://github.com/petitparser/dart-petitparser-examples/blob/main/lib/src/dart/grammar.dart" target="_blank" class="button button-outline button-sm">Source</a>
+          </div>
+        </div>
+      </div>
 
-        <dt><a href="json/json.html">JSON Parser</a></dt>
-        <dd>
-            Compares the native JSON parser against the one written with PetitParser.
-        </dd>
+      <div class="showcase-card" data-keywords="pascal apple grammar visualizer ast parser compiler">
+        <div class="showcase-card-header">
+          <h3 class="showcase-card-title">Pascal</h3>
+          <span class="badge badge-primary">AST Visualizer</span>
+        </div>
+        <p class="showcase-card-desc">
+          Parses classic Pascal source code implementing the Apple Pascal standard into structured Abstract Syntax Trees.
+        </p>
+        <div class="showcase-card-footer">
+          <div class="showcase-card-actions">
+            <a href="pascal/pascal.html" class="button button-sm">Open Demo</a>
+            <a href="https://github.com/petitparser/dart-petitparser-examples/blob/main/lib/pascal.dart" target="_blank" class="button button-outline button-sm">Source</a>
+          </div>
+        </div>
+      </div>
 
-        <dt><a href="lisp/lisp.html">Lisp Interpreter</a></dt>
-        <dd>
-            A reasonably complete interpreter that is able to parse and evaluate complex programs.
-        </dd>
+      <div class="showcase-card" data-keywords="python grammar visualizer ast indentation whitespace pep">
+        <div class="showcase-card-header">
+          <h3 class="showcase-card-title">Python</h3>
+          <span class="badge badge-primary">AST Visualizer</span>
+        </div>
+        <p class="showcase-card-desc">
+          Indentation-aware grammar visualizer for modern Python 3.12+ source code supporting match statements, type aliases, and async constructs.
+        </p>
+        <div class="showcase-card-footer">
+          <div class="showcase-card-actions">
+            <a href="python/python.html" class="button button-sm">Open Demo</a>
+            <a href="https://github.com/petitparser/dart-petitparser-examples/blob/main/lib/src/python/grammar.dart" target="_blank" class="button button-outline button-sm">Source</a>
+          </div>
+        </div>
+      </div>
 
-        <dt><a href="math/eval.html">Math Evaluator</a></dt>
-        <dd>
-            Parses and evaluates mathematical expressions.
-        </dd>
+      <div class="showcase-card" data-keywords="smalltalk helvetia grammar ast methods expressions cascade">
+        <div class="showcase-card-header">
+          <h3 class="showcase-card-title">Smalltalk</h3>
+          <span class="badge badge-primary">AST Visualizer</span>
+        </div>
+        <p class="showcase-card-desc">
+          Complete Smalltalk-80 grammar and AST visualizer, ported from the original Smalltalk Helvetia implementation.
+        </p>
+        <div class="showcase-card-footer">
+          <div class="showcase-card-actions">
+            <a href="smalltalk/smalltalk.html" class="button button-sm">Open Demo</a>
+            <a href="https://github.com/petitparser/dart-petitparser-examples/blob/main/lib/smalltalk.dart" target="_blank" class="button button-outline button-sm">Source</a>
+          </div>
+        </div>
+      </div>
+    </div>
 
-        <dt><a href="math/plot.html">Math Plotter</a></dt>
-        <dd>
-            Parses and plots mathematical expressions.
-        </dd>
+    <!-- Interpreters & Engines -->
+    <h2 class="showcase-section-title">Interpreters &amp; Engines</h2>
+    <div class="showcase-grid">
+      <div class="showcase-card" data-keywords="lisp scheme interpreter repl eval closures environment">
+        <div class="showcase-card-header">
+          <h3 class="showcase-card-title">Lisp Interpreter</h3>
+          <span class="badge badge-success">Interactive REPL</span>
+        </div>
+        <p class="showcase-card-desc">
+          Scheme-like evaluator supporting lexical scoping, lambda closures, macros, recursion, and native environment inspection.
+        </p>
+        <div class="showcase-card-footer">
+          <div class="showcase-card-actions">
+            <a href="lisp/lisp.html" class="button button-sm">Open Demo</a>
+            <a href="https://github.com/petitparser/dart-petitparser-examples/blob/main/lib/lisp.dart" target="_blank" class="button button-outline button-sm">Source</a>
+          </div>
+        </div>
+      </div>
 
-        <dt><a href="markdown/markdown.html">Markdown Parser &amp; Visualizer</a></dt>
-        <dd>
-            Parses CommonMark and GFM Markdown into typed ASTs with live syntax highlighting and HTML rendering.
-        </dd>
+      <div class="showcase-card" data-keywords="prolog logic programming sld resolution unification facts rules">
+        <div class="showcase-card-header">
+          <h3 class="showcase-card-title">Prolog Interpreter</h3>
+          <span class="badge badge-success">Inference Engine</span>
+        </div>
+        <p class="showcase-card-desc">
+          Logic programming inference engine featuring knowledge base rule parsing, SLD-resolution search, and unification.
+        </p>
+        <div class="showcase-card-footer">
+          <div class="showcase-card-actions">
+            <a href="prolog/prolog.html" class="button button-sm">Open Demo</a>
+            <a href="https://github.com/petitparser/dart-petitparser-examples/blob/main/lib/prolog.dart" target="_blank" class="button button-outline button-sm">Source</a>
+          </div>
+        </div>
+      </div>
 
-        <dt><a href="pascal/pascal.html">Pascal Grammar Visualizer</a></dt>
-        <dd>
-            Parses Pascal source code into typed ASTs, highlighting language features and measuring parsing performance.
-        </dd>
+      <div class="showcase-card" data-keywords="regexp regex regular expressions nfa automata playground visualizer">
+        <div class="showcase-card-header">
+          <h3 class="showcase-card-title">RegExp Playground</h3>
+          <span class="badge badge-accent">NFA Automata</span>
+        </div>
+        <p class="showcase-card-desc">
+          Parses regular expressions, compiles them to Non-deterministic Finite Automata (NFA), and matches against text with interactive visualization.
+        </p>
+        <div class="showcase-card-footer">
+          <div class="showcase-card-actions">
+            <a href="regexp/regexp.html" class="button button-sm">Open Demo</a>
+            <a href="https://github.com/petitparser/dart-petitparser-examples/blob/main/lib/regexp.dart" target="_blank" class="button button-outline button-sm">Source</a>
+          </div>
+        </div>
+      </div>
+    </div>
 
-        <dt><a href="python/python.html">Python Grammar Visualizer</a></dt>
-        <dd>
-            Parses Python 3.12+ source code into typed ASTs, with indentation awareness and modern language feature support.
-        </dd>
+    <!-- Mathematics & Expressions -->
+    <h2 class="showcase-section-title">Mathematics &amp; Expressions</h2>
+    <div class="showcase-grid">
+      <div class="showcase-card" data-keywords="math evaluator expression parser arithmetic precedence tree">
+        <div class="showcase-card-header">
+          <h3 class="showcase-card-title">Math Evaluator</h3>
+          <span class="badge badge-primary">Expression Parser</span>
+        </div>
+        <p class="showcase-card-desc">
+          Parses mathematical expressions with operator precedence, function calls, variables, and renders evaluation trees.
+        </p>
+        <div class="showcase-card-footer">
+          <div class="showcase-card-actions">
+            <a href="math/eval.html" class="button button-sm">Open Demo</a>
+            <a href="https://github.com/petitparser/dart-petitparser-examples/blob/main/lib/math.dart" target="_blank" class="button button-outline button-sm">Source</a>
+          </div>
+        </div>
+      </div>
 
-        <dt><a href="prolog/prolog.html">Prolog Interpreter</a></dt>
-        <dd>
-            A reasonably complete interpreter that is able to parse and evaluate basic logic programs.
-        </dd>
+      <div class="showcase-card" data-keywords="math plotter function graph canvas animated waves">
+        <div class="showcase-card-header">
+          <h3 class="showcase-card-title">Math Plotter</h3>
+          <span class="badge badge-accent">Animated Canvas</span>
+        </div>
+        <p class="showcase-card-desc">
+          Parses dynamic multi-variable mathematical formulas in real time and renders smooth animated function plots on HTML5 canvas.
+        </p>
+        <div class="showcase-card-footer">
+          <div class="showcase-card-actions">
+            <a href="math/plot.html" class="button button-sm">Open Demo</a>
+            <a href="https://github.com/petitparser/dart-petitparser-examples/blob/main/web/math/plot.dart" target="_blank" class="button button-outline button-sm">Source</a>
+          </div>
+        </div>
+      </div>
+    </div>
 
-        <dt><a href="regexp/regexp.html">Regular Expression Playground</a></dt>
-        <dd>
-            Parses regular expressions, compiles them to Non-deterministic Finite Automata (NFA), and matches them against input text with interactive visualization.
-        </dd>
+    <!-- Data Formats & Protocols -->
+    <h2 class="showcase-section-title">Data Formats &amp; Protocols</h2>
+    <div class="showcase-grid">
+      <div class="showcase-card" data-keywords="bibtex bibliography search citations parser scg">
+        <div class="showcase-card-header">
+          <h3 class="showcase-card-title">BibTeX Browser</h3>
+          <span class="badge badge-primary">Search &amp; Filter</span>
+        </div>
+        <p class="showcase-card-desc">
+          Downloads and parses real-world BibTeX databases directly in your browser with filtering, full-text search, and citation export.
+        </p>
+        <div class="showcase-card-footer">
+          <div class="showcase-card-actions">
+            <a href="bibtex/bibtex.html" class="button button-sm">Open Demo</a>
+            <a href="https://github.com/petitparser/dart-petitparser-examples/blob/main/lib/bibtex.dart" target="_blank" class="button button-outline button-sm">Source</a>
+          </div>
+        </div>
+      </div>
 
-        <dt><a href="smalltalk/smalltalk.html">Smalltalk Parser</a></dt>
-        <dd>
-            Contains the beginnings of a Smalltalk Interpreter. Currently only the parsed AST is printed.
-        </dd>
+      <div class="showcase-card" data-keywords="json parser benchmark native timing comparison">
+        <div class="showcase-card-header">
+          <h3 class="showcase-card-title">JSON Parser</h3>
+          <span class="badge badge-accent">Benchmark</span>
+        </div>
+        <p class="showcase-card-desc">
+          Compares the performance and parsed output of PetitParser's pure-Dart JSON grammar against the platform native JSON parser.
+        </p>
+        <div class="showcase-card-footer">
+          <div class="showcase-card-actions">
+            <a href="json/json.html" class="button button-sm">Open Demo</a>
+            <a href="https://github.com/petitparser/dart-petitparser-examples/blob/main/lib/json.dart" target="_blank" class="button button-outline button-sm">Source</a>
+          </div>
+        </div>
+      </div>
 
-        <dt><a href="tabular/tabular.html">Tabular Text Parser</a></dt>
-        <dd>
-            Parseres comma-separated or tab-separated tabular textual data.
-        </dd>
+      <div class="showcase-card" data-keywords="markdown commonmark gfm syntax highlighter html renderer ast">
+        <div class="showcase-card-header">
+          <h3 class="showcase-card-title">Markdown Parser</h3>
+          <span class="badge badge-primary">Syntax &amp; HTML</span>
+        </div>
+        <p class="showcase-card-desc">
+          Parses CommonMark and GFM Markdown into typed ASTs with live in-browser syntax highlighting and HTML rendering.
+        </p>
+        <div class="showcase-card-footer">
+          <div class="showcase-card-actions">
+            <a href="markdown/markdown.html" class="button button-sm">Open Demo</a>
+            <a href="https://github.com/petitparser/dart-petitparser-examples/blob/main/lib/markdown.dart" target="_blank" class="button button-outline button-sm">Source</a>
+          </div>
+        </div>
+      </div>
 
-        <dt><a href="uri/uri.html">URI Parser</a></dt>
-        <dd>
-            Parses and decomposes URIs into their individual components.
-        </dd>
+      <div class="showcase-card" data-keywords="tabular csv tsv comma separated tab table parser">
+        <div class="showcase-card-header">
+          <h3 class="showcase-card-title">Tabular Text</h3>
+          <span class="badge badge-primary">CSV / TSV</span>
+        </div>
+        <p class="showcase-card-desc">
+          Parses comma-separated (CSV) or tab-separated (TSV) tabular data with robust quote and escape handling into structured records.
+        </p>
+        <div class="showcase-card-footer">
+          <div class="showcase-card-actions">
+            <a href="tabular/tabular.html" class="button button-sm">Open Demo</a>
+            <a href="https://github.com/petitparser/dart-petitparser-examples/blob/main/lib/tabular.dart" target="_blank" class="button button-outline button-sm">Source</a>
+          </div>
+        </div>
+      </div>
 
-        <dt><a href="xml/xml.html">XML Parser</a></dt>
-        <dd>
-            Parses XML files to events, creates and pretty-prints a DOM tree, and evaluates XPath expressions.
-        </dd>
-    </dl>
+      <div class="showcase-card" data-keywords="uri url parser components scheme host port path query fragment">
+        <div class="showcase-card-header">
+          <h3 class="showcase-card-title">URI Parser</h3>
+          <span class="badge badge-primary">RFC 3986</span>
+        </div>
+        <p class="showcase-card-desc">
+          Parses and decomposes Uniform Resource Identifiers (URIs) into their constituent parts according to RFC 3986 specifications.
+        </p>
+        <div class="showcase-card-footer">
+          <div class="showcase-card-actions">
+            <a href="uri/uri.html" class="button button-sm">Open Demo</a>
+            <a href="https://github.com/petitparser/dart-petitparser-examples/blob/main/lib/uri.dart" target="_blank" class="button button-outline button-sm">Source</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="showcase-card" data-keywords="xml xpath sax dom parser pretty print events">
+        <div class="showcase-card-header">
+          <h3 class="showcase-card-title">XML &amp; XPath</h3>
+          <span class="badge badge-primary">DOM &amp; XPath</span>
+        </div>
+        <p class="showcase-card-desc">
+          Stream parses XML events (SAX), creates interactive DOM trees with pretty-printing, and evaluates real-time XPath queries.
+        </p>
+        <div class="showcase-card-footer">
+          <div class="showcase-card-actions">
+            <a href="xml/xml.html" class="button button-sm">Open Demo</a>
+            <a href="https://github.com/petitparser/dart-petitparser-examples/blob/main/lib/xml.dart" target="_blank" class="button button-outline button-sm">Source</a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <script>
+    document.querySelectorAll('.showcase-card').forEach(card => {
+      card.addEventListener('click', (e) => {
+        if (e.target.closest('a, button')) return;
+        const link = card.querySelector('a.button');
+        if (link) link.click();
+      });
+    });
+  </script>
+  <script src="shared/shared.dart.js"></script>
 </body>
 </html>

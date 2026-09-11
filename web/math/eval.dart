@@ -1,5 +1,6 @@
 import 'dart:js_interop';
 
+import 'package:petitparser/petitparser.dart';
 import 'package:petitparser_examples/math.dart';
 import 'package:web/web.dart';
 
@@ -9,14 +10,22 @@ final tree = document.querySelector('#tree') as HTMLElement;
 
 void update() {
   tree.textContent = '';
+  final parseResult = parser.parse(input.value);
+  if (parseResult is Failure) {
+    result.textContent =
+        '${parseResult.message} at ${parseResult.toPositionString()}';
+    result.className = 'error';
+    window.location.hash = Uri.encodeComponent(input.value);
+    return;
+  }
   try {
-    final expr = parser.parse(input.value).value;
+    final expr = parseResult.value;
     tree.innerHTML = inspect(expr).toJS;
     result.textContent = ' = ${expr.eval({})}';
-    result.classList.value = '';
+    result.className = '';
   } on Object catch (exception) {
     result.textContent = exception.toString();
-    result.classList.add('error');
+    result.className = 'error';
   }
   window.location.hash = Uri.encodeComponent(input.value);
 }

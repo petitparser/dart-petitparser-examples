@@ -1,22 +1,32 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
   <meta charset="utf-8">
-  <title>JSON Parser</title>
-  <link rel="stylesheet"
-        href="//cdn.rawgit.com/milligram/milligram/master/dist/milligram.min.css">
-  <style>
-    textarea { width: 100%; height: 380px; }
-    #output td { font-family: monospace; }
-    .error { color: red; }
-  </style>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>JSON Parser &amp; Benchmark</title>
+  <link rel="stylesheet" href="../shared/style.css">
 </head>
 <body>
-  <h1>JSON Parser</h1>
+  <header class="page-header">
+    <h1 class="project-name">JSON Parser &amp; Benchmark</h1>
+    <h2 class="project-tagline">Compares PetitParser's pure-Dart JSON grammar with the platform-native parser.</h2>
+    <div class="header-nav">
+      <a class="btn-banner" href="/">Website</a>
+      <a class="btn-banner" href="https://github.com/petitparser/dart-petitparser-examples/blob/main/lib/json.dart" target="_blank" rel="noopener">Source</a>
+    </div>
+  </header>
 
-  <h2>Input</h2>
-  <p>
-    <textarea id="input">{
+  <main class="container">
+    <div class="card">
+      <h2>Presets</h2>
+      <div class="button-group">
+        <button class="preset-btn" id="preset-user">User Profile</button>
+        <button class="preset-btn" id="preset-array">Data Records</button>
+        <button class="preset-btn" id="preset-types">All JSON Types</button>
+      </div>
+
+      <h2>Input JSON</h2>
+      <textarea id="input" rows="12" spellcheck="false">{
   "firstName": "John",
   "lastName": "Smith",
   "isAlive": true,
@@ -40,34 +50,90 @@
   "children": [],
   "spouse": null
 }</textarea>
-    <input type="submit" id="action" value="Parse">
-  </p>
+      <div>
+        <button id="action" class="button">Run Benchmark &amp; Parse</button>
+      </div>
+    </div>
 
-  <h2>Output</h2>
-  <table>
-    <thead>
-      <tr>
-        <th></th>
-        <th>PetitParser</th>
-        <th>Native</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr id="timing">
-        <th>Timing:</th>
-        <td class="custom"></td>
-        <td class="native"></td>
-      </tr>
-      <tr id="output">
-        <th>Output:</th>
-        <td class="custom"></td>
-        <td class="native"></td>
-      </tr>
-    </tbody>
-  </table>
+    <div class="card">
+      <h2>Benchmark Results &amp; Output</h2>
+      <table>
+        <thead>
+          <tr>
+            <th style="width: 20%;">Metric</th>
+            <th style="width: 40%;">PetitParser (Pure Dart)</th>
+            <th style="width: 40%;">Native (dart:convert)</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr id="timing">
+            <th>Average Timing:</th>
+            <td class="custom" style="font-weight: 600; color: var(--color-accent);"></td>
+            <td class="native" style="font-weight: 600; color: var(--color-success);"></td>
+          </tr>
+          <tr id="output">
+            <th>Parsed Output:</th>
+            <td class="custom" style="font-family: var(--font-mono); font-size: 1.25rem; word-break: break-all;"></td>
+            <td class="native" style="font-family: var(--font-mono); font-size: 1.25rem; word-break: break-all;"></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="card markdown-body" data-markdown>
+### About this Parser
+
+The **PetitParser JSON grammar** models the complete [ECMA-404 JSON standard](https://www.json.org/) directly as composable Dart parser combinators.
+
+* **Grammar Definition**: Defined in [`JsonDefinition`](https://github.com/petitparser/dart-petitparser-examples/blob/main/lib/json.dart) using modular rules for objects, arrays, strings with escape sequences, numbers, and boolean/null tokens.
+* **Pure Dart Execution**: Unlike `dart:convert` (which delegates to optimized C++/native runtime primitives), PetitParser operates completely within Dart bytecode or WebAssembly, enabling custom AST transformations and syntax extensions.
+    </div>
+    <footer>
+      Built with <a href="/">PetitParser</a>.
+    </footer>
+  </main>
+
+  <script>
+    const inputEl = document.getElementById('input');
+    const actionEl = document.getElementById('action');
+
+    document.getElementById('preset-user').addEventListener('click', () => {
+      inputEl.value = JSON.stringify({
+        firstName: "Ada",
+        lastName: "Lovelace",
+        pioneer: true,
+        year: 1843,
+        interests: ["mathematics", "computing", "analytical engine"]
+      }, null, 2);
+      actionEl.click();
+    });
+
+    document.getElementById('preset-array').addEventListener('click', () => {
+      inputEl.value = JSON.stringify([
+        { id: 1, name: "Alpha", active: true, score: 98.6 },
+        { id: 2, name: "Beta", active: false, score: 72.1 },
+        { id: 3, name: "Gamma", active: true, score: 85.0 }
+      ], null, 2);
+      actionEl.click();
+    });
+
+    document.getElementById('preset-types').addEventListener('click', () => {
+      inputEl.value = JSON.stringify({
+        string: "Hello \u00a9 World",
+        integer: 42,
+        float: 3.14159,
+        scientific: 1.0e-5,
+        booleanTrue: true,
+        booleanFalse: false,
+        nullValue: null,
+        array: [1, 2, 3],
+        nested: { key: "value" }
+      }, null, 2);
+      actionEl.click();
+    });
+  </script>
 
   <script src="json.dart.js"></script>
-  <script async src="https://www.googletagmanager.com/gtag/js?id=G-QK0KCHXW3F"></script>
-  <script>window.dataLayer = window.dataLayer || [];function gtag(){dataLayer.push(arguments);}gtag('js', new Date());gtag('config', 'G-QK0KCHXW3F');</script>
+  <script src="../shared/shared.dart.js"></script>
 </body>
 </html>

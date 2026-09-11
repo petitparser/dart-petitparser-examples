@@ -1,23 +1,32 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
   <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Prolog Interpreter</title>
-  <link rel="stylesheet"
-        href="//cdn.rawgit.com/milligram/milligram/master/dist/milligram.min.css">
-  <style>
-    textarea { width: 100%; height: 200px; }
-    input[type=text] { width: 90% }
-    #rules, #query, #answers { font-family: monospace; }
-    .error { color: red; }
-  </style>
+  <link rel="stylesheet" href="../shared/style.css">
 </head>
 <body>
-  <h1>Prolog Interpreter</h1>
+  <header class="page-header">
+    <h1 class="project-name">Prolog Interpreter</h1>
+    <h2 class="project-tagline">Logic programming inference engine featuring knowledge base parsing, SLD-resolution, and unification.</h2>
+    <div class="header-nav">
+      <a class="btn-banner" href="/">Website</a>
+      <a class="btn-banner" href="https://github.com/petitparser/dart-petitparser-examples/blob/main/lib/prolog.dart" target="_blank" rel="noopener">Source</a>
+    </div>
+  </header>
 
-  <h2>Rules</h2>
-  <textarea id="rules">
-father_child(massimo, ridge).
+  <main class="container">
+    <div class="card">
+      <h2>Presets</h2>
+      <div class="button-group">
+        <button class="preset-btn" id="preset-family">Family Relations</button>
+        <button class="preset-btn" id="preset-graph">Graph Reachability</button>
+        <button class="preset-btn" id="preset-einstein">Einstein's Puzzle</button>
+      </div>
+
+      <h2>Knowledge Base (Rules &amp; Facts)</h2>
+      <textarea id="rules" rows="12" spellcheck="false">father_child(massimo, ridge).
 father_child(eric, thorne).
 father_child(thorne, alexandria).
 
@@ -31,18 +40,120 @@ parent_child(X, Y) :- mother_child(X, Y).
 sibling(X, Y) :- parent_child(Z, X), parent_child(Z, Y).
 
 ancestor(X, Y) :- parent_child(X, Y).
-ancestor(X, Y) :- parent_child(X, Z), ancestor(Z, Y).
-  </textarea>
+ancestor(X, Y) :- parent_child(X, Z), ancestor(Z, Y).</textarea>
 
-  <h2>Query</h2>
-  <input type="text" id="query" value="sibling(X, felicia)">
-  <input type="submit" id="ask" value="Ask">
+      <h2>Query</h2>
+      <div style="display: flex; gap: 1rem; align-items: center; flex-wrap: wrap;">
+        <input type="text" id="query" value="sibling(X, felicia)" spellcheck="false" autocomplete="off" style="flex: 1; font-family: var(--font-mono); margin-bottom: 0; min-width: 220px;" />
+        <button id="ask" class="button" style="margin-bottom: 0; align-self: stretch;">Ask Query</button>
+      </div>
+    </div>
 
-  <h2>Answers</h2>
-  <ul id="answers"></ul>
+    <div class="card">
+      <h2>Answers &amp; Solutions</h2>
+      <div id="output" style="font-family: var(--font-mono); font-size: 1.35rem; min-height: 4rem;"></div>
+    </div>
+
+    <div class="card markdown-body" data-markdown>
+### About this Interpreter
+
+* **Syntax Combinators**: Parses Horn clauses, terms, atoms, numbers, variables, and compounds with PetitParser.
+* **SLD Resolution**: Recursively resolves goals using standard depth-first search with backtracking.
+* **Unification**: Matches terms and binds logic variables across rule applications.
+    </div>
+
+    <footer>
+      Built with <a href="/">PetitParser</a>.
+    </footer>
+  </main>
+
+  <script>
+    const rulesEl = document.getElementById('rules');
+    const queryEl = document.getElementById('query');
+    const askBtn = document.getElementById('ask');
+
+    document.getElementById('preset-family').addEventListener('click', () => {
+      rulesEl.value = `father_child(massimo, ridge).
+father_child(eric, thorne).
+father_child(thorne, alexandria).
+
+mother_child(stephanie, thorne).
+mother_child(stephanie, kristen).
+mother_child(stephanie, felicia).
+
+parent_child(X, Y) :- father_child(X, Y).
+parent_child(X, Y) :- mother_child(X, Y).
+
+sibling(X, Y) :- parent_child(Z, X), parent_child(Z, Y).
+
+ancestor(X, Y) :- parent_child(X, Y).
+ancestor(X, Y) :- parent_child(X, Z), ancestor(Z, Y).`;
+      queryEl.value = 'sibling(X, felicia)';
+      askBtn.click();
+    });
+
+    document.getElementById('preset-graph').addEventListener('click', () => {
+      rulesEl.value = `edge(a, b).
+edge(b, c).
+edge(c, d).
+edge(b, e).
+
+path(X, Y) :- edge(X, Y).
+path(X, Y) :- edge(X, Z), path(Z, Y).`;
+      queryEl.value = 'path(a, Goal)';
+      askBtn.click();
+    });
+
+    document.getElementById('preset-einstein').addEventListener('click', () => {
+      rulesEl.value = `exists(A, list(A, _, _, _, _)).
+exists(A, list(_, A, _, _, _)).
+exists(A, list(_, _, A, _, _)).
+exists(A, list(_, _, _, A, _)).
+exists(A, list(_, _, _, _, A)).
+
+rightOf(R, L, list(L, R, _, _, _)).
+rightOf(R, L, list(_, L, R, _, _)).
+rightOf(R, L, list(_, _, L, R, _)).
+rightOf(R, L, list(_, _, _, L, R)).
+
+middle(A, list(_, _, A, _, _)).
+first(A, list(A, _, _, _, _)).
+
+nextTo(A, B, list(B, A, _, _, _)).
+nextTo(A, B, list(_, B, A, _, _)).
+nextTo(A, B, list(_, _, B, A, _)).
+nextTo(A, B, list(_, _, _, B, A)).
+nextTo(A, B, list(A, B, _, _, _)).
+nextTo(A, B, list(_, A, B, _, _)).
+nextTo(A, B, list(_, _, A, B, _)).
+nextTo(A, B, list(_, _, _, A, B)).
+
+puzzle(Houses) :-
+  exists(house(red, british, _, _, _), Houses),
+  exists(house(_, swedish, _, _, dog), Houses),
+  exists(house(green, _, coffee, _, _), Houses),
+  exists(house(_, danish, tea, _, _), Houses),
+  rightOf(house(white, _, _, _, _), house(green, _, _, _, _), Houses),
+  exists(house(_, _, _, pall_mall, bird), Houses),
+  exists(house(yellow, _, _, dunhill, _), Houses),
+  middle(house(_, _, milk, _, _), Houses),
+  first(house(_, norwegian, _, _, _), Houses),
+  nextTo(house(_, _, _, blend, _), house(_, _, _, _, cat), Houses),
+  nextTo(house(_, _, _, dunhill, _), house(_, _, _, _, horse), Houses),
+  exists(house(_, _, beer, bluemaster, _), Houses),
+  exists(house(_, german, _, prince, _), Houses),
+  nextTo(house(_, norwegian, _, _, _), house(blue, _, _, _, _), Houses),
+  nextTo(house(_, _, _, blend, _), house(_, _, water, _, _), Houses).
+
+solution(FishOwner) :-
+  puzzle(Houses),
+  exists(house(_, FishOwner, _, _, fish), Houses).`;
+      queryEl.value = 'solution(FishOwner)';
+      askBtn.click();
+    });
+  </script>
 
   <script src="prolog.dart.js"></script>
-  <script async src="https://www.googletagmanager.com/gtag/js?id=G-QK0KCHXW3F"></script>
-  <script>window.dataLayer = window.dataLayer || [];function gtag(){dataLayer.push(arguments);}gtag('js', new Date());gtag('config', 'G-QK0KCHXW3F');</script>
+  <script src="../shared/shared.dart.js"></script>
 </body>
 </html>

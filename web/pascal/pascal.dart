@@ -637,21 +637,8 @@ void parseInput() {
         'Parse failed after <span>${stopwatch.elapsedMicroseconds} &micro;s</span>.'
             .toJS;
     output.className = 'error';
-    output.textContent =
-        'Failure at ${result.position}:\n${result.message}\n\n'
-        '${_formatContext(text, result.position)}';
+    output.textContent = '${result.message} at ${result.toPositionString()}';
   }
-}
-
-String _formatContext(String input, int position) {
-  if (position < 0 || position > input.length) return '';
-  final lineStart = input.lastIndexOf('\n', position - 1) + 1;
-  final lineEndIdx = input.indexOf('\n', position);
-  final lineEnd = lineEndIdx == -1 ? input.length : lineEndIdx;
-  final line = input.substring(lineStart, lineEnd);
-  final col = position - lineStart;
-  final pointer = '${' ' * col}^';
-  return '$line\n$pointer';
 }
 
 void setPreset(String key, String prod) {
@@ -663,6 +650,7 @@ void setPreset(String key, String prod) {
 void main() {
   action.onClick.listen((_) => parseInput());
   production.onChange.listen((_) => parseInput());
+  input.onInput.listen((_) => parseInput());
 
   btnProgram.onClick.listen((_) => setPreset('program', 'program'));
   btnStrings.onClick.listen((_) => setPreset('strings', 'program'));

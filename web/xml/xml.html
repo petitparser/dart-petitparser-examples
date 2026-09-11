@@ -1,62 +1,63 @@
 <!DOCTYPE html>
-<html>
-
+<html lang="en">
 <head>
   <meta charset="utf-8">
-  <title>XML Parser</title>
-  <link rel="stylesheet" href="//cdn.rawgit.com/milligram/milligram/master/dist/milligram.min.css">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>XML Parser &amp; XPath Evaluator</title>
+  <link rel="stylesheet" href="../shared/style.css">
   <style>
-    textarea {
-      width: 100%;
-      height: 200px;
-    }
-
-    textarea,
-    input {
-      font-family: monospace;
-    }
-
-    #sax-output,
-    #dom-output,
-    #xpath-output {
-      font-family: monospace;
-      vertical-align: top;
-      width: 33%;
-    }
-
     #sax-output div {
       display: flex;
+      gap: 0.5rem;
+      border-bottom: 1px solid var(--color-border-light);
+      padding: 0.2rem 0;
     }
-
     #sax-output div span {
       flex: 1;
     }
-
     #dom-output {
       white-space: pre;
     }
-
     #dom-output .selection {
-      background-color: #9b4dca;
-      color: #fff;
+      background-color: var(--color-primary);
+      color: #ffffff;
+      border-radius: 2px;
+      padding: 0 2px;
     }
-
-    .error {
-      color: red;
-      font-weight: normal;
+    .xml-col {
+      font-family: var(--font-mono);
+      font-size: 1.25rem;
+      line-height: 1.5;
+      background: var(--color-pre-bg);
+      border: 1px solid var(--color-border);
+      border-radius: 4px;
+      padding: 1.2rem;
+      max-height: 480px;
+      overflow-y: auto;
     }
   </style>
-  <script async src="https://www.googletagmanager.com/gtag/js?id=G-QK0KCHXW3F"></script>
-  <script>window.dataLayer = window.dataLayer || []; function gtag() { dataLayer.push(arguments); } gtag('js', new Date()); gtag('config', 'G-QK0KCHXW3F');</script>
 </head>
-
 <body>
-  <h1>XML Parser</h1>
+  <header class="page-header">
+    <h1 class="project-name">XML Parser &amp; XPath Evaluator</h1>
+    <h2 class="project-tagline">Stream parse XML events (SAX), inspect pretty-printed DOM trees, and evaluate real-time XPath queries.</h2>
+    <div class="header-nav">
+      <a class="btn-banner" href="/">Website</a>
+      <a class="btn-banner" href="https://github.com/petitparser/dart-petitparser-examples/blob/main/lib/xml.dart" target="_blank" rel="noopener">Source</a>
+    </div>
+  </header>
 
-  <h2>Input</h2>
-  <fieldset>
-    <label for="xml-input">XML</label>
-    <textarea id="xml-input"><?xml version="1.0"?>
+  <main class="container">
+    <div class="card">
+      <h2>Presets</h2>
+      <div class="button-group">
+        <button class="preset-btn" id="preset-books">Bookshelf &amp; Authors</button>
+        <button class="preset-btn" id="preset-store">Store Catalog &amp; Prices</button>
+        <button class="preset-btn" id="preset-svg">SVG Vector Graphics</button>
+      </div>
+
+      <h2>XML Input</h2>
+      <textarea id="xml-input" rows="10" spellcheck="false"><?xml version="1.0"?>
 <bookshelf>
   <book>
     <title lang="en" pages="328" year="1949">Nineteen Eighty-Four</title>
@@ -74,34 +75,57 @@
   </book>
 </bookshelf></textarea>
 
-    <label for="xpath-input">XPath <span id="xpath-error" class="error"></span></label>
-    <input id="xpath-input" value="//book[title/@lang=&quot;en&quot;]/author/text()">
+      <div class="row" style="align-items: center; margin-bottom: 0;">
+        <div class="column column-75" style="margin-bottom: 0;">
+          <label for="xpath-input">XPath Query: <span id="xpath-error" class="error" style="display: none; padding: 0.2rem 0.5rem; font-size: 1.2rem; margin-left: 0.5rem;"></span></label>
+          <input id="xpath-input" type="text" value="//book[title/@lang=&quot;en&quot;]/author/text()" spellcheck="false" autocomplete="off" style="margin-bottom: 0;" />
+        </div>
+        <div class="column column-25" style="margin-bottom: 0; padding-top: 2rem;">
+          <label style="cursor: pointer; display: flex; align-items: center;">
+            <input id="dom-pretty" type="checkbox" style="margin-right: 0.6rem;" />
+            Pretty-print DOM
+          </label>
+        </div>
+      </div>
+    </div>
 
-    <input id="dom-pretty" type="checkbox">
-    <label for="dom-pretty" class="label-inline">Pretty-print DOM</label>
-  </fieldset>
+    <div class="card">
+      <div class="tab-bar">
+        <button class="tab-btn active" data-tab="dom">XML DOM Tree</button>
+        <button class="tab-btn" data-tab="xpath">XPath Results</button>
+        <button class="tab-btn" data-tab="sax">Streaming Events (SAX)</button>
+      </div>
+      <p style="font-size: 1.3rem; color: var(--color-text-muted); margin-bottom: 1rem;">
+        Click on any element in the XML DOM to inspect its generated XPath expression.
+      </p>
 
-  <h2>Output</h2>
-  <table>
-    <thead>
-      <tr>
-        <th>XML Events (SAX)</th>
-        <th>XML DOM</th>
-        <th>XPath</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td id="sax-output"></td>
-        <td id="dom-output"></td>
-        <td id="xpath-output"></td>
-      </tr>
-    </tbody>
-  </table>
+      <div id="panel-dom" class="output-panel active">
+        <div id="dom-output" class="xml-col"></div>
+      </div>
+      <div id="panel-xpath" class="output-panel">
+        <div id="xpath-output" class="xml-col"></div>
+      </div>
+      <div id="panel-sax" class="output-panel">
+        <div id="sax-output" class="xml-col"></div>
+      </div>
+    </div>
+
+    <div class="card markdown-body" data-markdown>
+### About this Parser
+
+Powered by `package:xml` built on PetitParser:
+
+* **Event-based Streaming (SAX)**: Emits high-performance tokens (`XmlEvent`) with character source positions.
+* **DOM Construction**: Generates typed trees (`XmlDocument`, `XmlElement`, `XmlAttribute`, `XmlText`).
+* **XPath 1.0 Support**: Evaluates axes, predicates, and node tests with live DOM element highlighting.
+    </div>
+
+    <footer>
+      Built with <a href="/">PetitParser</a>.
+    </footer>
+  </main>
 
   <script src="xml.dart.js"></script>
-  <script async src="https://www.googletagmanager.com/gtag/js?id=G-QK0KCHXW3F"></script>
-  <script>window.dataLayer = window.dataLayer || []; function gtag() { dataLayer.push(arguments); } gtag('js', new Date()); gtag('config', 'G-QK0KCHXW3F');</script>
+  <script src="../shared/shared.dart.js"></script>
 </body>
-
 </html>

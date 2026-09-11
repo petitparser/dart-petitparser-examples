@@ -201,7 +201,7 @@ void update() {
     final parseResult = nodeParser.parse(regexText);
     if (parseResult is Failure) {
       throw FormatException(
-        'Parsing failed at position ${parseResult.position}: ${parseResult.message}',
+        '${parseResult.message} at ${parseResult.toPositionString()}',
       );
     }
     final node = parseResult.value;

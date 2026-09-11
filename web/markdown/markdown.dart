@@ -1,6 +1,5 @@
 import 'dart:js_interop';
 
-import 'package:petitparser/petitparser.dart';
 import 'package:petitparser_examples/markdown.dart';
 import 'package:web/web.dart';
 
@@ -10,8 +9,6 @@ final editorHighlight =
 final stats = document.querySelector('#stats') as HTMLElement;
 
 final panelPreview = document.querySelector('#panel-preview') as HTMLElement;
-final panelHighlight =
-    document.querySelector('#panel-highlight') as HTMLElement;
 final panelHtmlSource =
     document.querySelector('#panel-html-source') as HTMLElement;
 final panelAst = document.querySelector('#panel-ast') as HTMLElement;
@@ -247,18 +244,6 @@ void parseAndRender() {
   final result = parser.parse(source);
   final parseTime = watch.elapsedMicroseconds;
 
-  if (result is Failure) {
-    updateEditorHighlight(source);
-    stats.innerHTML = 'Parse failed in <span>$parseTimeμs</span>'.toJS;
-    final errorHtml =
-        '<div class="error">ParserException: ${result.message}\nat line ${result.toPositionString()}</div>';
-    panelPreview.innerHTML = errorHtml.toJS;
-    panelHighlight.innerHTML = highlighter.highlight(source).toJS;
-    panelHtmlSource.innerHTML = errorHtml.toJS;
-    panelAst.innerHTML = errorHtml.toJS;
-    return;
-  }
-
   final astNode = result.value;
   updateEditorHighlight(source, astNode);
 
@@ -267,14 +252,11 @@ void parseAndRender() {
   final renderTime = watch.elapsedMicroseconds;
 
   stats.innerHTML =
-      'Parsed in <span>$parseTimeμs</span>, Rendered in <span>$renderTimeμs</span> (Input: <span>${source.length}</span> chars)'
+      'Parsed <span>${source.length}</span> characters in <span>$parseTime &micro;s</span> (rendered in <span>$renderTime &micro;s</span>).'
           .toJS;
 
   // 1. Rendered HTML preview
   panelPreview.innerHTML = renderedHtml.toJS;
-
-  // 2. Syntax highlighted markdown view
-  panelHighlight.innerHTML = highlighter.highlightAst(astNode, source).toJS;
 
   // 3. Raw HTML source
   panelHtmlSource.innerText = renderedHtml;
@@ -285,7 +267,7 @@ void parseAndRender() {
 
 void setupTabs() {
   final tabButtons = document.querySelectorAll('.tab-btn');
-  final panels = document.querySelectorAll('.output-panel');
+  final panels = document.querySelectorAll('.tab-panel');
 
   for (var i = 0; i < tabButtons.length; i++) {
     final btn = tabButtons.item(i) as HTMLButtonElement;

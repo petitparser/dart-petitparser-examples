@@ -449,18 +449,18 @@ void parseCode() {
   final elapsed = watch.elapsedMicroseconds;
 
   if (result is Failure) {
-    stats.innerHTML = 'Parse failed in <span>$elapsedμs</span>'.toJS;
-    output.innerHTML =
-        '<div class="error">ParserException: ${result.message}\nat line ${result.toPositionString()}</div>'
-            .toJS;
+    stats.innerHTML = 'Parse failed after <span>$elapsed &micro;s</span>.'.toJS;
+    output.className = 'error';
+    output.textContent = '${result.message} at ${result.toPositionString()}';
     return;
   }
 
   final val = result.value;
   stats.innerHTML =
-      'Parsed successfully in <span>$elapsedμs</span> (Length: <span>${source.length}</span> chars)'
+      'Parsed <span>${source.length}</span> characters in <span>$elapsed &micro;s</span>.'
           .toJS;
-  output.innerHTML = '<div id="ast-output">${formatAst(val)}</div>'.toJS;
+  output.className = '';
+  output.innerHTML = formatAst(val).toJS;
 }
 
 void loadPreset(String key, String targetProd) {
@@ -479,6 +479,7 @@ void main() {
 
   action.onClick.listen((_) => parseCode());
   production.onChange.listen((_) => parseCode());
+  input.onInput.listen((_) => parseCode());
 
   // Default preset
   loadPreset('classes', 'module');

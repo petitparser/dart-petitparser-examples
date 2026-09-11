@@ -1,27 +1,81 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
   <meta charset="utf-8">
-  <title>Math Evaluator</title>
-  <link rel="stylesheet"
-        href="//cdn.rawgit.com/milligram/milligram/master/dist/milligram.min.css">
-  <style>
-    #input { font-family: monospace; width: 100%; }
-    #error { color: red; }
-  </style>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Math Plotter</title>
+  <link rel="stylesheet" href="../shared/style.css">
 </head>
 <body>
-  <h1>Math Plotter</h1>
+  <header class="page-header">
+    <h1 class="project-name">Math Plotter</h1>
+    <h2 class="project-tagline">Real-time expression parser that animates dynamic multi-variable formulas on an HTML5 canvas.</h2>
+    <div class="header-nav">
+      <a class="btn-banner" href="/">Website</a>
+      <a class="btn-banner" href="https://github.com/petitparser/dart-petitparser-examples/blob/main/web/math/plot.dart" target="_blank" rel="noopener">Source</a>
+    </div>
+  </header>
 
-  <h2>Function f<sub>t</sub>(x)</h2>
-  <input type="text" id="input" value="x * sin(10 * cos(t / 20) / x)"/>
-  <p id="error"></p>
+  <main class="container">
+    <div class="card">
+      <h2>Presets</h2>
+      <div class="button-group">
+        <button class="preset-btn" id="preset-ripple">Oscillating Ripple</button>
+        <button class="preset-btn" id="preset-sine">Harmonic Wave</button>
+        <button class="preset-btn" id="preset-damped">Damped Oscillator</button>
+        <button class="preset-btn" id="preset-standing">Standing Wave</button>
+      </div>
 
-  <h2>Graph</h2>
-  <canvas id="canvas"></canvas>
+      <h2>Function f<sub>t</sub>(x)</h2>
+      <input type="text" id="input" value="x * sin(10 * cos(t / 20) / x)" spellcheck="false" autocomplete="off" />
+      <div id="error" class="error" style="display: none;"></div>
+    </div>
+
+    <div class="card" style="text-align: center;">
+      <h2 style="text-align: left;">Graph Viewport</h2>
+      <div style="width: 100%; overflow: hidden; border-radius: 4px; border: 1px solid var(--color-border); background: #ffffff;">
+        <canvas id="canvas" style="display: block; width: 100%;"></canvas>
+      </div>
+      <p style="font-size: 1.3rem; color: var(--color-text-muted); margin-top: 1rem; margin-bottom: 0;">
+        Parameters: <code>x &isin; [-5, 5]</code>, <code>y &isin; [-2.5, 2.5]</code>, <code>t</code> is incremented each animation frame.
+      </p>
+    </div>
+
+    <div class="card markdown-body" data-markdown>
+### How it Works
+
+* The mathematical formula is compiled into an executable expression tree using PetitParser.
+* Every animation frame (<strong id="fps-display">30 FPS</strong>), the tree is evaluated over the horizontal pixel resolution for varying `t` time steps.
+* Parsing errors are detected dynamically as you type without interrupting the rendering loop.
+    </div>
+
+    <footer>
+      Built with <a href="/">PetitParser</a>.
+    </footer>
+  </main>
+
+  <script>
+    const inputEl = document.getElementById('input');
+    const errorEl = document.getElementById('error');
+
+    function setFunc(fn) {
+      inputEl.value = fn;
+      inputEl.dispatchEvent(new Event('input'));
+    }
+
+    document.getElementById('preset-ripple').addEventListener('click', () => setFunc('x * sin(10 * cos(t / 20) / x)'));
+    document.getElementById('preset-sine').addEventListener('click', () => setFunc('sin(x + t / 10) * cos(x / 2)'));
+    document.getElementById('preset-damped').addEventListener('click', () => setFunc('2 * exp(-abs(x) / 2) * cos(3 * x - t / 15)'));
+    document.getElementById('preset-standing').addEventListener('click', () => setFunc('sin(2 * x) * cos(t / 10)'));
+
+    // Observe error changes
+    const observer = new MutationObserver(() => {
+      errorEl.style.display = errorEl.textContent.trim() ? 'block' : 'none';
+    });
+    observer.observe(errorEl, { childList: true, characterData: true, subtree: true });
+  </script>
 
   <script src="plot.dart.js"></script>
-  <script async src="https://www.googletagmanager.com/gtag/js?id=G-QK0KCHXW3F"></script>
-  <script>window.dataLayer = window.dataLayer || [];function gtag(){dataLayer.push(arguments);}gtag('js', new Date());gtag('config', 'G-QK0KCHXW3F');</script>
+  <script src="../shared/shared.dart.js"></script>
 </body>
 </html>

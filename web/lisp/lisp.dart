@@ -1,5 +1,6 @@
 import 'dart:js_interop';
 
+import 'package:petitparser/core.dart';
 import 'package:petitparser_examples/lisp.dart';
 import 'package:web/web.dart';
 
@@ -25,6 +26,10 @@ void main() {
     try {
       final result = evalString(lispParser, user, input.value);
       output.textContent = result.toString();
+    } on ParserException catch (exception) {
+      output.textContent =
+          '${exception.failure.message} at ${exception.failure.toPositionString()}';
+      output.classList.add('error');
     } on Object catch (exception) {
       output.textContent = exception.toString();
       output.classList.add('error');
@@ -32,11 +37,15 @@ void main() {
     inspect(environment, user);
   });
   inspect(environment, user);
+  evaluate.click();
 }
 
 void inspect(Element element, Environment? environment) {
   final buffer = StringBuffer();
   while (environment != null) {
+    if (buffer.isNotEmpty) {
+      buffer.write('<hr/>');
+    }
     if (environment.keys.isNotEmpty) {
       buffer.write('<ul>');
       for (final symbol in environment.keys) {
@@ -47,7 +56,6 @@ void inspect(Element element, Environment? environment) {
         buffer.write('<li><b>$symbol</b>: $object</li>');
       }
       buffer.write('</ul>');
-      buffer.write('<hr/>');
     }
     environment = environment.owner;
   }

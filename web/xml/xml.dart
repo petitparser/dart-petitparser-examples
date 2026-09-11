@@ -92,8 +92,10 @@ void updateDom(XmlDocument document) {
   try {
     results = document.xpathEvaluate(xpathInput.value).toList();
     xpathError.innerText = '';
+    xpathError.style.display = 'none';
   } catch (error) {
     xpathError.innerText = error.toString();
+    xpathError.style.display = 'inline-block';
   }
   // Render the highlighted document.
   HighlightWriter(
@@ -129,6 +131,91 @@ void selectDom(MouseEvent event) {
         break;
       }
     }
+  }
+}
+
+const xmlPresets = {
+  'books': (
+    xml: '''<?xml version="1.0"?>
+<bookshelf>
+  <book>
+    <title lang="en" pages="328" year="1949">Nineteen Eighty-Four</title>
+    <author>George Orwell</author>
+  </book>
+  <book>
+    <title lang="en" pages="234" year="1951">The Catcher in the Rye</title>
+    <author>J. D. Salinger</author>
+  </book>
+  <book>
+    <title lang="de" year="2005">
+      Die Vermessung der Welt
+    </title>
+    <author>Daniel Kehlmann</author><publisher>Rowohlt</publisher>
+  </book>
+</bookshelf>''',
+    xpath: '//book[title/@lang="en"]/author/text()',
+  ),
+  'store': (
+    xml: '''<?xml version="1.0" encoding="UTF-8"?>
+<store name="Tech Depot">
+  <category name="Laptops">
+    <item id="101" stock="15">
+      <name>Pro Laptop 15"</name>
+      <price currency="USD">1299.99</price>
+    </item>
+    <item id="102" stock="0">
+      <name>Air Ultrabook 13"</name>
+      <price currency="USD">999.00</price>
+    </item>
+  </category>
+  <category name="Accessories">
+    <item id="201" stock="42">
+      <name>Wireless Mouse</name>
+      <price currency="USD">29.99</price>
+    </item>
+  </category>
+</store>''',
+    xpath: '//item[@stock > 0 and price < 1000]/name/text()',
+  ),
+  'svg': (
+    xml: '''<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="100" height="100">
+  <circle cx="50" cy="50" r="40" stroke="green" stroke-width="4" fill="yellow" />
+  <rect x="20" y="20" width="30" height="30" fill="blue" id="rect1" />
+  <text x="50" y="55" font-size="12" text-anchor="middle" fill="red">PetitParser</text>
+</svg>''',
+    xpath: '//@fill',
+  ),
+};
+
+void setupTabs() {
+  final tabButtons = document.querySelectorAll('.tab-btn');
+  final panels = document.querySelectorAll('.output-panel');
+
+  for (var i = 0; i < tabButtons.length; i++) {
+    final btn = tabButtons.item(i) as HTMLButtonElement;
+    btn.onClick.listen((_) {
+      for (var j = 0; j < tabButtons.length; j++) {
+        (tabButtons.item(j) as HTMLElement).classList.remove('active');
+      }
+      for (var j = 0; j < panels.length; j++) {
+        (panels.item(j) as HTMLElement).classList.remove('active');
+      }
+
+      btn.classList.add('active');
+      final tabId = btn.getAttribute('data-tab');
+      final targetPanel =
+          document.querySelector('#panel-$tabId') as HTMLElement?;
+      targetPanel?.classList.add('active');
+    });
+  }
+}
+
+void loadPreset(String key) {
+  final data = xmlPresets[key];
+  if (data != null) {
+    xmlInput.value = data.xml;
+    xpathInput.value = data.xpath;
+    update();
   }
 }
 
@@ -188,6 +275,18 @@ class HighlightWriter extends XmlWriter {
 }
 
 void main() {
+  setupTabs();
+
+  final btnBooks =
+      document.querySelector('#preset-books') as HTMLButtonElement?;
+  final btnStore =
+      document.querySelector('#preset-store') as HTMLButtonElement?;
+  final btnSvg = document.querySelector('#preset-svg') as HTMLButtonElement?;
+
+  btnBooks?.onClick.listen((_) => loadPreset('books'));
+  btnStore?.onClick.listen((_) => loadPreset('store'));
+  btnSvg?.onClick.listen((_) => loadPreset('svg'));
+
   xmlInput.onInput.listen((event) => update());
   xpathInput.onInput.listen((event) => update());
   domPretty.onInput.listen((event) => update());

@@ -1,28 +1,79 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
   <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>URI Parser</title>
-  <link rel="stylesheet"
-        href="//cdn.rawgit.com/milligram/milligram/master/dist/milligram.min.css">
+  <link rel="stylesheet" href="../shared/style.css">
   <style>
-    input { width: 100%; }
-    .error { color: red; }
-    th { width: 20rem; }
-    tr.sub th { padding-left: 6rem; }
+    tr.sub th {
+      padding-left: 3.5rem;
+      font-weight: 500;
+      color: var(--color-text-muted);
+      font-style: italic;
+    }
+    th {
+      width: 20rem;
+    }
   </style>
 </head>
 <body>
-  <h1>URI Parser</h1>
+  <header class="page-header">
+    <h1 class="project-name">URI Parser</h1>
+    <h2 class="project-tagline">Parses and decomposes Uniform Resource Identifiers (RFC 3986) into individual components.</h2>
+    <div class="header-nav">
+      <a class="btn-banner" href="/">Website</a>
+      <a class="btn-banner" href="https://github.com/petitparser/dart-petitparser-examples/blob/main/lib/uri.dart" target="_blank" rel="noopener">Source</a>
+    </div>
+  </header>
 
-  <h2>Enter URI</h2>
-  <p><input id="input"></p>
+  <main class="container">
+    <div class="card">
+      <h2>Presets</h2>
+      <div class="button-group">
+        <button class="preset-btn" id="preset-http">HTTP with Query</button>
+        <button class="preset-btn" id="preset-auth">Credentials &amp; Port</button>
+        <button class="preset-btn" id="preset-urn">URN / Namespace</button>
+        <button class="preset-btn" id="preset-mail">Mailto URI</button>
+      </div>
 
-  <h2>Parsed components</h2>
-  <p id="output"></p>
+      <h2>Enter URI</h2>
+      <input id="input" type="text" spellcheck="false" autocomplete="off" />
+    </div>
+
+    <div class="card">
+      <h2>Parsed Components</h2>
+      <div id="output"></div>
+    </div>
+
+    <div class="card markdown-body" data-markdown>
+### About this Parser
+
+Implements full [RFC 3986 Uniform Resource Identifier](https://www.rfc-editor.org/rfc/rfc3986) grammar decomposition using PetitParser combinators:
+
+* **Hierarchical Deconstruction**: Extracts scheme, authority (userinfo, host, port), path segments, query parameters, and fragment identifier.
+* **Component Validation**: Performs character set checking for percent-encoded escapes and path normalization rules.
+    </div>
+
+    <footer>
+      Built with <a href="/">PetitParser</a>.
+    </footer>
+  </main>
+
+  <script>
+    const inputEl = document.getElementById('input');
+    function setUri(uri) {
+      inputEl.value = uri;
+      inputEl.dispatchEvent(new Event('input'));
+    }
+
+    document.getElementById('preset-http').addEventListener('click', () => setUri('https://petitparser.github.io/examples/dart/dart.html?mode=ast&view=full#records'));
+    document.getElementById('preset-auth').addEventListener('click', () => setUri('https://admin:secret123@api.example.com:8443/v2/users?page=1&sort=desc#profile'));
+    document.getElementById('preset-urn').addEventListener('click', () => setUri('urn:isbn:0-486-27557-4'));
+    document.getElementById('preset-mail').addEventListener('click', () => setUri('mailto:user@example.com?subject=PetitParser&body=Great%20library!'));
+  </script>
 
   <script src="uri.dart.js"></script>
-  <script async src="https://www.googletagmanager.com/gtag/js?id=G-QK0KCHXW3F"></script>
-  <script>window.dataLayer = window.dataLayer || [];function gtag(){dataLayer.push(arguments);}gtag('js', new Date());gtag('config', 'G-QK0KCHXW3F');</script>
+  <script src="../shared/shared.dart.js"></script>
 </body>
 </html>

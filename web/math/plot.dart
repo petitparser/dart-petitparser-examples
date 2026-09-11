@@ -68,9 +68,9 @@ class Viewport {
   }
 
   /// Plots a numeric function.
-  void plot(num Function(num x) function, {String functionStyle = 'blue'}) {
+  void plot(num Function(num x) function, {String functionStyle = '#0e5f8e'}) {
     context.strokeStyle = functionStyle.toJS;
-    context.lineWidth = 1.0;
+    context.lineWidth = 2.0;
     context.beginPath();
     num lastY = double.infinity;
     for (var x = 0; x <= width; x++) {
@@ -125,10 +125,27 @@ void update() {
   window.location.hash = Uri.encodeComponent(source);
 }
 
+final fpsDisplay = document.querySelector('#fps-display') as HTMLElement?;
+var lastFrameTime = DateTime.now().millisecondsSinceEpoch;
+var frameCount = 0;
+var currentFps = 30;
+
 void refresh(int tick) {
   viewport.clear();
   viewport.grid();
   viewport.plot((x) => expression.eval({'x': x, 't': tick}));
+
+  frameCount++;
+  final now = DateTime.now().millisecondsSinceEpoch;
+  final delta = now - lastFrameTime;
+  if (delta >= 1000) {
+    currentFps = ((frameCount * 1000) / delta).round();
+    frameCount = 0;
+    lastFrameTime = now;
+    if (fpsDisplay != null) {
+      fpsDisplay!.textContent = '$currentFps FPS';
+    }
+  }
 }
 
 void main() {

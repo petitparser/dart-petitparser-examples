@@ -2,120 +2,71 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Dart Grammar Visualizer</title>
-  <link rel="stylesheet"
-        href="//cdn.rawgit.com/milligram/milligram/master/dist/milligram.min.css">
-  <style>
-    body {
-      padding: 2rem 0;
-      color: #333;
-    }
-    textarea {
-      width: 100%;
-      height: 260px;
-      font-family: monospace;
-      font-size: 1.4rem;
-      line-height: 1.5;
-    }
-    h2 {
-      margin-top: 3rem;
-    }
-    .preset-btn {
-      margin-right: 0.5rem;
-      margin-bottom: 0.5rem;
-    }
-    .stats {
-      font-size: 1.4rem;
-      color: #666;
-      margin-bottom: 1rem;
-    }
-    .stats span {
-      font-weight: bold;
-      color: #9b4dca;
-    }
-    .error {
-      color: #d9534f;
-      background-color: #fdf7f7;
-      border: 1px solid #d9534f;
-      padding: 1rem;
-      border-radius: 4px;
-      font-family: monospace;
-      white-space: pre-wrap;
-      font-size: 1.4rem;
-    }
-    #ast-output {
-      font-family: monospace;
-      font-size: 1.3rem;
-      line-height: 1.6;
-      background-color: #f8f9fa;
-      border: 1px solid #e1e1e1;
-      padding: 1.5rem;
-      border-radius: 4px;
-      max-height: 500px;
-      overflow-y: auto;
-      white-space: pre-wrap;
-      word-break: break-word;
-    }
-    .node-type {
-      color: #9b4dca;
-      font-weight: bold;
-    }
-    .node-prop {
-      color: #606c76;
-    }
-    .node-val {
-      color: #2b7489;
-    }
-    .node-str {
-      color: #d14;
-    }
-  </style>
+  <link rel="stylesheet" href="../shared/style.css">
 </head>
 <body>
-  <div class="container">
-    <h1>Dart Grammar Visualizer</h1>
-    <p>
-      Parses Dart source code using the Dart grammar written with PetitParser,
-      producing an interactive, strongly-typed Abstract Syntax Tree (AST).
-    </p>
+  <header class="page-header">
+    <h1 class="project-name">Dart Grammar Visualizer</h1>
+    <h2 class="project-tagline">Parses modern Dart 3+ source code into strongly-typed Abstract Syntax Trees (ASTs).</h2>
+    <div class="header-nav">
+      <a class="btn-banner" href="/">Website</a>
+      <a class="btn-banner" href="https://github.com/petitparser/dart-petitparser-examples/blob/main/lib/src/dart/grammar.dart" target="_blank" rel="noopener">Source</a>
+    </div>
+  </header>
 
-    <h2>Presets</h2>
-    <div>
-      <button class="button button-outline preset-btn" id="btn-class">Class & Extension</button>
-      <button class="button button-outline preset-btn" id="btn-patterns">Dart 3 Patterns</button>
-      <button class="button button-outline preset-btn" id="btn-enums">Enhanced Enum</button>
-      <button class="button button-outline preset-btn" id="btn-records">Records & Functions</button>
+  <main class="container">
+    <div class="card">
+      <h2>Presets</h2>
+      <div class="button-group">
+        <button class="preset-btn" id="btn-class">Class &amp; Extension Type</button>
+        <button class="preset-btn" id="btn-patterns">Dart 3 Patterns</button>
+        <button class="preset-btn" id="btn-enums">Enhanced Enums</button>
+        <button class="preset-btn" id="btn-records">Records &amp; Functions</button>
+      </div>
+
+      <h2>Input Source Code</h2>
+      <textarea id="input" rows="10" spellcheck="false"></textarea>
+
+      <div class="toolbar">
+        <div class="toolbar-field">
+          <label for="production">Target Grammar Production</label>
+          <select id="production">
+            <option value="compilationUnit" selected>Compilation Unit (Full File)</option>
+            <option value="statement">Statement</option>
+            <option value="expression">Expression</option>
+            <option value="dartPattern">Pattern</option>
+            <option value="type">Type</option>
+          </select>
+        </div>
+        <div class="toolbar-action">
+          <button id="action" class="button">Parse Code</button>
+        </div>
+      </div>
     </div>
 
-    <h2>Input Source Code</h2>
-    <p>
-      <textarea id="input" spellcheck="false"></textarea>
-    </p>
-
-    <div class="row">
-      <div class="column column-50">
-        <label for="production">Target Grammar Production</label>
-        <select id="production">
-          <option value="compilationUnit" selected>Compilation Unit (Full File)</option>
-          <option value="statement">Statement</option>
-          <option value="expression">Expression</option>
-          <option value="dartPattern">Pattern</option>
-          <option value="type">Type</option>
-        </select>
-      </div>
-      <div class="column column-50" style="text-align: right; margin-top: 3rem;">
-        <button id="action" class="button">Parse Code</button>
-      </div>
+    <div class="card">
+      <h2>Abstract Syntax Tree</h2>
+      <div class="stats" id="stats"></div>
+      <div id="output"></div>
     </div>
 
-    <div class="stats" id="stats"></div>
+    <div class="card markdown-body" data-markdown>
+### Grammar Features
 
-    <h2>Abstract Syntax Tree</h2>
-    <div id="output"></div>
-  </div>
+This visualizer demonstrates PetitParser's full implementation of the **Dart programming language**:
+
+* **Dart 3 Syntax**: Records, pattern matching (object, list, map, record, relational, and logical patterns), switch expressions, and class modifiers (`sealed`, `base`, `interface`, `final`).
+* **Typed AST Generation**: Every construct is mapped into immutable AST node records that can be walked with visitor patterns or inspected in debuggers.
+    </div>
+
+    <footer>
+      Built with <a href="/">PetitParser</a>.
+    </footer>
+  </main>
 
   <script src="dart.dart.js"></script>
-  <script async src="https://www.googletagmanager.com/gtag/js?id=G-QK0KCHXW3F"></script>
-  <script>window.dataLayer = window.dataLayer || [];function gtag(){dataLayer.push(arguments);}gtag('js', new Date());gtag('config', 'G-QK0KCHXW3F');</script>
+  <script src="../shared/shared.dart.js"></script>
 </body>
 </html>

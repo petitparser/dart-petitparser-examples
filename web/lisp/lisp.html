@@ -1,40 +1,121 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
   <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Lisp Interpreter</title>
-  <link rel="stylesheet"
-        href="//cdn.rawgit.com/milligram/milligram/master/dist/milligram.min.css">
-  <style>
-    textarea { width: 100%; height: 200px; }
-    #input, #output, #console, #environment { font-family: monospace; }
-    .error { color: red; }
-  </style>
+  <link rel="stylesheet" href="../shared/style.css">
 </head>
 <body>
-  <h1>Lisp Interpreter</h1>
+  <header class="page-header">
+    <h1 class="project-name">Lisp Interpreter</h1>
+    <h2 class="project-tagline">A Scheme-like Lisp evaluator featuring lexical scoping, closures, macros, and native environments.</h2>
+    <div class="header-nav">
+      <a class="btn-banner" href="/">Website</a>
+      <a class="btn-banner" href="https://github.com/petitparser/dart-petitparser-examples/blob/main/lib/lisp.dart" target="_blank" rel="noopener">Source</a>
+    </div>
+  </header>
 
-  <h2>Program</h2>
-  <textarea id="input">
-(define (fib n)
+  <main class="container">
+    <div class="card">
+      <h2>Presets</h2>
+      <div class="button-group">
+        <button class="preset-btn" id="preset-fib">Fibonacci</button>
+        <button class="preset-btn" id="preset-counter">Closure Counter</button>
+        <button class="preset-btn" id="preset-map">Higher-Order Map</button>
+        <button class="preset-btn" id="preset-while">While Loop</button>
+      </div>
+
+      <h2>Program</h2>
+      <textarea id="input" rows="8" spellcheck="false">(define (fib n)
   (if (<= n 1)
     1
     (+ (fib (- n 1)) (fib (- n 2)))))
-(fib 10)
-  </textarea>
-  <input type="submit" id="evaluate" value="Evaluate"/>
+(fib 10)</textarea>
+      <div>
+        <button id="evaluate" class="button">Evaluate Program</button>
+      </div>
+    </div>
 
-  <h2>Output</h2>
-  <p id="output"></p>
+    <div class="row">
+      <div class="column column-50">
+        <div class="card" style="height: calc(100% - 2rem); display: flex; flex-direction: column;">
+          <h2>Evaluation Result</h2>
+          <pre id="output" style="min-height: 10rem; flex: 1; margin-bottom: 0; font-size: 1.4rem; color: var(--color-primary); font-weight: 600;"></pre>
+        </div>
+      </div>
+      <div class="column column-50">
+        <div class="card" style="height: calc(100% - 2rem); display: flex; flex-direction: column;">
+          <h2>Console Output</h2>
+          <pre id="console" style="min-height: 10rem; flex: 1; margin-bottom: 0; font-size: 1.3rem;"></pre>
+        </div>
+      </div>
+    </div>
 
-  <h3>Console</h3>
-  <p id="console"></p>
+    <div class="card">
+      <h2>Environment Inspector</h2>
+      <div id="environment" style="max-height: 350px; overflow-y: auto; font-family: var(--font-mono); font-size: 1.3rem;"></div>
+    </div>
 
-  <h3>Environment</h3>
-  <p id="environment"></p>
+    <div class="card markdown-body" data-markdown>
+### About this Interpreter
+
+This Lisp dialect is built with **PetitParser** and features a clean AST-based evaluator:
+
+* **S-Expression Grammar**: Tokenizes symbols, numbers, strings, and quoted lists with zero regex.
+* **Lexical Closures**: Lambdas capture their enclosing environment frames dynamically.
+* **Native Extensibility**: Standard library primitives and math operators map directly to Dart functions.
+    </div>
+
+    <footer>
+      Built with <a href="/">PetitParser</a>.
+    </footer>
+  </main>
+
+  <script>
+    const inputEl = document.getElementById('input');
+    const evalBtn = document.getElementById('evaluate');
+
+    document.getElementById('preset-fib').addEventListener('click', () => {
+      inputEl.value = `(define (fib n)
+  (if (<= n 1)
+    1
+    (+ (fib (- n 1)) (fib (- n 2)))))
+(fib 10)`;
+      evalBtn.click();
+    });
+
+    document.getElementById('preset-counter').addEventListener('click', () => {
+      inputEl.value = `(define (counter start)
+  (let ((count start))
+    (lambda ()
+      (set! count (+ count 1)))))
+
+(define c (counter 10))
+(print "First: " (c))
+(print "Second: " (c))
+(print "Third: " (c))
+(c)`;
+      evalBtn.click();
+    });
+
+    document.getElementById('preset-map').addEventListener('click', () => {
+      inputEl.value = `(define (square x) (* x x))
+(map '(1 2 3 4 5 6) square)`;
+      evalBtn.click();
+    });
+
+    document.getElementById('preset-while').addEventListener('click', () => {
+      inputEl.value = `(define x 5)
+(while (> x 0)
+  (print "Countdown: " x)
+  (set! x (- x 1)))
+x`;
+      evalBtn.click();
+    });
+  </script>
 
   <script src="lisp.dart.js"></script>
-  <script async src="https://www.googletagmanager.com/gtag/js?id=G-QK0KCHXW3F"></script>
-  <script>window.dataLayer = window.dataLayer || [];function gtag(){dataLayer.push(arguments);}gtag('js', new Date());gtag('config', 'G-QK0KCHXW3F');</script>
+  <script src="../shared/shared.dart.js"></script>
 </body>
 </html>

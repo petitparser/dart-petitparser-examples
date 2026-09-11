@@ -2,117 +2,69 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Smalltalk Grammar Visualizer</title>
-  <link rel="stylesheet"
-        href="//cdn.rawgit.com/milligram/milligram/master/dist/milligram.min.css">
-  <style>
-    body {
-      padding: 2rem 0;
-      color: #333;
-    }
-    textarea {
-      width: 100%;
-      height: 240px;
-      font-family: monospace;
-      font-size: 1.4rem;
-      line-height: 1.5;
-    }
-    h2 {
-      margin-top: 3rem;
-    }
-    .preset-btn {
-      margin-right: 0.5rem;
-      margin-bottom: 0.5rem;
-    }
-    .stats {
-      font-size: 1.4rem;
-      color: #666;
-      margin-bottom: 1rem;
-    }
-    .stats span {
-      font-weight: bold;
-      color: #9b4dca;
-    }
-    .error {
-      color: #d9534f;
-      background-color: #fdf7f7;
-      border: 1px solid #d9534f;
-      padding: 1rem;
-      border-radius: 4px;
-      font-family: monospace;
-      white-space: pre-wrap;
-      font-size: 1.4rem;
-    }
-    #output {
-      font-family: monospace;
-      font-size: 1.3rem;
-      line-height: 1.6;
-      background-color: #f8f9fa;
-      border: 1px solid #e1e1e1;
-      padding: 1.5rem;
-      border-radius: 4px;
-      max-height: 500px;
-      overflow-y: auto;
-      white-space: pre-wrap;
-      word-break: break-word;
-    }
-    .node-type {
-      color: #9b4dca;
-      font-weight: bold;
-    }
-    .node-prop {
-      color: #606c76;
-    }
-    .node-val {
-      color: #2b7489;
-    }
-    .node-str {
-      color: #d14;
-    }
-  </style>
+  <link rel="stylesheet" href="../shared/style.css">
 </head>
 <body>
-  <div class="container">
-    <h1>Smalltalk Grammar Visualizer</h1>
-    <p>
-      Parses Smalltalk source code using the Smalltalk grammar written with PetitParser,
-      producing a formatted, strongly-typed Abstract Syntax Tree (AST).
-    </p>
+  <header class="page-header">
+    <h1 class="project-name">Smalltalk Grammar Visualizer</h1>
+    <h2 class="project-tagline">Smalltalk-80 grammar and typed AST visualizer ported from the original Smalltalk Helvetia implementation.</h2>
+    <div class="header-nav">
+      <a class="btn-banner" href="/">Website</a>
+      <a class="btn-banner" href="https://github.com/petitparser/dart-petitparser-examples/blob/main/lib/smalltalk.dart" target="_blank" rel="noopener">Source</a>
+    </div>
+  </header>
 
-    <h2>Presets</h2>
-    <div>
-      <button class="button button-outline preset-btn" id="btn-comprehensive">Comprehensive Method</button>
-      <button class="button button-outline preset-btn" id="btn-benchmark">Complex Benchmark</button>
-      <button class="button button-outline preset-btn" id="btn-cascade">Cascade & Blocks</button>
-      <button class="button button-outline preset-btn" id="btn-expression">Expression</button>
+  <main class="container">
+    <div class="card">
+      <h2>Presets</h2>
+      <div class="button-group">
+        <button class="preset-btn" id="btn-comprehensive">Comprehensive Method</button>
+        <button class="preset-btn" id="btn-benchmark">Complex Benchmark</button>
+        <button class="preset-btn" id="btn-cascade">Cascade &amp; Blocks</button>
+        <button class="preset-btn" id="btn-expression">Expression</button>
+      </div>
+
+      <h2>Input Source Code</h2>
+      <textarea id="input" rows="10" spellcheck="false"></textarea>
+
+      <div class="toolbar">
+        <div class="toolbar-field">
+          <label for="production">Target Grammar Production</label>
+          <select id="production">
+            <option value="startMethod" selected>Method (Default)</option>
+            <option value="expression">Expression</option>
+            <option value="sequence">Sequence</option>
+          </select>
+        </div>
+        <div class="toolbar-action">
+          <button id="action" class="button">Parse Code</button>
+        </div>
+      </div>
     </div>
 
-    <h2>Input Source Code</h2>
-    <p>
-      <textarea id="input" spellcheck="false"></textarea>
-    </p>
-
-    <div class="row">
-      <div class="column column-50">
-        <label for="production">Target Grammar Production</label>
-        <select id="production">
-          <option value="startMethod" selected>Method (Default)</option>
-          <option value="expression">Expression</option>
-          <option value="sequence">Sequence</option>
-        </select>
-      </div>
-      <div class="column column-50" style="display: flex; align-items: flex-end;">
-        <button class="button" id="action" style="width: 100%; margin-bottom: 1.5rem;">Parse & Visualize</button>
-      </div>
+    <div class="card">
+      <h2>Abstract Syntax Tree</h2>
+      <div class="stats" id="stats">Ready.</div>
+      <div id="output">Click "Parse Code" to inspect the AST.</div>
     </div>
 
-    <h2>Abstract Syntax Tree</h2>
-    <div class="stats" id="stats">Ready.</div>
-    <div id="output">Click "Parse & Visualize" to inspect the AST.</div>
-  </div>
+    <div class="card markdown-body" data-markdown>
+### Historical Context
+
+PetitParser originated in the **Smalltalk** ecosystem (Helvetia) at the University of Bern by Lukas Renggli.
+
+* **Message Passing Hierarchy**: Models unary, binary, and keyword message sends with cascading syntax (`receiver msg1; msg2`).
+* **Blocks &amp; Closures**: Directly models lexical block closures (`[ :arg | ... ]`), temporaries (`| temp |`), and return statements (`^ value`).
+    </div>
+
+    <footer>
+      Built with <a href="/">PetitParser</a>.
+    </footer>
+  </main>
 
   <script src="smalltalk.dart.js"></script>
-  <script async src="https://www.googletagmanager.com/gtag/js?id=G-QK0KCHXW3F"></script>
-  <script>window.dataLayer = window.dataLayer || [];function gtag(){dataLayer.push(arguments);}gtag('js', new Date());gtag('config', 'G-QK0KCHXW3F');</script>
+  <script src="../shared/shared.dart.js"></script>
 </body>
 </html>

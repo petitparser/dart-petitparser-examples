@@ -1,38 +1,69 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
   <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Tabular Text Parser</title>
-  <link rel="stylesheet"
-        href="//cdn.rawgit.com/milligram/milligram/master/dist/milligram.min.css">
-  <style>
-    select { width: 70%; }
-    textarea { width: 100%; height: 200px; }
-    #input, #output { font-family: monospace; }
-    #output { white-space: preserve nowrap; }
-    .error { color: red; }
-  </style>
+  <link rel="stylesheet" href="../shared/style.css">
 </head>
 <body>
-  <h1>Tabular Text Parser</h1>
+  <header class="page-header">
+    <h1 class="project-name">Tabular Text Parser</h1>
+    <h2 class="project-tagline">Parses comma-separated (CSV) and tab-separated (TSV) textual data into structured tables.</h2>
+    <div class="header-nav">
+      <a class="btn-banner" href="/">Website</a>
+      <a class="btn-banner" href="https://github.com/petitparser/dart-petitparser-examples/blob/main/lib/tabular.dart" target="_blank" rel="noopener">Source</a>
+    </div>
+  </header>
 
-  <select id="options">
-    <option>CSV: Comma-separated values</option>
-    <option>TSV: Tab-separated values</option>
-  </select>
+  <main class="container">
+    <div class="card">
+      <h2>Presets</h2>
+      <div class="button-group">
+        <button class="preset-btn" id="preset-cities">Cities (CSV)</button>
+        <button class="preset-btn" id="preset-iris">Iris Dataset (TSV)</button>
+        <button class="preset-btn" id="preset-quotes">Quoted Fields (CSV)</button>
+      </div>
 
-  <button id="example">
-    Load Example
-  </button>
+      <h2>Input Text</h2>
+      <textarea id="input" rows="8" spellcheck="false"></textarea>
 
-  <h2>Input</h2>
-  <textarea id="input"></textarea>
+      <div class="toolbar">
+        <div class="toolbar-field">
+          <label for="format">Target Grammar Production</label>
+          <select id="format">
+            <option value="CSV">CSV: Comma-Separated Values</option>
+            <option value="TSV">TSV: Tab-Separated Values</option>
+          </select>
+        </div>
+        <div class="toolbar-action">
+          <button id="action" class="button">Parse Data</button>
+        </div>
+      </div>
+    </div>
 
-  <h2>Output</h2>
-  <div id="output"></div>
+    <div class="card">
+      <h2>Rendered Table</h2>
+      <div class="stats" id="stats"></div>
+      <div id="output" style="overflow-x: auto;"></div>
+    </div>
+
+    <div class="card markdown-body" data-markdown>
+### About this Parser
+
+The **Tabular Definition** handles real-world CSV/TSV edge cases using PetitParser:
+
+* **Quoted Cells**: Supports values enclosed in double quotes containing embedded line breaks and delimiters.
+* **Escaped Quotes**: Properly parses escaped double quotes (`""`).
+* **Format Flexibility**: Easily parameterized for alternate delimiters, custom quote characters, and row terminators.
+    </div>
+
+    <footer>
+      Built with <a href="/">PetitParser</a>.
+    </footer>
+  </main>
 
   <script src="tabular.dart.js"></script>
-  <script async src="https://www.googletagmanager.com/gtag/js?id=G-QK0KCHXW3F"></script>
-  <script>window.dataLayer = window.dataLayer || [];function gtag(){dataLayer.push(arguments);}gtag('js', new Date());gtag('config', 'G-QK0KCHXW3F');</script>
+  <script src="../shared/shared.dart.js"></script>
 </body>
 </html>

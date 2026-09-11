@@ -2,34 +2,17 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <title>BibTeX Browser & Search</title>
-  <link rel="stylesheet"
-        href="//cdn.rawgit.com/milligram/milligram/master/dist/milligram.min.css">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>BibTeX Browser &amp; Search</title>
+  <link rel="stylesheet" href="../shared/style.css">
   <style>
-    body {
-      padding: 2rem 0;
-      color: #333;
-    }
-    .header-desc {
-      color: #666;
-      margin-bottom: 2rem;
-    }
     .status-card {
       background: #f8f9fa;
-      border-left: 4px solid #9b4dca;
+      border-left: 4px solid var(--color-accent);
       padding: 1.2rem 1.6rem;
       margin-bottom: 2rem;
-      border-radius: 2px;
-      font-size: 1.4rem;
-    }
-    .error {
-      color: #d9534f;
-      background-color: #fdf7f7;
-      border: 1px solid #d9534f;
-      padding: 1.2rem 1.6rem;
       border-radius: 4px;
-      margin-bottom: 2rem;
-      white-space: pre-wrap;
+      font-size: 1.4rem;
     }
     .source-selector {
       margin-bottom: 1.5rem;
@@ -52,26 +35,18 @@
     }
     .filter-item input, .filter-item select {
       margin-bottom: 0;
-      height: 3.8rem;
+      height: 4.2rem;
     }
-    @media (min-width: 80.0rem) {
+    @media (min-width: 64rem) {
       .filter-bar {
         flex-direction: row;
         align-items: flex-end;
         gap: 1.5rem;
       }
-      .filter-search {
-        flex: 3;
-      }
-      .filter-type {
-        flex: 1.5;
-      }
-      .filter-year {
-        flex: 1.2;
-      }
-      .filter-sort {
-        flex: 1.5;
-      }
+      .filter-search { flex: 3; }
+      .filter-type { flex: 1.5; }
+      .filter-year { flex: 1.2; }
+      .filter-sort { flex: 1.5; }
     }
     .pagination {
       display: flex;
@@ -80,15 +55,16 @@
       margin: 1.5rem 0;
     }
     .entry-card {
-      border: 1px solid #e1e1e1;
+      border: 1px solid var(--color-border);
       border-radius: 6px;
       padding: 1.5rem 2rem;
       margin-bottom: 1.5rem;
       background: #fff;
-      transition: box-shadow 0.2s ease;
+      transition: box-shadow 0.2s ease, border-color 0.2s ease;
     }
     .entry-card:hover {
-      box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+      box-shadow: 0 4px 12px rgba(0, 57, 98, 0.08);
+      border-color: #b0c2d3;
     }
     .entry-header {
       display: flex;
@@ -99,18 +75,18 @@
     .entry-title {
       font-size: 1.8rem;
       font-weight: bold;
-      color: #2c3e50;
+      color: var(--color-primary);
       margin-bottom: 0.4rem;
     }
     .entry-authors {
-      font-size: 1.5rem;
+      font-size: 1.45rem;
       color: #555;
       margin-bottom: 0.4rem;
     }
     .entry-venue {
-      font-size: 1.4rem;
+      font-size: 1.35rem;
       font-style: italic;
-      color: #7f8c8d;
+      color: var(--color-text-muted);
       margin-bottom: 0.8rem;
     }
     .entry-badge {
@@ -129,9 +105,9 @@
     .entry-badge.phdthesis, .entry-badge.mastersthesis { background: #e8f5e9; color: #2e7d32; }
     .entry-badge.book, .entry-badge.incollection { background: #fbe9e7; color: #d84315; }
     .entry-citekey {
-      font-family: monospace;
+      font-family: var(--font-mono);
       font-weight: bold;
-      color: #9b4dca;
+      color: var(--color-accent);
       font-size: 1.3rem;
       margin-left: 0.8rem;
     }
@@ -144,23 +120,22 @@
     .raw-bibtex {
       display: none;
       margin-top: 1rem;
-      font-family: monospace;
-      font-size: 1.2rem;
-      background: #f8f9fa;
+      font-family: var(--font-mono);
+      font-size: 1.25rem;
+      background: var(--color-pre-bg);
+      border: 1px solid var(--color-border);
       padding: 1rem;
       border-radius: 4px;
       white-space: pre-wrap;
       word-break: break-all;
     }
     .copy-btn, .toggle-btn {
-      padding: 0 1rem;
-      height: 3rem;
-      line-height: 3rem;
-      font-size: 1.2rem;
+      padding: 0.4rem 1rem;
+      font-size: 1.25rem;
       margin-bottom: 0;
     }
     .url-link {
-      font-size: 1.3rem;
+      font-size: 1.35rem;
       margin-left: auto;
     }
     #loading-indicator {
@@ -178,94 +153,103 @@
     .progress-fill {
       height: 100%;
       width: 0%;
-      background: #9b4dca;
+      background: var(--color-accent);
       transition: width 0.15s ease;
     }
     .loading-text {
       font-size: 1.4rem;
-      color: #7f8c8d;
+      color: var(--color-text-muted);
     }
   </style>
 </head>
 <body>
-  <div class="container">
-    <h1>BibTeX Browser & Search</h1>
-    <p class="header-desc">
-      Download and parse real-world BibTeX databases directly in your browser using the
-      <a href="https://github.com/petitparser/dart-petitparser-examples" target="_blank">PetitParser BibTeX grammar</a>.
-      Supports instant search, filtering by author/year/type, and citation export.
-    </p>
-
-    <div class="source-selector">
-      <label for="bib-source">Source URL:</label>
-      <div style="display: flex; gap: 1rem;">
-        <input type="text" id="bib-source" value="https://raw.githubusercontent.com/scgbern/scgbib/main/scg.bib" spellcheck="false" style="margin-bottom: 0;" />
-        <button id="load-btn" class="button" style="margin-bottom: 0;">Load</button>
-      </div>
+  <header class="page-header">
+    <h1 class="project-name">BibTeX Browser &amp; Search</h1>
+    <h2 class="project-tagline">Downloads and parses real-world BibTeX databases directly in your browser with filtering, search, and citation export.</h2>
+    <div class="header-nav">
+      <a class="btn-banner" href="/">Website</a>
+      <a class="btn-banner" href="https://github.com/petitparser/dart-petitparser-examples/blob/main/lib/bibtex.dart" target="_blank" rel="noopener">Source</a>
     </div>
+  </header>
 
-    <div id="loading-indicator">
-      <div class="loading-text" id="loading-status">Connecting...</div>
-      <div class="progress-track">
-        <div class="progress-fill" id="progress-bar"></div>
+  <main class="container">
+    <div class="card">
+      <div class="source-selector">
+        <label for="bib-source">Source BibTeX Database URL:</label>
+        <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
+          <input type="text" id="bib-source" value="https://raw.githubusercontent.com/scgbern/scgbib/main/scg.bib" spellcheck="false" style="flex: 1; margin-bottom: 0; min-width: 250px;" />
+          <button id="load-btn" class="button" style="margin-bottom: 0;">Load &amp; Parse Database</button>
+        </div>
       </div>
+
+      <div id="loading-indicator">
+        <div class="loading-text" id="loading-status">Connecting...</div>
+        <div class="progress-track">
+          <div class="progress-fill" id="progress-bar"></div>
+        </div>
+      </div>
+      <div id="error-box" class="error" style="display: none;"></div>
+      <div id="stats" class="stats" style="display: none;"></div>
     </div>
-    <div id="error-box" class="error" style="display: none;"></div>
-    <div id="status-box" class="status-card" style="display: none;"></div>
 
     <div id="controls" style="display: none;">
-      <div class="filter-bar">
-        <div class="filter-item filter-search">
-          <label for="search-input">Search:</label>
-          <input type="text" id="search-input" placeholder="Search title, author, key, abstract..." />
-        </div>
-        <div class="filter-item filter-type">
-          <label for="type-filter">Type:</label>
-          <select id="type-filter">
-            <option value="">All Types</option>
-          </select>
-        </div>
-        <div class="filter-item filter-year">
-          <label for="year-filter">Year:</label>
-          <select id="year-filter">
-            <option value="">All Years</option>
-          </select>
-        </div>
-        <div class="filter-item filter-sort">
-          <label for="sort-order">Sort:</label>
-          <select id="sort-order">
-            <option value="year-desc">Year (Newest)</option>
-            <option value="year-asc">Year (Oldest)</option>
-            <option value="author-asc">Author (A-Z)</option>
-            <option value="title-asc">Title (A-Z)</option>
-          </select>
-        </div>
-      </div>
-
-      <div class="pagination">
-        <span id="results-count"></span>
-        <div>
-          <button id="prev-page" class="button button-outline" style="height: 3.2rem; line-height: 3.2rem; padding: 0 1.5rem; margin-bottom: 0;">&laquo; Prev</button>
-          <span id="page-info" style="margin: 0 1rem; font-weight: bold;"></span>
-          <button id="next-page" class="button button-outline" style="height: 3.2rem; line-height: 3.2rem; padding: 0 1.5rem; margin-bottom: 0;">Next &raquo;</button>
+      <div class="card">
+        <div class="filter-bar">
+          <div class="filter-item filter-search">
+            <label for="search-input">Search:</label>
+            <input type="text" id="search-input" placeholder="Search title, author, citekey, abstract..." />
+          </div>
+          <div class="filter-item filter-type">
+            <label for="type-filter">Type:</label>
+            <select id="type-filter">
+              <option value="">All Types</option>
+            </select>
+          </div>
+          <div class="filter-item filter-year">
+            <label for="year-filter">Year:</label>
+            <select id="year-filter">
+              <option value="">All Years</option>
+            </select>
+          </div>
+          <div class="filter-item filter-sort">
+            <label for="sort-order">Sort:</label>
+            <select id="sort-order">
+              <option value="year-desc">Year (Newest First)</option>
+              <option value="year-asc">Year (Oldest First)</option>
+              <option value="author-asc">Author (A-Z)</option>
+              <option value="title-asc">Title (A-Z)</option>
+            </select>
+          </div>
         </div>
       </div>
 
       <div id="entries-list"></div>
 
       <div class="pagination" style="margin-top: 2rem;">
-        <span></span>
+        <span id="results-count" style="font-weight: 600; color: var(--color-primary);"></span>
         <div>
-          <button id="prev-page-bottom" class="button button-outline" style="height: 3.2rem; line-height: 3.2rem; padding: 0 1.5rem; margin-bottom: 0;">&laquo; Prev</button>
+          <button id="prev-page-bottom" class="button button-outline" style="padding: 0.4rem 1.2rem; margin-bottom: 0;">&laquo; Prev</button>
           <span id="page-info-bottom" style="margin: 0 1rem; font-weight: bold;"></span>
-          <button id="next-page-bottom" class="button button-outline" style="height: 3.2rem; line-height: 3.2rem; padding: 0 1.5rem; margin-bottom: 0;">Next &raquo;</button>
+          <button id="next-page-bottom" class="button button-outline" style="padding: 0.4rem 1.2rem; margin-bottom: 0;">Next &raquo;</button>
         </div>
       </div>
     </div>
-  </div>
+
+    <div class="card markdown-body" data-markdown>
+### About this Parser
+
+The **PetitParser BibTeX grammar** parses large bibliography databases in the browser:
+
+* **Streaming Parser**: Handles `@article`, `@book`, `@inproceedings`, `@phdthesis`, string macros (`@string`), and comments.
+* **Resilient Syntax**: Robustly parses nested braces, escaped characters, LaTeX accents, and varied key-value syntax.
+    </div>
+
+    <footer>
+      Built with <a href="/">PetitParser</a>.
+    </footer>
+  </main>
 
   <script src="bibtex.dart.js"></script>
-  <script async src="https://www.googletagmanager.com/gtag/js?id=G-QK0KCHXW3F"></script>
-  <script>window.dataLayer = window.dataLayer || [];function gtag(){dataLayer.push(arguments);}gtag('js', new Date());gtag('config', 'G-QK0KCHXW3F');</script>
+  <script src="../shared/shared.dart.js"></script>
 </body>
 </html>

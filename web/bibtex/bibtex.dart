@@ -13,7 +13,7 @@ final loadingIndicator =
 final loadingStatus = document.querySelector('#loading-status') as HTMLElement;
 final progressBar = document.querySelector('#progress-bar') as HTMLElement;
 final errorBox = document.querySelector('#error-box') as HTMLElement;
-final statusBox = document.querySelector('#status-box') as HTMLElement;
+final stats = document.querySelector('#stats') as HTMLElement;
 final controls = document.querySelector('#controls') as HTMLElement;
 
 final searchInput = document.querySelector('#search-input') as HTMLInputElement;
@@ -22,11 +22,8 @@ final yearFilter = document.querySelector('#year-filter') as HTMLSelectElement;
 final sortOrder = document.querySelector('#sort-order') as HTMLSelectElement;
 
 final resultsCount = document.querySelector('#results-count') as HTMLElement;
-final pageInfo = document.querySelector('#page-info') as HTMLElement;
 final pageInfoBottom =
     document.querySelector('#page-info-bottom') as HTMLElement;
-final prevPage = document.querySelector('#prev-page') as HTMLButtonElement;
-final nextPage = document.querySelector('#next-page') as HTMLButtonElement;
 final prevPageBottom =
     document.querySelector('#prev-page-bottom') as HTMLButtonElement;
 final nextPageBottom =
@@ -54,9 +51,10 @@ Future<void> loadFromUrl(String url) async {
   loadingStatus.textContent = 'Connecting to $url...';
   progressBar.style.width = '0%';
   errorBox.style.display = 'none';
-  statusBox.style.display = 'none';
+  stats.style.display = 'none';
   controls.style.display = 'none';
 
+  final downloadWatch = Stopwatch()..start();
   final completer = Completer<String>();
   final xhr = XMLHttpRequest();
   xhr.open('GET', url);
@@ -97,12 +95,17 @@ Future<void> loadFromUrl(String url) async {
 
   try {
     final text = await completer.future;
+    final downloadMs = downloadWatch.elapsedMilliseconds;
     progressBar.style.width = '100%';
     loadingStatus.textContent =
         'Downloaded ${(text.length / (1024 * 1024)).toStringAsFixed(1)} MB. Parsing entries with PetitParser...';
     // Yield to let browser render the updated status before CPU-intensive parse
     await Future<void>.delayed(const Duration(milliseconds: 20));
-    parseBibTeX(text, 'Source: $url (${(text.length / 1024).round()} KB)');
+    parseBibTeX(
+      text,
+      downloadMs: downloadMs,
+      sourceLabel: 'Source: $url (${(text.length / 1024).round()} KB)',
+    );
   } catch (e) {
     loadingIndicator.style.display = 'none';
     errorBox.style.display = 'block';
@@ -110,7 +113,11 @@ Future<void> loadFromUrl(String url) async {
   }
 }
 
-void parseBibTeX(String content, String sourceLabel) {
+void parseBibTeX(
+  String content, {
+  required int downloadMs,
+  required String sourceLabel,
+}) {
   loadingIndicator.style.display = 'block';
   final watch = Stopwatch()..start();
   try {
@@ -122,9 +129,9 @@ void parseBibTeX(String content, String sourceLabel) {
 
     allEntries = result.value;
     loadingIndicator.style.display = 'none';
-    statusBox.style.display = 'block';
-    statusBox.innerHTML =
-        '<strong>Parsed ${allEntries.length} entries</strong> in <strong>${elapsedMs}ms</strong>. $sourceLabel'
+    stats.style.display = 'block';
+    stats.innerHTML =
+        'Downloaded in <span>$downloadMs ms</span>, parsed <span>${allEntries.length}</span> entries in <span>$elapsedMs ms</span>.'
             .toJS;
 
     populateFilters();
@@ -240,12 +247,9 @@ void renderPage() {
 
   resultsCount.textContent = 'Found $total entries';
   final pageStr = 'Page $currentPage of $totalPages';
-  pageInfo.textContent = pageStr;
   pageInfoBottom.textContent = pageStr;
 
-  prevPage.disabled = currentPage <= 1;
   prevPageBottom.disabled = currentPage <= 1;
-  nextPage.disabled = currentPage >= totalPages;
   nextPageBottom.disabled = currentPage >= totalPages;
 
   entriesList.innerHTML = ''.toJS;
@@ -385,26 +389,12 @@ void main() {
   yearFilter.onChange.listen((_) => applyFilters());
   sortOrder.onChange.listen((_) => applyFilters());
 
-  prevPage.onClick.listen((_) {
-    if (currentPage > 1) {
-      currentPage--;
-      renderPage();
-      window.scrollTo(0.toJS, 0);
-    }
-  });
-
   prevPageBottom.onClick.listen((_) {
     if (currentPage > 1) {
       currentPage--;
       renderPage();
       window.scrollTo(0.toJS, 0);
     }
-  });
-
-  nextPage.onClick.listen((_) {
-    currentPage++;
-    renderPage();
-    window.scrollTo(0.toJS, 0);
   });
 
   nextPageBottom.onClick.listen((_) {
