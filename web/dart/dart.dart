@@ -4,6 +4,8 @@ import 'package:petitparser/petitparser.dart';
 import 'package:petitparser_examples/dart.dart';
 import 'package:web/web.dart';
 
+import '../shared/shared.dart';
+
 final input = document.querySelector('#input') as HTMLTextAreaElement;
 final production = document.querySelector('#production') as HTMLSelectElement;
 final action = document.querySelector('#action') as HTMLButtonElement;
@@ -692,6 +694,8 @@ void loadPreset(String key, String targetProd) {
 }
 
 void main() {
+  initShared();
+
   btnClass.onClick.listen((_) => loadPreset('class', 'compilationUnit'));
   btnPatterns.onClick.listen((_) => loadPreset('patterns', 'statement'));
   btnEnums.onClick.listen((_) => loadPreset('enums', 'compilationUnit'));

@@ -50,13 +50,18 @@
       <div id="output">Click "Parse Code" to inspect the AST.</div>
     </div>
 
-    <div class="card markdown-body" data-markdown>
-### Historical Context
+    <div class="card" id="about">
+      <h2>About Smalltalk-80 Grammar</h2>
+      <div data-markdown>
+Smalltalk-80 is an object-oriented, dynamically typed reflective programming language renowned for its elegant, minimal syntax.
 
-PetitParser originated in the **Smalltalk** ecosystem (Helvetia) at the University of Bern by Lukas Renggli.
+### Historical Context &amp; Significance
 
-* **Message Passing Hierarchy**: Models unary, binary, and keyword message sends with cascading syntax (`receiver msg1; msg2`).
-* **Blocks &amp; Closures**: Directly models lexical block closures (`[ :arg | ... ]`), temporaries (`| temp |`), and return statements (`^ value`).
+- **The Very First PetitParser Grammar**: PetitParser originated in the Smalltalk ecosystem as part of Lukas Renggli's PhD research on **Helvetia** (a dynamic language workbench enabling language embedding into Smalltalk) at the University of Bern. This Smalltalk grammar was the very first parser ever implemented with PetitParser!
+- **Pure Message-Passing Syntax**: Smalltalk syntax is entirely structured around messages. The grammar models precedence strictly across unary (`receiver msg`), binary (`a + b`), and keyword (`receiver msg: arg1 with: arg2`) messages, as well as cascading (`receiver m1; m2`).
+- **Rich Typed AST**: The parser builds a complete, strongly-typed AST representing methods, sequences, blocks (`[:arg | ...]`), assignments, return statements, and pragma definitions.
+- **Interactive Production Switching**: The grammar allows parsing at different root productions: full method definitions, isolated expressions, or statement sequences.
+      </div>
     </div>
 
     <footer>
@@ -65,6 +70,5 @@ PetitParser originated in the **Smalltalk** ecosystem (Helvetia) at the Universi
   </main>
 
   <script src="smalltalk.dart.js"></script>
-  <script src="../shared/shared.dart.js"></script>
 </body>
 </html>

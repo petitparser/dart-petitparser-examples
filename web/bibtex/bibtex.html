@@ -236,12 +236,10 @@
     </div>
 
     <div class="card markdown-body" data-markdown>
-### About this Parser
+### What makes this parser special?
 
-The **PetitParser BibTeX grammar** parses large bibliography databases in the browser:
-
-* **Streaming Parser**: Handles `@article`, `@book`, `@inproceedings`, `@phdthesis`, string macros (`@string`), and comments.
-* **Resilient Syntax**: Robustly parses nested braces, escaped characters, LaTeX accents, and varied key-value syntax.
+* **Full Streaming Execution**: Capable of processing large multi-megabyte bibliography files directly in the browser with high throughput and instant progress reporting.
+* **Resilient Nested Delimiters**: BibTeX values can be enclosed in quotes (`"..."`) or recursively balanced curly braces (`{...}`), containing nested LaTeX math and accents. PetitParser handles these arbitrarily deep structures with clean, modular combinators.
     </div>
 
     <footer>
@@ -250,6 +248,5 @@ The **PetitParser BibTeX grammar** parses large bibliography databases in the br
   </main>
 
   <script src="bibtex.dart.js"></script>
-  <script src="../shared/shared.dart.js"></script>
 </body>
 </html>

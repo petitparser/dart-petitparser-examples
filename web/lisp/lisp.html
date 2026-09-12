@@ -58,13 +58,13 @@
     </div>
 
     <div class="card markdown-body" data-markdown>
-### About this Interpreter
+### What makes this interpreter special?
 
-This Lisp dialect is built with **PetitParser** and features a clean AST-based evaluator:
+This interactive environment demonstrates how PetitParser transforms raw textual syntax into an active, functional programming language runtime:
 
-* **S-Expression Grammar**: Tokenizes symbols, numbers, strings, and quoted lists with zero regex.
-* **Lexical Closures**: Lambdas capture their enclosing environment frames dynamically.
-* **Native Extensibility**: Standard library primitives and math operators map directly to Dart functions.
+* **Scannerless S-Expressions**: Parses symbols, numbers, strings, and quoted lists directly without a standalone lexical analyzer.
+* **First-Class Closures**: Functions (`lambda`) capture their defining lexical environment frame, supporting lexical scoping, higher-order functions (`map`), and stateful closures (`counter`).
+* **Seamless Host Interop**: Standard library primitives, math operators, and I/O streams bind directly to native Dart closures without bridging overhead.
     </div>
 
     <footer>
@@ -72,50 +72,6 @@ This Lisp dialect is built with **PetitParser** and features a clean AST-based e
     </footer>
   </main>
 
-  <script>
-    const inputEl = document.getElementById('input');
-    const evalBtn = document.getElementById('evaluate');
-
-    document.getElementById('preset-fib').addEventListener('click', () => {
-      inputEl.value = `(define (fib n)
-  (if (<= n 1)
-    1
-    (+ (fib (- n 1)) (fib (- n 2)))))
-(fib 10)`;
-      evalBtn.click();
-    });
-
-    document.getElementById('preset-counter').addEventListener('click', () => {
-      inputEl.value = `(define (counter start)
-  (let ((count start))
-    (lambda ()
-      (set! count (+ count 1)))))
-
-(define c (counter 10))
-(print "First: " (c))
-(print "Second: " (c))
-(print "Third: " (c))
-(c)`;
-      evalBtn.click();
-    });
-
-    document.getElementById('preset-map').addEventListener('click', () => {
-      inputEl.value = `(define (square x) (* x x))
-(map '(1 2 3 4 5 6) square)`;
-      evalBtn.click();
-    });
-
-    document.getElementById('preset-while').addEventListener('click', () => {
-      inputEl.value = `(define x 5)
-(while (> x 0)
-  (print "Countdown: " x)
-  (set! x (- x 1)))
-x`;
-      evalBtn.click();
-    });
-  </script>
-
   <script src="lisp.dart.js"></script>
-  <script src="../shared/shared.dart.js"></script>
 </body>
 </html>

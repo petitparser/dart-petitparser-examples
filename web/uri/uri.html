@@ -46,13 +46,17 @@
       <div id="output"></div>
     </div>
 
-    <div class="card markdown-body" data-markdown>
-### About this Parser
+    <div class="card" id="about">
+      <h2>About URI Parser</h2>
+      <div data-markdown>
+Uniform Resource Identifiers (URIs) provide a standard, extensible mechanism for identifying resources on the internet or private networks.
 
-Implements full [RFC 3986 Uniform Resource Identifier](https://www.rfc-editor.org/rfc/rfc3986) grammar decomposition using PetitParser combinators:
+### What Makes This Parser Special?
 
-* **Hierarchical Deconstruction**: Extracts scheme, authority (userinfo, host, port), path segments, query parameters, and fragment identifier.
-* **Component Validation**: Performs character set checking for percent-encoded escapes and path normalization rules.
+- **Strict RFC 3986 Specification Compliance**: Implements the official ABNF grammar for URIs using PetitParser's combinator hierarchy, handling edge-case nuances that generic regular expressions fail on.
+- **Full Hierarchical Decomposition**: Dissects every structural component: scheme, authority (sub-parsing optional username, password, hostname, IPv6 host brackets, and port), hierarchical path segments, query strings (with decoded key-value parameters), and fragment identifiers.
+- **Percent-Encoding &amp; Character Classes**: Reliably identifies and isolates pct-encoded octets (`%HH`), sub-delimiters, and unreserved character classes according to specification constraints.
+      </div>
     </div>
 
     <footer>
@@ -60,20 +64,6 @@ Implements full [RFC 3986 Uniform Resource Identifier](https://www.rfc-editor.or
     </footer>
   </main>
 
-  <script>
-    const inputEl = document.getElementById('input');
-    function setUri(uri) {
-      inputEl.value = uri;
-      inputEl.dispatchEvent(new Event('input'));
-    }
-
-    document.getElementById('preset-http').addEventListener('click', () => setUri('https://petitparser.github.io/examples/dart/dart.html?mode=ast&view=full#records'));
-    document.getElementById('preset-auth').addEventListener('click', () => setUri('https://admin:secret123@api.example.com:8443/v2/users?page=1&sort=desc#profile'));
-    document.getElementById('preset-urn').addEventListener('click', () => setUri('urn:isbn:0-486-27557-4'));
-    document.getElementById('preset-mail').addEventListener('click', () => setUri('mailto:user@example.com?subject=PetitParser&body=Great%20library!'));
-  </script>
-
   <script src="uri.dart.js"></script>
-  <script src="../shared/shared.dart.js"></script>
 </body>
 </html>

@@ -4,6 +4,8 @@ import 'dart:js_interop';
 import 'package:petitparser_examples/math.dart';
 import 'package:web/web.dart';
 
+import '../shared/shared.dart';
+
 class Viewport {
   new(
     this.canvas, {
@@ -118,9 +120,11 @@ void update() {
     expression = parser.parse(source).value;
     expression.eval({'x': 0, 't': 0});
     error.textContent = '';
+    error.style.display = 'none';
   } on Object catch (exception) {
     expression = Value(double.nan);
     error.textContent = exception.toString();
+    error.style.display = 'block';
   }
   window.location.hash = Uri.encodeComponent(source);
 }
@@ -149,6 +153,29 @@ void refresh(int tick) {
 }
 
 void main() {
+  initShared();
+
+  final presetRipple =
+      document.querySelector('#preset-ripple') as HTMLButtonElement?;
+  final presetSine =
+      document.querySelector('#preset-sine') as HTMLButtonElement?;
+  final presetDamped =
+      document.querySelector('#preset-damped') as HTMLButtonElement?;
+  final presetStanding =
+      document.querySelector('#preset-standing') as HTMLButtonElement?;
+
+  void setFunc(String fn) {
+    input.value = fn;
+    update();
+  }
+
+  presetRipple?.onClick.listen((_) => setFunc('x * sin(10 * cos(t / 20) / x)'));
+  presetSine?.onClick.listen((_) => setFunc('sin(x + t / 10) * cos(x / 2)'));
+  presetDamped?.onClick.listen(
+    (_) => setFunc('2 * exp(-abs(x) / 2) * cos(3 * x - t / 15)'),
+  );
+  presetStanding?.onClick.listen((_) => setFunc('sin(2 * x) * cos(t / 10)'));
+
   if (window.location.hash.startsWith('#')) {
     input.value = Uri.decodeComponent(window.location.hash.substring(1));
   }

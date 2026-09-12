@@ -223,6 +223,11 @@ void main() {
       final parser = grammar.buildFrom(grammar.factor()).end();
       expect(parser, isSuccess('1'));
       expect(parser, isSuccess('a'));
+      expect(parser, isSuccess('a.b'));
+      expect(parser, isSuccess('a.b.c'));
+      expect(parser, isSuccess('a[1]'));
+      expect(parser, isSuccess('a[1, 2]'));
+      expect(parser, isSuccess('a^'));
       expect(parser, isSuccess('sin(a)'));
       expect(parser, isSuccess('arctan(a, b)'));
       expect(parser, isSuccess('not a'));
@@ -277,7 +282,11 @@ void main() {
     test('field list', () {
       final parser = grammar.buildFrom(grammar.fieldList()).end();
       expect(parser, isSuccess('a: b'));
+      expect(parser, isSuccess('a: b;'));
       expect(parser, isSuccess('a, b: c'));
+      expect(parser, isSuccess('a, b: c;'));
+      expect(parser, isSuccess('a: b; c: d'));
+      expect(parser, isSuccess('a: b; c: d;'));
       expect(parser, isSuccess('case a of b : (c: d)'));
       expect(parser, isSuccess('case a : b of c : (d: e)'));
       expect(parser, isSuccess('case a of b, c : (d: e)'));
@@ -323,6 +332,60 @@ void main() {
         ),
       );
     });
+    test('calculate stats', () {
+      const code = '''
+program CalculateStats(input, output);
+const
+  MaxElements = 100;
+  Threshold = 0.05;
+type
+  DataArray = array [1..MaxElements] of Real;
+var
+  data: DataArray;
+  n, i: Integer;
+  sum, mean: Real;
+
+procedure LoadData(var count: Integer);
+begin
+  count := 10;
+  for i := 1 to count do
+    data[i] := i * 1.5;
+end;
+
+begin
+  LoadData(n);
+  sum := 0.0;
+  for i := 1 to n do
+    sum := sum + data[i];
+  mean := sum / n;
+  if mean > Threshold then
+    WriteLn('Mean exceeds threshold: ', mean)
+  else
+    WriteLn('Mean is within limits');
+end.''';
+      expect(parser, isSuccess(code));
+    });
+    test('geometry demo', () {
+      const code = '''
+program GeometryDemo;
+type
+  Point = record
+    x, y: Real;
+  end;
+  Circle = record
+    center: Point;
+    radius: Real;
+  end;
+var
+  c: Circle;
+begin
+  c.center.x := 10.0;
+  c.center.y := 20.0;
+  c.radius := 5.0;
+  WriteLn('Circle at (', c.center.x, ', ', c.center.y, ')');
+end.''';
+      expect(parser, isSuccess(code));
+    });
     test('linter', () => expect(linter(parser), isEmpty));
   });
 
@@ -364,6 +427,85 @@ end.''';
         'Integer',
       );
       expect(prog.block.statement.statements, hasLength(2));
+    });
+
+    test('calculate stats', () {
+      const code = '''
+program CalculateStats(input, output);
+const
+  MaxElements = 100;
+  Threshold = 0.05;
+type
+  DataArray = array [1..MaxElements] of Real;
+var
+  data: DataArray;
+  n, i: Integer;
+  sum, mean: Real;
+
+procedure LoadData(var count: Integer);
+begin
+  count := 10;
+  for i := 1 to count do
+    data[i] := i * 1.5;
+end;
+
+begin
+  LoadData(n);
+  sum := 0.0;
+  for i := 1 to n do
+    sum := sum + data[i];
+  mean := sum / n;
+  if mean > Threshold then
+    WriteLn('Mean exceeds threshold: ', mean)
+  else
+    WriteLn('Mean is within limits');
+end.''';
+      final prog = astParser.parse(code).value as ProgramNode;
+      expect(prog.name, 'CalculateStats');
+      expect(prog.parameters, ['input', 'output']);
+      expect(prog.block.constants, hasLength(2));
+      expect(prog.block.types, hasLength(1));
+      expect(prog.block.variables, hasLength(3));
+      expect(prog.block.subroutines, hasLength(1));
+      final proc = prog.block.subroutines.first as ProcedureNode;
+      expect(proc.name, 'LoadData');
+      expect(proc.parameters, hasLength(1));
+      expect(proc.parameters.first.isVar, isTrue);
+      expect(prog.block.statement.statements, hasLength(5));
+    });
+
+    test('geometry demo', () {
+      const code = '''
+program GeometryDemo;
+type
+  Point = record
+    x, y: Real;
+  end;
+  Circle = record
+    center: Point;
+    radius: Real;
+  end;
+var
+  c: Circle;
+begin
+  c.center.x := 10.0;
+  c.center.y := 20.0;
+  c.radius := 5.0;
+  WriteLn('Circle at (', c.center.x, ', ', c.center.y, ')');
+end.''';
+      final prog = astParser.parse(code).value as ProgramNode;
+      expect(prog.name, 'GeometryDemo');
+      expect(prog.block.types, hasLength(2));
+      final pointType = prog.block.types[0].type as RecordTypeNode;
+      expect(pointType.fields, hasLength(1));
+      expect(pointType.fields.first.names, ['x', 'y']);
+      expect(prog.block.variables, hasLength(1));
+      expect(prog.block.statement.statements, hasLength(4));
+      final lastStmt =
+          prog.block.statement.statements.last as ProcedureStatementNode;
+      expect(lastStmt.name, 'WriteLn');
+      expect(lastStmt.arguments, hasLength(5));
+      expect(lastStmt.arguments[1], isA<FieldAccessExpressionNode>());
     });
 
     test('linter', () => expect(linter(astParser), isEmpty));

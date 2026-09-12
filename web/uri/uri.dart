@@ -4,6 +4,8 @@ import 'package:petitparser/petitparser.dart';
 import 'package:petitparser_examples/uri.dart';
 import 'package:web/web.dart';
 
+import '../shared/shared.dart';
+
 final input = document.querySelector('#input') as HTMLInputElement;
 final output = document.querySelector('#output') as HTMLElement;
 
@@ -53,6 +55,38 @@ void update() {
 }
 
 void main() {
+  initShared();
+
+  final presetHttp =
+      document.querySelector('#preset-http') as HTMLButtonElement?;
+  final presetAuth =
+      document.querySelector('#preset-auth') as HTMLButtonElement?;
+  final presetUrn = document.querySelector('#preset-urn') as HTMLButtonElement?;
+  final presetMail =
+      document.querySelector('#preset-mail') as HTMLButtonElement?;
+
+  void setUri(String value) {
+    input.value = value;
+    update();
+  }
+
+  presetHttp?.onClick.listen(
+    (_) => setUri(
+      'https://petitparser.github.io/examples/dart/dart.html?mode=ast&view=full#records',
+    ),
+  );
+  presetAuth?.onClick.listen(
+    (_) => setUri(
+      'https://admin:secret123@api.example.com:8443/v2/users?page=1&sort=desc#profile',
+    ),
+  );
+  presetUrn?.onClick.listen((_) => setUri('urn:isbn:0-486-27557-4'));
+  presetMail?.onClick.listen(
+    (_) => setUri(
+      'mailto:user@example.com?subject=PetitParser&body=Great%20library!',
+    ),
+  );
+
   input.onInput.listen((event) => update());
   input.value = window.location.href;
   update();

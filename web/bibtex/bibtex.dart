@@ -5,6 +5,8 @@ import 'package:petitparser/petitparser.dart';
 import 'package:petitparser_examples/bibtex.dart';
 import 'package:web/web.dart';
 
+import '../shared/shared.dart';
+
 final bibSource = document.querySelector('#bib-source') as HTMLInputElement;
 final loadBtn = document.querySelector('#load-btn') as HTMLButtonElement;
 
@@ -379,6 +381,8 @@ void renderPage() {
 }
 
 void main() {
+  initShared();
+
   loadBtn.onClick.listen((_) {
     final url = bibSource.value.trim();
     if (url.isNotEmpty) loadFromUrl(url);

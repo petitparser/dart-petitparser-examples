@@ -41,12 +41,17 @@
       </p>
     </div>
 
-    <div class="card markdown-body" data-markdown>
-### How it Works
+    <div class="card" id="about">
+      <h2>About Math Plotter</h2>
+      <div data-markdown>
+This real-time plotter evaluates mathematical functions of one spatial variable ($x$) and dynamic time ($t$) directly onto an HTML5 canvas at 30 FPS.
 
-* The mathematical formula is compiled into an executable expression tree using PetitParser.
-* Every animation frame (<strong id="fps-display">30 FPS</strong>), the tree is evaluated over the horizontal pixel resolution for varying `t` time steps.
-* Parsing errors are detected dynamically as you type without interrupting the rendering loop.
+### What Makes This Example Special?
+
+- **Real-Time Dynamic Evaluation**: The formula is parsed once into an abstract expression tree. Every rendering frame, that parsed tree is repeatedly evaluated across the entire horizontal canvas pixel domain with incremented time parameters.
+- **Resilient Asynchronous Error Handling**: If syntax or domain errors occur while editing the formula, the rendering loop degrades gracefully without breaking canvas animation state or throwing unhandled exceptions.
+- **Responsive High-DPI Canvas Rendering**: Dynamically adapts to device pixel ratios and window resizing events while maintaining crisp vector rendering.
+      </div>
     </div>
 
     <footer>
@@ -54,28 +59,6 @@
     </footer>
   </main>
 
-  <script>
-    const inputEl = document.getElementById('input');
-    const errorEl = document.getElementById('error');
-
-    function setFunc(fn) {
-      inputEl.value = fn;
-      inputEl.dispatchEvent(new Event('input'));
-    }
-
-    document.getElementById('preset-ripple').addEventListener('click', () => setFunc('x * sin(10 * cos(t / 20) / x)'));
-    document.getElementById('preset-sine').addEventListener('click', () => setFunc('sin(x + t / 10) * cos(x / 2)'));
-    document.getElementById('preset-damped').addEventListener('click', () => setFunc('2 * exp(-abs(x) / 2) * cos(3 * x - t / 15)'));
-    document.getElementById('preset-standing').addEventListener('click', () => setFunc('sin(2 * x) * cos(t / 10)'));
-
-    // Observe error changes
-    const observer = new MutationObserver(() => {
-      errorEl.style.display = errorEl.textContent.trim() ? 'block' : 'none';
-    });
-    observer.observe(errorEl, { childList: true, characterData: true, subtree: true });
-  </script>
-
   <script src="plot.dart.js"></script>
-  <script src="../shared/shared.dart.js"></script>
 </body>
 </html>

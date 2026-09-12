@@ -81,59 +81,19 @@
     </div>
 
     <div class="card markdown-body" data-markdown>
-### About this Parser
+### What makes this parser special?
 
-The **PetitParser JSON grammar** models the complete [ECMA-404 JSON standard](https://www.json.org/) directly as composable Dart parser combinators.
+The **PetitParser JSON grammar** implements the complete [ECMA-404 JSON standard](https://www.json.org/) as composable parser combinators:
 
-* **Grammar Definition**: Defined in [`JsonDefinition`](https://github.com/petitparser/dart-petitparser-examples/blob/main/lib/json.dart) using modular rules for objects, arrays, strings with escape sequences, numbers, and boolean/null tokens.
-* **Pure Dart Execution**: Unlike `dart:convert` (which delegates to optimized C++/native runtime primitives), PetitParser operates completely within Dart bytecode or WebAssembly, enabling custom AST transformations and syntax extensions.
+* **Pure Dart Implementation**: Unlike `dart:convert` (which delegates to proprietary C++ runtime primitives), PetitParser runs entirely in Dart bytecode or WebAssembly, making it fully portable, inspectable, and debuggable.
+* **Extensible Architecture**: Serves as a modular foundation that can easily be extended into non-standard variants such as JSON5, JSON with comments (JSONC), trailing commas, or custom unquoted keys.
+* **Live Head-to-Head Benchmark**: Measures real-time execution speeds side-by-side with native platform decoders across varying structural loads.
     </div>
     <footer>
       Built with <a href="/">PetitParser</a>.
     </footer>
   </main>
 
-  <script>
-    const inputEl = document.getElementById('input');
-    const actionEl = document.getElementById('action');
-
-    document.getElementById('preset-user').addEventListener('click', () => {
-      inputEl.value = JSON.stringify({
-        firstName: "Ada",
-        lastName: "Lovelace",
-        pioneer: true,
-        year: 1843,
-        interests: ["mathematics", "computing", "analytical engine"]
-      }, null, 2);
-      actionEl.click();
-    });
-
-    document.getElementById('preset-array').addEventListener('click', () => {
-      inputEl.value = JSON.stringify([
-        { id: 1, name: "Alpha", active: true, score: 98.6 },
-        { id: 2, name: "Beta", active: false, score: 72.1 },
-        { id: 3, name: "Gamma", active: true, score: 85.0 }
-      ], null, 2);
-      actionEl.click();
-    });
-
-    document.getElementById('preset-types').addEventListener('click', () => {
-      inputEl.value = JSON.stringify({
-        string: "Hello \u00a9 World",
-        integer: 42,
-        float: 3.14159,
-        scientific: 1.0e-5,
-        booleanTrue: true,
-        booleanFalse: false,
-        nullValue: null,
-        array: [1, 2, 3],
-        nested: { key: "value" }
-      }, null, 2);
-      actionEl.click();
-    });
-  </script>
-
   <script src="json.dart.js"></script>
-  <script src="../shared/shared.dart.js"></script>
 </body>
 </html>

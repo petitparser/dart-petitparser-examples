@@ -21,7 +21,7 @@
       <h2>Presets</h2>
       <div class="button-group">
         <button class="preset-btn" id="preset-cities">Cities (CSV)</button>
-        <button class="preset-btn" id="preset-iris">Iris Dataset (TSV)</button>
+        <button class="preset-btn" id="preset-iris">Flowers (TSV)</button>
         <button class="preset-btn" id="preset-quotes">Quoted Fields (CSV)</button>
       </div>
 
@@ -48,14 +48,17 @@
       <div id="output" style="overflow-x: auto;"></div>
     </div>
 
-    <div class="card markdown-body" data-markdown>
-### About this Parser
+    <div class="card" id="about">
+      <h2>About Tabular Text Parser</h2>
+      <div data-markdown>
+Tabular text formats like Comma-Separated Values (CSV) and Tab-Separated Values (TSV) are ubiquitously used for structured data interchange.
 
-The **Tabular Definition** handles real-world CSV/TSV edge cases using PetitParser:
+### What Makes This Parser Special?
 
-* **Quoted Cells**: Supports values enclosed in double quotes containing embedded line breaks and delimiters.
-* **Escaped Quotes**: Properly parses escaped double quotes (`""`).
-* **Format Flexibility**: Easily parameterized for alternate delimiters, custom quote characters, and row terminators.
+- **Configurable `TabularDefinition`**: Built as a parameterized grammar where field delimiters (`,`, `\t`, `;`), quote characters (`"`), and end-of-line sequences can be customized without rewriting parsing logic.
+- **Robust RFC 4180 Compliance**: Correctly parses complex quoting edge cases, including multiline cell content, embedded commas, leading/trailing whitespace inside quotes, and escaped quotes (`""`).
+- **Resilient Row Termination**: Gracefully tolerates mixed Windows (`\r\n`) and Unix (`\n`) newline conventions as well as optional trailing newlines.
+      </div>
     </div>
 
     <footer>
@@ -64,6 +67,5 @@ The **Tabular Definition** handles real-world CSV/TSV edge cases using PetitPars
   </main>
 
   <script src="tabular.dart.js"></script>
-  <script src="../shared/shared.dart.js"></script>
 </body>
 </html>

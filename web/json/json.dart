@@ -4,6 +4,8 @@ import 'dart:js_interop';
 import 'package:petitparser_examples/json.dart';
 import 'package:web/web.dart';
 
+import '../shared/shared.dart';
+
 final parser = JsonDefinition().build();
 
 void execute(
@@ -65,7 +67,79 @@ void update({bool benchmark = false}) {
   );
 }
 
+const presets = {
+  'user': '''{
+  "firstName": "Ada",
+  "lastName": "Lovelace",
+  "pioneer": true,
+  "year": 1843,
+  "interests": [
+    "mathematics",
+    "computing",
+    "analytical engine"
+  ]
+}''',
+  'array': '''[
+  {
+    "id": 1,
+    "name": "Alpha",
+    "active": true,
+    "score": 98.6
+  },
+  {
+    "id": 2,
+    "name": "Beta",
+    "active": false,
+    "score": 72.1
+  },
+  {
+    "id": 3,
+    "name": "Gamma",
+    "active": true,
+    "score": 85.0
+  }
+]''',
+  'types': '''{
+  "string": "Hello \u00a9 World",
+  "integer": 42,
+  "float": 3.14159,
+  "scientific": 0.00001,
+  "booleanTrue": true,
+  "booleanFalse": false,
+  "nullValue": null,
+  "array": [
+    1,
+    2,
+    3
+  ],
+  "nested": {
+    "key": "value"
+  }
+}''',
+};
+
 void main() {
+  initShared();
+
+  final presetUser =
+      document.querySelector('#preset-user') as HTMLButtonElement?;
+  final presetArray =
+      document.querySelector('#preset-array') as HTMLButtonElement?;
+  final presetTypes =
+      document.querySelector('#preset-types') as HTMLButtonElement?;
+
+  void loadPreset(String key) {
+    final value = presets[key];
+    if (value != null) {
+      input.value = value;
+      update(benchmark: true);
+    }
+  }
+
+  presetUser?.onClick.listen((_) => loadPreset('user'));
+  presetArray?.onClick.listen((_) => loadPreset('array'));
+  presetTypes?.onClick.listen((_) => loadPreset('types'));
+
   action.onClick.listen((event) => update(benchmark: true));
   input.onInput.listen((event) => update());
   update(benchmark: true);

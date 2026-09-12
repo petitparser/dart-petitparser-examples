@@ -275,15 +275,6 @@
 
   </main>
 
-  <script>
-    document.querySelectorAll('.showcase-card').forEach(card => {
-      card.addEventListener('click', (e) => {
-        if (e.target.closest('a, button')) return;
-        const link = card.querySelector('a.button');
-        if (link) link.click();
-      });
-    });
-  </script>
   <script src="shared/shared.dart.js"></script>
 </body>
 </html>

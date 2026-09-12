@@ -54,12 +54,18 @@ ancestor(X, Y) :- parent_child(X, Z), ancestor(Z, Y).</textarea>
       <div id="output" style="font-family: var(--font-mono); font-size: 1.35rem; min-height: 4rem;"></div>
     </div>
 
-    <div class="card markdown-body" data-markdown>
-### About this Interpreter
+    <div class="card" id="about">
+      <h2>About Prolog Interpreter</h2>
+      <div data-markdown>
+Prolog is a declarative logic programming language where computation is carried out by posing queries over a knowledge base of facts and inference rules.
 
-* **Syntax Combinators**: Parses Horn clauses, terms, atoms, numbers, variables, and compounds with PetitParser.
-* **SLD Resolution**: Recursively resolves goals using standard depth-first search with backtracking.
-* **Unification**: Matches terms and binds logic variables across rule applications.
+### What Makes This Parser &amp; Engine Special?
+
+- **First-Order Horn Clause Syntax**: Parses rules (`Head :- Body1, Body2.`), ground facts (`fact(a, b).`), logic variables (`X`, `_`), numbers, and recursive compound terms.
+- **SLD Resolution with Backtracking**: Implements full Selective Linear Definite clause resolution with automated search and backtracking to discover all valid variable bindings satisfying a goal.
+- **Syntactic Term Unification**: Matches terms structurally while propagating variable substitution environments across rule invocations.
+- **Pure Dart Inference Engine**: Both the parser and the full deductive inference machine run natively in the browser without external WebAssembly or C-based Prolog runtimes.
+      </div>
     </div>
 
     <footer>
@@ -67,93 +73,6 @@ ancestor(X, Y) :- parent_child(X, Z), ancestor(Z, Y).</textarea>
     </footer>
   </main>
 
-  <script>
-    const rulesEl = document.getElementById('rules');
-    const queryEl = document.getElementById('query');
-    const askBtn = document.getElementById('ask');
-
-    document.getElementById('preset-family').addEventListener('click', () => {
-      rulesEl.value = `father_child(massimo, ridge).
-father_child(eric, thorne).
-father_child(thorne, alexandria).
-
-mother_child(stephanie, thorne).
-mother_child(stephanie, kristen).
-mother_child(stephanie, felicia).
-
-parent_child(X, Y) :- father_child(X, Y).
-parent_child(X, Y) :- mother_child(X, Y).
-
-sibling(X, Y) :- parent_child(Z, X), parent_child(Z, Y).
-
-ancestor(X, Y) :- parent_child(X, Y).
-ancestor(X, Y) :- parent_child(X, Z), ancestor(Z, Y).`;
-      queryEl.value = 'sibling(X, felicia)';
-      askBtn.click();
-    });
-
-    document.getElementById('preset-graph').addEventListener('click', () => {
-      rulesEl.value = `edge(a, b).
-edge(b, c).
-edge(c, d).
-edge(b, e).
-
-path(X, Y) :- edge(X, Y).
-path(X, Y) :- edge(X, Z), path(Z, Y).`;
-      queryEl.value = 'path(a, Goal)';
-      askBtn.click();
-    });
-
-    document.getElementById('preset-einstein').addEventListener('click', () => {
-      rulesEl.value = `exists(A, list(A, _, _, _, _)).
-exists(A, list(_, A, _, _, _)).
-exists(A, list(_, _, A, _, _)).
-exists(A, list(_, _, _, A, _)).
-exists(A, list(_, _, _, _, A)).
-
-rightOf(R, L, list(L, R, _, _, _)).
-rightOf(R, L, list(_, L, R, _, _)).
-rightOf(R, L, list(_, _, L, R, _)).
-rightOf(R, L, list(_, _, _, L, R)).
-
-middle(A, list(_, _, A, _, _)).
-first(A, list(A, _, _, _, _)).
-
-nextTo(A, B, list(B, A, _, _, _)).
-nextTo(A, B, list(_, B, A, _, _)).
-nextTo(A, B, list(_, _, B, A, _)).
-nextTo(A, B, list(_, _, _, B, A)).
-nextTo(A, B, list(A, B, _, _, _)).
-nextTo(A, B, list(_, A, B, _, _)).
-nextTo(A, B, list(_, _, A, B, _)).
-nextTo(A, B, list(_, _, _, A, B)).
-
-puzzle(Houses) :-
-  exists(house(red, british, _, _, _), Houses),
-  exists(house(_, swedish, _, _, dog), Houses),
-  exists(house(green, _, coffee, _, _), Houses),
-  exists(house(_, danish, tea, _, _), Houses),
-  rightOf(house(white, _, _, _, _), house(green, _, _, _, _), Houses),
-  exists(house(_, _, _, pall_mall, bird), Houses),
-  exists(house(yellow, _, _, dunhill, _), Houses),
-  middle(house(_, _, milk, _, _), Houses),
-  first(house(_, norwegian, _, _, _), Houses),
-  nextTo(house(_, _, _, blend, _), house(_, _, _, _, cat), Houses),
-  nextTo(house(_, _, _, dunhill, _), house(_, _, _, _, horse), Houses),
-  exists(house(_, _, beer, bluemaster, _), Houses),
-  exists(house(_, german, _, prince, _), Houses),
-  nextTo(house(_, norwegian, _, _, _), house(blue, _, _, _, _), Houses),
-  nextTo(house(_, _, _, blend, _), house(_, _, water, _, _), Houses).
-
-solution(FishOwner) :-
-  puzzle(Houses),
-  exists(house(_, FishOwner, _, _, fish), Houses).`;
-      queryEl.value = 'solution(FishOwner)';
-      askBtn.click();
-    });
-  </script>
-
   <script src="prolog.dart.js"></script>
-  <script src="../shared/shared.dart.js"></script>
 </body>
 </html>

@@ -4,6 +4,8 @@ import 'package:petitparser/petitparser.dart';
 import 'package:petitparser_examples/regexp.dart';
 import 'package:web/web.dart' hide Node;
 
+import '../shared/shared.dart';
+
 final regexpInput = document.querySelector('#regexp-input') as HTMLInputElement;
 final testInput = document.querySelector('#test-input') as HTMLTextAreaElement;
 final errorBox = document.querySelector('#error-box') as HTMLElement;
@@ -13,6 +15,10 @@ final highlightContainer =
     document.querySelector('#highlight-container') as HTMLElement;
 final matchCount = document.querySelector('#match-count') as HTMLElement;
 final matchList = document.querySelector('#match-list') as HTMLElement;
+final matchDetailsContainer =
+    document.querySelector('#match-details-container') as HTMLElement;
+final noMatchesWarning =
+    document.querySelector('#no-matches-warning') as HTMLElement;
 final astContainer = document.querySelector('#ast-container') as HTMLElement;
 final nfaTableBody = document.querySelector('#nfa-table-body') as HTMLElement;
 
@@ -102,46 +108,51 @@ void _renderAstNode(Node node, StringBuffer buffer) {
     buffer.write(
       '<span class="ast-badge badge-quantifier">Quantifier: <strong>$rangeStr</strong></span>',
     );
+    buffer.write('<div class="ast-children">');
     buffer.write('<div class="ast-node">');
     _renderAstNode(node.child, buffer);
-    buffer.write('</div>');
+    buffer.write('</div></div>');
   } else if (node is AlternationNode) {
     buffer.write(
       '<span class="ast-badge badge-alternation">Alternation (|)</span>',
     );
+    buffer.write('<div class="ast-children">');
     buffer.write('<div class="ast-node">');
     _renderAstNode(node.left, buffer);
     buffer.write('</div>');
     buffer.write('<div class="ast-node">');
     _renderAstNode(node.right, buffer);
-    buffer.write('</div>');
+    buffer.write('</div></div>');
   } else if (node is ConcatenationNode) {
     buffer.write(
       '<span class="ast-badge badge-concatenation">Concatenation</span>',
     );
+    buffer.write('<div class="ast-children">');
     buffer.write('<div class="ast-node">');
     _renderAstNode(node.left, buffer);
     buffer.write('</div>');
     buffer.write('<div class="ast-node">');
     _renderAstNode(node.right, buffer);
-    buffer.write('</div>');
+    buffer.write('</div></div>');
   } else if (node is ComplementNode) {
     buffer.write(
       '<span class="ast-badge badge-complement">Complement (!)</span>',
     );
+    buffer.write('<div class="ast-children">');
     buffer.write('<div class="ast-node">');
     _renderAstNode(node.child, buffer);
-    buffer.write('</div>');
+    buffer.write('</div></div>');
   } else if (node is IntersectionNode) {
     buffer.write(
       '<span class="ast-badge badge-intersection">Intersection (&amp;)</span>',
     );
+    buffer.write('<div class="ast-children">');
     buffer.write('<div class="ast-node">');
     _renderAstNode(node.left, buffer);
     buffer.write('</div>');
     buffer.write('<div class="ast-node">');
     _renderAstNode(node.right, buffer);
-    buffer.write('</div>');
+    buffer.write('</div></div>');
   } else {
     buffer.write(
       '<span class="ast-badge badge-empty">Unknown Node: ${node.runtimeType}</span>',
@@ -193,6 +204,8 @@ void update() {
 
   if (regexText.isEmpty) {
     highlightContainer.textContent = testStr;
+    matchDetailsContainer.style.display = 'none';
+    noMatchesWarning.style.display = 'none';
     return;
   }
 
@@ -309,6 +322,14 @@ void update() {
     final matches = nfa.allMatches(testStr).toList();
     matchCount.textContent = matches.length.toString();
 
+    if (matches.isEmpty) {
+      noMatchesWarning.style.display = 'block';
+      matchDetailsContainer.style.display = 'none';
+    } else {
+      noMatchesWarning.style.display = 'none';
+      matchDetailsContainer.style.display = 'block';
+    }
+
     final highlightHtml = StringBuffer();
     var lastIndex = 0;
     for (var i = 0; i < matches.length; i++) {
@@ -379,6 +400,8 @@ void update() {
 }
 
 void main() {
+  initShared();
+
   // Parse initial state from hash if present
   if (window.location.hash.startsWith('#')) {
     final hash = window.location.hash.substring(1);

@@ -4,6 +4,8 @@ import 'package:petitparser/core.dart';
 import 'package:petitparser_examples/tabular.dart';
 import 'package:web/web.dart';
 
+import '../shared/shared.dart';
+
 final format = document.querySelector('#format') as HTMLSelectElement;
 final action = document.querySelector('#action') as HTMLButtonElement;
 final input = document.querySelector('#input') as HTMLTextAreaElement;
@@ -84,6 +86,8 @@ void loadPreset(String key, String fmt) {
 }
 
 void main() {
+  initShared();
+
   presetCities.onClick.listen((_) => loadPreset('cities', 'CSV'));
   presetIris.onClick.listen((_) => loadPreset('iris', 'TSV'));
   presetQuotes.onClick.listen((_) => loadPreset('quotes', 'CSV'));

@@ -4,6 +4,8 @@ import 'package:petitparser/petitparser.dart';
 import 'package:petitparser_examples/python.dart';
 import 'package:web/web.dart';
 
+import '../shared/shared.dart';
+
 final input = document.querySelector('#input') as HTMLTextAreaElement;
 final production = document.querySelector('#production') as HTMLSelectElement;
 final action = document.querySelector('#action') as HTMLButtonElement;
@@ -17,14 +19,15 @@ final btnAsync = document.querySelector('#btn-async') as HTMLButtonElement;
 final btnComprehensions =
     document.querySelector('#btn-comprehensions') as HTMLButtonElement;
 
-final grammar = PythonGrammarDefinition();
-
-Parser<Object?> getParser(String prod) => switch (prod) {
-  'statement' => grammar.buildFrom(grammar.statementLine()),
-  'expression' => grammar.buildFrom(grammar.expression()),
-  'pattern' => grammar.buildFrom(grammar.pythonPattern()),
-  _ => grammar.build(),
-};
+Parser<Object?> getParser(String prod) {
+  final grammar = PythonGrammarDefinition();
+  return switch (prod) {
+    'statement' => grammar.buildFrom(grammar.statementLine()),
+    'expression' => grammar.buildFrom(grammar.expression()),
+    'pattern' => grammar.buildFrom(grammar.pythonPattern()),
+    _ => grammar.build(),
+  };
+}
 
 const presets = {
   'classes': '''class Stack[T]:
@@ -470,6 +473,8 @@ void loadPreset(String key, String targetProd) {
 }
 
 void main() {
+  initShared();
+
   btnClasses.onClick.listen((_) => loadPreset('classes', 'module'));
   btnPatterns.onClick.listen((_) => loadPreset('patterns', 'statement'));
   btnAsync.onClick.listen((_) => loadPreset('async', 'module'));

@@ -53,12 +53,13 @@
     </div>
 
     <div class="card markdown-body" data-markdown>
-### Grammar Features
+### What makes this grammar special?
 
-This visualizer demonstrates PetitParser's full implementation of the **Dart programming language**:
+This visualizer implements the complete **modern Dart 3+ language specification** purely as composable Dart parser combinators with zero external code generation:
 
-* **Dart 3 Syntax**: Records, pattern matching (object, list, map, record, relational, and logical patterns), switch expressions, and class modifiers (`sealed`, `base`, `interface`, `final`).
-* **Typed AST Generation**: Every construct is mapped into immutable AST node records that can be walked with visitor patterns or inspected in debuggers.
+* **Modern Dart 3 Syntax**: Full support for structural pattern matching (object, list, map, record, relational, and logical patterns), destructuring assignments, switch expressions, and class modifiers (`sealed`, `base`, `interface`, `final`).
+* **Scannerless PEG Grammar**: Unlike traditional LALR or lexer-dependent compilers, the entire Dart syntax (including string interpolation, raw strings, and disambiguation of generics vs. relational operators) is parsed in a unified, backtracking combinator tree.
+* **Strongly Typed AST**: Directly constructs immutable, typed AST node classes with source offsets and visitor pattern traversal.
     </div>
 
     <footer>
@@ -67,6 +68,5 @@ This visualizer demonstrates PetitParser's full implementation of the **Dart pro
   </main>
 
   <script src="dart.dart.js"></script>
-  <script src="../shared/shared.dart.js"></script>
 </body>
 </html>

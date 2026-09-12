@@ -623,8 +623,19 @@ pre code {
 	font-size: 1.35rem;
 }
 
+.alert-warning {
+	background-color: #fff8e6;
+	border: 1px solid #ffeeba;
+	border-left: 4px solid #f39c12;
+	color: #856404;
+	border-radius: 4px;
+	padding: 1.2rem 1.6rem;
+	margin-bottom: 1.5rem;
+	font-size: 1.35rem;
+}
+
 /* --- Tab Navigation --- */
-.tab-bar {
+.tab-buttons {
 	display: flex;
 	gap: 0.4rem;
 	border-bottom: 2px solid var(--color-border);
@@ -632,7 +643,8 @@ pre code {
 	overflow-x: auto;
 }
 
-.tab-btn {
+.tab-button,
+.tab-buttons > button {
 	background: transparent;
 	border: none;
 	border-radius: 4px 4px 0 0;
@@ -647,24 +659,24 @@ pre code {
 	transition: all var(--transition-speed);
 }
 
-.tab-btn:hover {
+.tab-button:hover,
+.tab-buttons > button:hover {
 	color: var(--color-primary);
 	background: rgba(0, 57, 98, 0.04);
 }
 
-.tab-btn.active {
+.tab-button.active,
+.tab-buttons > button.active {
 	color: var(--color-accent);
 	border-bottom: 2px solid var(--color-accent);
 	background: transparent;
 }
 
-.tab-panel,
-.output-panel {
+.tab-body {
 	display: none;
 }
 
-.tab-panel.active,
-.output-panel.active {
+.tab-body.active {
 	display: block;
 }
 

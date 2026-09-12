@@ -4,7 +4,9 @@ import 'package:petitparser/core.dart';
 import 'package:petitparser_examples/lisp.dart';
 import 'package:web/web.dart';
 
-final input = document.querySelector('#input') as HTMLInputElement;
+import '../shared/shared.dart';
+
+final input = document.querySelector('#input') as HTMLTextAreaElement;
 final output = document.querySelector('#output') as HTMLElement;
 final console = document.querySelector('#console') as HTMLElement;
 final environment = document.querySelector('#environment') as HTMLElement;
@@ -14,7 +16,54 @@ final root = NativeEnvironment();
 final standard = StandardEnvironment(root);
 final user = standard.create();
 
+const presets = {
+  'fib': '''(define (fib n)
+  (if (<= n 1)
+    1
+    (+ (fib (- n 1)) (fib (- n 2)))))
+(fib 10)''',
+  'counter': '''(define (counter start)
+  (let ((count start))
+    (lambda ()
+      (set! count (+ count 1)))))
+
+(define c (counter 10))
+(print "First: " (c))
+(print "Second: " (c))
+(print "Third: " (c))
+(c)''',
+  'map': '''(define (square x) (* x x))
+(map '(1 2 3 4 5 6) square)''',
+  'while': '''(define x 5)
+(while (> x 0)
+  (print "Countdown: " x)
+  (set! x (- x 1)))
+x''',
+};
+
 void main() {
+  initShared();
+
+  final presetFib = document.querySelector('#preset-fib') as HTMLButtonElement?;
+  final presetCounter =
+      document.querySelector('#preset-counter') as HTMLButtonElement?;
+  final presetMap = document.querySelector('#preset-map') as HTMLButtonElement?;
+  final presetWhile =
+      document.querySelector('#preset-while') as HTMLButtonElement?;
+
+  void loadPreset(String key) {
+    final code = presets[key];
+    if (code != null) {
+      input.value = code;
+      evaluate.click();
+    }
+  }
+
+  presetFib?.onClick.listen((_) => loadPreset('fib'));
+  presetCounter?.onClick.listen((_) => loadPreset('counter'));
+  presetMap?.onClick.listen((_) => loadPreset('map'));
+  presetWhile?.onClick.listen((_) => loadPreset('while'));
+
   printer = (object) {
     console.append(document.createTextNode(object.toString()));
     console.append(document.createElement('br'));

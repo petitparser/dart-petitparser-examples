@@ -80,6 +80,10 @@
     .hl-task { color: var(--color-accent); font-weight: 700 !important; }
     .hl-table { color: var(--color-primary); font-weight: 700 !important; }
     .hl-info { color: #8250df; font-style: italic; }
+
+    #panel-preview {
+      font-family: var(--font-sans);
+    }
   </style>
 </head>
 <body>
@@ -111,16 +115,26 @@
       <div class="stats" id="stats"></div>
     </div>
 
-    <div class="card">
-      <div class="tab-bar">
-        <button class="tab-btn active" data-tab="preview">Rendered HTML</button>
-        <button class="tab-btn" data-tab="html-source">HTML Source</button>
-        <button class="tab-btn" data-tab="ast">Abstract Syntax Tree</button>
+    <div class="card tabs">
+      <div class="tab-buttons">
+        <button class="active">Rendered HTML</button>
+        <button>HTML Source</button>
+        <button>Abstract Syntax Tree</button>
       </div>
 
-      <div id="panel-preview" class="tab-panel active markdown-body"></div>
-      <div id="panel-html-source" class="tab-panel output-panel"></div>
-      <div id="panel-ast" class="tab-panel output-panel"></div>
+      <div id="panel-preview" class="tab-body active markdown-body"></div>
+      <div id="panel-html-source" class="tab-body output-panel"></div>
+      <div id="panel-ast" class="tab-body output-panel"></div>
+    </div>
+    
+    <div class="card markdown-body" data-markdown>
+### What makes this parser special?
+
+This parser implements both standard **CommonMark 0.31.2** and **GitHub Flavored Markdown (GFM)** without a separate tokenizer:
+
+* **Scannerless PEG Architecture**: Standard markdown engines employ complicated state machines and lexers. PetitParser parses block structures (headings, blockquotes, lists, tables) and recursive inlines (emphasis, autolinks, code spans, strikethrough) within a single combinator framework.
+* **Live Syntax Highlighting &amp; AST**: The same grammar powers real-time in-editor syntax highlighting, strongly-typed AST tree generation, and standards-compliant HTML output.
+* **GFM Extensions**: Directly parses advanced features including GFM tables with column alignments and task list items (`[x]`).
     </div>
     
     <footer>
@@ -129,6 +143,5 @@
   </main>
 
   <script src="markdown.dart.js"></script>
-  <script src="../shared/shared.dart.js"></script>
 </body>
 </html>

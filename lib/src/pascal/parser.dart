@@ -304,16 +304,25 @@ class PascalParserDefinition extends PascalGrammarDefinition {
   Parser<List<FormalParameterNode>?> parameterList() =>
       super.parameterList().map((values) {
         if (values == null) return null;
-        final rawParamsSep = values.$2;
-        return rawParamsSep.elements.map((p) {
-          final (varKeyword, namesSep, _, typeName) =
-              p as (dynamic, SeparatedList<dynamic, dynamic>, dynamic, String);
-          return FormalParameterNode(
-            names: namesSep.elements.cast<String>(),
-            type: SimpleTypeNode(typeName),
-            isVar: varKeyword != null,
-          );
-        }).toList();
+        final rawParamsSep = values.$2 as SeparatedList<dynamic, dynamic>;
+        return [
+          for (final p in rawParamsSep.elements)
+            () {
+              final (varKeyword, namesSep, _, typeName) =
+                  p
+                      as (
+                        dynamic,
+                        SeparatedList<dynamic, dynamic>,
+                        dynamic,
+                        String,
+                      );
+              return FormalParameterNode(
+                names: namesSep.elements.cast<String>(),
+                type: SimpleTypeNode(typeName),
+                isVar: varKeyword != null,
+              );
+            }(),
+        ];
       });
 
   @override
@@ -388,15 +397,18 @@ class PascalParserDefinition extends PascalGrammarDefinition {
   @override
   Parser<List<VariableDeclarationNode>> fieldListBase() =>
       super.fieldListBase().map((values) {
-        final listSep = values;
-        return listSep.elements.map((item) {
-          final (namesSep, _, type) =
-              item as (SeparatedList<dynamic, dynamic>, dynamic, TypeNode);
-          return VariableDeclarationNode(
-            names: namesSep.elements.cast<String>(),
-            type: type,
-          );
-        }).toList();
+        final listSep = values as SeparatedList<dynamic, dynamic>;
+        return [
+          for (final item in listSep.elements)
+            () {
+              final (namesSep, _, type) =
+                  item as (SeparatedList<dynamic, dynamic>, dynamic, TypeNode);
+              return VariableDeclarationNode(
+                names: namesSep.elements.cast<String>(),
+                type: type,
+              );
+            }(),
+        ];
       });
 
   @override
@@ -502,23 +514,17 @@ class PascalParserDefinition extends PascalGrammarDefinition {
         return SetExpressionNode(elements);
       }
     }
-    if (values is (String, dynamic)) {
-      if (values.$1 == 'not') {
-        return UnaryExpressionNode(
-          operator: 'not',
-          operand: values.$2 as ExpressionNode,
-        );
-      }
-      final name = values.$1;
-      final callPart = values.$2 as (dynamic, dynamic, dynamic)?;
-      if (callPart != null) {
-        final argsSep = callPart.$2 as SeparatedList<dynamic, dynamic>;
-        return FunctionCallExpressionNode(
-          name: name,
-          arguments: argsSep.elements.cast<ExpressionNode>(),
-        );
-      }
-      return VariableExpressionNode(name);
+    if (values is (String, dynamic, dynamic, dynamic)) {
+      final (name, _, argsSep, _) = values;
+      final args = (argsSep as SeparatedList<dynamic, dynamic>).elements
+          .cast<ExpressionNode>();
+      return FunctionCallExpressionNode(name: name, arguments: args);
+    }
+    if (values is (String, dynamic) && values.$1 == 'not') {
+      return UnaryExpressionNode(
+        operator: 'not',
+        operand: values.$2 as ExpressionNode,
+      );
     }
     throw StateError('Unknown factor: $values');
   });

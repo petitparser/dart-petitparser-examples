@@ -311,16 +311,14 @@ class PascalGrammarDefinition extends GrammarDefinition {
       ).starSeparated(ref1(token, ',')),
       ref1(token, ']'),
     ),
-    seq2(
+    seq4(
       ref0(identifier),
-      seq3(
-        ref1(token, '('),
-        ref0(expression).plusSeparated(ref1(token, ',')),
-        ref1(token, ')'),
-      ).optional(),
+      ref1(token, '('),
+      ref0(expression).plusSeparated(ref1(token, ',')),
+      ref1(token, ')'),
     ),
-    ref0(unsignedConstant),
     ref0(variable),
+    ref0(unsignedConstant),
   ].toChoiceParser();
 
   Parser unsignedConstant() => [
@@ -373,7 +371,7 @@ class PascalGrammarDefinition extends GrammarDefinition {
     ref0(identifier).plusSeparated(ref1(token, ',')),
     ref1(token, ':'),
     ref0(type),
-  ).plusSeparated(ref1(token, ';'));
+  ).plusSeparated(ref1(token, ';')).skip(after: ref1(token, ';').optional());
 
   Parser fieldListCase() => seq5(
     ref1(token, 'case'),

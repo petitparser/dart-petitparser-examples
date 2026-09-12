@@ -34,28 +34,56 @@
     }
 
     /* AST visualizer styles */
+    .ast-children {
+      margin-left: 1.4rem;
+    }
     .ast-node {
       font-family: var(--font-mono);
-      margin-left: 2rem;
       position: relative;
+      padding-left: 1.4rem;
     }
     .ast-node::before {
-      content: "├─";
+      content: "";
       position: absolute;
-      left: -1.5rem;
-      color: #999;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      border-left: 2px solid #94a3b8;
+    }
+    .ast-node:first-child::before {
+      top: -0.3rem;
     }
     .ast-node:last-child::before {
-      content: "└─";
+      bottom: auto;
+      height: 1.4rem;
+    }
+    .ast-node:only-child::before {
+      top: -0.3rem;
+      height: 1.7rem;
+    }
+    .ast-node::after {
+      content: "";
+      position: absolute;
+      left: 0;
+      top: 1.4rem;
+      width: 1.2rem;
+      border-top: 2px solid #94a3b8;
+    }
+    .ast-item {
+      display: block;
+      margin: 0.2rem 0;
     }
     .ast-badge {
-      display: inline-block;
-      padding: 0.2rem 0.6rem;
-      margin: 0.2rem;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      padding: 0.25rem 0.7rem;
+      margin: 0.2rem 0;
       border-radius: 4px;
-      font-size: 1.2rem;
-      font-weight: bold;
+      font-size: 1.25rem;
+      font-weight: 600;
       color: #fff;
+      line-height: 1.4;
     }
     .badge-empty { background-color: #777; }
     .badge-literal { background-color: #0e5f8e; }
@@ -137,76 +165,84 @@
   </header>
 
   <main class="container">
-    <div class="row">
-      <div class="column column-50">
-        <div class="card">
-          <h2>1. Pattern &amp; Input</h2>
-          
-          <label for="regexp-input">Regular Expression</label>
-          <input type="text" id="regexp-input" value="(a|b)*abb" placeholder="e.g. (a|b)*abb" spellcheck="false" autocomplete="off" autofocus>
-          
-          <label for="test-input">Test String</label>
-          <textarea id="test-input" placeholder="Type test string here..." rows="4" spellcheck="false">ababb</textarea>
+    <div class="card">
+      <h2>1. Pattern &amp; Input</h2>
+      
+      <label for="regexp-input">Regular Expression</label>
+      <input type="text" id="regexp-input" value="(a|b)*abb" placeholder="e.g. (a|b)*abb" spellcheck="false" autocomplete="off" autofocus>
+      
+      <label for="test-input">Test String</label>
+      <textarea id="test-input" placeholder="Type test string here..." rows="4" spellcheck="false">ababb</textarea>
 
-          <label>Quick Examples</label>
-          <div class="button-group">
-            <button class="preset-btn example-btn" data-regex="(a|b)*abb" data-test="ababb">ababb</button>
-            <button class="preset-btn example-btn" data-regex="\d+" data-test="12345">Digits</button>
-            <button class="preset-btn example-btn" data-regex="[a-zA-Z_]\w*" data-test="my_variable_12">Identifiers</button>
-            <button class="preset-btn example-btn" data-regex="[a-z]+@[a-z]+\.[a-z]+" data-test="hello@world.com">Simple Email</button>
-            <button class="preset-btn example-btn" data-regex="^a*b$" data-test="aaab">Anchored</button>
-            <button class="preset-btn example-btn" data-regex="a{2,4}" data-test="aaaaa">Ranges</button>
-          </div>
-        </div>
+      <label>Quick Examples</label>
+      <div class="button-group">
+        <button class="preset-btn example-btn" data-regex="(a|b)*abb" data-test="ababb">ababb</button>
+        <button class="preset-btn example-btn" data-regex="\d+" data-test="12345">Digits</button>
+        <button class="preset-btn example-btn" data-regex="[a-zA-Z_]\w*" data-test="my_variable_12">Identifiers</button>
+        <button class="preset-btn example-btn" data-regex="[a-z]+@[a-z]+\.[a-z]+" data-test="hello@world.com">Simple Email</button>
+        <button class="preset-btn example-btn" data-regex="^a*b$" data-test="aaab">Anchored</button>
+        <button class="preset-btn example-btn" data-regex="a{2,4}" data-test="aaaaa">Ranges</button>
       </div>
+    </div>
 
-      <div class="column column-50">
-        <div class="card">
-          <h2>2. Match Results</h2>
-          <div id="error-box" style="display: none;" class="error"></div>
-          
-          <div id="match-results-box">
-            <label>Live Matches</label>
-            <div id="highlight-container"></div>
-            
-            <label style="margin-top: 1.5rem;">Match Details (<span id="match-count">0</span> matches found)</label>
-            <div style="max-height: 15rem; overflow-y: auto; border: 1px solid var(--color-border); border-radius: 4px; padding: 0.5rem 1rem; background-color: var(--color-pre-bg);">
-              <ul id="match-list" style="margin: 0; padding: 0; list-style: none; font-size: 1.35rem; font-family: var(--font-mono);">
-                <!-- Populate dynamically -->
-              </ul>
-            </div>
+    <div class="card">
+      <h2>2. Match Results</h2>
+      <div id="error-box" style="display: none;" class="error"></div>
+      
+      <div id="match-results-box">
+        <label>Live Matches</label>
+        <div id="highlight-container"></div>
+        
+        <div id="no-matches-warning" class="alert-warning" style="display: none; margin-top: 1.5rem;">
+          No matches found for this regular expression in the test string.
+        </div>
+
+        <div id="match-details-container">
+          <label style="margin-top: 1.5rem;">Match Details (<span id="match-count">0</span> matches found)</label>
+          <div style="max-height: 15rem; overflow-y: auto; border: 1px solid var(--color-border); border-radius: 4px; padding: 0.5rem 1rem; background-color: var(--color-pre-bg);">
+            <ul id="match-list" style="margin: 0; padding: 0; list-style: none; font-size: 1.35rem; font-family: var(--font-mono);">
+              <!-- Populate dynamically -->
+            </ul>
           </div>
         </div>
       </div>
     </div>
 
-    <div class="row">
-      <div class="column column-50">
-        <div class="card">
-          <h2>3. AST Visualization</h2>
-          <div style="background-color: var(--color-pre-bg); border: 1px solid var(--color-border); border-radius: 4px; padding: 1.5rem; max-height: 400px; overflow-y: auto;">
-            <div id="ast-container"></div>
-          </div>
-        </div>
+    <div class="card">
+      <h2>3. AST Visualization</h2>
+      <div style="background-color: var(--color-pre-bg); border: 1px solid var(--color-border); border-radius: 4px; padding: 1.5rem; max-height: 400px; overflow-y: auto;">
+        <div id="ast-container"></div>
       </div>
+    </div>
 
-      <div class="column column-50">
-        <div class="card">
-          <h2>4. NFA States &amp; Transitions</h2>
-          <div class="nfa-table-container">
-            <table class="nfa-table">
-              <thead>
-                <tr>
-                  <th style="width: 25%;">State</th>
-                  <th>Transitions</th>
-                </tr>
-              </thead>
-              <tbody id="nfa-table-body">
-                <!-- Populate dynamically -->
-              </tbody>
-            </table>
-          </div>
-        </div>
+    <div class="card">
+      <h2>4. NFA States &amp; Transitions</h2>
+      <div class="nfa-table-container">
+        <table class="nfa-table">
+          <thead>
+            <tr>
+              <th style="width: 25%;">State</th>
+              <th>Transitions</th>
+            </tr>
+          </thead>
+          <tbody id="nfa-table-body">
+            <!-- Populate dynamically -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="card" id="about">
+      <h2>About Regular Expression Parser</h2>
+      <div data-markdown>
+This interactive playground demonstrates parsing regular expressions and compiling them directly into non-deterministic finite automata (**NFA**) using Thompson's construction algorithm.
+
+### What Makes This Parser Special?
+
+- **Non-Standard Operators**: Beyond standard concatenation, union (`|`), and Kleene star (`*`), this parser supports intersection (`&`) and complementation (`!`), which are rarely found in mainstream regex engines.
+- **Pure PetitParser Grammar**: The parser defines a clean hierarchical expression grammar with precedence handling using PetitParser's combinators.
+- **Direct AST to NFA Compilation**: Each AST node provides an `Nfa toNfa()` method, constructing an executable state machine with epsilon transitions, character predicates, and anchor checks without intermediate bytecode or backtracking.
+- **Inspectable State Machine**: The resulting state machine transitions are directly inspected to power the interactive transition table and match visualizer.
       </div>
     </div>
 
@@ -216,6 +252,5 @@
   </main>
 
   <script src="regexp.dart.js"></script>
-  <script src="../shared/shared.dart.js"></script>
 </body>
 </html>

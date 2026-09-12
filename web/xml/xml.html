@@ -28,10 +28,8 @@
       font-family: var(--font-mono);
       font-size: 1.25rem;
       line-height: 1.5;
-      background: var(--color-pre-bg);
-      border: 1px solid var(--color-border);
-      border-radius: 4px;
-      padding: 1.2rem;
+      border: none;
+      padding: 0;
       max-height: 480px;
       overflow-y: auto;
     }
@@ -89,35 +87,37 @@
       </div>
     </div>
 
-    <div class="card">
-      <div class="tab-bar">
-        <button class="tab-btn active" data-tab="dom">XML DOM Tree</button>
-        <button class="tab-btn" data-tab="xpath">XPath Results</button>
-        <button class="tab-btn" data-tab="sax">Streaming Events (SAX)</button>
+    <div class="card tabs">
+      <div class="tab-buttons">
+        <button class="active">XML DOM Tree</button>
+        <button>XPath Results</button>
+        <button>Streaming Events (SAX)</button>
       </div>
-      <p style="font-size: 1.3rem; color: var(--color-text-muted); margin-bottom: 1rem;">
-        Click on any element in the XML DOM to inspect its generated XPath expression.
-      </p>
-
-      <div id="panel-dom" class="output-panel active">
-        <div id="dom-output" class="xml-col"></div>
+      <div id="panel-dom" class="tab-body active">
+        <p style="font-size: 1.3rem; color: var(--color-text-muted); margin-bottom: 1rem;">
+          Click on any element in the XML DOM to inspect its generated XPath expression.
+        </p>
+        <div id="dom-output" class="output-panel xml-col"></div>
       </div>
-      <div id="panel-xpath" class="output-panel">
+      <div id="panel-xpath" class="tab-body output-panel">
         <div id="xpath-output" class="xml-col"></div>
       </div>
-      <div id="panel-sax" class="output-panel">
+      <div id="panel-sax" class="tab-body output-panel">
         <div id="sax-output" class="xml-col"></div>
       </div>
     </div>
 
-    <div class="card markdown-body" data-markdown>
-### About this Parser
+    <div class="card" id="about">
+      <h2>About XML Parser &amp; XPath Evaluator</h2>
+      <div data-markdown>
+Extensible Markup Language (XML) is a versatile markup language that defines a set of rules for encoding documents in a format that is both human-readable and machine-readable.
 
-Powered by `package:xml` built on PetitParser:
+### What Makes This Parser Special?
 
-* **Event-based Streaming (SAX)**: Emits high-performance tokens (`XmlEvent`) with character source positions.
-* **DOM Construction**: Generates typed trees (`XmlDocument`, `XmlElement`, `XmlAttribute`, `XmlText`).
-* **XPath 1.0 Support**: Evaluates axes, predicates, and node tests with live DOM element highlighting.
+- **Dual Parsing Architecture (SAX &amp; DOM)**: Built directly on top of PetitParser combinators, `package:xml` provides two modes: a lightweight event-driven stream scanner (`XmlEvent` / SAX) with zero tree allocation, and a comprehensive strongly-typed Document Object Model (`XmlDocument`, `XmlElement`, `XmlAttribute`, `XmlText`).
+- **Integrated XPath 1.0 Grammar**: Uses an independent PetitParser PEG grammar to parse full XPath expressions, evaluate axes (`//`, `child::`, `parent::`), test predicates, and dynamically highlight matched DOM elements in real-time.
+- **Bi-Directional Node Introspection**: Clicking any node in the rendered DOM tree automatically derives and generates its unique canonical XPath expression.
+      </div>
     </div>
 
     <footer>
@@ -126,6 +126,5 @@ Powered by `package:xml` built on PetitParser:
   </main>
 
   <script src="xml.dart.js"></script>
-  <script src="../shared/shared.dart.js"></script>
 </body>
 </html>

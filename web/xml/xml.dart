@@ -6,6 +6,8 @@ import 'package:xml/xml.dart';
 import 'package:xml/xml_events.dart';
 import 'package:xml/xpath.dart';
 
+import '../shared/shared.dart';
+
 final xmlInput = document.querySelector('#xml-input') as HTMLInputElement;
 final xpathInput = document.querySelector('#xpath-input') as HTMLInputElement;
 final xpathError = document.querySelector('#xpath-error') as HTMLElement;
@@ -187,29 +189,6 @@ const xmlPresets = {
   ),
 };
 
-void setupTabs() {
-  final tabButtons = document.querySelectorAll('.tab-btn');
-  final panels = document.querySelectorAll('.output-panel');
-
-  for (var i = 0; i < tabButtons.length; i++) {
-    final btn = tabButtons.item(i) as HTMLButtonElement;
-    btn.onClick.listen((_) {
-      for (var j = 0; j < tabButtons.length; j++) {
-        (tabButtons.item(j) as HTMLElement).classList.remove('active');
-      }
-      for (var j = 0; j < panels.length; j++) {
-        (panels.item(j) as HTMLElement).classList.remove('active');
-      }
-
-      btn.classList.add('active');
-      final tabId = btn.getAttribute('data-tab');
-      final targetPanel =
-          document.querySelector('#panel-$tabId') as HTMLElement?;
-      targetPanel?.classList.add('active');
-    });
-  }
-}
-
 void loadPreset(String key) {
   final data = xmlPresets[key];
   if (data != null) {
@@ -275,7 +254,7 @@ class HighlightWriter extends XmlWriter {
 }
 
 void main() {
-  setupTabs();
+  initShared();
 
   final btnBooks =
       document.querySelector('#preset-books') as HTMLButtonElement?;

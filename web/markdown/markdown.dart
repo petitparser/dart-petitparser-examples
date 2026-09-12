@@ -3,6 +3,8 @@ import 'dart:js_interop';
 import 'package:petitparser_examples/markdown.dart';
 import 'package:web/web.dart';
 
+import '../shared/shared.dart';
+
 final input = document.querySelector('#input') as HTMLTextAreaElement;
 final editorHighlight =
     document.querySelector('#editor-highlight') as HTMLElement;
@@ -265,36 +267,13 @@ void parseAndRender() {
   panelAst.innerHTML = formatAst(astNode).toJS;
 }
 
-void setupTabs() {
-  final tabButtons = document.querySelectorAll('.tab-btn');
-  final panels = document.querySelectorAll('.tab-panel');
-
-  for (var i = 0; i < tabButtons.length; i++) {
-    final btn = tabButtons.item(i) as HTMLButtonElement;
-    btn.onClick.listen((_) {
-      for (var j = 0; j < tabButtons.length; j++) {
-        (tabButtons.item(j) as HTMLElement).classList.remove('active');
-      }
-      for (var j = 0; j < panels.length; j++) {
-        (panels.item(j) as HTMLElement).classList.remove('active');
-      }
-
-      btn.classList.add('active');
-      final tabId = btn.getAttribute('data-tab');
-      final targetPanel =
-          document.querySelector('#panel-$tabId') as HTMLElement?;
-      targetPanel?.classList.add('active');
-    });
-  }
-}
-
 void loadPreset(String key) {
   input.value = presets[key] ?? '';
   parseAndRender();
 }
 
 void main() {
-  setupTabs();
+  initShared();
 
   // Synchronize scroll between transparent textarea and overlay highlight layer
   input.onScroll.listen((_) {

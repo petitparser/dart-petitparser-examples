@@ -4,6 +4,8 @@ import 'package:petitparser/petitparser.dart';
 import 'package:petitparser_examples/pascal.dart';
 import 'package:web/web.dart';
 
+import '../shared/shared.dart';
+
 final input = document.querySelector('#input') as HTMLTextAreaElement;
 final production = document.querySelector('#production') as HTMLSelectElement;
 final action = document.querySelector('#action') as HTMLButtonElement;
@@ -648,6 +650,8 @@ void setPreset(String key, String prod) {
 }
 
 void main() {
+  initShared();
+
   action.onClick.listen((_) => parseInput());
   production.onChange.listen((_) => parseInput());
   input.onInput.listen((_) => parseInput());
