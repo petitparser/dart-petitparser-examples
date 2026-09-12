@@ -10,5 +10,4 @@
 library;
 
 export 'src/pascal/ast.dart';
-export 'src/pascal/grammar.dart';
 export 'src/pascal/parser.dart';

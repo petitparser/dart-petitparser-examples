@@ -145,7 +145,7 @@ const mathInput =
     '  (e ^ -(x ^ 2 + y ^ 2)) / (sqrt(2.0 * pi) * (1.0 + abs(sin(z))))'
     ')';
 
-final pascalParser = pascal_example.PascalGrammarDefinition().build();
+final pascalParser = pascal_example.PascalParserDefinition().build();
 const pascalInput =
     'program ComplexDemo(input, output);\n'
     'label 99;\n'

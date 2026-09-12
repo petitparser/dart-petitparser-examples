@@ -1,226 +1,506 @@
-// ignore_for_file: unnecessary_overrides
 import 'package:petitparser/petitparser.dart';
 
 import 'ast.dart';
-import 'grammar.dart';
 
-/// Smalltalk parser definition.
-class SmalltalkParserDefinition extends SmalltalkGrammarDefinition {
+/// Smalltalk parser definition producing strongly typed [Node] AST nodes.
+class SmalltalkParserDefinition extends GrammarDefinition<MethodNode> {
   @override
-  Parser array() => super.array().map(
-    (input) => buildArray(input[1])..surroundWith(input[0], input[2]),
+  Parser<MethodNode> start() => ref0(startMethod);
+
+  Parser<MethodNode> startMethod() => ref0(method).end();
+
+  // region token helpers
+  Parser<Token<String>> token(
+    Object source, [
+    String? message,
+  ]) => switch (source) {
+    final String string =>
+      string
+          .toParser(message: 'Expected ${message ?? string}')
+          .token()
+          .trim(ref0(spacer)),
+    final Parser<String> parser =>
+      parser
+          .flatten(
+            message:
+                'Expected ${message ?? (throw ArgumentError.notNull('message'))}',
+          )
+          .token()
+          .trim(ref0(spacer)),
+    final Parser parser =>
+      parser
+          .flatten(
+            message:
+                'Expected ${message ?? (throw ArgumentError.notNull('message'))}',
+          )
+          .token()
+          .trim(ref0(spacer)),
+    _ => throw ArgumentError.value(source, 'source', 'Unknown token type'),
+  };
+
+  Parser<void> spacer() => [whitespace(), ref0(comment)].toChoiceParser();
+  Parser<void> comment() => seq3(char('"'), char('"').neg().star(), char('"'));
+  // endregion
+
+  // region number parsing
+  Parser<String> number() => seq2(
+    char('-').optional(),
+    ref0(positiveNumber),
+  ).flatten(message: 'number expected');
+  Parser<void> positiveNumber() =>
+      [ref0(scaledDecimal), ref0(float), ref0(integer)].toChoiceParser();
+  Parser<void> integer() =>
+      [ref0(radixInteger), ref0(decimalInteger)].toChoiceParser();
+  Parser<void> decimalInteger() => ref0(digits);
+  Parser<void> digits() => digit().plus();
+  Parser<void> radixInteger() =>
+      seq3(ref0(radixSpecifier), char('r'), ref0(radixDigits));
+  Parser<void> radixSpecifier() => ref0(digits);
+  Parser<void> radixDigits() => pattern('0-9A-Z').plus();
+  Parser<void> float() => seq2(
+    ref0(mantissa),
+    seq2(ref0(exponentLetter), ref0(exponent)).optional(),
+  );
+  Parser<void> mantissa() => seq3(ref0(digits), char('.'), ref0(digits));
+  Parser<void> exponent() => seq2(char('-').optional(), ref0(decimalInteger));
+  Parser<void> exponentLetter() => pattern('edq');
+  Parser<void> scaledDecimal() =>
+      seq3(ref0(scaledMantissa), char('s'), ref0(fractionalDigits).optional());
+  Parser<void> scaledMantissa() =>
+      [ref0(decimalInteger), ref0(mantissa)].toChoiceParser();
+  Parser<void> fractionalDigits() => ref0(decimalInteger);
+  // endregion
+
+  // region grammar productions
+  Parser<ArrayNode> array() =>
+      seq3(
+        ref1(token, '{'),
+        ref0(expression)
+            .starSeparated(ref0(periodToken).plus())
+            .skip(after: ref0(periodToken).star()),
+        ref1(token, '}'),
+      ).map3((open, list, close) {
+        final result = ArrayNode()..surroundWith(open, close);
+        result.statements.addAll(list.elements);
+        for (final sep in list.separators) {
+          result.periods.addAll(sep);
+        }
+        return result;
+      });
+
+  Parser<LiteralNode<dynamic>> arrayItem() => <Parser<LiteralNode>>[
+    ref0(literal),
+    ref0(symbolLiteralArray),
+    ref0(arrayLiteralArray),
+    ref0(byteLiteralArray),
+  ].toChoiceParser();
+
+  Parser<LiteralArrayNode<dynamic>> arrayLiteral() =>
+      seq3(ref1(token, '#('), ref0(arrayItem).star(), ref1(token, ')')).map3(
+        (open, items, close) =>
+            LiteralArrayNode(items)..surroundWith(open, close),
+      );
+
+  Parser<LiteralArrayNode<dynamic>> arrayLiteralArray() =>
+      seq3(ref1(token, '('), ref0(arrayItem).star(), ref1(token, ')')).map3(
+        (open, items, close) =>
+            LiteralArrayNode(items)..surroundWith(open, close),
+      );
+
+  Parser<(VariableNode, Token<String>)> assignment() =>
+      seq2(ref0(variable), ref0(assignmentToken));
+
+  Parser<Token<String>> assignmentToken() => ref1(token, ':=');
+
+  Parser<String> binary() => anyOf(r'!%&*+,-/<=>?@\|~').plusString();
+
+  Parser<ValueNode> binaryExpression() =>
+      seq2(ref0(unaryExpression), ref0(binaryMessage).star()).map2((
+        unary,
+        messages,
+      ) {
+        var current = unary;
+        for (final (tokens, args) in messages) {
+          final msg = MessageNode(current);
+          msg.selectorToken.addAll(tokens);
+          msg.arguments.addAll(args);
+          current = msg;
+        }
+        return current;
+      });
+
+  Parser<(List<Token<String>>, List<ValueNode>)> binaryMessage() => seq2(
+    ref0(binaryToken),
+    ref0(unaryExpression),
+  ).map2((t, expr) => ([t], [expr]));
+
+  Parser<(List<Token<String>>, List<VariableNode>)> binaryMethod() =>
+      seq2(ref0(binaryToken), ref0(variable)).map2((t, v) => ([t], [v]));
+
+  Parser<(List<Token<String>>, List<LiteralNode<dynamic>>)> binaryPragma() =>
+      seq2(ref0(binaryToken), ref0(arrayItem)).map2((t, item) => ([t], [item]));
+
+  Parser<Token<String>> binaryToken() =>
+      ref2(token, ref0(binary), 'binary selector');
+
+  Parser<BlockNode> block() =>
+      seq3(ref1(token, '['), ref0(blockBody), ref1(token, ']')).map3((
+        open,
+        bodyInfo,
+        close,
+      ) {
+        final (args, body) = bodyInfo;
+        final (arguments, separator) = args;
+        final result = BlockNode(body)..surroundWith(open, close);
+        result.arguments.addAll(arguments);
+        if (separator != null) {
+          result.separators.add(separator);
+        }
+        return result;
+      });
+
+  Parser<VariableNode> blockArgument() =>
+      seq2(ref1(token, ':'), ref0(variable)).map2((_, v) => v);
+
+  Parser<(List<VariableNode>, Token<String>?)> blockArguments() =>
+      [ref0(blockArgumentsWith), ref0(blockArgumentsWithout)].toChoiceParser();
+
+  Parser<(List<VariableNode>, Token<String>?)> blockArgumentsWith() => seq2(
+    ref0(blockArgument).plus(),
+    [
+      ref1(token, '|').map((t) => t as Token<String>?),
+      ref1(token, ']').and().map((_) => null),
+    ].toChoiceParser(),
   );
 
-  @override
-  Parser arrayLiteral() => super.arrayLiteral().map(
-    (input) =>
-        LiteralArrayNode(input[1].cast<LiteralNode>().toList())
-          ..surroundWith(input[0], input[2]),
-  );
+  Parser<(List<VariableNode>, Token<String>?)> blockArgumentsWithout() =>
+      epsilonWith((const <VariableNode>[], null));
 
-  @override
-  Parser arrayLiteralArray() => super.arrayLiteralArray().map(
-    (input) =>
-        LiteralArrayNode(input[1].cast<LiteralNode>().toList())
-          ..surroundWith(input[0], input[2]),
-  );
+  Parser<((List<VariableNode>, Token<String>?), SequenceNode)> blockBody() =>
+      seq2(ref0(blockArguments), ref0(sequence));
 
-  @override
-  Parser binaryExpression() =>
-      super.binaryExpression().map((input) => buildMessage(input[0], input[1]));
+  Parser<LiteralArrayNode<num>> byteLiteral() =>
+      seq3(
+        ref1(token, '#['),
+        ref0(numberLiteral).star(),
+        ref1(token, ']'),
+      ).map3(
+        (open, items, close) =>
+            LiteralArrayNode<num>(items)..surroundWith(open, close),
+      );
 
-  @override
-  Parser block() =>
-      super.block().map((input) => input[1]..surroundWith(input[0], input[2]));
+  Parser<LiteralArrayNode<num>> byteLiteralArray() =>
+      seq3(ref1(token, '['), ref0(numberLiteral).star(), ref1(token, ']')).map3(
+        (open, items, close) =>
+            LiteralArrayNode<num>(items)..surroundWith(open, close),
+      );
 
-  @override
-  Parser blockArgument() => super.blockArgument();
+  Parser<ValueNode> cascadeExpression() =>
+      seq2(
+        ref0(keywordExpression),
+        seq2(ref1(token, ';'), ref0(message)).star(),
+      ).map2((first, rest) {
+        if (rest.isEmpty) return first;
+        final cascade = CascadeNode();
+        cascade.messages.add(first as MessageNode);
+        final receiver = cascade.receiver;
+        for (final (semicolon, (tokens, args)) in rest) {
+          final msg = MessageNode(receiver);
+          msg.selectorToken.addAll(tokens);
+          msg.arguments.addAll(args);
+          cascade.messages.add(msg);
+          cascade.semicolons.add(semicolon);
+        }
+        return cascade;
+      });
 
-  @override
-  Parser blockBody() =>
-      super.blockBody().map((input) => buildBlock(input[0], input[1]));
+  Parser<(Token<String>, (List<Token<String>>, List<ValueNode>))>
+  cascadeMessage() => seq2(ref1(token, ';'), ref0(message));
 
-  @override
-  Parser byteLiteral() => super.byteLiteral().map(
-    (input) =>
-        LiteralArrayNode<num>(input[1].cast<LiteralNode<num>>().toList())
-          ..surroundWith(input[0], input[2]),
-  );
+  Parser<String> character() => seq2(char(r'$'), any()).flatten();
 
-  @override
-  Parser byteLiteralArray() => super.byteLiteralArray().map(
-    (input) =>
-        LiteralArrayNode<num>(input[1].cast<LiteralNode<num>>().toList())
-          ..surroundWith(input[0], input[2]),
-  );
+  Parser<LiteralValueNode<String>> characterLiteral() =>
+      ref0(characterToken)
+          .map((t) => LiteralValueNode<String>(t, t.value.substring(1)));
 
-  @override
-  Parser characterLiteral() => super.characterLiteral().map(
-    (input) => LiteralValueNode<String>(input, input.value.substring(1)),
-  );
+  Parser<Token<String>> characterToken() =>
+      ref2(token, ref0(character), 'character');
 
-  @override
-  Parser cascadeExpression() => super.cascadeExpression().map(
-    (input) => buildCascade(input[0], input[1]),
-  );
+  Parser<ValueNode> expression() =>
+      seq2(ref0(assignment).star(), ref0(cascadeExpression)).map2(
+        (assignments, expr) => assignments.reversed.fold(
+          expr,
+          (result, assign) => AssignmentNode(assign.$1, assign.$2, result),
+        ),
+      );
 
-  @override
-  Parser expression() =>
-      super.expression().map((input) => buildAssignment(input[1], input[0]));
+  Parser<ReturnNode> expressionReturn() => seq2(
+    ref1(token, '^'),
+    ref0(expression),
+  ).map2((caret, expr) => ReturnNode(caret, expr));
 
-  @override
-  Parser expressionReturn() =>
-      super.expressionReturn().map((input) => ReturnNode(input[0], input[1]));
+  Parser<LiteralValueNode<bool>> falseLiteral() =>
+      ref0(falseToken).map((t) => LiteralValueNode<bool>(t, false));
 
-  @override
-  Parser falseLiteral() =>
-      super.falseLiteral().map((input) => LiteralValueNode<bool>(input, false));
+  Parser<Token<String>> falseToken() =>
+      ref2(token, seq2(string('false'), word().not()), 'false');
 
-  @override
-  Parser keywordExpression() => super.keywordExpression().map(
-    (input) => buildMessage(input[0], [input[1]]),
-  );
+  Parser<String> identifier() =>
+      seq2(pattern('a-zA-Z_'), word().star()).flatten();
 
-  @override
-  Parser method() => super.method().map((input) => buildMethod(input));
+  Parser<Token<String>> identifierToken() =>
+      ref2(token, ref0(identifier), 'identifier');
 
-  @override
-  Parser nilLiteral() =>
-      super.nilLiteral().map((input) => LiteralValueNode<void>(input, null));
+  Parser<String> keyword() => seq2(ref0(identifier), char(':')).flatten();
 
-  @override
-  Parser numberLiteral() => super.numberLiteral().map(
-    (input) => LiteralValueNode<num>(input, buildNumber(input.value)),
-  );
+  Parser<ValueNode> keywordExpression() =>
+      seq2(ref0(binaryExpression), ref0(keywordMessage).optional()).map2((
+        binary,
+        kwMsg,
+      ) {
+        if (kwMsg == null) return binary;
+        final msg = MessageNode(binary);
+        msg.selectorToken.addAll(kwMsg.$1);
+        msg.arguments.addAll(kwMsg.$2);
+        return msg;
+      });
 
-  @override
-  Parser parens() =>
-      super.parens().map((input) => input[1]..surroundWith(input[0], input[2]));
+  Parser<(List<Token<String>>, List<ValueNode>)> keywordMessage() =>
+      seq2(ref0(keywordToken), ref0(binaryExpression)).plus().map(
+        (pairs) =>
+            (pairs.map((p) => p.$1).toList(), pairs.map((p) => p.$2).toList()),
+      );
 
-  @override
-  Parser pragma() => super.pragma().map(
-    (input) => buildPragma(input[1])..surroundWith(input[0], input[2]),
-  );
+  Parser<(List<Token<String>>, List<VariableNode>)> keywordMethod() =>
+      seq2(ref0(keywordToken), ref0(variable)).plus().map(
+        (pairs) =>
+            (pairs.map((p) => p.$1).toList(), pairs.map((p) => p.$2).toList()),
+      );
 
-  @override
-  Parser sequence() => super.sequence().map(
-    (input) => buildSequence(input[0], [input[1], input[2]]),
-  );
+  Parser<(List<Token<String>>, List<LiteralNode<dynamic>>)> keywordPragma() =>
+      seq2(ref0(keywordToken), ref0(arrayItem)).plus().map(
+        (pairs) =>
+            (pairs.map((p) => p.$1).toList(), pairs.map((p) => p.$2).toList()),
+      );
 
-  @override
-  Parser stringLiteral() => super.stringLiteral().map(
-    (input) => LiteralValueNode<String>(input, buildString(input.value)),
-  );
+  Parser<Token<String>> keywordToken() =>
+      ref2(token, ref0(keyword), 'keyword selector');
 
-  @override
-  Parser symbolLiteral() => super.symbolLiteral().map(
-    (input) => LiteralValueNode<String>(
-      Token.join<dynamic>([...input[0], input[1]]),
-      buildString(input[1].value),
-    ),
-  );
+  Parser<LiteralNode<dynamic>> literal() => <Parser<LiteralNode>>[
+    ref0(numberLiteral),
+    ref0(stringLiteral),
+    ref0(characterLiteral),
+    ref0(arrayLiteral),
+    ref0(byteLiteral),
+    ref0(symbolLiteral),
+    ref0(nilLiteral),
+    ref0(trueLiteral),
+    ref0(falseLiteral),
+  ].toChoiceParser();
 
-  @override
-  Parser symbolLiteralArray() => super.symbolLiteralArray().map(
-    (input) => LiteralValueNode<String>(input, buildString(input.value)),
-  );
+  Parser<(List<Token<String>>, List<ValueNode>)> message() => [
+    ref0(keywordMessage),
+    ref0(binaryMessage),
+    ref0(unaryMessage),
+  ].toChoiceParser();
 
-  @override
-  Parser unaryExpression() =>
-      super.unaryExpression().map((input) => buildMessage(input[0], input[1]));
+  Parser<MethodNode> method() =>
+      seq2(ref0(methodDeclaration), ref0(methodSequence)).map2((decl, seqInfo) {
+        final (declTokens, declArgs) = decl;
+        final (pragmas, temps, stmts, periods) = seqInfo;
+        final result = MethodNode();
+        result.selectorToken.addAll(declTokens);
+        result.arguments.addAll(declArgs);
+        result.pragmas.addAll(pragmas);
+        result.body.temporaries.addAll(temps);
+        result.body.statements.addAll(stmts);
+        result.body.periods.addAll(periods);
+        return result;
+      });
 
-  @override
-  Parser trueLiteral() =>
-      super.trueLiteral().map((input) => LiteralValueNode<bool>(input, true));
+  Parser<(List<Token<String>>, List<VariableNode>)> methodDeclaration() => [
+    ref0(keywordMethod),
+    ref0(unaryMethod),
+    ref0(binaryMethod),
+  ].toChoiceParser();
 
-  @override
-  Parser variable() => super.variable().map((input) => VariableNode(input));
+  Parser<
+    (
+      List<PragmaNode>,
+      List<VariableNode>,
+      List<IsStatement>,
+      List<Token<String>>,
+    )
+  >
+  methodSequence() =>
+      seq8(
+        ref0(periodToken).star(),
+        ref0(pragmas),
+        ref0(periodToken).star(),
+        ref0(temporaries),
+        ref0(periodToken).star(),
+        ref0(pragmas),
+        ref0(periodToken).star(),
+        ref0(statements),
+      ).map8(
+        (p1, pragmas1, p2, temps, p3, pragmas2, p4, stmts) => (
+          [...pragmas1, ...pragmas2],
+          temps,
+          stmts,
+          [...p1, ...p2, ...p3, ...p4],
+        ),
+      );
+
+  Parser<void> multiword() => ref0(keyword).plus();
+
+  Parser<LiteralValueNode<void>> nilLiteral() =>
+      ref0(nilToken).map((t) => LiteralValueNode<void>(t, null));
+
+  Parser<Token<String>> nilToken() =>
+      ref2(token, seq2(string('nil'), word().not()), 'nil');
+
+  Parser<LiteralValueNode<num>> numberLiteral() =>
+      ref0(numberToken)
+          .map((t) => LiteralValueNode<num>(t, _buildNumber(t.value)));
+
+  Parser<Token<String>> numberToken() => ref2(token, ref0(number), 'number');
+
+  Parser<ValueNode> parens() => seq3(
+    ref1(token, '('),
+    ref0(expression),
+    ref1(token, ')'),
+  ).map3((open, expr, close) => expr..surroundWith(open, close));
+
+  Parser<String> period() => char('.');
+
+  Parser<Token<String>> periodToken() => ref2(token, ref0(period), 'period');
+
+  Parser<PragmaNode> pragma() =>
+      seq3(ref1(token, '<'), ref0(pragmaMessage), ref1(token, '>')).map3((
+        open,
+        msgInfo,
+        close,
+      ) {
+        final (tokens, args) = msgInfo;
+        final result = PragmaNode()..surroundWith(open, close);
+        result.selectorToken.addAll(tokens);
+        result.arguments.addAll(args);
+        return result;
+      });
+
+  Parser<(List<Token<String>>, List<LiteralNode<dynamic>>)> pragmaMessage() => [
+    ref0(keywordPragma),
+    ref0(unaryPragma),
+    ref0(binaryPragma),
+  ].toChoiceParser();
+
+  Parser<List<PragmaNode>> pragmas() => ref0(pragma).star();
+
+  Parser<ValueNode> primary() => [
+    ref0(literal),
+    ref0(variable),
+    ref0(block),
+    ref0(parens),
+    ref0(array),
+  ].toChoiceParser();
+
+  Parser<SequenceNode> sequence() =>
+      seq3(ref0(temporaries), ref0(periodToken).star(), ref0(statements)).map3((
+        temps,
+        periods,
+        stmts,
+      ) {
+        final result = SequenceNode();
+        result.temporaries.addAll(temps);
+        result.periods.addAll(periods);
+        result.statements.addAll(stmts);
+        return result;
+      });
+
+  Parser<List<IsStatement>> statements() =>
+      [ref0(expressionReturn), ref0(expression)]
+          .toChoiceParser()
+          .starSeparated(ref0(periodToken).plus())
+          .skip(after: ref0(periodToken).star())
+          .map((list) => list.elements);
+
+  Parser<String> _string() => seq3(
+    char("'"),
+    [string("''"), pattern("^'")].toChoiceParser().star(),
+    char("'"),
+  ).flatten();
+
+  Parser<LiteralValueNode<String>> stringLiteral() =>
+      ref0(stringToken)
+          .map((t) => LiteralValueNode<String>(t, _buildString(t.value)));
+
+  Parser<Token<String>> stringToken() => ref2(token, ref0(_string), 'string');
+
+  Parser<void> symbol() => [
+    ref0(unary),
+    ref0(binary),
+    ref0(multiword),
+    ref0(_string),
+  ].toChoiceParser();
+
+  Parser<LiteralValueNode<String>> symbolLiteral() =>
+      seq2(ref1(token, '#').plus(), ref2(token, ref0(symbol), 'symbol')).map2(
+        (hashes, sym) => LiteralValueNode<String>(
+          Token.join<dynamic>([...hashes, sym]),
+          _buildString(sym.value),
+        ),
+      );
+
+  Parser<LiteralValueNode<String>> symbolLiteralArray() => ref2(
+    token,
+    ref0(symbol),
+    'symbol',
+  ).map((sym) => LiteralValueNode<String>(sym, _buildString(sym.value)));
+
+  Parser<List<VariableNode>> temporaries() => seq3(
+    ref1(token, '|'),
+    ref0(variable).star(),
+    ref1(token, '|'),
+  ).map3((_, vars, _) => vars).optionalWith(const <VariableNode>[]);
+
+  Parser<LiteralValueNode<bool>> trueLiteral() =>
+      ref0(trueToken).map((t) => LiteralValueNode<bool>(t, true));
+
+  Parser<Token<String>> trueToken() =>
+      ref2(token, seq2(string('true'), word().not()), 'true');
+
+  Parser<String> unary() => seq2(ref0(identifier), char(':').not()).flatten();
+
+  Parser<ValueNode> unaryExpression() =>
+      seq2(ref0(primary), ref0(unaryMessage).star()).map2((primary, messages) {
+        var current = primary;
+        for (final (tokens, args) in messages) {
+          final msg = MessageNode(current);
+          msg.selectorToken.addAll(tokens);
+          msg.arguments.addAll(args);
+          current = msg;
+        }
+        return current;
+      });
+
+  Parser<(List<Token<String>>, List<ValueNode>)> unaryMessage() =>
+      ref0(unaryToken).map((t) => ([t], const <ValueNode>[]));
+
+  Parser<(List<Token<String>>, List<VariableNode>)> unaryMethod() =>
+      ref0(identifierToken).map((t) => ([t], const <VariableNode>[]));
+
+  Parser<(List<Token<String>>, List<LiteralNode<dynamic>>)> unaryPragma() =>
+      ref0(identifierToken).map((t) => ([t], const <LiteralNode<dynamic>>[]));
+
+  Parser<Token<String>> unaryToken() =>
+      ref2(token, ref0(unary), 'unary selector');
+
+  Parser<VariableNode> variable() =>
+      ref0(identifierToken).map(VariableNode.new);
+  // endregion
 }
 
-// Build different node types
-
-ArrayNode buildArray(List statements) {
-  final result = ArrayNode();
-  addTo<IsStatement>(result.statements, statements);
-  addTo<Token>(result.periods, statements);
-  return result;
-}
-
-ValueNode buildAssignment(ValueNode node, List parts) => parts.reversed.fold(
-  node,
-  (result, variableAndToken) =>
-      AssignmentNode(variableAndToken[0], variableAndToken[1], result),
-);
-
-ValueNode buildBlock(List arguments, SequenceNode body) {
-  final result = BlockNode(body);
-  addTo<VariableNode>(result.arguments, arguments);
-  addTo<Token>(result.separators, arguments);
-  return result;
-}
-
-ValueNode buildCascade(ValueNode value, List parts) {
-  if (parts.isNotEmpty) {
-    final result = CascadeNode();
-    result.messages.add(value as MessageNode);
-    for (final part in parts) {
-      final message = buildMessage(result.receiver, [part[1]]);
-      result.messages.add(message as MessageNode);
-      result.semicolons.add(part[0]);
-    }
-    return result;
-  }
-  return value;
-}
-
-ValueNode buildMessage(ValueNode receiver, List parts) => parts
-    .where((selectorAndArguments) => selectorAndArguments.isNotEmpty)
-    .fold(receiver, (receiver, selectorAndArguments) {
-      final message = MessageNode(receiver);
-      addTo<Token>(message.selectorToken, selectorAndArguments);
-      addTo<ValueNode>(message.arguments, selectorAndArguments);
-      return message;
-    });
-
-MethodNode buildMethod(List parts) {
-  final result = MethodNode();
-  addTo<Token>(result.selectorToken, parts[0]);
-  addTo<VariableNode>(result.arguments, parts[0]);
-  addTo<PragmaNode>(result.pragmas, parts[1]);
-  addTo<VariableNode>(result.body.temporaries, parts[1][3]);
-  addTo<IsStatement>(result.body.statements, parts[1][7]);
-  addTo<Token>(result.body.periods, parts[1][7]);
-  return result;
-}
-
-PragmaNode buildPragma(List parts) {
-  final result = PragmaNode();
-  addTo<Token>(result.selectorToken, parts);
-  addTo<LiteralNode>(result.arguments, parts);
-  return result;
-}
-
-SequenceNode buildSequence(List temporaries, List statements) {
-  final result = SequenceNode();
-  addTo<VariableNode>(result.temporaries, temporaries);
-  addTo<IsStatement>(result.statements, statements);
-  addTo<Token>(result.periods, statements);
-  return result;
-}
-
-// Various other helpers.
-
-void addTo<T>(List<T> target, List parts) {
-  for (final part in parts) {
-    if (part is T) {
-      target.add(part);
-    } else if (part is List) {
-      addTo<T>(target, part);
-    }
-  }
-}
-
-num buildNumber(String input) {
+num _buildNumber(String input) {
   final values = input.split('r');
   return values.length == 1
       ? num.parse(values[0])
@@ -229,7 +509,7 @@ num buildNumber(String input) {
       : throw ArgumentError.value(input, 'number', 'Unable to parse');
 }
 
-String buildString(String input) =>
-    input.isNotEmpty && input.startsWith("'") && input.startsWith("'")
+String _buildString(String input) =>
+    input.isNotEmpty && input.startsWith("'") && input.endsWith("'")
     ? input.substring(1, input.length - 1).replaceAll("''", "'")
     : input;

@@ -67,7 +67,7 @@ void main() {
     });
 
     test('Pascal', () {
-      final parser = PascalGrammarDefinition().build();
+      final parser = PascalParserDefinition().build();
       final result = parser.parse('''
 program HelloWorld;
 begin

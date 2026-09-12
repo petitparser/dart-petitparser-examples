@@ -124,7 +124,7 @@ A grammar for Pascal following the 1978 Apple Pascal Standard.
 import 'package:petitparser_examples/pascal.dart';
 
 void main() {
-  final parser = PascalGrammarDefinition().build();
+  final parser = PascalParserDefinition().build();
   final result = parser.parse('''
 program HelloWorld;
 begin

@@ -4,8 +4,8 @@ import 'package:petitparser/reflection.dart';
 import 'package:petitparser_examples/smalltalk.dart';
 import 'package:test/test.dart';
 
-final grammar = SmalltalkGrammarDefinition();
 final parser = SmalltalkParserDefinition();
+final grammar = parser;
 
 class NodeCollector extends Visitor {
   static List<Node> allNodes(Node node) {

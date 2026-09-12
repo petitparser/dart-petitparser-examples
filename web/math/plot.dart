@@ -1,4 +1,3 @@
-import 'dart:async';
 import 'dart:js_interop';
 
 import 'package:petitparser/petitparser.dart';
