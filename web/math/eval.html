@@ -20,10 +20,10 @@
     <div class="card">
       <h2>Presets</h2>
       <div class="button-group">
-        <button class="preset-btn" id="preset-arith">Basic Arithmetic</button>
-        <button class="preset-btn" id="preset-precedence">Precedence &amp; Parentheses</button>
-        <button class="preset-btn" id="preset-functions">Trigonometry &amp; Functions</button>
-        <button class="preset-btn" id="preset-powers">Exponents &amp; Roots</button>
+        <button type="button" class="preset-btn" id="preset-arith">Basic Arithmetic</button>
+        <button type="button" class="preset-btn" id="preset-precedence">Precedence &amp; Parentheses</button>
+        <button type="button" class="preset-btn" id="preset-functions">Trigonometry &amp; Functions</button>
+        <button type="button" class="preset-btn" id="preset-powers">Exponents &amp; Roots</button>
       </div>
 
       <h2>Expression</h2>
@@ -31,7 +31,8 @@
 
       <div style="margin-top: 1rem;">
         <label>Computed Result:</label>
-        <div id="result" style="font-family: var(--font-mono); font-size: 1.8rem; font-weight: 700; color: var(--color-primary); padding: 0.8rem 1.2rem; background: var(--color-code-bg); border-radius: 4px; border: 1px solid var(--color-code-border);"></div>
+        <div id="result" class="result hide-empty"></div>
+        <div id="error" class="error hide-empty"></div>
       </div>
     </div>
 
@@ -40,18 +41,17 @@
       <div id="tree" style="font-family: var(--font-mono); font-size: 1.35rem; line-height: 1.7; background: var(--color-pre-bg); border: 1px solid var(--color-border); border-radius: 4px; padding: 1.5rem; max-height: 380px; overflow-y: auto;"></div>
     </div>
 
-    <div class="card" id="about">
-      <h2>About Math Evaluator</h2>
-      <div data-markdown>
+    <div class="card" id="about" data-markdown>
+## About Math Evaluator
+      
 This interactive evaluator parses mathematical expressions into an abstract syntax tree (**AST**) and computes numerical results in real time.
 
 ### What Makes This Parser Special?
 
 - **ExpressionBuilder Combinator**: Demonstrates PetitParser's `ExpressionBuilder`, a higher-level combinator that simplifies defining complex operator precedence and associativity rules without manual grammar factoring.
-- **Associativity &amp; Precedence Levels**: Seamlessly differentiates left-associative operations (addition, subtraction, multiplication, division) from right-associative operators (exponentiation `^`).
+- **Associativity and Precedence Levels**: Seamlessly differentiates left-associative operations (addition, subtraction, multiplication, division) from right-associative operators (exponentiation `^`).
 - **Dynamic Function Application**: Parses arbitrary named multi-argument function calls (`sin(x)`, `atan2(y, x)`, `sqrt(x)`) and mathematical constants (`pi`, `e`).
 - **Separation of AST and Evaluation**: Rather than computing results during parsing, it builds an immutable `Expression` AST hierarchy that can be evaluated against arbitrary variable environments.
-      </div>
     </div>
 
     <footer>

@@ -54,9 +54,9 @@ ancestor(X, Y) :- parent_child(X, Z), ancestor(Z, Y).</textarea>
       <div id="output" style="font-family: var(--font-mono); font-size: 1.35rem; min-height: 4rem;"></div>
     </div>
 
-    <div class="card" id="about">
-      <h2>About Prolog Interpreter</h2>
-      <div data-markdown>
+    <div class="card" id="about" data-markdown>
+## About Prolog Interpreter
+
 Prolog is a declarative logic programming language where computation is carried out by posing queries over a knowledge base of facts and inference rules.
 
 ### What Makes This Parser &amp; Engine Special?
@@ -65,7 +65,6 @@ Prolog is a declarative logic programming language where computation is carried 
 - **SLD Resolution with Backtracking**: Implements full Selective Linear Definite clause resolution with automated search and backtracking to discover all valid variable bindings satisfying a goal.
 - **Syntactic Term Unification**: Matches terms structurally while propagating variable substitution environments across rule invocations.
 - **Pure Dart Inference Engine**: Both the parser and the full deductive inference machine run natively in the browser without external WebAssembly or C-based Prolog runtimes.
-      </div>
     </div>
 
     <footer>

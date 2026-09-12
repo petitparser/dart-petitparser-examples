@@ -22,9 +22,9 @@ final btnComprehensions =
 Parser<Object?> getParser(String prod) {
   final grammar = PythonGrammarDefinition();
   return switch (prod) {
-    'statement' => grammar.buildFrom(grammar.statementLine()),
-    'expression' => grammar.buildFrom(grammar.expression()),
-    'pattern' => grammar.buildFrom(grammar.pythonPattern()),
+    'statement' => grammar.buildFrom(grammar.statementLine()).end(),
+    'expression' => grammar.buildFrom(grammar.expression()).end(),
+    'pattern' => grammar.buildFrom(grammar.pythonPattern()).end(),
     _ => grammar.build(),
   };
 }

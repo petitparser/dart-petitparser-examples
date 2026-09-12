@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:js_interop';
 
+import 'package:petitparser/petitparser.dart';
 import 'package:petitparser_examples/math.dart';
 import 'package:web/web.dart';
 
@@ -123,25 +124,26 @@ void update() {
     error.style.display = 'none';
   } on Object catch (exception) {
     expression = Value(double.nan);
-    error.textContent = exception.toString();
+    error.textContent = exception is ParserException
+        ? '${exception.message} at ${exception.failure.toPositionString()}'
+        : exception.toString();
     error.style.display = 'block';
   }
   window.location.hash = Uri.encodeComponent(source);
 }
 
 final fpsDisplay = document.querySelector('#fps-display') as HTMLElement?;
-var lastFrameTime = DateTime.now().millisecondsSinceEpoch;
+final animationFrame = refresh.toJS;
+final firstFrameTime = DateTime.now().millisecondsSinceEpoch;
+var lastFrameTime = firstFrameTime;
 var frameCount = 0;
 var currentFps = 30;
 
-void refresh(int tick) {
-  viewport.clear();
-  viewport.grid();
-  viewport.plot((x) => expression.eval({'x': x, 't': tick}));
-
+void refresh() {
   frameCount++;
   final now = DateTime.now().millisecondsSinceEpoch;
   final delta = now - lastFrameTime;
+  final offsetSec = (now - firstFrameTime) / 1000.0;
   if (delta >= 1000) {
     currentFps = ((frameCount * 1000) / delta).round();
     frameCount = 0;
@@ -150,6 +152,12 @@ void refresh(int tick) {
       fpsDisplay!.textContent = '$currentFps FPS';
     }
   }
+
+  viewport.clear();
+  viewport.grid();
+  viewport.plot((x) => expression.eval({'x': x, 't': offsetSec}));
+
+  window.requestAnimationFrame(animationFrame);
 }
 
 void main() {
@@ -169,12 +177,12 @@ void main() {
     update();
   }
 
-  presetRipple?.onClick.listen((_) => setFunc('x * sin(10 * cos(t / 20) / x)'));
-  presetSine?.onClick.listen((_) => setFunc('sin(x + t / 10) * cos(x / 2)'));
+  presetRipple?.onClick.listen((_) => setFunc('x * sin(10 * cos(t) / x)'));
+  presetSine?.onClick.listen((_) => setFunc('sin(x + 5 * t) * cos(5 * x)'));
   presetDamped?.onClick.listen(
-    (_) => setFunc('2 * exp(-abs(x) / 2) * cos(3 * x - t / 15)'),
+    (_) => setFunc('2 * exp(-abs(x) / 2) * cos(3 * x - 5 * t)'),
   );
-  presetStanding?.onClick.listen((_) => setFunc('sin(2 * x) * cos(t / 10)'));
+  presetStanding?.onClick.listen((_) => setFunc('sin(2 * x) * cos(10 * t)'));
 
   if (window.location.hash.startsWith('#')) {
     input.value = Uri.decodeComponent(window.location.hash.substring(1));
@@ -183,8 +191,5 @@ void main() {
   window.addEventListener('resize', resize.toJS);
   update();
   input.onInput.listen((event) => update());
-  Timer.periodic(
-    const Duration(milliseconds: 1000 ~/ 30),
-    (Timer timer) => refresh(timer.tick),
-  );
+  window.requestAnimationFrame(animationFrame);
 }

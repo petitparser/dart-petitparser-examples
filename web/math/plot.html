@@ -20,10 +20,10 @@
     <div class="card">
       <h2>Presets</h2>
       <div class="button-group">
-        <button class="preset-btn" id="preset-ripple">Oscillating Ripple</button>
-        <button class="preset-btn" id="preset-sine">Harmonic Wave</button>
-        <button class="preset-btn" id="preset-damped">Damped Oscillator</button>
-        <button class="preset-btn" id="preset-standing">Standing Wave</button>
+        <button type="button" class="preset-btn" id="preset-ripple">Oscillating Ripple</button>
+        <button type="button" class="preset-btn" id="preset-sine">Harmonic Wave</button>
+        <button type="button" class="preset-btn" id="preset-damped">Damped Oscillator</button>
+        <button type="button" class="preset-btn" id="preset-standing">Standing Wave</button>
       </div>
 
       <h2>Function f<sub>t</sub>(x)</h2>
@@ -37,21 +37,19 @@
         <canvas id="canvas" style="display: block; width: 100%;"></canvas>
       </div>
       <p style="font-size: 1.3rem; color: var(--color-text-muted); margin-top: 1rem; margin-bottom: 0;">
-        Parameters: <code>x &isin; [-5, 5]</code>, <code>y &isin; [-2.5, 2.5]</code>, <code>t</code> is incremented each animation frame.
+        Parameters: <code>x &isin; [-5, 5]</code>, <code>y &isin; [-2.5, 2.5]</code>, <code>t</code> is seconds since page load.
       </p>
     </div>
 
-    <div class="card" id="about">
-      <h2>About Math Plotter</h2>
-      <div data-markdown>
-This real-time plotter evaluates mathematical functions of one spatial variable ($x$) and dynamic time ($t$) directly onto an HTML5 canvas at 30 FPS.
+    <div class="card" id="about" data-markdown>
+## About Math Plotter
+This real-time plotter evaluates mathematical functions of one spatial variable (_x_) and dynamic time (_t_) directly onto an HTML5 canvas at <span id="fps-display">30 FPS</span>.
 
 ### What Makes This Example Special?
 
 - **Real-Time Dynamic Evaluation**: The formula is parsed once into an abstract expression tree. Every rendering frame, that parsed tree is repeatedly evaluated across the entire horizontal canvas pixel domain with incremented time parameters.
 - **Resilient Asynchronous Error Handling**: If syntax or domain errors occur while editing the formula, the rendering loop degrades gracefully without breaking canvas animation state or throwing unhandled exceptions.
 - **Responsive High-DPI Canvas Rendering**: Dynamically adapts to device pixel ratios and window resizing events while maintaining crisp vector rendering.
-      </div>
     </div>
 
     <footer>

@@ -89,9 +89,9 @@
 
     <div class="card tabs">
       <div class="tab-buttons">
-        <button class="active">XML DOM Tree</button>
-        <button>XPath Results</button>
-        <button>Streaming Events (SAX)</button>
+        <button type="button" class="active">XML DOM Tree</button>
+        <button type="button">XPath Results</button>
+        <button type="button">Streaming Events (SAX)</button>
       </div>
       <div id="panel-dom" class="tab-body active">
         <p style="font-size: 1.3rem; color: var(--color-text-muted); margin-bottom: 1rem;">
@@ -99,25 +99,24 @@
         </p>
         <div id="dom-output" class="output-panel xml-col"></div>
       </div>
-      <div id="panel-xpath" class="tab-body output-panel">
-        <div id="xpath-output" class="xml-col"></div>
+      <div id="panel-xpath" class="tab-body">
+        <div id="xpath-output" class="output-panel xml-col"></div>
       </div>
-      <div id="panel-sax" class="tab-body output-panel">
-        <div id="sax-output" class="xml-col"></div>
+      <div id="panel-sax" class="tab-body">
+        <div id="sax-output" class="output-panel xml-col"></div>
       </div>
     </div>
 
-    <div class="card" id="about">
-      <h2>About XML Parser &amp; XPath Evaluator</h2>
-      <div data-markdown>
+    <div class="card" id="about" data-markdown>
+## About XML Parser and XPath Evaluator
+
 Extensible Markup Language (XML) is a versatile markup language that defines a set of rules for encoding documents in a format that is both human-readable and machine-readable.
 
 ### What Makes This Parser Special?
 
-- **Dual Parsing Architecture (SAX &amp; DOM)**: Built directly on top of PetitParser combinators, `package:xml` provides two modes: a lightweight event-driven stream scanner (`XmlEvent` / SAX) with zero tree allocation, and a comprehensive strongly-typed Document Object Model (`XmlDocument`, `XmlElement`, `XmlAttribute`, `XmlText`).
-- **Integrated XPath 1.0 Grammar**: Uses an independent PetitParser PEG grammar to parse full XPath expressions, evaluate axes (`//`, `child::`, `parent::`), test predicates, and dynamically highlight matched DOM elements in real-time.
+- **Dual Parsing Architecture (SAX and DOM)**: Built directly on top of PetitParser combinators, `package:xml` provides two modes: a lightweight event-driven stream scanner (`XmlEvent` / SAX) with zero tree allocation, and a comprehensive strongly-typed Document Object Model (`XmlDocument`, `XmlElement`, `XmlAttribute`, `XmlText`).
+- **Integrated XPath 3.0 Grammar**: Uses an independent PetitParser PEG grammar to parse full XPath expressions, evaluate axes (`//`, `child::`, `parent::`), test predicates, and dynamically highlight matched DOM elements in real-time.
 - **Bi-Directional Node Introspection**: Clicking any node in the rendered DOM tree automatically derives and generates its unique canonical XPath expression.
-      </div>
     </div>
 
     <footer>

@@ -33,8 +33,8 @@ void renderMarkdownElements() {
   final elements = document.querySelectorAll('[data-markdown]');
   for (var i = 0; i < elements.length; i++) {
     final element = elements.item(i) as HTMLElement;
-    final rawText = element.textContent?.trim();
-    if (rawText != null && rawText.isNotEmpty) {
+    final rawText = element.innerHTML.toString().trim();
+    if (rawText.isNotEmpty) {
       try {
         final html = markdownToHtml(rawText);
         element.innerHTML = html.toJS;

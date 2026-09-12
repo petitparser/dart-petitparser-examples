@@ -634,6 +634,10 @@ pre code {
 	font-size: 1.35rem;
 }
 
+.hide-empty:empty {
+	display: none;
+}
+
 /* --- Tab Navigation --- */
 .tab-buttons {
 	display: flex;

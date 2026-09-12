@@ -51,9 +51,9 @@
       <div id="output"></div>
     </div>
 
-    <div class="card" id="about">
-      <h2>About Python Grammar</h2>
-      <div data-markdown>
+    <div class="card" id="about" data-markdown>
+## About Python Grammar
+
 Python is a dynamically typed, high-level programming language featuring indentation-delimited syntactic block structures ("off-side rule").
 
 ### What Makes This Parser Special?
@@ -61,7 +61,6 @@ Python is a dynamically typed, high-level programming language featuring indenta
 - **Handling Significant Whitespace in PEG**: While context-sensitive indentation is traditionally difficult for pure Parsing Expression Grammars, this parser elegant integrates an indentation tracking stack to synthesize virtual `INDENT`, `DEDENT`, and `NEWLINE` boundary tokens.
 - **Modern Python 3.12+ Features**: Fully supports recent Python language specifications, including PEP 634 Structural Pattern Matching (`match` / `case`), PEP 695 Type Parameter Syntax and Type Aliases (`class Stack[T]`, `type NumberList[T]`), Walrus assignment expressions (`:=`), and decorators on async functions/classes.
 - **Granular Production Targets**: The grammar definition allows directly isolating and parsing complete modules, single statements, standalone expressions, or isolated match patterns.
-      </div>
     </div>
 
     <footer>

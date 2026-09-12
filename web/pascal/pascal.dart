@@ -21,10 +21,11 @@ final btnExpression =
 final parserDefinition = PascalParserDefinition();
 
 Parser<Object?> getParser(String prod) => switch (prod) {
-  'block' => parserDefinition.buildFrom(parserDefinition.block()),
-  'statement' => parserDefinition.buildFrom(parserDefinition.statement()),
-  'expression' => parserDefinition.buildFrom(parserDefinition.expression()),
-  'type' => parserDefinition.buildFrom(parserDefinition.type()),
+  'block' => parserDefinition.buildFrom(parserDefinition.block()).end(),
+  'statement' => parserDefinition.buildFrom(parserDefinition.statement()).end(),
+  'expression' =>
+    parserDefinition.buildFrom(parserDefinition.expression()).end(),
+  'type' => parserDefinition.buildFrom(parserDefinition.type()).end(),
   _ => parserDefinition.build(),
 };
 
@@ -120,9 +121,9 @@ class HtmlPascalAstVisitor implements PascalVisitor<void, void> {
 
   void _writeProperty(String name, [String? value]) {
     _writeIndent();
-    buffer.write('  <span class="node-prop">$name:</span>');
+    buffer.write('<span class="node-prop">$name:</span>');
     if (value != null) {
-      buffer.write(' <span class="node-val">$value</span>\n');
+      buffer.write('<span class="node-val">$value</span>\n');
     } else {
       buffer.write('\n');
     }

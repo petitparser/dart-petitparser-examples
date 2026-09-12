@@ -8,15 +8,16 @@ import '../shared/shared.dart';
 
 final input = document.querySelector('#input') as HTMLInputElement;
 final result = document.querySelector('#result') as HTMLElement;
+final error = document.querySelector('#error') as HTMLElement;
 final tree = document.querySelector('#tree') as HTMLElement;
 
 void update() {
   tree.textContent = '';
   final parseResult = parser.parse(input.value);
   if (parseResult is Failure) {
-    result.textContent =
+    result.textContent = '';
+    error.textContent =
         '${parseResult.message} at ${parseResult.toPositionString()}';
-    result.className = 'error';
     window.location.hash = Uri.encodeComponent(input.value);
     return;
   }
@@ -24,10 +25,10 @@ void update() {
     final expr = parseResult.value;
     tree.innerHTML = inspect(expr).toJS;
     result.textContent = ' = ${expr.eval({})}';
-    result.className = '';
+    error.textContent = '';
   } on Object catch (exception) {
-    result.textContent = exception.toString();
-    result.className = 'error';
+    result.textContent = '';
+    error.textContent = exception.toString();
   }
   window.location.hash = Uri.encodeComponent(input.value);
 }

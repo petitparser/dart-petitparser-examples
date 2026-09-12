@@ -232,9 +232,9 @@
       </div>
     </div>
 
-    <div class="card" id="about">
-      <h2>About Regular Expression Parser</h2>
-      <div data-markdown>
+    <div class="card" id="about" data-markdown>
+## About Regular Expression Parser
+
 This interactive playground demonstrates parsing regular expressions and compiling them directly into non-deterministic finite automata (**NFA**) using Thompson's construction algorithm.
 
 ### What Makes This Parser Special?
@@ -243,7 +243,6 @@ This interactive playground demonstrates parsing regular expressions and compili
 - **Pure PetitParser Grammar**: The parser defines a clean hierarchical expression grammar with precedence handling using PetitParser's combinators.
 - **Direct AST to NFA Compilation**: Each AST node provides an `Nfa toNfa()` method, constructing an executable state machine with epsilon transitions, character predicates, and anchor checks without intermediate bytecode or backtracking.
 - **Inspectable State Machine**: The resulting state machine transitions are directly inspected to power the interactive transition table and match visualizer.
-      </div>
     </div>
 
     <footer>

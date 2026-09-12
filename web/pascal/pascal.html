@@ -52,9 +52,9 @@
       <div id="output"></div>
     </div>
 
-    <div class="card" id="about">
-      <h2>About Pascal Grammar</h2>
-      <div data-markdown>
+    <div class="card" id="about" data-markdown>
+## About Pascal Grammar
+
 Pascal is a historically imperative and procedural language designed by Niklaus Wirth to encourage structured programming and rigorous data structuring.
 
 ### What Makes This Parser Special?
@@ -63,7 +63,6 @@ Pascal is a historically imperative and procedural language designed by Niklaus 
 - **Comprehensive Scoping &amp; Declarations**: Fully parses constants, type aliases, structured records (`record ... end`), enumerations, subranges, arrays, pointer types, variable declarations, and nested procedures/functions.
 - **Dual Comment Conventions**: Seamlessly handles both curly-brace comments (`{ ... }`) and alternate multi-character delimiter comments (`(* ... *)`), including nested lexical whitespace skipping.
 - **Production Modularity**: Designed using PetitParser's `GrammarDefinition` pattern, enabling direct parsing from individual isolated productions (`program`, `block`, `statement`, `expression`, `type`).
-      </div>
     </div>
 
     <footer>
