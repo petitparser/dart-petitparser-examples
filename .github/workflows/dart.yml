@@ -43,9 +43,6 @@ jobs:
         uses: codecov/codecov-action@v7
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
-      - name: "Deploy Examples"
-        uses: petitparser/petitparser.github.io/.github/workflows/deploy-examples.yml@deploy
-        secrets: inherit # Automatically passes existing secrets
   check:
     name: "Flutter CI"
     runs-on: ubuntu-latest
