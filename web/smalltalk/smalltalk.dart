@@ -100,7 +100,7 @@ class HtmlAstVisitor extends Visitor {
 
   void _writeProperty(String name, [String? value]) {
     _writeIndent();
-    buffer.write('  <span class="node-prop">$name:</span>');
+    buffer.write('<span class="node-prop">$name:</span>');
     if (value != null) {
       buffer.write(' <span class="node-val">$value</span>\n');
     } else {

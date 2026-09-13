@@ -23,14 +23,13 @@ String normalizeFieldName(String name) => name.toLowerCase().replaceAllMapped(
 /// ```dart
 /// normalizeFieldValue('{pages 10--20}') == 'pages 10–20'
 /// normalizeFieldValue('"A---B"') == 'A—B'
-/// normalizeFieldValue("{Lukas Renggli and St\\'ephane Ducasse}") ==
-///     'Lukas Renggli and Stéphane Ducasse'
+/// normalizeFieldValue("{St\\'ephane Ducasse}") == 'Stéphane Ducasse'
 /// ```
 String normalizeFieldValue(String value) {
-  var text = value.trim();
+  final text = value.trim();
   if ((text.startsWith('{') && text.endsWith('}')) ||
       (text.startsWith('"') && text.endsWith('"'))) {
-    text = text.substring(1, text.length - 1).trim();
+    return normalizeFieldValue(text.substring(1, text.length - 1));
   }
   return text
       .replaceAll('---', '\u2014') // em dash first, before en dash
