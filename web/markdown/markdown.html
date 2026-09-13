@@ -128,13 +128,16 @@
     </div>
     
     <div class="card markdown-body" data-markdown>
-### What makes this parser special?
+## About Markdown Parser
 
-This parser implements both standard **CommonMark 0.31.2** and **GitHub Flavored Markdown (GFM)** without a separate tokenizer:
+This parser implements core **CommonMark 0.31.2** specifications and popular **GitHub Flavored Markdown (GFM)** extensions using parser combinators.
 
-* **Scannerless PEG Architecture**: Standard markdown engines employ complicated state machines and lexers. PetitParser parses block structures (headings, blockquotes, lists, tables) and recursive inlines (emphasis, autolinks, code spans, strikethrough) within a single combinator framework.
-* **Live Syntax Highlighting &amp; AST**: The same grammar powers real-time in-editor syntax highlighting, strongly-typed AST tree generation, and standards-compliant HTML output.
-* **GFM Extensions**: Directly parses advanced features including GFM tables with column alignments and task list items (`[x]`).
+### Key Parser Features
+
+- **Block and Inline Structure**: Parses document blocks (headings, blockquotes, lists, tables, code blocks) and nested inlines (emphasis, autolinks, code spans, strikethrough).
+- **GFM Extensions**: Includes support for pipe tables with alignment indicators and interactive task list checkboxes (`[x]`).
+- **AST and HTML Output**: Generates an immutable, strongly-typed AST tree that can be traversed, formatted, or rendered to HTML.
+- **Live Syntax Highlighting**: Token streams produced by the parser drive live highlighting directly in the web editor.
     </div>
     
     <footer>

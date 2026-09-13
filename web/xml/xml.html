@@ -107,16 +107,16 @@
       </div>
     </div>
 
-    <div class="card" id="about" data-markdown>
+    <div class="card markdown-body" data-markdown>
 ## About XML Parser and XPath Evaluator
 
-Extensible Markup Language (XML) is a versatile markup language that defines a set of rules for encoding documents in a format that is both human-readable and machine-readable.
+Extensible Markup Language (XML) is a markup format defining rules for encoding structured documents.
 
-### What Makes This Parser Special?
+### Key Parser Features
 
-- **Dual Parsing Architecture (SAX and DOM)**: Built directly on top of PetitParser combinators, `package:xml` provides two modes: a lightweight event-driven stream scanner (`XmlEvent` / SAX) with zero tree allocation, and a comprehensive strongly-typed Document Object Model (`XmlDocument`, `XmlElement`, `XmlAttribute`, `XmlText`).
-- **Integrated XPath 3.0 Grammar**: Uses an independent PetitParser PEG grammar to parse full XPath expressions, evaluate axes (`//`, `child::`, `parent::`), test predicates, and dynamically highlight matched DOM elements in real-time.
-- **Bi-Directional Node Introspection**: Clicking any node in the rendered DOM tree automatically derives and generates its unique canonical XPath expression.
+- **Streaming and DOM Modes**: Powered by `package:xml`, providing both an event-driven stream scanner (`XmlEvent`) and a Document Object Model (`XmlDocument`, `XmlElement`, `XmlAttribute`, `XmlText`).
+- **XPath Evaluation**: Includes an XPath grammar to parse expressions, evaluate axis navigation, test predicates, and highlight matched DOM nodes.
+- **Node Introspection**: Clicking a node in the rendered DOM tree automatically derives and displays its canonical XPath expression.
     </div>
 
     <footer>

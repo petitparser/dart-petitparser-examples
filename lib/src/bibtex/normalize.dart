@@ -26,10 +26,10 @@ String normalizeFieldName(String name) => name.toLowerCase().replaceAllMapped(
 /// normalizeFieldValue("{St\\'ephane Ducasse}") == 'Stéphane Ducasse'
 /// ```
 String normalizeFieldValue(String value) {
-  final text = value.trim();
-  if ((text.startsWith('{') && text.endsWith('}')) ||
+  var text = value.trim();
+  while ((text.startsWith('{') && text.endsWith('}')) ||
       (text.startsWith('"') && text.endsWith('"'))) {
-    return normalizeFieldValue(text.substring(1, text.length - 1));
+    text = text.substring(1, text.length - 1).trim();
   }
   return text
       .replaceAll('---', '\u2014') // em dash first, before en dash
@@ -59,6 +59,7 @@ String normalizeFieldValue(String value) {
       .replaceAll(r'\ss{}', 'ß')
       .replaceAll(r'\ss', 'ß')
       .replaceAll(r'{\em ', '') // italic markup
+      .replaceAll(r'\em ', '')
       .replaceAll(r'\{', '{')
       .replaceAll(r'\}', '}')
       .replaceAll(_remainingBraces, '');

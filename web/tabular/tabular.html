@@ -48,16 +48,16 @@
       <div id="output" style="overflow-x: auto;"></div>
     </div>
 
-    <div class="card" id="about" data-markdown>
+    <div class="card markdown-body" data-markdown>
 ## About Tabular Text Parser
 
-Tabular text formats like Comma-Separated Values (CSV) and Tab-Separated Values (TSV) are ubiquitously used for structured data interchange.
+Tabular text formats such as Comma-Separated Values (CSV) and Tab-Separated Values (TSV) are widely used for structured data interchange.
 
-### What Makes This Parser Special?
+### Key Parser Features
 
-- **Configurable `TabularDefinition`**: Built as a parameterized grammar where field delimiters (`,`, `\t`, `;`), quote characters (`"`), and end-of-line sequences can be customized without rewriting parsing logic.
-- **Robust RFC 4180 Compliance**: Correctly parses complex quoting edge cases, including multiline cell content, embedded commas, leading/trailing whitespace inside quotes, and escaped quotes (`""`).
-- **Resilient Row Termination**: Gracefully tolerates mixed Windows (`\r\n`) and Unix (`\n`) newline conventions as well as optional trailing newlines.
+- **Configurable Grammar**: Built with a parameterized `TabularDefinition` where field delimiters (`,`, `\t`, `;`), quote characters (`"`), and line separators are configurable.
+- **RFC 4180 Quoting**: Parses multiline cell content, embedded delimiter characters, whitespace inside quotes, and escaped quotes (`""`).
+- **Line Endings**: Accommodates standard Windows (`\r\n`) and Unix (`\n`) newline conventions as well as optional trailing newlines.
     </div>
 
     <footer>

@@ -58,13 +58,16 @@
     </div>
 
     <div class="card markdown-body" data-markdown>
-### What makes this interpreter special?
+## About Lisp Interpreter
 
-This interactive environment demonstrates how PetitParser transforms raw textual syntax into an active, functional programming language runtime:
+This interactive playground combines a PetitParser-based S-expression parser with a lightweight Scheme-like interpreter runtime.
 
-* **Scannerless S-Expressions**: Parses symbols, numbers, strings, and quoted lists directly without a standalone lexical analyzer.
-* **First-Class Closures**: Functions (`lambda`) capture their defining lexical environment frame, supporting lexical scoping, higher-order functions (`map`), and stateful closures (`counter`).
-* **Seamless Host Interop**: Standard library primitives, math operators, and I/O streams bind directly to native Dart closures without bridging overhead.
+### Key Features
+
+- **Scannerless S-Expressions**: Parses symbols, numbers, strings, and quoted lists directly using combinators.
+- **Lexical Closures**: Supports `define`, `lambda`, conditional branching (`if`), variable scoping, and higher-order functions (`map`).
+- **Dart Interoperability**: Built-in environment primitives and I/O functions bind directly to Dart callback functions.
+- **Environment Inspection**: Dynamically inspects defined environment bindings and values across parent scopes.
     </div>
 
     <footer>

@@ -41,17 +41,17 @@
       <div id="tree" style="font-family: var(--font-mono); font-size: 1.35rem; line-height: 1.7; background: var(--color-pre-bg); border: 1px solid var(--color-border); border-radius: 4px; padding: 1.5rem; max-height: 380px; overflow-y: auto;"></div>
     </div>
 
-    <div class="card" id="about" data-markdown>
+    <div class="card markdown-body" data-markdown>
 ## About Math Evaluator
-      
-This interactive evaluator parses mathematical expressions into an abstract syntax tree (**AST**) and computes numerical results in real time.
 
-### What Makes This Parser Special?
+This interactive evaluator parses mathematical expressions into an abstract syntax tree (**AST**) and computes numerical results.
 
-- **ExpressionBuilder Combinator**: Demonstrates PetitParser's `ExpressionBuilder`, a higher-level combinator that simplifies defining complex operator precedence and associativity rules without manual grammar factoring.
-- **Associativity and Precedence Levels**: Seamlessly differentiates left-associative operations (addition, subtraction, multiplication, division) from right-associative operators (exponentiation `^`).
-- **Dynamic Function Application**: Parses arbitrary named multi-argument function calls (`sin(x)`, `atan2(y, x)`, `sqrt(x)`) and mathematical constants (`pi`, `e`).
-- **Separation of AST and Evaluation**: Rather than computing results during parsing, it builds an immutable `Expression` AST hierarchy that can be evaluated against arbitrary variable environments.
+### Key Parser Features
+
+- **ExpressionBuilder Combinator**: Uses PetitParser's `ExpressionBuilder` to define operator precedence and associativity rules concisely.
+- **Associativity and Precedence**: Differentiates standard left-associative operations (addition, subtraction, multiplication, division) and right-associative operations (exponentiation `^`).
+- **Function and Constant Support**: Parses multi-argument function calls (`sin(x)`, `atan2(y, x)`, `sqrt(x)`) and mathematical constants (`pi`, `e`).
+- **Separation of Parsing and Evaluation**: Builds an immutable `Expression` AST hierarchy that evaluates against arbitrary variable dictionaries.
     </div>
 
     <footer>

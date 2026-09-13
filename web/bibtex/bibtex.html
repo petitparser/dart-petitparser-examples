@@ -236,10 +236,15 @@
     </div>
 
     <div class="card markdown-body" data-markdown>
-### What makes this parser special?
+## About BibTeX Parser
 
-* **Full Streaming Execution**: Capable of processing large multi-megabyte bibliography files directly in the browser with high throughput and instant progress reporting.
-* **Resilient Nested Delimiters**: BibTeX values can be enclosed in quotes (`"..."`) or recursively balanced curly braces (`{...}`), containing nested LaTeX math and accents. PetitParser handles these arbitrarily deep structures with clean, modular combinators.
+BibTeX is a reference management format commonly used alongside LaTeX documents for citing bibliographic entries.
+
+### Key Parser Features
+
+- **Asynchronous Processing**: Parses bibliography entries progressively with progress reporting for larger files.
+- **Nested Delimiters**: Handles values delimited either by double quotes (`"..."`) or balanced curly braces (`{...}`), including nested braces used in LaTeX commands and accents.
+- **Normalized Field Extraction**: Extracts standard publication types, citation keys, and entry fields for filtering and searching.
     </div>
 
     <footer>

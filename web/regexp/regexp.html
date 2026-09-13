@@ -232,17 +232,17 @@
       </div>
     </div>
 
-    <div class="card" id="about" data-markdown>
+    <div class="card markdown-body" data-markdown>
 ## About Regular Expression Parser
 
-This interactive playground demonstrates parsing regular expressions and compiling them directly into non-deterministic finite automata (**NFA**) using Thompson's construction algorithm.
+This playground demonstrates parsing regular expressions and compiling them directly into non-deterministic finite automata (**NFA**) using Thompson's construction algorithm.
 
-### What Makes This Parser Special?
+### Key Parser Features
 
-- **Non-Standard Operators**: Beyond standard concatenation, union (`|`), and Kleene star (`*`), this parser supports intersection (`&`) and complementation (`!`), which are rarely found in mainstream regex engines.
-- **Pure PetitParser Grammar**: The parser defines a clean hierarchical expression grammar with precedence handling using PetitParser's combinators.
-- **Direct AST to NFA Compilation**: Each AST node provides an `Nfa toNfa()` method, constructing an executable state machine with epsilon transitions, character predicates, and anchor checks without intermediate bytecode or backtracking.
-- **Inspectable State Machine**: The resulting state machine transitions are directly inspected to power the interactive transition table and match visualizer.
+- **Extended Operators**: Supports concatenation, alternation (`|`), Kleene star (`*`), plus (`+`), optional (`?`), character classes, intersection (`&`), and complementation (`!`).
+- **Combinator Grammar**: Uses PetitParser expression combinators to handle operator precedence and grouping.
+- **AST to NFA Compilation**: Each AST node compiles to an NFA fragment with epsilon transitions, character predicates, and match anchors.
+- **Inspectable State Machine**: State transitions can be inspected directly to generate transition tables and highlight matches.
     </div>
 
     <footer>

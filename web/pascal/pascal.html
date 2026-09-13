@@ -52,17 +52,17 @@
       <div id="output"></div>
     </div>
 
-    <div class="card" id="about" data-markdown>
+    <div class="card markdown-body" data-markdown>
 ## About Pascal Grammar
 
-Pascal is a historically imperative and procedural language designed by Niklaus Wirth to encourage structured programming and rigorous data structuring.
+Pascal is an imperative procedural language designed by Niklaus Wirth to encourage structured programming.
 
-### What Makes This Parser Special?
+### Key Parser Features
 
-- **Apple Pascal Standard Compliance**: Faithfully implements the syntax specified in the 1978 Apple Pascal Reference Manual (derived from UCSD Pascal).
-- **Comprehensive Scoping &amp; Declarations**: Fully parses constants, type aliases, structured records (`record ... end`), enumerations, subranges, arrays, pointer types, variable declarations, and nested procedures/functions.
-- **Dual Comment Conventions**: Seamlessly handles both curly-brace comments (`{ ... }`) and alternate multi-character delimiter comments (`(* ... *)`), including nested lexical whitespace skipping.
-- **Production Modularity**: Designed using PetitParser's `GrammarDefinition` pattern, enabling direct parsing from individual isolated productions (`program`, `block`, `statement`, `expression`, `type`).
+- **Apple Pascal Syntax**: Implements the syntax specified in the 1978 Apple Pascal Reference Manual (derived from UCSD Pascal).
+- **Declarations &amp; Types**: Parses constants, type aliases, structured records (`record ... end`), enumerations, subranges, arrays, pointer types, variable declarations, and nested procedures/functions.
+- **Comment Syntax**: Supports both curly-brace comments (`{ ... }`) and parenthesis-star comments (`(* ... *)`).
+- **Production Modularity**: Built using PetitParser's `GrammarDefinition` pattern, allowing direct parsing from individual productions (`program`, `block`, `statement`, `expression`, `type`).
     </div>
 
     <footer>

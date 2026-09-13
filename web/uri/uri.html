@@ -46,16 +46,16 @@
       <div id="output"></div>
     </div>
 
-    <div class="card" id="about" data-markdown>
+    <div class="card markdown-body" data-markdown>
 ## About URI Parser
 
-Uniform Resource Identifiers (URIs) provide a standard, extensible mechanism for identifying resources on the internet or private networks.
+Uniform Resource Identifiers (URIs) provide a standard syntax for identifying abstract or physical resources.
 
-### What Makes This Parser Special?
+### Key Parser Features
 
-- **Strict RFC 3986 Specification Compliance**: Implements the official ABNF grammar for URIs using PetitParser's combinator hierarchy, handling edge-case nuances that generic regular expressions fail on.
-- **Full Hierarchical Decomposition**: Dissects every structural component: scheme, authority (sub-parsing optional username, password, hostname, IPv6 host brackets, and port), hierarchical path segments, query strings (with decoded key-value parameters), and fragment identifiers.
-- **Percent-Encoding &amp; Character Classes**: Reliably identifies and isolates pct-encoded octets (`%HH`), sub-delimiters, and unreserved character classes according to specification constraints.
+- **RFC 3986 Compliance**: Implements the generic URI syntax specified in RFC 3986 using parser combinators.
+- **Hierarchical Components**: Breaks down inputs into scheme, authority (userinfo, host, port), path segments, query parameters, and fragments.
+- **Character Classes**: Handles percent-encoded octets (`%HH`), sub-delimiters, and reserved character sets according to specification rules.
     </div>
 
     <footer>
