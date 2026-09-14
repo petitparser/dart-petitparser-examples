@@ -168,6 +168,7 @@
     <h2 class="project-tagline">Downloads and parses real-world BibTeX databases directly in your browser with filtering, search, and citation export.</h2>
     <div class="header-nav">
       <a class="btn-banner" href="/">Website</a>
+      <a class="btn-banner" href="../index.html">Examples</a>
       <a class="btn-banner" href="https://github.com/petitparser/dart-petitparser-examples/blob/main/lib/bibtex.dart" target="_blank" rel="noopener">Source</a>
     </div>
   </header>
@@ -178,7 +179,7 @@
         <label for="bib-source">Source BibTeX Database URL:</label>
         <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
           <input type="text" id="bib-source" value="https://raw.githubusercontent.com/scgbern/scgbib/main/scg.bib" spellcheck="false" style="flex: 1; margin-bottom: 0; min-width: 250px;" />
-          <button id="load-btn" class="button" style="margin-bottom: 0;">Load &amp; Parse Database</button>
+          <button id="load-btn" type="button" class="button" style="margin-bottom: 0;">Load &amp; Parse Database</button>
         </div>
       </div>
 
@@ -228,9 +229,9 @@
       <div class="pagination" style="margin-top: 2rem;">
         <span id="results-count" style="font-weight: 600; color: var(--color-primary);"></span>
         <div>
-          <button id="prev-page-bottom" class="button button-outline" style="padding: 0.4rem 1.2rem; margin-bottom: 0;">&laquo; Prev</button>
+          <button id="prev-page-bottom" type="button" class="button button-outline" style="padding: 0.4rem 1.2rem; margin-bottom: 0;">&laquo; Prev</button>
           <span id="page-info-bottom" style="margin: 0 1rem; font-weight: bold;"></span>
-          <button id="next-page-bottom" class="button button-outline" style="padding: 0.4rem 1.2rem; margin-bottom: 0;">Next &raquo;</button>
+          <button id="next-page-bottom" type="button" class="button button-outline" style="padding: 0.4rem 1.2rem; margin-bottom: 0;">Next &raquo;</button>
         </div>
       </div>
     </div>
