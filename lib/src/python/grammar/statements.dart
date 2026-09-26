@@ -34,13 +34,11 @@ mixin PythonStatementGrammar
       [ref0(indentedBlock), ref0(simpleStatements)].toChoiceParser();
 
   /// Indented block of statements.
-  Parser<List<StatementNode>> indentedBlock() => seq5(
+  Parser<List<StatementNode>> indentedBlock() => seq3(
     ref0(newlineToken),
     ref0(blankLines),
-    indent.increase,
-    ref0(indentedStatements),
-    indent.decrease,
-  ).map5((_, _, _, stmts, _) => stmts);
+    indent.during(ref0(indentedStatements)),
+  ).map3((_, _, stmts) => stmts);
 
   Parser<List<StatementNode>> indentedStatements() =>
       ref0(indentedStatementLine)
@@ -254,17 +252,18 @@ mixin PythonStatementGrammar
   ).map3((_, _, clause) => clause.$2);
 
   // Match statement
-  Parser<MatchNode> matchStatement() => seq4(
-    ref0(matchToken),
-    ref0(expression),
-    seq2(ref1(token, ':'), ref0(newlineToken)).map2((_, _) => null),
-    seq4(
-      ref0(blankLines),
-      indent.increase,
-      ref0(caseBlock).plus(),
-      indent.decrease,
-    ).map4((_, _, cases, _) => cases),
-  ).map4((_, subject, _, cases) => MatchNode(subject: subject, cases: cases));
+  Parser<MatchNode> matchStatement() =>
+      seq6(
+        ref0(matchToken),
+        ref0(expression),
+        ref1(token, ':'),
+        ref0(newlineToken),
+        ref0(blankLines),
+        indent.during(ref0(caseBlock).plus()),
+      ).map6(
+        (_, subject, _, _, _, cases) =>
+            MatchNode(subject: subject, cases: cases),
+      );
 
   Parser<MatchCaseNode> caseBlock() =>
       seq3(
