@@ -1,4 +1,5 @@
 import 'dart:js_interop';
+import 'dart:math' as math;
 
 import 'package:petitparser/petitparser.dart';
 import 'package:petitparser_examples/math.dart';
@@ -9,24 +10,41 @@ import '../shared/shared.dart';
 class Viewport {
   new(
     this.canvas, {
-    required this.minX,
-    required this.maxX,
-    required this.minY,
-    required this.maxY,
+    this.minX = -5,
+    this.maxX = 5,
+    this.minY = -2.5,
+    this.maxY = 2.5,
   }) : context = canvas.context2D,
        width = canvas.offsetWidth,
-       height = canvas.offsetHeight;
+       height = canvas.offsetHeight,
+       defaultMinX = minX,
+       defaultMaxX = maxX,
+       defaultMinY = minY,
+       defaultMaxY = maxY;
 
   final HTMLCanvasElement canvas;
   final CanvasRenderingContext2D context;
 
-  final num minX;
-  final num maxX;
-  final num minY;
-  final num maxY;
+  final num defaultMinX;
+  final num defaultMaxX;
+  final num defaultMinY;
+  final num defaultMaxY;
+
+  num minX;
+  num maxX;
+  num minY;
+  num maxY;
 
   num width;
   num height;
+
+  /// Resets the viewport bounds to default values.
+  void reset() {
+    minX = defaultMinX;
+    maxX = defaultMaxX;
+    minY = defaultMinY;
+    maxY = defaultMaxY;
+  }
 
   /// Resizes the canvas.
   void resize(num width, num height) {
@@ -48,20 +66,39 @@ class Viewport {
     context.clearRect(0, 0, width, height);
   }
 
+  static num _calculateStep(num min, num max) {
+    final span = max - min;
+    if (span <= 0 || span.isInfinite || span.isNaN) return 1;
+    final rawStep = span / 10;
+    final power = (rawStep <= 0 ? 0 : (math.log(rawStep) / math.ln10).floor());
+    final magnitude = math.pow(10, power);
+    final norm = rawStep / magnitude;
+    if (norm < 1.5) return magnitude;
+    if (norm < 3.5) return 2 * magnitude;
+    if (norm < 7.5) return 5 * magnitude;
+    return 10 * magnitude;
+  }
+
   /// Plots the grid and axis.
   void grid({String axisStyle = 'black', String gridStyle = 'gray'}) {
     context.lineWidth = 0.5;
-    for (var x = minX.floor(); x <= maxX.ceil(); x++) {
+    final stepX = _calculateStep(minX, maxX);
+    final startX = (minX / stepX).floor() * stepX;
+    for (var x = startX; x <= maxX + stepX / 2; x += stepX) {
       final pixelX = toPixelX(x);
-      context.strokeStyle = x == 0 ? axisStyle.toJS : gridStyle.toJS;
+      final isAxis = x.abs() < stepX * 0.1;
+      context.strokeStyle = isAxis ? axisStyle.toJS : gridStyle.toJS;
       context.beginPath();
       context.moveTo(pixelX, 0);
       context.lineTo(pixelX, height);
       context.stroke();
     }
-    for (var y = minY.floor(); y <= maxY.ceil(); y++) {
+    final stepY = _calculateStep(minY, maxY);
+    final startY = (minY / stepY).floor() * stepY;
+    for (var y = startY; y <= maxY + stepY / 2; y += stepY) {
       final pixelY = toPixelY(y);
-      context.strokeStyle = y == 0 ? axisStyle.toJS : gridStyle.toJS;
+      final isAxis = y.abs() < stepY * 0.1;
+      context.strokeStyle = isAxis ? axisStyle.toJS : gridStyle.toJS;
       context.beginPath();
       context.moveTo(0, pixelY);
       context.lineTo(width, pixelY);
@@ -78,7 +115,9 @@ class Viewport {
     for (var x = 0; x <= width; x++) {
       final currentY = function(fromPixelX(x));
       if (lastY.isInfinite ||
+          lastY.isNaN ||
           currentY.isInfinite ||
+          currentY.isNaN ||
           (lastY.sign != currentY.sign && (lastY - currentY).abs() > 100)) {
         context.moveTo(x, toPixelY(currentY));
       } else {
@@ -97,6 +136,9 @@ class Viewport {
 
   /// Converts pixel to logical x-coordinate.
   num fromPixelX(num value) => value * (maxX - minX) / width + minX;
+
+  /// Converts pixel to logical y-coordinate.
+  num fromPixelY(num value) => (height - value) * (maxY - minY) / height + minY;
 }
 
 final input = document.querySelector('#input') as HTMLInputElement;
@@ -129,6 +171,23 @@ void update() {
     error.style.display = 'block';
   }
   window.location.hash = Uri.encodeComponent(source);
+}
+
+final viewportRange = document.querySelector('#viewport-range') as HTMLElement?;
+
+String _formatNum(num n) {
+  if (n.abs() >= 1000 || (n.abs() > 0 && n.abs() < 0.01)) {
+    return n.toStringAsExponential(2);
+  }
+  return n.toStringAsFixed(n.truncateToDouble() == n ? 0 : 2);
+}
+
+void updateViewportDisplay() {
+  if (viewportRange != null) {
+    viewportRange!.textContent =
+        'x ∈ [${_formatNum(viewport.minX)}, ${_formatNum(viewport.maxX)}], '
+        'y ∈ [${_formatNum(viewport.minY)}, ${_formatNum(viewport.maxY)}]';
+  }
 }
 
 final fpsDisplay = document.querySelector('#fps-display') as HTMLElement?;
@@ -173,6 +232,8 @@ void main() {
 
   void setFunc(String fn) {
     input.value = fn;
+    viewport.reset();
+    updateViewportDisplay();
     update();
   }
 
@@ -182,6 +243,85 @@ void main() {
     (_) => setFunc('2 * exp(-abs(x) / 2) * cos(3 * x - 5 * t)'),
   );
   presetStanding?.onClick.listen((_) => setFunc('sin(2 * x) * cos(10 * t)'));
+
+  var isDragging = false;
+  var dragStartX = 0.0;
+  var dragStartY = 0.0;
+  var origMinX = viewport.minX;
+  var origMaxX = viewport.maxX;
+  var origMinY = viewport.minY;
+  var origMaxY = viewport.maxY;
+
+  canvas.onMouseDown.listen((MouseEvent event) {
+    if (event.button == 0) {
+      isDragging = true;
+      dragStartX = event.clientX.toDouble();
+      dragStartY = event.clientY.toDouble();
+      origMinX = viewport.minX;
+      origMaxX = viewport.maxX;
+      origMinY = viewport.minY;
+      origMaxY = viewport.maxY;
+      canvas.style.cursor = 'grabbing';
+      event.preventDefault();
+    }
+  });
+
+  window.addEventListener(
+    'mousemove',
+    ((MouseEvent event) {
+      if (!isDragging) return;
+      final dx = event.clientX - dragStartX;
+      final dy = event.clientY - dragStartY;
+      final logicalDx = dx * (origMaxX - origMinX) / viewport.width;
+      final logicalDy = dy * (origMaxY - origMinY) / viewport.height;
+      viewport.minX = origMinX - logicalDx;
+      viewport.maxX = origMaxX - logicalDx;
+      viewport.minY = origMinY + logicalDy;
+      viewport.maxY = origMaxY + logicalDy;
+      updateViewportDisplay();
+    }).toJS,
+  );
+
+  window.addEventListener(
+    'mouseup',
+    ((MouseEvent event) {
+      if (isDragging) {
+        isDragging = false;
+        canvas.style.cursor = 'grab';
+      }
+    }).toJS,
+  );
+
+  canvas.onWheel.listen((WheelEvent event) {
+    event.preventDefault();
+    final rect = canvas.getBoundingClientRect();
+    final mouseX = event.clientX - rect.left;
+    final mouseY = event.clientY - rect.top;
+    final logicalX = viewport.fromPixelX(mouseX);
+    final logicalY = viewport.fromPixelY(mouseY);
+    final factor = event.deltaY < 0 ? 0.85 : 1.15;
+
+    final newSpanX = (viewport.maxX - viewport.minX) * factor;
+    final newSpanY = (viewport.maxY - viewport.minY) * factor;
+    if (newSpanX > 1e-9 &&
+        newSpanX < 1e9 &&
+        newSpanY > 1e-9 &&
+        newSpanY < 1e9) {
+      viewport.minX = logicalX - (logicalX - viewport.minX) * factor;
+      viewport.maxX = logicalX + (viewport.maxX - logicalX) * factor;
+      viewport.minY = logicalY - (logicalY - viewport.minY) * factor;
+      viewport.maxY = logicalY + (viewport.maxY - logicalY) * factor;
+      updateViewportDisplay();
+    }
+  });
+
+  canvas.addEventListener(
+    'dblclick',
+    ((Event event) {
+      viewport.reset();
+      updateViewportDisplay();
+    }).toJS,
+  );
 
   if (window.location.hash.startsWith('#')) {
     input.value = Uri.decodeComponent(window.location.hash.substring(1));
