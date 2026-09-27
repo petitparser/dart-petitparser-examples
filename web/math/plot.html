@@ -5,11 +5,66 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Math Plotter</title>
   <link rel="stylesheet" href="../shared/style.css">
+  <style>
+    .preset-btn.active-mode {
+      background: var(--color-primary, #0969da);
+      color: #ffffff;
+      border-color: var(--color-primary, #0969da);
+    }
+    .viewport-controls {
+      display: inline-flex;
+      align-items: center;
+      gap: 1.2rem;
+      font-size: 1.3rem;
+      line-height: 1;
+      color: var(--color-text);
+    }
+    .viewport-controls-title {
+      font-weight: 600;
+      color: var(--color-text-muted);
+      line-height: 1;
+      display: inline-flex;
+      align-items: center;
+      margin: 0;
+    }
+    .viewport-toggle {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      cursor: pointer;
+      user-select: none;
+      line-height: 1;
+      margin: 0;
+      padding: 0;
+    }
+    .viewport-toggle input[type="checkbox"] {
+      margin: 0;
+      padding: 0;
+      width: 1.4rem;
+      height: 1.4rem;
+      cursor: pointer;
+      accent-color: var(--color-primary, #003962);
+      vertical-align: middle;
+      display: inline-block;
+      box-sizing: border-box;
+    }
+    .viewport-toggle span {
+      line-height: 1;
+      display: inline-block;
+      vertical-align: middle;
+    }
+    .viewport-divider {
+      border-left: 1px solid var(--color-border);
+      height: 1.4rem;
+      margin: 0 0.2rem;
+      display: inline-block;
+    }
+  </style>
 </head>
 <body>
   <header class="page-header">
     <h1 class="project-name">Math Plotter</h1>
-    <h2 class="project-tagline">Real-time expression parser that animates dynamic multi-variable formulas on an HTML5 canvas.</h2>
+    <h2 class="project-tagline">Real-time expression parser that animates dynamic 3D surface graphs in WebGL.</h2>
     <div class="header-nav">
       <a class="btn" href="https://petitparser.github.io/">Website</a>
       <a class="btn" href="../index.html">Examples</a>
@@ -21,40 +76,63 @@
     <div class="card">
       <h2>Presets</h2>
       <div class="button-group">
-        <button type="button" class="preset-btn" id="preset-ripple">Oscillating Ripple</button>
-        <button type="button" class="preset-btn" id="preset-sine">Harmonic Wave</button>
-        <button type="button" class="preset-btn" id="preset-damped">Damped Oscillator</button>
-        <button type="button" class="preset-btn" id="preset-standing">Standing Wave</button>
+        <button type="button" class="preset-btn" id="preset-ripple-2d">2D Ripple</button>
+        <button type="button" class="preset-btn" id="preset-harmonic-2d">2D Harmonic</button>
+        <button type="button" class="preset-btn" id="preset-damped-2d">2D Damped</button>
+        <button type="button" class="preset-btn" id="preset-standing-2d">2D Standing</button>
+        <button type="button" class="preset-btn" id="preset-ripple-3d">3D Ripple</button>
+        <button type="button" class="preset-btn" id="preset-waves-3d">3D Waves</button>
+        <button type="button" class="preset-btn" id="preset-sombrero-3d">3D Sombrero</button>
+        <button type="button" class="preset-btn" id="preset-saddle-3d">3D Saddle</button>
       </div>
 
-      <h2>Function f<sub>t</sub>(x)</h2>
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 1.5rem; margin-bottom: 0.5rem; flex-wrap: wrap; gap: 0.5rem;">
+        <h2 style="margin: 0;">Function <span id="formula-label">y = f<sub>t</sub>(x)</span></h2>
+        <div class="button-group" style="margin: 0;">
+          <button type="button" class="preset-btn active-mode" id="mode-auto">Auto</button>
+          <button type="button" class="preset-btn" id="mode-2d">2D</button>
+          <button type="button" class="preset-btn" id="mode-3d">3D</button>
+        </div>
+      </div>
       <input type="text" id="input" value="x * sin(10 * cos(t) / x)" spellcheck="false" autocomplete="off" />
       <div id="error" class="error" style="display: none;"></div>
     </div>
 
     <div class="card" style="text-align: center;">
-      <h2 style="text-align: left;">Graph Viewport</h2>
-      <div style="width: 100%; overflow: hidden; border-radius: 4px; border: 1px solid var(--color-border); background: #ffffff;">
-        <canvas id="canvas" style="display: block; width: 100%; cursor: grab; user-select: none; touch-action: none;"></canvas>
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; flex-wrap: wrap; gap: 0.8rem;">
+        <h2 style="margin: 0; text-align: left;">WebGL Graph Viewport</h2>
+        <div class="viewport-controls">
+          <label class="viewport-toggle">
+            <input type="checkbox" id="toggle-grid" checked><span>Grid</span>
+          </label>
+          <span class="viewport-divider"></span>
+          <label class="viewport-toggle">
+            <input type="checkbox" id="toggle-axis" checked><span>Axis</span>
+          </label>
+        </div>
+      </div>
+      <div style="width: 100%; overflow: hidden; border-radius: 6px; border: 1px solid var(--color-border); background: #ffffff;">
+        <canvas id="canvas" style="display: block; width: 100%; height: 500px; cursor: grab; user-select: none; touch-action: none; background: #ffffff;"></canvas>
       </div>
       <p style="font-size: 1.3rem; color: var(--color-text-muted); margin-top: 1rem; margin-bottom: 0;">
-        Parameters: <code id="viewport-range">x &isin; [-5, 5], y &isin; [-2.5, 2.5]</code>, <code>t</code> is seconds since page load.
+        Parameters: <code id="viewport-range">x &isin; [-5, 5], y &isin; [-5, 5]</code>, <code>t</code> is seconds since page load.
       </p>
       <p style="font-size: 1.2rem; color: var(--color-text-muted); margin-top: 0.5rem; margin-bottom: 0;">
-        Drag to pan &bull; Scroll to zoom &bull; Double-click to reset
+        <span id="interaction-hint">Left-drag to rotate &bull; Shift+drag to pan &bull; Scroll to zoom &bull; Double-click to reset</span>
       </p>
     </div>
 
     <div class="card markdown-body" data-markdown>
 ## About Math Plotter
 
-This real-time plotter evaluates mathematical functions of one spatial variable (_x_) and time (_t_) directly onto an HTML5 canvas at <span id="fps-display">30 FPS</span>.
+This real-time application demonstrates PetitParser by parsing dynamic mathematical formulas of spatial coordinates (_x_, _y_) and time (_t_), evaluating the compiled expression tree across thousands of grid points per frame, and rendering interactive 2D curves and 3D surfaces in WebGL at <span id="fps-display">60 FPS</span>.
 
 ### Key Features
 
-- **Parsed Expression Tree**: The mathematical expression is parsed once into an AST, then repeatedly evaluated across horizontal canvas pixel columns for each animation frame.
-- **Error Handling**: Syntactic and evaluation errors display an inline warning without interrupting the animation loop.
-- **Canvas Rendering**: Adapts to device pixel ratios and window resizing events to maintain crisp graph lines.
+- **ExpressionBuilder**: Uses PetitParser's `ExpressionBuilder` to construct an operator-precedence grammar defining prefix operators (`+`, `-`), right-associative exponentiation (`^`), and left-associative arithmetic (`*`, `/`, `+`, `-`).
+- **Function & Variable Bindings**: Combines combinators (`seq2`, `starSeparated`, `skip`) to parse multi-variable identifiers (`x`, `y`, `t`), mathematical constants (`pi`, `e`), and function invocations (`sin`, `cos`, `tan`, `sqrt`, `exp`, `log`, `abs`).
+- **AST Generation & Fast Evaluation**: Transforms the parsed input into an Abstract Syntax Tree ([Expression]) that is evaluated repeatedly with variable environment maps in real-time animation loops.
+- **Precise Error Diagnostics**: Leverages PetitParser's failure reporting to pinpoint exact character offsets and provide descriptive error messages as formulas are typed.
     </div>
 
     <footer>

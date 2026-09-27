@@ -23,9 +23,4 @@ final functions1 = {
 };
 
 /// Two-argument mathematical functions mapped to binary evaluation closures.
-final functions2 = {
-  'atan2': (num x, num y) => atan2(x, y),
-  'max': (num x, num y) => max(x, y),
-  'min': (num x, num y) => min(x, y),
-  'pow': (num x, num y) => pow(x, y),
-};
+final functions2 = {'atan2': atan2, 'max': max, 'min': min, 'pow': pow};
