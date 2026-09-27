@@ -1,4 +1,4 @@
-/// This library contains a complete implementation of [JSON](https://json.org/).
+/// Complete parser and AST definition for [JSON](https://json.org/).
 library;
 
 import 'src/json/definition.dart';
@@ -18,4 +18,4 @@ final _jsonParser = JsonDefinition().build();
 /// final result = parseJson('{"a": 1, "b": [2, 3.4], "c": false}');
 /// print(result);  // {a: 1, b: [2, 3.4], c: false}
 /// ```
-JSON parseJson(String input) => _jsonParser.parse(input).value;
+Json parseJson(String input) => _jsonParser.parse(input).value;

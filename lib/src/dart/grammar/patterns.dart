@@ -65,8 +65,9 @@ mixin DartPatternGrammar
       ).map2((primary, suffixes) {
         var result = primary;
         for (final s in suffixes) {
-          if (s.op == 'as') {
-            result = CastPatternNode(result, s.type!);
+          final type = s.type;
+          if (s.op == 'as' && type != null) {
+            result = CastPatternNode(result, type);
           } else if (s.op == '?') {
             result = NullCheckPatternNode(result);
           } else if (s.op == '!') {

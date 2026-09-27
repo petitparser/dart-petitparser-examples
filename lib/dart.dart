@@ -1,4 +1,5 @@
-/// This library contains the grammar and AST parser for the Dart programming language.
+/// Dart grammar, strongly typed AST models, and parser based on the
+/// [Dart programming language specification](https://raw.githubusercontent.com/dart-lang/language/refs/heads/main/specification/dartLangSpec.tex).
 ///
 /// Supports modern Dart 3.x features including records, patterns, switch expressions,
 /// enhanced enums, extension types, class modifiers, and null safety.

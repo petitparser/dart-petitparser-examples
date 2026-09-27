@@ -1,13 +1,27 @@
 import 'node.dart';
 import 'pattern.dart';
 
-/// Nondeterministic Finite Automaton
+/// A nondeterministic finite automaton (NFA) for executing regular expression patterns.
+///
+/// Implements [RegexpPattern] to match strings according to Thompson's construction.
+///
+/// For example:
+///
+/// ```dart
+/// final nfa = Nfa.fromString('a*b+');
+/// print(nfa.matchAsPrefix('aaabb')?.group(0)); // 'aaabb'
+/// ```
 class Nfa extends RegexpPattern {
+  /// Creates an NFA with given [start] and [end] states.
   new({required this.start, required this.end});
 
+  /// Compiles a regular expression string into an [Nfa].
   factory fromString(String regexp) => Node.fromString(regexp).toNfa();
 
+  /// The entry state of the NFA.
   final NfaState start;
+
+  /// The accepting terminal state of the NFA.
   final NfaState end;
 
   @override
@@ -60,13 +74,26 @@ class Nfa extends RegexpPattern {
   }
 }
 
+/// A state within a nondeterministic finite automaton ([Nfa]).
 class NfaState {
+  /// Creates an NFA state, marked as accepting when [isEnd] is `true`.
   new({required this.isEnd});
 
+  /// Whether this state is an accepting (terminal) state.
   bool isEnd;
+
+  /// Map of character code points to subsequent transition states.
   final Map<int, NfaState> transitions = {};
+
+  /// Epsilon (empty string) transition states.
   final List<NfaState> epsilons = [];
+
+  /// Wildcard (any character) transition states.
   final List<NfaState> dots = [];
+
+  /// Start-of-input anchor transition states.
   final List<NfaState> startAnchors = [];
+
+  /// End-of-input anchor transition states.
   final List<NfaState> endAnchors = [];
 }

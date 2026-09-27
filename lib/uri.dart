@@ -19,6 +19,26 @@ import 'package:petitparser/petitparser.dart';
 import 'src/uri/authority.dart' as lib_authority;
 import 'src/uri/query.dart' as lib_query;
 
+export 'src/uri/authority.dart';
+export 'src/uri/query.dart';
+
+/// A parser that decomposes an RFC-3986 URI into its constituent components.
+///
+/// Returns a record containing named fields for `scheme`, `authority`,
+/// `username`, `password`, `hostname`, `port`, `path`, `query`, `params`,
+/// and `fragment`.
+///
+/// For example:
+///
+/// ```dart
+/// final result = uri.parse('https://user:pass@example.com:8080/path?a=1&b=2#frag');
+/// final value = result.value;
+/// print(value.scheme);   // 'https'
+/// print(value.hostname); // 'example.com'
+/// print(value.port);     // '8080'
+/// print(value.path);     // '/path'
+/// print(value.params);   // [('a', '1'), ('b', '2')]
+/// ```
 final uri =
     seq5(
       _scheme.skip(after: ':'.toParser()).optional(),

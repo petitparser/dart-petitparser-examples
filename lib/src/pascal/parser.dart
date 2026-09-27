@@ -504,11 +504,8 @@ class PascalParserDefinition extends GrammarDefinition<ProgramNode> {
         for (final acc in accessors) {
           if (acc.isDeref) {
             current = PointerDereferenceExpressionNode(current);
-          } else if (acc.field != null) {
-            current = FieldAccessExpressionNode(
-              record: current,
-              field: acc.field!,
-            );
+          } else if (acc.field case final field?) {
+            current = FieldAccessExpressionNode(record: current, field: field);
           } else {
             current = ArrayAccessExpressionNode(
               array: current,
@@ -535,7 +532,7 @@ class PascalParserDefinition extends GrammarDefinition<ProgramNode> {
 
   Parser<String> stringLiteral() => seq3(
     char("'"),
-    pattern("^'").starString(),
+    [string("''"), pattern("^'")].toChoiceParser().star(),
     char("'"),
   ).flatten(message: 'string expected').trim(ref0(spacer));
 
@@ -590,7 +587,7 @@ class PascalParserDefinition extends GrammarDefinition<ProgramNode> {
                   right: termExpr,
                 );
         }
-        return result!;
+        return result ?? (throw StateError('Expression expected'));
       });
 
   Parser<ExpressionNode> term() => ref0(factor)
@@ -661,7 +658,14 @@ class PascalParserDefinition extends GrammarDefinition<ProgramNode> {
       token,
       'nil',
     ).map((_) => const LiteralExpressionNode(raw: 'nil', value: null)),
-    ref0(stringLiteral).map((s) => LiteralExpressionNode(raw: s, value: s)),
+    ref0(stringLiteral).map(
+      (s) => LiteralExpressionNode(
+        raw: s,
+        value: s.length >= 2 && s.startsWith("'") && s.endsWith("'")
+            ? s.substring(1, s.length - 1).replaceAll("''", "'")
+            : s,
+      ),
+    ),
     ref0(unsignedNumber)
         .map((n) => LiteralExpressionNode(raw: n.toString(), value: n)),
     ref0(identifier).map((id) => LiteralExpressionNode(raw: id, value: id)),

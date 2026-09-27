@@ -1,15 +1,28 @@
 import 'nfa.dart';
 import 'parser.dart';
 
+/// Base class for all regular expression Abstract Syntax Tree (AST) nodes.
 abstract class Node {
+  /// Const constructor for subclasses.
   const new();
 
+  /// Parses a regular expression string into a [Node] AST.
+  ///
+  /// For example:
+  ///
+  /// ```dart
+  /// final node = Node.fromString('a*b+');
+  /// print(node);
+  /// ```
   static Node fromString(String regexp) => nodeParser.parse(regexp).value;
 
+  /// Compiles this AST node into a nondeterministic finite automaton ([Nfa]).
   Nfa toNfa();
 }
 
+/// An AST node matching the empty string.
 class EmptyNode extends Node {
+  /// Creates an empty regular expression node.
   const new();
 
   @override
@@ -30,7 +43,9 @@ class EmptyNode extends Node {
   int get hashCode => runtimeType.hashCode;
 }
 
+/// An AST node matching any single character (the `.` wildcard).
 class DotNode extends Node {
+  /// Creates a wildcard dot node.
   const new();
 
   @override
@@ -51,9 +66,12 @@ class DotNode extends Node {
   int get hashCode => runtimeType.hashCode;
 }
 
+/// An AST node matching a single literal character by its Unicode code point.
 class LiteralNode extends Node {
+  /// Creates a literal node matching the single character [literal].
   new(String literal) : codePoint = literal.codeUnits.single;
 
+  /// The Unicode code point to match.
   final int codePoint;
 
   @override
@@ -75,7 +93,11 @@ class LiteralNode extends Node {
   int get hashCode => Object.hash(runtimeType, codePoint);
 }
 
+/// An AST node matching any character within the inclusive range between [startCodePoint] and [endCodePoint].
 class RangeNode extends Node {
+  /// Creates a character range node from [start] to [end].
+  ///
+  /// Throws an [ArgumentError] if [start] has a higher code point than [end].
   new(String start, String end)
     : startCodePoint = start.codeUnits.single,
       endCodePoint = end.codeUnits.single {
@@ -88,7 +110,10 @@ class RangeNode extends Node {
     }
   }
 
+  /// The inclusive lower-bound Unicode code point.
   final int startCodePoint;
+
+  /// The inclusive upper-bound Unicode code point.
   final int endCodePoint;
 
   @override
@@ -115,10 +140,15 @@ class RangeNode extends Node {
   int get hashCode => Object.hash(runtimeType, startCodePoint, endCodePoint);
 }
 
+/// An AST node matching [left] followed immediately by [right].
 class ConcatenationNode extends Node {
+  /// Creates a concatenation of [left] and [right] nodes.
   new(this.left, this.right);
 
+  /// The first node in the sequence.
   final Node left;
+
+  /// The second node in the sequence.
   final Node right;
 
   @override
@@ -141,10 +171,15 @@ class ConcatenationNode extends Node {
   int get hashCode => Object.hash(runtimeType, left, right);
 }
 
+/// An AST node matching either [left] or [right] (the `|` operator).
 class AlternationNode extends Node {
+  /// Creates an alternation between [left] and [right].
   new(this.left, this.right);
 
+  /// The alternative branch on the left.
   final Node left;
+
+  /// The alternative branch on the right.
   final Node right;
 
   @override
@@ -176,10 +211,17 @@ class AlternationNode extends Node {
   int get hashCode => Object.hash(runtimeType, left, right);
 }
 
+/// An AST node matching the intersection of [left] and [right] (the `&` operator).
+///
+/// Note: Compilation to an [Nfa] is currently unsupported for intersection nodes.
 class IntersectionNode extends Node {
+  /// Creates an intersection of [left] and [right].
   new(this.left, this.right);
 
+  /// The first intersecting expression.
   final Node left;
+
+  /// The second intersecting expression.
   final Node right;
 
   @override
@@ -196,24 +238,37 @@ class IntersectionNode extends Node {
   int get hashCode => Object.hash(runtimeType, left, right);
 }
 
+/// An AST node repeating [child] between [min] and [max] times.
+///
+/// If [max] is `null`, the repetition is unbounded (such as `*` or `+`).
 class QuantificationNode extends Node {
+  /// Creates a quantification of [child] with [min] and optional [max] bounds.
+  ///
+  /// Throws a [RangeError] if [min] is negative or if [max] is less than [min].
   new(this.child, this.min, [this.max]) {
     RangeError.checkNotNegative(min, 'min', 'Minimum must be non-negative');
-    if (max != null && max! < min) {
+    final max = this.max;
+    if (max != null && max < min) {
       throw RangeError.value(
-        max!,
+        max,
         'max',
         'Maximum must be greater than or equal to minimum ($min)',
       );
     }
   }
 
+  /// The child node being quantified.
   final Node child;
+
+  /// The minimum number of repetitions.
   final int min;
+
+  /// The optional maximum number of repetitions, or `null` if unbounded.
   final int? max;
 
   @override
   Nfa toNfa() {
+    final max = this.max;
     if (min == 0 && max == null) {
       final start = NfaState(isEnd: false);
       final end = NfaState(isEnd: true);
@@ -241,7 +296,7 @@ class QuantificationNode extends Node {
     if (max == null) {
       nfas.add(QuantificationNode(child, 0, null).toNfa());
     } else {
-      for (var i = 0; i < max! - min; i++) {
+      for (var i = 0; i < max - min; i++) {
         nfas.add(QuantificationNode(child, 0, 1).toNfa());
       }
     }
@@ -274,9 +329,12 @@ class QuantificationNode extends Node {
   int get hashCode => Object.hash(runtimeType, child, min, max);
 }
 
+/// An AST node matching the complement of [child] (inverting matches).
 class ComplementNode extends Node {
+  /// Creates a complement node inverting matches of [child].
   new(this.child);
 
+  /// The child node whose matches are complemented.
   final Node child;
 
   @override
@@ -305,7 +363,9 @@ class ComplementNode extends Node {
   int get hashCode => Object.hash(runtimeType, child);
 }
 
+/// An AST node matching the start of input (the `^` anchor).
 class StartAnchorNode extends Node {
+  /// Creates a start anchor node.
   const new();
 
   @override
@@ -326,7 +386,9 @@ class StartAnchorNode extends Node {
   int get hashCode => runtimeType.hashCode;
 }
 
+/// An AST node matching the end of input (the `$` anchor).
 class EndAnchorNode extends Node {
+  /// Creates an end anchor node.
   const new();
 
   @override

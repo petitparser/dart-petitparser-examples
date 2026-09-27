@@ -1,8 +1,6 @@
 import 'package:meta/meta.dart';
 import 'package:petitparser/petitparser.dart';
 import 'package:petitparser/reflection.dart';
-import 'package:petitparser_examples/src/uri/authority.dart';
-import 'package:petitparser_examples/src/uri/query.dart';
 import 'package:petitparser_examples/uri.dart';
 import 'package:test/test.dart';
 
@@ -142,5 +140,84 @@ void main() {
     ]) {
       test(input, () => expect(parser, isSuccess(input)));
     }
+  });
+  group('authority failure edge-cases', () {
+    final authParser = authority.end();
+
+    test('malformed port with non-digits', () {
+      expect(authParser, isFailure('example.com:abc'));
+      expect(authParser, isFailure('example.com:80a'));
+      expect(authParser, isFailure('example.com:80b9'));
+      expect(authParser, isFailure('example.com:x1y2'));
+    });
+
+    test('malformed port with trailing colon and no digits', () {
+      expect(authParser, isFailure('example.com:'));
+      expect(authParser, isFailure('user:pass@example.com:'));
+    });
+
+    test('malformed port with negative sign or whitespace', () {
+      expect(authParser, isFailure('example.com:-80'));
+      expect(authParser, isFailure('example.com:+80'));
+      expect(authParser, isFailure('example.com: 80'));
+      expect(authParser, isFailure('example.com:80 '));
+    });
+
+    test('multiple port delimiters', () {
+      expect(authParser, isFailure('example.com:80:80'));
+      expect(authParser, isFailure('example.com:80:'));
+    });
+
+    test('missing username before password colon', () {
+      expect(authParser, isFailure(':secret@example.com'));
+      expect(authParser, isFailure(':secret@example.com:8080'));
+    });
+
+    test('malformed port with user credentials', () {
+      expect(authParser, isFailure('user:pass@example.com:abc'));
+      expect(authParser, isFailure('user:pass@example.com:80xyz'));
+      expect(authParser, isFailure('user@example.com:invalid'));
+    });
+
+    test('malformed IPv6 host port separation', () {
+      expect(authParser, isFailure('[::1]:abc'));
+      expect(authParser, isFailure('[::1]:'));
+      expect(authParser, isFailure('[2001:db8::1]:badport'));
+    });
+
+    test('trailing path or query delimiters unconsumed', () {
+      expect(authParser, isFailure('example.com:80/path'));
+      expect(authParser, isFailure('example.com:80?query'));
+      expect(authParser, isFailure('example.com:80#frag'));
+    });
+  });
+
+  group('query', () {
+    test('parses multiple parameters', () {
+      final result = query.parse('key1=val1&key2=val2&noval&empty=');
+      expect(result, isA<Success<dynamic>>());
+      final entries = (result.value as List).cast<(String, String?)>();
+      expect(
+        entries,
+        equals([
+          ('key1', 'val1'),
+          ('key2', 'val2'),
+          ('noval', null),
+          ('empty', ''),
+        ]),
+      );
+    });
+
+    test('handles empty input and separator edge cases', () {
+      final resultEmpty = query.parse('');
+      expect(resultEmpty, isA<Success<dynamic>>());
+      expect(resultEmpty.value, isEmpty);
+
+      final resultSeparators = query.parse('&a=1&&b=2&');
+      expect(resultSeparators, isA<Success<dynamic>>());
+      final entries = (resultSeparators.value as List)
+          .cast<(String, String?)>();
+      expect(entries, equals([('a', '1'), ('b', '2')]));
+    });
   });
 }

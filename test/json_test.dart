@@ -1,3 +1,4 @@
+import 'package:petitparser/petitparser.dart';
 import 'package:petitparser/reflection.dart';
 import 'package:petitparser_examples/json.dart';
 import 'package:test/test.dart';
@@ -134,6 +135,7 @@ void main() {
     test('escaped string', () {
       expect(parser, isSuccess('"\\""', value: '"'));
       expect(parser, isSuccess('"\\\\"', value: '\\'));
+      expect(parser, isSuccess('"\\/"', value: '/'));
       expect(parser, isSuccess('"\\b"', value: '\b'));
       expect(parser, isSuccess('"\\f"', value: '\f'));
       expect(parser, isSuccess('"\\n"', value: '\n'));
@@ -149,6 +151,8 @@ void main() {
       expect(parser, isFailure('"'));
       expect(parser, isFailure('"a'));
       expect(parser, isFailure('"a\\"'));
+      expect(parser, isFailure(r'"\a"'));
+      expect(parser, isFailure(r'"\x41"'));
       expect(parser, isFailure('"\\u00"'));
       expect(parser, isFailure('"\\u000X"'));
     });
@@ -241,6 +245,91 @@ void main() {
         parser,
         isFailure('1e', position: 1, message: 'end of input expected'),
       );
+    });
+  });
+  group('malformed inputs & parseJson exceptions', () {
+    test('empty and whitespace-only input', () {
+      expect(parser, isFailure(''));
+      expect(parser, isFailure('   '));
+      expect(parser, isFailure('\t\n'));
+      expect(() => parseJson(''), throwsA(isA<ParserException>()));
+      expect(() => parseJson('   '), throwsA(isA<ParserException>()));
+    });
+
+    test('unclosed brackets and braces', () {
+      expect(parser, isFailure('['));
+      expect(parser, isFailure('[1'));
+      expect(parser, isFailure('[1, 2'));
+      expect(parser, isFailure('{'));
+      expect(parser, isFailure('{"a"'));
+      expect(parser, isFailure('{"a": 1'));
+      expect(() => parseJson('[1, 2'), throwsA(isA<ParserException>()));
+      expect(() => parseJson('{"a": 1'), throwsA(isA<ParserException>()));
+    });
+
+    test('unquoted keys', () {
+      expect(parser, isFailure('{a: 1}'));
+      expect(parser, isFailure('{foo: "bar"}'));
+      expect(parser, isFailure('{1: "numeric"}'));
+      expect(() => parseJson('{a: 1}'), throwsA(isA<ParserException>()));
+      expect(() => parseJson('{foo: "bar"}'), throwsA(isA<ParserException>()));
+    });
+
+    test('single quoted strings and keys', () {
+      expect(parser, isFailure("'hello'"));
+      expect(parser, isFailure("{'a': 1}"));
+      expect(parser, isFailure("{'a': 'b'}"));
+      expect(parser, isFailure("['item1', 'item2']"));
+      expect(() => parseJson("'hello'"), throwsA(isA<ParserException>()));
+      expect(() => parseJson("{'a': 1}"), throwsA(isA<ParserException>()));
+    });
+
+    test('trailing commas in collections', () {
+      expect(parser, isFailure('[1, 2,]'));
+      expect(parser, isFailure('["a",]'));
+      expect(parser, isFailure('{"a": 1,}'));
+      expect(parser, isFailure('{"a": 1, "b": 2,}'));
+      expect(() => parseJson('[1, 2,]'), throwsA(isA<ParserException>()));
+      expect(() => parseJson('{"a": 1,}'), throwsA(isA<ParserException>()));
+    });
+
+    test('trailing garbage after valid JSON', () {
+      expect(parser, isFailure('{"a": 1} trailing'));
+      expect(parser, isFailure('[] trailing'));
+      expect(parser, isFailure('true false'));
+      expect(parser, isFailure('123 456'));
+      expect(parser, isFailure('"hello" "world"'));
+      expect(parser, isFailure('null 0'));
+      expect(
+        () => parseJson('{"a": 1} trailing'),
+        throwsA(isA<ParserException>()),
+      );
+      expect(() => parseJson('true false'), throwsA(isA<ParserException>()));
+      expect(() => parseJson('123 456'), throwsA(isA<ParserException>()));
+    });
+
+    test('parseJson error handling', () {
+      expect(() => parseJson('invalid'), throwsA(isA<ParserException>()));
+      expect(() => parseJson('undefined'), throwsA(isA<ParserException>()));
+      expect(() => parseJson('{'), throwsA(isA<ParserException>()));
+      expect(() => parseJson('NaN'), throwsA(isA<ParserException>()));
+      expect(() => parseJson('Infinity'), throwsA(isA<ParserException>()));
+    });
+
+    test('Json type alias compatibility', () {
+      final values = <Json>[
+        null,
+        42,
+        'hello',
+        [1, 'two'],
+        {'key': 'value'},
+      ];
+      expect(values, hasLength(5));
+      expect(values[0], isNull);
+      expect(values[1], equals(42));
+      expect(values[2], equals('hello'));
+      expect(values[3], isA<List<Object?>>());
+      expect(values[4], isA<Map<String, Object?>>());
     });
   });
 }

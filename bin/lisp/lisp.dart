@@ -17,9 +17,17 @@ void evalInteractive(
     try {
       output.writeln('=> ${evalString(parser, env, line)}');
     } on ParserException catch (exception) {
-      error.writeln('Parser error: ${exception.toString()}');
+      error.writeln('Parser error: $exception');
+    } on ArgumentError catch (exception) {
+      error.writeln('Argument error: ${exception.message ?? exception}');
+    } on StateError catch (exception) {
+      error.writeln('State error: ${exception.message}');
+    } on FormatException catch (exception) {
+      error.writeln('Format error: ${exception.message}');
     } on Exception catch (exception) {
       error.writeln(exception.toString());
+    } on Error catch (errorObject) {
+      error.writeln(errorObject.toString());
     }
     output.write('>> ');
   });

@@ -169,5 +169,110 @@ void main() {
       );
       expect(formalParams, isSuccess('([@deprecated int count = 0])'));
     });
+
+    test('function-typed parameter with metadata annotations', () {
+      expect(
+        formalParams,
+        isSuccess(
+          '(@meta void cb())',
+          value: isA<List<ParameterNode>>().having(
+            (list) => list.first,
+            'first',
+            isA<FunctionTypedParameterNode>()
+                .having((p) => p.name, 'name', 'cb')
+                .having((p) => p.metadata, 'metadata', hasLength(1)),
+          ),
+        ),
+      );
+      expect(formalParams, isSuccess('(@foo @bar int Function() cb)'));
+    });
+
+    test('optional positional parameter defaults', () {
+      expect(
+        formalParams,
+        isSuccess(
+          '([int x = 42])',
+          value: isA<List<ParameterNode>>().having(
+            (list) => list.first,
+            'first',
+            isA<SimpleParameterNode>()
+                .having((p) => p.name, 'name', 'x')
+                .having(
+                  (p) => p.defaultValue,
+                  'defaultValue',
+                  isA<IntegerLiteralNode>(),
+                ),
+          ),
+        ),
+      );
+      expect(
+        formalParams,
+        isSuccess(
+          '([void cb() = defaultCallback])',
+          value: isA<List<ParameterNode>>().having(
+            (list) => list.first,
+            'first',
+            isA<FunctionTypedParameterNode>()
+                .having((p) => p.name, 'name', 'cb')
+                .having(
+                  (p) => p.defaultValue,
+                  'defaultValue',
+                  isA<IdentifierNode>(),
+                ),
+          ),
+        ),
+      );
+    });
+
+    test('named function-typed parameter defaults', () {
+      expect(
+        formalParams,
+        isSuccess(
+          '({void cb() = defaultCallback})',
+          value: isA<List<ParameterNode>>().having(
+            (list) => list.first,
+            'first',
+            isA<FunctionTypedParameterNode>()
+                .having((p) => p.name, 'name', 'cb')
+                .having((p) => p.isNamed, 'isNamed', isTrue)
+                .having(
+                  (p) => p.defaultValue,
+                  'defaultValue',
+                  isA<IdentifierNode>(),
+                ),
+          ),
+        ),
+      );
+      expect(
+        formalParams,
+        isSuccess(
+          '({void cb(): defaultCallback})',
+          value: isA<List<ParameterNode>>().having(
+            (list) => list.first,
+            'first',
+            isA<FunctionTypedParameterNode>()
+                .having((p) => p.name, 'name', 'cb')
+                .having(
+                  (p) => p.defaultValue,
+                  'defaultValue',
+                  isA<IdentifierNode>(),
+                ),
+          ),
+        ),
+      );
+      expect(
+        formalParams,
+        isSuccess(
+          '({@meta required void cb() = defaultCallback})',
+          value: isA<List<ParameterNode>>().having(
+            (list) => list.first,
+            'first',
+            isA<FunctionTypedParameterNode>()
+                .having((p) => p.metadata, 'metadata', hasLength(1))
+                .having((p) => p.isRequired, 'isRequired', isTrue),
+          ),
+        ),
+      );
+    });
   });
 }

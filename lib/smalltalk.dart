@@ -1,6 +1,4 @@
-/// This library contains the complete grammar of Smalltalk.
-///
-/// It was automatically exported from PetitParser for Smalltalk.
+/// Smalltalk grammar, strongly typed AST models, and visitor traversal.
 ///
 /// For example:
 ///

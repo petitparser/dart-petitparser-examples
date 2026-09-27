@@ -3,13 +3,17 @@ import 'package:petitparser/petitparser.dart';
 import 'escape.dart';
 import 'node.dart';
 
+/// Grammar definition parsing regular expression syntax into a [Node] AST.
+///
+/// Supports literal characters, character classes (`[...]`), ranges (`[a-z]`),
+/// complements (`[^...]` and `!`), wildcards (`.`), anchors (`^`, `$`),
+/// quantification (`*`, `+`, `?`, `{min,max}`), concatenations,
+/// alternations (`|`), and intersections (`&`).
 class RegexpParserDefinition extends GrammarDefinition<Node> {
   Parser<Node> escape() => any()
       .skip(before: char(r'\'))
       .map(
-        (char) => escapeClasses.containsKey(char)
-            ? escapeClasses[char]!
-            : LiteralNode(escapeChars[char] ?? char),
+        (char) => escapeClasses[char] ?? LiteralNode(escapeChars[char] ?? char),
       );
   Parser<Node> dot() => char('.').map((_) => const DotNode());
   Parser<Node> startAnchor() => char('^').map((_) => const StartAnchorNode());
@@ -86,4 +90,12 @@ class RegexpParserDefinition extends GrammarDefinition<Node> {
   }
 }
 
+/// A parser that converts regular expression strings into a [Node] AST.
+///
+/// For example:
+///
+/// ```dart
+/// final node = nodeParser.parse('a(b|c)*').value;
+/// print(node);
+/// ```
 final nodeParser = RegexpParserDefinition().build();

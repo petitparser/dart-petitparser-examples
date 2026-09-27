@@ -123,7 +123,7 @@ class HtmlPascalAstVisitor implements PascalVisitor<void, void> {
     _writeIndent();
     buffer.write('<span class="node-prop">$name:</span>');
     if (value != null) {
-      buffer.write('<span class="node-val">$value</span>\n');
+      buffer.write(' <span class="node-val">$value</span>\n');
     } else {
       buffer.write('\n');
     }
@@ -577,9 +577,17 @@ class HtmlPascalAstVisitor implements PascalVisitor<void, void> {
 
   @override
   void visitLiteralExpression(LiteralExpressionNode node, void context) {
-    final valStr = node.value is String
-        ? '<span class="node-str">\'${node.value}\'</span>'
-        : node.raw;
+    String valStr;
+    if (node.value is String) {
+      final str = node.value as String;
+      final display =
+          str.startsWith("'") && str.endsWith("'") && str.length >= 2
+          ? str.substring(1, str.length - 1)
+          : str;
+      valStr = '<span class="node-str">\'$display\'</span>';
+    } else {
+      valStr = node.raw;
+    }
     _writeNodeHeader('LiteralExpressionNode', valStr);
   }
 

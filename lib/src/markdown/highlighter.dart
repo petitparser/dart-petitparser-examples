@@ -244,11 +244,12 @@ class _SpanCollector implements MarkdownVisitor<void> {
         spans.add(HighlightSpan(start, fenceEnd, 'hl-punct'));
       }
       // Info string
-      if (node.info != null && node.info!.isNotEmpty) {
-        final infoStart = source.indexOf(node.info!, fenceEnd);
+      final info = node.info;
+      if (info != null && info.isNotEmpty) {
+        final infoStart = source.indexOf(info, fenceEnd);
         if (infoStart != -1 && infoStart < stop) {
           spans.add(
-            HighlightSpan(infoStart, infoStart + node.info!.length, 'hl-info'),
+            HighlightSpan(infoStart, infoStart + info.length, 'hl-info'),
           );
         }
       }

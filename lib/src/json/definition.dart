@@ -4,10 +4,10 @@ import 'encoding.dart';
 import 'types.dart';
 
 /// JSON grammar definition.
-class JsonDefinition extends GrammarDefinition<JSON> {
+class JsonDefinition extends GrammarDefinition<Json> {
   @override
-  Parser<JSON> start() => ref0(value).end();
-  Parser<JSON> value() => [
+  Parser<Json> start() => ref0(value).end();
+  Parser<Json> value() => [
     ref0(object),
     ref0(array),
     ref0(stringToken),
@@ -18,23 +18,23 @@ class JsonDefinition extends GrammarDefinition<JSON> {
     failure(message: 'value expected'),
   ].toChoiceParser();
 
-  Parser<Map<String, JSON>> object() =>
+  Parser<Map<String, Json>> object() =>
       ref0(objectElements)
           .skip(before: char('{').trim(), after: char('}').trim());
-  Parser<Map<String, JSON>> objectElements() =>
+  Parser<Map<String, Json>> objectElements() =>
       ref0(objectElement)
           .starSeparated(char(',').trim())
           .map((list) => Map.fromEntries(list.elements));
-  Parser<MapEntry<String, JSON>> objectElement() => seq3(
+  Parser<MapEntry<String, Json>> objectElement() => seq3(
     ref0(stringToken),
     char(':').trim(),
     ref0(value),
   ).map3((key, _, value) => MapEntry(key, value));
 
-  Parser<List<JSON>> array() =>
+  Parser<List<Json>> array() =>
       ref0(arrayElements)
           .skip(before: char('[').trim(), after: char(']').trim());
-  Parser<List<JSON>> arrayElements() =>
+  Parser<List<Json>> arrayElements() =>
       ref0(value).starSeparated(char(',').trim()).map((list) => list.elements);
 
   Parser<bool> trueToken() => string('true').trim().map((_) => true);
@@ -56,7 +56,7 @@ class JsonDefinition extends GrammarDefinition<JSON> {
   Parser<String> characterEscape() => seq2(
     char('\\'),
     anyOf(jsonEscapeChars.keys.join()),
-  ).map2((_, char) => jsonEscapeChars[char]!);
+  ).map2((_, char) => jsonEscapeChars[char] ?? char);
   Parser<String> characterUnicode() => seq2(
     string('\\u'),
     pattern('0-9A-Fa-f').timesString(4, message: '4-digit hex number expected'),

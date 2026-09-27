@@ -5,15 +5,15 @@ import 'evaluator.dart';
 /// The standard prolog parser definition.
 final _definition = PrologParserDefinition();
 
-/// The standard prolog parser to read rules.
+/// A parser that reads Prolog rules into a list of [Rule] clauses.
 final Parser<List<Rule>> rulesParser = _definition
     .buildFrom(_definition.rules())
     .end();
 
-/// The standard prolog parser to read queries.
+/// A parser that reads a Prolog query into a [Term].
 final Parser<Term> termParser = _definition.buildFrom(_definition.term()).end();
 
-/// Prolog parser definition that directly creates typed Prolog AST structures.
+/// Grammar definition that produces typed Prolog AST structures.
 class PrologParserDefinition extends GrammarDefinition<List<Rule>> {
   final Map<String, Variable> scope = {};
 

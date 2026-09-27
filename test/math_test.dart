@@ -60,6 +60,11 @@ void main() {
     verify('min(2, 3)', min(2, 3));
     verify('pow(2, 3)', pow(2, 3));
   });
+  test('unknown functions throw ArgumentError', () {
+    expect(() => parser.parse('unknown(1)'), throwsArgumentError);
+    expect(() => parser.parse('unknown(1, 2)'), throwsArgumentError);
+    expect(() => parser.parse('foo(1, 2, 3)'), throwsArgumentError);
+  });
   test('prefix', () {
     verify('+2', 2);
     verify('-pi', -pi);

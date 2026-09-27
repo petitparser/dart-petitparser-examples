@@ -5,6 +5,21 @@ import 'package:petitparser/petitparser.dart';
 import 'ast.dart';
 import 'common.dart';
 
+/// A mathematical expression parser supporting arithmetic, functions, and variables.
+///
+/// Evaluates expressions using standard operator precedence: parentheses,
+/// function calls, exponentiation (`^`), multiplication/division (`*`, `/`),
+/// and addition/subtraction (`+`, `-`).
+///
+/// Returns an [Expression] AST node that can be evaluated against a variable map.
+///
+/// For example:
+///
+/// ```dart
+/// final result = parser.parse('3 * (x + 2) ^ 2');
+/// final expression = result.value;
+/// print(expression.eval({'x': 4})); // 108.0
+/// ```
 final parser = () {
   final builder = ExpressionBuilder<Expression>();
   builder
@@ -76,12 +91,12 @@ Expression _createBinding(String name, List<Expression> arguments) =>
         final num value => Value(value),
         _ => Variable(name),
       },
-      1 => Application(name, arguments, checkValue(name, functions1[name])),
-      2 => Application(name, arguments, checkValue(name, functions2[name])),
-      _ => throwUnknown(name),
+      1 => Application(name, arguments, _checkValue(name, functions1[name])),
+      2 => Application(name, arguments, _checkValue(name, functions2[name])),
+      _ => _throwUnknown(name),
     };
 
-T checkValue<T>(String name, T? value) => value ?? throwUnknown(name);
+T _checkValue<T>(String name, T? value) => value ?? _throwUnknown(name);
 
-Never throwUnknown(String name) =>
+Never _throwUnknown(String name) =>
     throw ArgumentError.value(name, 'Unknown function');

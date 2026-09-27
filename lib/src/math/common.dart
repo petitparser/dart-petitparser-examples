@@ -1,9 +1,9 @@
 import 'dart:math';
 
-/// Common mathematical constants.
+/// Mathematical constants mapped to their [num] values.
 const constants = {'e': e, 'pi': pi};
 
-/// Common mathematical functions (1 argument).
+/// Single-argument mathematical functions mapped to unary evaluation closures.
 final functions1 = {
   'acos': acos,
   'asin': asin,
@@ -22,7 +22,7 @@ final functions1 = {
   'truncate': (num x) => x.truncate(),
 };
 
-/// Common mathematical functions (2 arguments).
+/// Two-argument mathematical functions mapped to binary evaluation closures.
 final functions2 = {
   'atan2': (num x, num y) => atan2(x, y),
   'max': (num x, num y) => max(x, y),

@@ -1,4 +1,3 @@
-import 'package:http/http.dart' as http;
 import 'package:petitparser/reflection.dart';
 import 'package:petitparser_examples/bibtex.dart';
 import 'package:test/test.dart';
@@ -15,6 +14,99 @@ Matcher isBibTextEntry({
     .having((e) => e.key, 'key', key)
     .having((e) => e.fields, 'fields', fields)
     .having((e) => e.normalized, 'normalized', normalized);
+
+/// Synthetic hermetic BibTeX fixture containing diverse entry types, field
+/// formats, LaTeX escapes, and nested braces.
+const syntheticBibTeX = r'''
+@article{Knuth1984,
+	author = {Donald E. Knuth},
+	title = {Literate Programming},
+	journal = {The Computer Journal},
+	volume = {27},
+	number = {2},
+	pages = {97--111},
+	year = 1984,
+	month = may,
+	url = {https://doi.org/10.1093/comjnl/27.2.97}
+}
+
+@book{Abelson1996,
+	author = "Harold Abelson and Gerald Jay Sussman",
+	title = "Structure and Interpretation of Computer Programs",
+	publisher = "MIT Press",
+	year = "1996",
+	address = "Cambridge, MA",
+	isbn = "0-262-01153-0"
+}
+
+@inproceedings{Reng10c,
+	title = "Practical Dynamic Grammars for Dynamic Languages",
+	author = {Lukas Renggli and St\'ephane Ducasse and Tudor G\^irba and Oscar Nierstrasz},
+	booktitle = "Proceedings of the 9th International Conference on Dynamic Languages",
+	series = {ICDL '10},
+	pages = {1---10},
+	year = 2010,
+	publisher = {ACM}
+}
+
+@misc{Renggli2024,
+	author = {Lukas Renggli},
+	title = {PetitParser: Dynamic Grammars for Dart},
+	howpublished = {https://github.com/petitparser/dart-petitparser},
+	year = 2024,
+	note = {well-known}
+}
+
+@techreport{Steele1980,
+	author = {Guy L. {Steele} Jr.},
+	title = {The Definition and Implementation of a Computer Programming Language Based on Constraints},
+	institution = {MIT AI Lab},
+	number = {AI-TR-595},
+	year = 1980
+}
+
+@phdthesis{Fielding2000,
+	author = {Roy Thomas Fielding},
+	title = {Architectural Styles and the Design of Network-based Software Architectures},
+	school = {University of California, Irvine},
+	year = 2000
+}
+
+@mastersthesis{Shannon1938,
+	author = {Claude E. Shannon},
+	title = {A Symbolic Analysis of Relay and Switching Circuits},
+	school = {Massachusetts Institute of Technology},
+	year = 1938
+}
+
+@proceedings{PLDI1990,
+	title = {Proceedings of the ACM SIGPLAN Conference on Programming Language Design and Implementation},
+	editor = {John Backus},
+	year = 1990,
+	publisher = {ACM}
+}
+
+@manual{DartSpec2023,
+	title = {Dart Programming Language Specification},
+	organization = {Google Inc.},
+	edition = {7th},
+	year = 2023
+}
+
+@comment{Cmt2026,
+	note = "Synthetic comment entry for hermetic test verification",
+	timestamp = "2026-09-27"
+}
+
+@string{StrACM,
+	name = "ACM",
+	value = {Association for Computing Machinery}
+}
+
+@preamble{Pre2026,
+	text = "Maintained hermetically for PetitParserExamples test suite"
+}
+''';
 
 void main() {
   final parser = BibTeXDefinition().build();
@@ -114,12 +206,25 @@ void main() {
       expect(normalizeFieldName('cross-ref'), 'Cross-Ref');
       expect(normalizeFieldName('CROSS-REF'), 'Cross-Ref');
     });
+    test('handles edge case strings without error', () {
+      expect(normalizeFieldName(''), '');
+      expect(normalizeFieldName('-'), '-');
+      expect(normalizeFieldName('-a'), '-A');
+      expect(normalizeFieldName('a-'), 'A-');
+      expect(normalizeFieldName('123'), '123');
+      expect(normalizeFieldName('--'), '--');
+    });
     test('is idempotent', () {
       expect(normalizeFieldName(normalizeFieldName('TITLE')), 'Title');
     });
   });
 
   group('normalizeFieldValue', () {
+    test('handles empty and blank values', () {
+      expect(normalizeFieldValue(''), '');
+      expect(normalizeFieldValue('{}'), '');
+      expect(normalizeFieldValue('""'), '');
+    });
     test('strips outer braces', () {
       expect(normalizeFieldValue('{hello}'), 'hello');
     });
@@ -144,46 +249,71 @@ void main() {
     });
   });
 
-  group(
-    'scg.bib',
-    () {
-      late final List<BibTeXEntry> entries;
-      setUpAll(() async {
-        final body = await http.read(
-          Uri.parse(
-            'https://raw.githubusercontent.com/scgbern/scgbib/main/scg.bib',
+  group('hermetic synthetic bibtex', () {
+    late final List<BibTeXEntry> entries;
+    setUpAll(() {
+      entries = parser.parse(syntheticBibTeX).value;
+    });
+
+    test('parses all entry types', () {
+      expect(entries.length, equals(12));
+      final types = entries.map((e) => e.type).toSet();
+      expect(
+        types,
+        containsAll([
+          'article',
+          'book',
+          'inproceedings',
+          'misc',
+          'techreport',
+          'phdthesis',
+          'mastersthesis',
+          'proceedings',
+          'manual',
+          'comment',
+          'string',
+          'preamble',
+        ]),
+      );
+    });
+
+    test('author filtering matches expected count', () {
+      final renggliEntries = entries.where(
+        (entry) => entry.fields['author']?.contains('Renggli') ?? false,
+      );
+      expect(renggliEntries.length, equals(2));
+    });
+
+    test('field normalization across entries', () {
+      final reng10c = entries.firstWhere((e) => e.key == 'Reng10c');
+      expect(
+        reng10c.normalized['Author'],
+        'Lukas Renggli and Stéphane Ducasse and Tudor Gîrba and Oscar Nierstrasz',
+      );
+      expect(reng10c.normalized['Pages'], '1\u201410');
+
+      final knuth = entries.firstWhere((e) => e.key == 'Knuth1984');
+      expect(knuth.normalized['Pages'], '97\u2013111');
+      expect(knuth.normalized['Author'], 'Donald E. Knuth');
+
+      final misc = entries.firstWhere((e) => e.key == 'Renggli2024');
+      expect(misc.normalized['Note'], 'well-known');
+    });
+
+    test('round-trip via raw toString()', () {
+      for (final entry in entries) {
+        final parsed = parser.parse(entry.toString()).value.single;
+        expect(
+          parsed,
+          isBibTextEntry(
+            type: entry.type,
+            key: entry.key,
+            fields: entry.fields,
           ),
         );
-        entries = parser.parse(body).value;
-      });
-      test('size', () {
-        expect(entries.length, greaterThan(9600));
-        expect(
-          entries
-              .where(
-                (entry) => entry.fields['Author']?.contains('Renggli') ?? false,
-              )
-              .length,
-          greaterThan(35),
-        );
-      });
-      test('round-trip via raw', () {
-        for (final entry in entries) {
-          expect(
-            parser.parse(entry.toString()).value.single,
-            isBibTextEntry(
-              type: entry.type,
-              key: entry.key,
-              fields: entry.fields,
-            ),
-          );
-        }
-      });
-    },
-    onPlatform: const {
-      'js': [Skip('http.get is unsupported in JavaScript')],
-    },
-  );
+      }
+    });
+  });
 
   group('failures', () {
     test('incomplete entry', () {

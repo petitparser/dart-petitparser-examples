@@ -14,7 +14,7 @@ This package showcases how to model domain-specific notations, standard intercha
 
 ## Highlights
 
-- **Grammar Catalog**: Practical parser definitions ranging from small data formats like JSON, BibTeX, CSV, and URIs to full programming languages such as Pascal, Smalltalk, and Dart.
+- **Grammar Catalog**: Practical parser definitions ranging from small data formats like JSON, BibTeX, CSV, and URIs to full programming languages such as Pascal, Python, Smalltalk, and Dart, as well as markup formats like Markdown.
 - **Interpreters and Evaluators**: Working interpreters for Prolog with resolution search and Lisp with lexical scoping and native functions.
 - **Automata Engine**: Regular expression parser compiling abstract syntax trees directly into non-deterministic finite automata for pattern matching.
 - **Interactive Tools**: Ready to use console command line REPLs and browser applications.
@@ -103,6 +103,24 @@ Run the interactive console REPL:
 dart run bin/lisp/lisp.dart
 ```
 
+### Markdown
+
+A CommonMark and GitHub Flavored Markdown (GFM) parser producing strongly-typed Abstract Syntax Trees (ASTs), with support for converting documents to HTML and syntax highlighting.
+
+```dart
+import 'package:petitparser_examples/markdown.dart';
+
+void main() {
+  final document = parseMarkdown('# Hello World\n\nThis is **bold** text.');
+  print(document.blocks.first); // HeadingNode(level: 1, content: TextNode("Hello World"))
+
+  final html = markdownToHtml('# Hello World\n\nThis is **bold** text.');
+  print(html); // <h1>Hello World</h1>\n<p>This is <strong>bold</strong> text.</p>
+}
+```
+
+Try the interactive [Markdown Parser & Syntax Highlighter](web/markdown/markdown.html) for live in-browser preview, syntax highlighting, and HTML rendering.
+
 ### Math
 
 A mathematical expression evaluator built using `ExpressionBuilder`. Handles operator precedence, associativity, parentheses, variables, and standard mathematical functions.
@@ -160,6 +178,21 @@ Run the interactive console REPL:
 ```bash
 dart run bin/prolog/prolog.dart
 ```
+
+### Python
+
+A grammar and parser for modern Python 3.12+ source code producing strongly-typed Abstract Syntax Trees (ASTs). Supports match/case pattern matching, PEP 695 type parameter syntax, walrus operator, f-strings, exception groups, async/await, and indentation-based suite parsing.
+
+```dart
+import 'package:petitparser_examples/python.dart';
+
+void main() {
+  final module = parsePython('def add(a: int, b: int) -> int:\n    return a + b\n');
+  print(module.body.first); // FunctionDefNode(name: add, args: ..., body: 1)
+}
+```
+
+Try the interactive [Python AST Visualizer](web/python/python.html) to parse and inspect Python syntax trees in the browser.
 
 ### Regular Expressions
 
@@ -243,7 +276,7 @@ dart pub global activate webdev
 webdev serve --release
 ```
 
-Open <http://localhost:8080/> to browse the interactive playgrounds for BibTeX search & browsing, Dart grammar visualization, JSON, Lisp, Math evaluation, Math plotting, Prolog, Regular Expressions, Smalltalk, Tabular data, URI parsing, and XML.
+Open <http://localhost:8080/> to browse the interactive playgrounds for BibTeX search & browsing, Dart grammar visualization, JSON, Lisp, Markdown live rendering & syntax highlighting, Math evaluation, Math plotting, Prolog, Python AST visualization, Regular Expressions, Smalltalk, Tabular data, URI parsing, and XML.
 
 ## Benchmarks
 

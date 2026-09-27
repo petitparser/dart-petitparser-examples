@@ -3,11 +3,13 @@ import 'package:petitparser_examples/bibtex.dart';
 import 'package:petitparser_examples/dart.dart';
 import 'package:petitparser_examples/json.dart';
 import 'package:petitparser_examples/lisp.dart';
+import 'package:petitparser_examples/markdown.dart';
 import 'package:petitparser_examples/math.dart';
 import 'package:petitparser_examples/pascal.dart';
 import 'package:petitparser_examples/prolog.dart';
+import 'package:petitparser_examples/python.dart';
 import 'package:petitparser_examples/regexp.dart';
-import 'package:petitparser_examples/smalltalk.dart';
+import 'package:petitparser_examples/smalltalk.dart' hide ReturnNode;
 import 'package:petitparser_examples/tabular.dart';
 import 'package:petitparser_examples/uri.dart';
 import 'package:test/test.dart';
@@ -61,6 +63,21 @@ void main() {
       expect(result, 7);
     });
 
+    test('Markdown', () {
+      final document = parseMarkdown('# Hello World\n\nThis is **bold** text.');
+      expect(document.blocks, hasLength(2));
+      expect(document.blocks.first, isA<HeadingNode>());
+      final heading = document.blocks.first as HeadingNode;
+      expect(heading.level, 1);
+      expect(heading.content, const TextNode('Hello World'));
+
+      final html = markdownToHtml('# Hello World\n\nThis is **bold** text.');
+      expect(
+        html,
+        '<h1>Hello World</h1>\n<p>This is <strong>bold</strong> text.</p>',
+      );
+    });
+
     test('Math', () {
       final expression = parser.parse('sqrt(16) + 2 ^ 3').value;
       expect(expression.eval({}), 12.0);
@@ -86,6 +103,21 @@ sibling(X, Y) :- parent(Z, X), parent(Z, Y).
       final query = Term.parse('sibling(ann, S)');
       final solutions = db.query(query).map((term) => term.toString()).toList();
       expect(solutions, ['sibling(ann, ann)', 'sibling(ann, pat)']);
+    });
+
+    test('Python', () {
+      final module = parsePython(
+        'def add(a: int, b: int) -> int:\n    return a + b\n',
+      );
+      expect(module.body, hasLength(1));
+      expect(module.body.first, isA<FunctionDefNode>());
+      final fn = module.body.first as FunctionDefNode;
+      expect(fn.name, 'add');
+      expect(fn.args.args, hasLength(2));
+      expect(fn.args.args[0].arg, 'a');
+      expect(fn.args.args[1].arg, 'b');
+      expect(fn.body, hasLength(1));
+      expect(fn.body.first, isA<ReturnNode>());
     });
 
     test('RegExp', () {

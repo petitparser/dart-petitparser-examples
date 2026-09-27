@@ -8,7 +8,7 @@
 /// ```
 String normalizeFieldName(String name) => name.toLowerCase().replaceAllMapped(
   _fieldNameBoundary,
-  (m) => '${m[1]}${m[2]!.toUpperCase()}',
+  (m) => '${m[1]}${m[2]?.toUpperCase() ?? ''}',
 );
 
 /// Normalizes a raw BibTeX field value to a clean display string.

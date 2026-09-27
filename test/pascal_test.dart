@@ -23,6 +23,51 @@ void main() {
       expect(parser, isSuccess('123: a := 1'));
       expect(parser, isSuccess('123: a(1, 2)'));
     });
+    test('labelled statements', () {
+      final parser = definition.buildFrom(definition.statement()).end();
+
+      final compound =
+          parser.parse('10: begin a := 1 end').value as CompoundStatementNode;
+      expect(compound.label, '10');
+      expect(compound.statements, hasLength(1));
+
+      final ifStmt =
+          parser.parse('20: if a > 0 then b := 1').value as IfStatementNode;
+      expect(ifStmt.label, '20');
+      expect(ifStmt.elseStatement, isNull);
+
+      final caseStmt =
+          parser.parse('30: case a of 1: b := 1 end').value
+              as CaseStatementNode;
+      expect(caseStmt.label, '30');
+      expect(caseStmt.cases, hasLength(1));
+
+      final whileStmt =
+          parser.parse('40: while a > 0 do a := a - 1').value
+              as WhileStatementNode;
+      expect(whileStmt.label, '40');
+
+      final repeatStmt =
+          parser.parse('50: repeat a := a + 1 until a > 10').value
+              as RepeatStatementNode;
+      expect(repeatStmt.label, '50');
+
+      final forStmt =
+          parser.parse('60: for i := 1 to 10 do a := a + 1').value
+              as ForStatementNode;
+      expect(forStmt.label, '60');
+
+      final withStmt =
+          parser.parse('70: with rec do a := 1').value as WithStatementNode;
+      expect(withStmt.label, '70');
+
+      final gotoStmt = parser.parse('80: goto 99').value as GotoStatementNode;
+      expect(gotoStmt.label, '80');
+      expect(gotoStmt.targetLabel, '99');
+
+      final emptyStmt = parser.parse('90:').value as EmptyStatementNode;
+      expect(emptyStmt.label, '90');
+    });
     test('statement assign', () {
       final parser = definition.buildFrom(definition.statementAssign()).end();
       expect(parser, isSuccess('a := 1'));
@@ -194,6 +239,7 @@ void main() {
       final parser = definition.buildFrom(definition.stringLiteral()).end();
       expect(parser, isSuccess("''", value: "''"));
       expect(parser, isSuccess("'whatever'", value: "'whatever'"));
+      expect(parser, isSuccess("'don''t'", value: "'don''t'"));
     });
     test('expression', () {
       final parser = definition.buildFrom(definition.expression()).end();
@@ -248,6 +294,14 @@ void main() {
       expect(parser, isSuccess('a'));
       expect(parser, isSuccess("''"));
       expect(parser, isSuccess('nil'));
+
+      final strLit = parser.parse("'Mean exceeds threshold: '").value;
+      expect(strLit.raw, "'Mean exceeds threshold: '");
+      expect(strLit.value, 'Mean exceeds threshold: ');
+
+      final escapedStrLit = parser.parse("'don''t'").value;
+      expect(escapedStrLit.raw, "'don''t'");
+      expect(escapedStrLit.value, "don't");
     });
     test('parameter list', () {
       final parser = definition.buildFrom(definition.parameterList()).end();

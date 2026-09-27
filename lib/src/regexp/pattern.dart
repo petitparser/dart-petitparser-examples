@@ -1,5 +1,8 @@
 import 'package:meta/meta.dart';
 
+/// A [Pattern] implementation powered by a regular expression engine.
+///
+/// Subclasses provide the matching logic through [tryMatch].
 abstract class RegexpPattern implements Pattern {
   @override
   Iterable<Match> allMatches(String input, [int start = 0]) sync* {
@@ -30,7 +33,9 @@ abstract class RegexpPattern implements Pattern {
   int tryMatch(String input, int start, int end);
 }
 
+/// A [Match] produced by a [RegexpPattern].
 class RegexpMatch implements Match {
+  /// Creates a match for [pattern] against [input] spanning from [start] to [end].
   new(this.pattern, this.input, this.start, this.end);
 
   @override

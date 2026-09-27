@@ -1,4 +1,4 @@
-/// This library contains a simple grammar and evaluator for LISP.
+/// Lisp grammar, evaluator, and standard environment.
 ///
 /// The code is reasonably complete to run and evaluate reasonably complex
 /// programs from the console or the web browser.
@@ -17,5 +17,6 @@ export 'src/lisp/evaluator.dart';
 export 'src/lisp/name.dart';
 export 'src/lisp/native.dart';
 export 'src/lisp/parser.dart';
+export 'src/lisp/quote.dart';
 export 'src/lisp/standard.dart';
 export 'src/lisp/types.dart';

@@ -5,6 +5,20 @@ library;
 
 import 'package:petitparser/petitparser.dart';
 
+/// A parser that decomposes a URI authority into user credentials, host, and port.
+///
+/// Accepts input formatted as `[username[:password]@]hostname[:port]` and
+/// returns a record containing named fields `username`, `password`,
+/// `hostname`, and `port`.
+///
+/// For example:
+///
+/// ```dart
+/// final result = authority.parse('user:pass@example.com:8080');
+/// print(result.value.username); // 'user'
+/// print(result.value.hostname); // 'example.com'
+/// print(result.value.port);     // '8080'
+/// ```
 final authority =
     seq3(_credentials.optional(), _hostname.optional(), _port.optional()).map3(
       (credentials, hostname, port) => (

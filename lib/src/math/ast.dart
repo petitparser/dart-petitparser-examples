@@ -1,13 +1,15 @@
-/// An abstract expression that can be evaluated.
+/// An abstract mathematical expression that can be evaluated.
 abstract class Expression {
-  /// Evaluates the expression with the provided [variables].
+  /// Evaluates this expression using the variable bindings in [variables].
   num eval(Map<String, num> variables);
 }
 
-/// A value expression.
+/// A literal numeric value expression.
 class Value extends Expression {
+  /// Creates a literal numeric [value] expression.
   new(this.value);
 
+  /// The literal numeric value.
   final num value;
 
   @override
@@ -17,27 +19,34 @@ class Value extends Expression {
   String toString() => 'Value{$value}';
 }
 
-/// A variable expression.
+/// A named variable expression resolved from a variable map.
 class Variable extends Expression {
+  /// Creates a variable expression referencing [name].
   new(this.name);
 
+  /// The name of the variable to look up.
   final String name;
 
   @override
-  num eval(Map<String, num> variables) => variables.containsKey(name)
-      ? variables[name]!
-      : throw ArgumentError.value(name, 'Unknown variable');
+  num eval(Map<String, num> variables) =>
+      variables[name] ?? (throw ArgumentError.value(name, 'Unknown variable'));
 
   @override
   String toString() => 'Variable{$name}';
 }
 
-/// A function application.
+/// A function or operator application expression.
 class Application extends Expression {
+  /// Creates a function application with [name], [arguments], and evaluation [function].
   new(this.name, this.arguments, this.function);
 
+  /// The name of the operator or function.
   final String name;
+
+  /// The argument expressions passed to the function.
   final List<Expression> arguments;
+
+  /// The underlying Dart function used to evaluate this application.
   final Function function;
 
   @override

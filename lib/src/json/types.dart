@@ -1,2 +1,7 @@
 /// Type definition for JSON data.
-typedef JSON = Object? /* Map<String, JSON>|List<JSON>|String|bool|num|Null */;
+typedef Json = Object? /* Map<String, Json>|List<Json>|String|bool|num|Null */;
+
+/// Backwards-compatibility alias for [Json].
+// ignore: remove_deprecations_in_breaking_versions
+@Deprecated('Use Json instead')
+typedef JSON = Json;

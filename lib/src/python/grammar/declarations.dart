@@ -211,14 +211,15 @@ mixin PythonDeclarationGrammar
             seenStar = true;
           } else if (item.isKwarg) {
             kwarg = item.arg;
-          } else {
+          } else if (item.arg case final arg?) {
+            final defaultVal = item.defaultVal;
             if (seenStar) {
-              kwonly.add(item.arg!);
-              kwDefaults.add(item.defaultVal);
+              kwonly.add(arg);
+              kwDefaults.add(defaultVal);
             } else {
-              args.add(item.arg!);
-              if (item.defaultVal != null) {
-                defaults.add(item.defaultVal!);
+              args.add(arg);
+              if (defaultVal != null) {
+                defaults.add(defaultVal);
               }
             }
           }
@@ -375,14 +376,15 @@ mixin PythonDeclarationGrammar
             seenStar = true;
           } else if (item.isKwarg) {
             kwarg = item.arg;
-          } else {
+          } else if (item.arg case final arg?) {
+            final defaultVal = item.defaultVal;
             if (seenStar) {
-              kwonly.add(item.arg!);
-              kwDefaults.add(item.defaultVal);
+              kwonly.add(arg);
+              kwDefaults.add(defaultVal);
             } else {
-              args.add(item.arg!);
-              if (item.defaultVal != null) {
-                defaults.add(item.defaultVal!);
+              args.add(arg);
+              if (defaultVal != null) {
+                defaults.add(defaultVal);
               }
             }
           }

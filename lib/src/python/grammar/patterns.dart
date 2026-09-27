@@ -99,8 +99,8 @@ mixin PythonPatternGrammar
         final kwdNames = <String>[];
         final kwdPatterns = <PatternNode>[];
         for (final item in seq.elements) {
-          if (item.kwd != null) {
-            kwdNames.add(item.kwd!);
+          if (item.kwd case final kwd?) {
+            kwdNames.add(kwd);
             kwdPatterns.add(item.pat);
           } else {
             pos.add(item.pat);
@@ -172,11 +172,13 @@ mixin PythonPatternGrammar
         final patterns = <PatternNode>[];
         String? rest;
         for (final item in seq.elements) {
+          final key = item.key;
+          final pat = item.pat;
           if (item.rest != null) {
             rest = item.rest;
-          } else if (item.key != null && item.pat != null) {
-            keys.add(item.key!);
-            patterns.add(item.pat!);
+          } else if (key != null && pat != null) {
+            keys.add(key);
+            patterns.add(pat);
           }
         }
         return (keys: keys, patterns: patterns, rest: rest);

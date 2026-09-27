@@ -159,6 +159,31 @@ void main() {
     test('string concatenation', () {
       expect(strParser, isSuccess("'hello ' 'world'"));
     });
+
+    test('f-string concatenation with strings', () {
+      expect(
+        strParser,
+        isSuccess(
+          '"hello " f"{name}"',
+          value: isA<JoinedStrNode>().having(
+            (node) => node.values,
+            'values',
+            hasLength(2),
+          ),
+        ),
+      );
+      expect(
+        strParser,
+        isSuccess(
+          'f"{a} " "middle " f"{b}"',
+          value: isA<JoinedStrNode>().having(
+            (node) => node.values,
+            'values',
+            hasLength(4),
+          ),
+        ),
+      );
+    });
   });
 
   group('f-strings', () {
@@ -167,6 +192,20 @@ void main() {
     test('simple f-string', () {
       expect(fStrParser, isSuccess('f"hello {name}"'));
       expect(fStrParser, isSuccess("f'count: {1 + 2}'"));
+    });
+
+    test('constant-only f-string produces ConstantNode', () {
+      expect(
+        fStrParser,
+        isSuccess(
+          'f"simple text"',
+          value: isA<ConstantNode>().having(
+            (node) => node.value,
+            'value',
+            'simple text',
+          ),
+        ),
+      );
     });
 
     test('f-string with format specifier', () {

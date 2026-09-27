@@ -214,9 +214,8 @@ class MarkdownHtmlRenderer implements MarkdownVisitor<String> {
   String visitLink(LinkNode node) {
     final text = node.text.accept(this);
     final href = escape(node.url);
-    final titleAttr = node.title != null
-        ? ' title="${escape(node.title!)}"'
-        : '';
+    final title = node.title;
+    final titleAttr = title != null ? ' title="${escape(title)}"' : '';
     return '<a href="$href"$titleAttr>$text</a>';
   }
 
@@ -224,9 +223,8 @@ class MarkdownHtmlRenderer implements MarkdownVisitor<String> {
   String visitImage(ImageNode node) {
     final alt = escape(plainText(node.alt));
     final src = escape(node.url);
-    final titleAttr = node.title != null
-        ? ' title="${escape(node.title!)}"'
-        : '';
+    final title = node.title;
+    final titleAttr = title != null ? ' title="${escape(title)}"' : '';
     return '<img src="$src" alt="$alt"$titleAttr />';
   }
 

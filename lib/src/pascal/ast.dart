@@ -181,7 +181,7 @@ class FormalParameterNode extends PascalNode {
       visitor.visitFormalParameter(this, context);
 
   @override
-  List<PascalNode> get children => type != null ? [type!] : const [];
+  List<PascalNode> get children => [?type];
 }
 
 /// A procedure declaration.
@@ -340,7 +340,7 @@ class FileTypeNode extends TypeNode {
       visitor.visitFileType(this, context);
 
   @override
-  List<PascalNode> get children => baseType != null ? [baseType!] : const [];
+  List<PascalNode> get children => [?baseType];
 }
 
 // ---------------------------------------------------------------------------

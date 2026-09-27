@@ -52,6 +52,25 @@ void main() {
       expect(cell.hashCode, isNonZero);
       expect(cell.toString(), '(3 4 . 5)');
     });
+    test('Quote', () {
+      final quote = Quote('datum_value');
+      expect(quote, isA<Quote>());
+      expect(quote.datum, equals('datum_value'));
+
+      quote.datum = 42;
+      expect(quote.datum, equals(42));
+
+      quote.datum = null;
+      expect(quote.datum, isNull);
+
+      quote.datum = ['nested', 'list'];
+      expect(quote.datum, equals(['nested', 'list']));
+
+      final innerQuote = Quote('inner');
+      final outerQuote = Quote(innerQuote);
+      expect(outerQuote.datum, isA<Quote>());
+      expect((outerQuote.datum as Quote).datum, equals('inner'));
+    });
   });
   group('Environment', () {
     final env = standard.create();
@@ -64,6 +83,45 @@ void main() {
       final sub = env.create();
       expect(sub.owner, same(env));
       expect(sub.keys, isEmpty);
+    });
+    test('operator [] and []=', () {
+      final root = Environment();
+      final key = Name('x');
+      root.define(key, 123);
+      expect(root[key], 123);
+
+      final nullKey = Name('n');
+      root.define(nullKey, null);
+      expect(root[nullKey], isNull);
+
+      final child = root.create();
+      expect(child[key], 123);
+
+      child[key] = 456;
+      expect(child[key], 456);
+      expect(root[key], 456);
+
+      final missingKey = Name('unbound');
+      expect(
+        () => root[missingKey],
+        throwsA(
+          isA<ArgumentError>().having(
+            (e) => e.message,
+            'message',
+            'Unknown binding for unbound',
+          ),
+        ),
+      );
+      expect(
+        () => root[missingKey] = 1,
+        throwsA(
+          isA<ArgumentError>().having(
+            (e) => e.message,
+            'message',
+            'Unknown binding for unbound',
+          ),
+        ),
+      );
     });
   });
   group('Parser', () {
@@ -152,8 +210,21 @@ void main() {
       expect(parser, isFailure('('));
       expect(parser, isFailure(')'));
       expect(parser, isFailure('['));
+      expect(parser, isFailure(']'));
       expect(parser, isFailure('{'));
+      expect(parser, isFailure('}'));
+      expect(parser, isFailure('(+ 1 2'));
+      expect(parser, isFailure('(+ 1 (+ 2 3)'));
+      expect(parser, isFailure('[+ 1 2'));
+      expect(parser, isFailure('{+ 1 2'));
+      expect(parser, isFailure('(+ 1 2))'));
       expect(parser, isFailure('"unterminated'));
+      expect(parser, isFailure(r'"escaped \"'));
+      expect(parser, isFailure('(foo "bar'));
+      expect(parser, isFailure("'"));
+      expect(parser, isFailure('`'));
+      expect(parser, isFailure(','));
+      expect(parser, isFailure(',@'));
       expect(parser, isFailure('`123'));
     });
   });

@@ -218,4 +218,56 @@ void main() {
       expect(db.query(query), [Term.parse('solution(german)')]);
     });
   });
+  group('AST nodes and evaluation methods', () {
+    final db = Database.parse('foo(a).');
+
+    test('Variable equality and hashCode', () {
+      const v1 = Variable('X');
+      const v2 = Variable('X');
+      const v3 = Variable('Y');
+
+      expect(v1, equals(v2));
+      expect(v1.hashCode, equals(v2.hashCode));
+      expect(v1, isNot(equals(v3)));
+      expect(v1.hashCode, isNot(equals(v3.hashCode)));
+      expect(v1.toString(), 'X');
+    });
+
+    test('Term equality and hashCode', () {
+      final t1 = Term('parent', const [Variable('X'), Value('bob')]);
+      final t2 = Term('parent', const [Variable('X'), Value('bob')]);
+      final t3 = Term('parent', const [Variable('Y'), Value('bob')]);
+
+      expect(t1, equals(t2));
+      expect(t1.hashCode, equals(t2.hashCode));
+      expect(t1, isNot(equals(t3)));
+      expect(t1.toString(), 'parent(X, bob)');
+    });
+
+    test('Value equality, hashCode and query', () {
+      const val1 = Value('apple');
+      const val2 = Value('apple');
+      const val3 = Value('banana');
+
+      expect(val1, equals(val2));
+      expect(val1.hashCode, equals(val2.hashCode));
+      expect(val1, isNot(equals(val3)));
+      expect(val1.query(db), [val1]);
+      expect(val1.toString(), 'apple');
+    });
+
+    test('Conjunction equality and hashCode', () {
+      final c1 = Conjunction(const [Value('a'), Value('b')]);
+      final c2 = Conjunction(const [Value('a'), Value('b')]);
+      final c3 = Conjunction(const [Value('a'), Value('c')]);
+      final c4 = Conjunction(const [Value('a')]);
+
+      expect(c1, equals(c2));
+      expect(c1.hashCode, equals(c2.hashCode));
+      expect(c1, isNot(equals(c3)));
+      expect(c1, isNot(equals(c4)));
+      expect(c1, isNot(equals(const Value('a'))));
+      expect(c1.toString(), 'a, b');
+    });
+  });
 }

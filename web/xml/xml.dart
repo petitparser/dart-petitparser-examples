@@ -8,7 +8,7 @@ import 'package:xml/xpath.dart';
 
 import '../shared/shared.dart';
 
-final xmlInput = document.querySelector('#xml-input') as HTMLInputElement;
+final xmlInput = document.querySelector('#xml-input') as HTMLTextAreaElement;
 final xpathInput = document.querySelector('#xpath-input') as HTMLInputElement;
 final xpathError = document.querySelector('#xpath-error') as HTMLElement;
 final domPretty = document.querySelector('#dom-pretty') as HTMLInputElement;
@@ -96,14 +96,19 @@ void updateDom(XmlDocument document) {
     xpathError.innerText = '';
     xpathError.style.display = 'none';
   } catch (error) {
+    results = const [];
     xpathError.innerText = error.toString();
     xpathError.style.display = 'inline-block';
   }
+  // Collect matched XmlNodes from XPath evaluation results.
+  final matches = <XmlNode>{
+    for (final result in results) ...[
+      if (result is XPathNode) result.node,
+      if (result is XmlNode) result,
+    ],
+  };
   // Render the highlighted document.
-  HighlightWriter(
-    HtmlBuffer(domOutput),
-    results.whereType<XmlNode>().toSet(),
-  ).visit(document);
+  HighlightWriter(HtmlBuffer(domOutput), matches).visit(document);
   // Render the XPath results.
   updateXPath(results);
 }

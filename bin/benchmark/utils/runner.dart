@@ -41,11 +41,13 @@ final defaultCharsInput = [
 final defaultStringInput = defaultCharsInput.join();
 
 final List<({String name, void Function() benchmark})> _benchmarkEntries = (() {
-  Future.delayed(const Duration(milliseconds: 1)).then((_) {
+  unawaited(() async {
+    await Future<void>.delayed(const Duration(milliseconds: 1));
+    final filter = optionFilter;
     for (final (:name, :benchmark) in _benchmarkEntries) {
-      if (optionFilter == null || name.contains(optionFilter!)) benchmark();
+      if (filter == null || name.contains(filter)) benchmark();
     }
-  });
+  }());
   return SortedList<({String name, void Function() benchmark})>(
     comparator: compareAsciiLowerCase.keyOf((entry) => entry.name),
   );

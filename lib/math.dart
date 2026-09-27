@@ -1,4 +1,4 @@
-/// This library contains a simple expression parser.
+/// Mathematical expression parser, AST models, and evaluation engine.
 ///
 /// For example:
 ///

@@ -23,7 +23,7 @@ class SmalltalkParserDefinition extends GrammarDefinition<MethodNode> {
       parser
           .flatten(
             message:
-                'Expected ${message ?? (throw ArgumentError.notNull('message'))}',
+                'Expected ${message ?? (throw ArgumentError('Message cannot be null'))}',
           )
           .token()
           .trim(ref0(spacer)),
@@ -31,7 +31,7 @@ class SmalltalkParserDefinition extends GrammarDefinition<MethodNode> {
       parser
           .flatten(
             message:
-                'Expected ${message ?? (throw ArgumentError.notNull('message'))}',
+                'Expected ${message ?? (throw ArgumentError('Message cannot be null'))}',
           )
           .token()
           .trim(ref0(spacer)),

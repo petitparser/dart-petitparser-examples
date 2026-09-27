@@ -1,8 +1,6 @@
-/// This library contains a simple grammar and evaluator for Prolog based on
-/// this blog post: https://curiosity-driven.org/prolog-interpreter.
+/// Prolog grammar, AST definitions, and unification-based query evaluator.
 ///
-/// The code is reasonably complete to run and evaluate reasonably complex
-/// programs from the console or the web browser.
+/// Based on <https://curiosity-driven.org/prolog-interpreter>.
 ///
 /// For example:
 ///

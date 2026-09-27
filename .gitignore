@@ -1,10 +1,12 @@
 .agents/
 .config/
 .dart_tool/
+.dart-tool/
 .DS_Store
 .idea/
 .packages
 .pub/
+.pub-cache/
 .opencode/
 *.iml
 petitparser_examples/build

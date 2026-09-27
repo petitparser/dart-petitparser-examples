@@ -4,6 +4,8 @@ import 'package:petitparser/reflection.dart';
 import 'package:petitparser_examples/smalltalk.dart';
 import 'package:test/test.dart';
 
+import 'utils/expect.dart';
+
 final parser = SmalltalkParserDefinition();
 final grammar = parser;
 
@@ -1526,12 +1528,56 @@ exampleWithNumber: x
     test('parser linter', () {
       expect(linter(parser.build()), isEmpty);
     });
-    test('failures', () {
+    group('negative syntax edge-cases', () {
       final methodParser = parser.build();
-      expect(methodParser.parse(''), isA<Failure>());
-      expect(methodParser.parse('123'), isA<Failure>());
-      expect(methodParser.parse('foo:'), isA<Failure>());
-      expect(methodParser.parse('foo ^ ( 1'), isA<Failure>());
+
+      test('empty and incomplete methods', () {
+        expect(methodParser, isFailure(''));
+        expect(methodParser, isFailure('   '));
+        expect(methodParser, isFailure('123'));
+        expect(methodParser, isFailure('foo:'));
+        expect(methodParser, isFailure('foo ^'));
+        expect(methodParser, isFailure('foo :='));
+        expect(methodParser, isFailure('foo: a bar:'));
+      });
+
+      test('unclosed block closures', () {
+        expect(methodParser, isFailure('foo [ :x | x + 1'));
+        expect(methodParser, isFailure('foo [ 1 + 2'));
+        expect(methodParser, isFailure('foo [ | a | a := 1'));
+        expect(methodParser, isFailure('foo [ [ 1 + 2 ]'));
+      });
+
+      test('unclosed parenthesized expressions', () {
+        expect(methodParser, isFailure('foo ( 1 + 2'));
+        expect(methodParser, isFailure('foo (( 1 )'));
+        expect(methodParser, isFailure('foo ( 1'));
+        expect(methodParser, isFailure('foo 1 + (2 * 3'));
+      });
+
+      test('unclosed literal and byte arrays', () {
+        expect(methodParser, isFailure('foo #( 1 2'));
+        expect(methodParser, isFailure('foo #[ 1 2'));
+        expect(methodParser, isFailure('foo #( #a #b'));
+      });
+
+      test('unclosed strings and comments', () {
+        expect(methodParser, isFailure("foo 'unclosed string"));
+        expect(methodParser, isFailure('foo "unclosed comment'));
+      });
+
+      test('invalid number representations', () {
+        final numberParser = parser.buildFrom(parser.number()).end();
+        expect(numberParser, isFailure('12r'));
+        expect(numberParser, isFailure('1.2e'));
+        expect(numberParser, isFailure('1.2e+'));
+        expect(numberParser, isFailure('1.'));
+      });
+
+      test('malformed cascades and pragmas', () {
+        expect(methodParser, isFailure('; cascadeWithoutReceiver'));
+        expect(methodParser, isFailure('foo < pragma'));
+      });
     });
   });
 }

@@ -47,6 +47,27 @@ void main() {
       expect(decl, isSuccess('@staticmethod\ndef foo():\n  pass\n'));
       expect(decl, isSuccess('@dec1\n@dec2(opt=True)\ndef foo():\n  pass\n'));
     });
+
+    test('decorated async functions', () {
+      expect(
+        decl,
+        isSuccess(
+          '@staticmethod\nasync def foo():\n  pass\n',
+          value: isA<AsyncFunctionDefNode>()
+              .having((fn) => fn.name, 'name', 'foo')
+              .having((fn) => fn.decoratorList, 'decoratorList', hasLength(1)),
+        ),
+      );
+      expect(
+        decl,
+        isSuccess(
+          '@dec1\n@dec2(opt=True)\nasync def foo(x: int) -> str:\n  return "x"\n',
+          value: isA<AsyncFunctionDefNode>()
+              .having((fn) => fn.decoratorList, 'decoratorList', hasLength(2))
+              .having((fn) => fn.returns, 'returns', isA<NameNode>()),
+        ),
+      );
+    });
   });
 
   group('class definitions', () {
