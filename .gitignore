@@ -9,5 +9,5 @@
 .pub-cache/
 .opencode/
 *.iml
-petitparser_examples/build
+coverage/
 pubspec.lock

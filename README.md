@@ -276,7 +276,7 @@ dart pub global activate webdev
 webdev serve --release
 ```
 
-Open <http://localhost:8080/> to browse the interactive playgrounds for BibTeX search & browsing, Dart grammar visualization, JSON, Lisp, Markdown live rendering & syntax highlighting, Math evaluation, Math plotting, Prolog, Python AST visualization, Regular Expressions, Smalltalk, Tabular data, URI parsing, and XML.
+Open `http://localhost:8080/` to browse the interactive playgrounds for BibTeX search & browsing, Dart grammar visualization, JSON, Lisp, Markdown live rendering & syntax highlighting, Math evaluation, Math plotting, Prolog, Python AST visualization, Regular Expressions, Smalltalk, Tabular data, URI parsing, and XML.
 
 ## Benchmarks
 
