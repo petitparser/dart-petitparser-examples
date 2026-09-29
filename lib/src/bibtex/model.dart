@@ -34,8 +34,10 @@ class BibTeXEntry {
 
   /// The normalized fields with standardized names and LaTeX accents converted.
   late final Map<String, String> normalized = fields.map(
-    (key, value) =>
-        MapEntry(normalizeFieldName(key), normalizeFieldValue(value)),
+    (key, value) => MapEntry(
+      normalizeFieldName(key),
+      normalizeFieldValue(value, fieldName: key),
+    ),
   );
 
   @override

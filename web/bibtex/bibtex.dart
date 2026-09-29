@@ -179,8 +179,32 @@ void populateFilters() {
   }
 }
 
+extension on JSString {
+  external JSString normalize([JSString form]);
+}
+
+final _combiningMarks = RegExp(r'[\u0300-\u036f]');
+final _specialFolds = {
+  'ß': 'ss',
+  'æ': 'ae',
+  'œ': 'oe',
+  'ø': 'o',
+  'ł': 'l',
+  'đ': 'd',
+  'ı': 'i',
+};
+final _specialFoldPattern = RegExp(r'[ßæœøłđı]');
+
+String _foldDiacritics(String text) => text.toJS
+    .normalize('NFD'.toJS)
+    .toDart
+    .replaceAll(_combiningMarks, '')
+    .replaceAllMapped(_specialFoldPattern, (m) => _specialFolds[m[0]] ?? m[0]!);
+
 void applyFilters() {
-  final query = searchInput.value.toLowerCase().trim();
+  final rawQuery = searchInput.value.trim();
+  final normalizedQuery = normalizeFieldValue(rawQuery).toLowerCase();
+  final foldedQuery = _foldDiacritics(normalizedQuery);
   final selectedType = typeFilter.value.toLowerCase();
   final selectedYear = yearFilter.value;
   final order = sortOrder.value;
@@ -193,21 +217,21 @@ void applyFilters() {
     if (selectedYear.isNotEmpty && year != selectedYear) {
       return false;
     }
-    if (query.isNotEmpty) {
+    if (normalizedQuery.isNotEmpty) {
       final key = entry.key.toLowerCase();
-      final title = (entry.normalized['Title'] ?? '').toLowerCase();
-      final author = (entry.normalized['Author'] ?? '').toLowerCase();
-      final booktitle = (entry.normalized['Booktitle'] ?? '').toLowerCase();
-      final journal = (entry.normalized['Journal'] ?? '').toLowerCase();
-      final annote = (entry.normalized['Annote'] ?? '').toLowerCase();
+      final title = entry.normalized['Title'] ?? '';
+      final author = entry.normalized['Author'] ?? '';
+      final booktitle = entry.normalized['Booktitle'] ?? '';
+      final journal = entry.normalized['Journal'] ?? '';
+      final annote = entry.normalized['Annote'] ?? '';
+
+      final targetText = '$key $title $author $booktitle $journal $annote'
+          .toLowerCase();
+      final foldedTarget = _foldDiacritics(targetText);
 
       final matches =
-          key.contains(query) ||
-          title.contains(query) ||
-          author.contains(query) ||
-          booktitle.contains(query) ||
-          journal.contains(query) ||
-          annote.contains(query);
+          targetText.contains(normalizedQuery) ||
+          foldedTarget.contains(foldedQuery);
       if (!matches) return false;
     }
     return true;
@@ -282,6 +306,12 @@ void renderPage() {
     final school = entry.normalized['School'] ?? '';
     final institution = entry.normalized['Institution'] ?? '';
     final url = entry.normalized['Url'] ?? '';
+    final doi = entry.normalized['Doi'] ?? '';
+    final effectiveUrl = url.isNotEmpty
+        ? url
+        : (doi.isNotEmpty
+              ? (doi.startsWith('http') ? doi : 'https://doi.org/$doi')
+              : '');
 
     final venueParts = <String>[];
     if (journal.isNotEmpty) venueParts.add(journal);
@@ -340,12 +370,12 @@ void renderPage() {
     actions.appendChild(toggleBtn);
     actions.appendChild(copyBtn);
 
-    if (url.isNotEmpty) {
+    if (effectiveUrl.isNotEmpty) {
       final link = document.createElement('a') as HTMLAnchorElement;
       link.className = 'url-link';
-      link.href = url;
+      link.href = effectiveUrl;
       link.target = '_blank';
-      link.textContent = 'PDF / Link ↗';
+      link.textContent = url.isNotEmpty ? 'PDF / Link ↗' : 'DOI ↗';
       actions.appendChild(link);
     }
     card.appendChild(actions);
