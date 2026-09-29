@@ -112,13 +112,13 @@
         </div>
       </div>
       <div style="width: 100%; overflow: hidden; border-radius: 6px; border: 1px solid var(--color-border); background: #ffffff;">
-        <canvas id="canvas" style="display: block; width: 100%; height: 500px; cursor: grab; user-select: none; touch-action: none; background: #ffffff;"></canvas>
+        <canvas id="canvas" style="display: block; width: 100%; height: auto; max-height: 500px; aspect-ratio: 4 / 3; cursor: grab; user-select: none; touch-action: none; background: #ffffff;"></canvas>
       </div>
       <p style="font-size: 1.3rem; color: var(--color-text-muted); margin-top: 1rem; margin-bottom: 0;">
         Parameters: <code id="viewport-range">x &isin; [-5, 5], y &isin; [-5, 5]</code>, <code>t</code> is seconds since page load.
       </p>
       <p style="font-size: 1.2rem; color: var(--color-text-muted); margin-top: 0.5rem; margin-bottom: 0;">
-        <span id="interaction-hint">Left-drag to rotate &bull; Shift+drag to pan &bull; Scroll to zoom &bull; Double-click to reset</span>
+        <span id="interaction-hint">Drag to rotate &bull; Shift/2-finger drag to pan &bull; Pinch/scroll to zoom &bull; Double-tap to reset</span>
       </p>
     </div>
 

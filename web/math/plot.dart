@@ -1210,8 +1210,8 @@ void updateModeUI() {
   }
   if (interactionHint != null) {
     interactionHint!.textContent = active3D
-        ? 'Left-drag to rotate • Shift+drag to pan • Scroll to zoom • Double-click to reset'
-        : 'Left-drag to pan • Scroll to zoom • Double-click to reset';
+        ? 'Drag to rotate • Shift/2-finger drag to pan • Pinch/scroll to zoom • Double-tap to reset'
+        : 'Drag to pan • Pinch/scroll to zoom • Double-tap to reset';
   }
   updateViewportDisplay();
 }
@@ -1235,7 +1235,14 @@ void updateViewportDisplay() {
 void resize(Event event) {
   final rect = canvas.parentElement?.getBoundingClientRect();
   if (rect != null) {
-    plotter.resize(rect.width, 500);
+    final width = rect.width;
+    // Adapt height to width and viewport height so the canvas stays proportional on mobile.
+    final maxViewportHeight = window.innerHeight > 0
+        ? window.innerHeight * 0.7
+        : 500.0;
+    final maxHeight = math.min(500.0, math.max(260.0, maxViewportHeight));
+    final height = (width * 0.75).clamp(240.0, maxHeight);
+    plotter.resize(width, height);
   }
 }
 
@@ -1390,6 +1397,21 @@ void main() {
   var origMinY2D = plotter.minY2D;
   var origMaxY2D = plotter.maxY2D;
 
+  var isTouching = false;
+  var touchStartX = 0.0;
+  var touchStartY = 0.0;
+  var lastTouchX = 0.0;
+  var lastTouchY = 0.0;
+  var tapTouchStartX = 0.0;
+  var tapTouchStartY = 0.0;
+  var touchStartTime = 0;
+  var lastTapTime = 0;
+
+  var touchStartMidX = 0.0;
+  var touchStartMidY = 0.0;
+  var touchStartDist = 0.0;
+  var touchOrigDistance = camera.distance;
+
   canvas.addEventListener(
     'contextmenu',
     ((Event event) {
@@ -1400,6 +1422,7 @@ void main() {
   canvas.addEventListener(
     'mousedown',
     ((MouseEvent event) {
+      if (isTouching) return;
       isDragging = true;
       isPanning = event.button == 2 || event.shiftKey;
       dragStartX = event.clientX.toDouble();
@@ -1503,6 +1526,195 @@ void main() {
       }
       updateViewportDisplay();
     }).toJS,
+  );
+
+  canvas.addEventListener(
+    'touchstart',
+    ((TouchEvent event) {
+      isTouching = true;
+      final touches = event.targetTouches;
+      final touchCount = touches.length;
+
+      if (touchCount == 1) {
+        final t0 = touches.item(0)!;
+        touchStartX = t0.clientX.toDouble();
+        touchStartY = t0.clientY.toDouble();
+        lastTouchX = touchStartX;
+        lastTouchY = touchStartY;
+        tapTouchStartX = touchStartX;
+        tapTouchStartY = touchStartY;
+        touchStartTime = DateTime.now().millisecondsSinceEpoch;
+
+        origAzimuth = camera.azimuth;
+        origElevation = camera.elevation;
+        origMinX2D = plotter.minX2D;
+        origMaxX2D = plotter.maxX2D;
+        origMinY2D = plotter.minY2D;
+        origMaxY2D = plotter.maxY2D;
+      } else if (touchCount >= 2) {
+        final t0 = touches.item(0)!;
+        final t1 = touches.item(1)!;
+        touchStartMidX = (t0.clientX + t1.clientX) / 2.0;
+        touchStartMidY = (t0.clientY + t1.clientY) / 2.0;
+        final dx = (t1.clientX - t0.clientX).toDouble();
+        final dy = (t1.clientY - t0.clientY).toDouble();
+        touchStartDist = math.sqrt(dx * dx + dy * dy);
+
+        touchOrigDistance = camera.distance;
+        origTargetX = camera.targetX;
+        origTargetY = camera.targetY;
+        origTargetZ = camera.targetZ;
+
+        origMinX2D = plotter.minX2D;
+        origMaxX2D = plotter.maxX2D;
+        origMinY2D = plotter.minY2D;
+        origMaxY2D = plotter.maxY2D;
+      }
+      event.preventDefault();
+    }).toJS,
+  );
+
+  canvas.addEventListener(
+    'touchmove',
+    ((TouchEvent event) {
+      final touches = event.targetTouches;
+      final touchCount = touches.length;
+
+      if (touchCount == 1) {
+        final t0 = touches.item(0)!;
+        lastTouchX = t0.clientX.toDouble();
+        lastTouchY = t0.clientY.toDouble();
+        final dx = lastTouchX - touchStartX;
+        final dy = lastTouchY - touchStartY;
+
+        if (is3DActive) {
+          camera.azimuth = origAzimuth - dx * 0.008;
+          camera.elevation = (origElevation + dy * 0.008).clamp(-1.45, 1.45);
+        } else {
+          // 2D 1-finger pan
+          final logicalDx = dx * (origMaxX2D - origMinX2D) / plotter.width;
+          final logicalDy = dy * (origMaxY2D - origMinY2D) / plotter.height;
+          plotter.minX2D = origMinX2D - logicalDx;
+          plotter.maxX2D = origMaxX2D - logicalDx;
+          plotter.minY2D = origMinY2D + logicalDy;
+          plotter.maxY2D = origMaxY2D + logicalDy;
+        }
+        updateViewportDisplay();
+      } else if (touchCount >= 2) {
+        final t0 = touches.item(0)!;
+        final t1 = touches.item(1)!;
+        final currentMidX = (t0.clientX + t1.clientX) / 2.0;
+        final currentMidY = (t0.clientY + t1.clientY) / 2.0;
+        final dx = (t1.clientX - t0.clientX).toDouble();
+        final dy = (t1.clientY - t0.clientY).toDouble();
+        final currentDist = math.sqrt(dx * dx + dy * dy);
+
+        final midDx = currentMidX - touchStartMidX;
+        final midDy = currentMidY - touchStartMidY;
+
+        if (is3DActive) {
+          // 3D 2-finger pan
+          final rightX = math.cos(camera.azimuth);
+          final rightZ = -math.sin(camera.azimuth);
+          final panScale = camera.distance * 0.0025;
+          camera.targetX = origTargetX - rightX * midDx * panScale;
+          camera.targetZ = origTargetZ - rightZ * midDx * panScale;
+          camera.targetY = origTargetY + midDy * panScale;
+
+          // 3D 2-finger zoom (pinch)
+          if (touchStartDist > 0 && currentDist > 0) {
+            final factor = touchStartDist / currentDist;
+            camera.distance = (touchOrigDistance * factor).clamp(3.0, 50.0);
+          }
+        } else {
+          // 2D 2-finger pan & pinch zoom
+          final rect = canvas.getBoundingClientRect();
+          final canvasMidX = touchStartMidX - rect.left;
+          final canvasMidY = touchStartMidY - rect.top;
+
+          final factor = (touchStartDist > 0 && currentDist > 0)
+              ? (touchStartDist / currentDist)
+              : 1.0;
+
+          final origSpanX = origMaxX2D - origMinX2D;
+          final origSpanY = origMaxY2D - origMinY2D;
+          final newSpanX = (origSpanX * factor).clamp(0.0001, 10000.0);
+          final newSpanY = (origSpanY * factor).clamp(0.0001, 10000.0);
+
+          final logX = canvasMidX * origSpanX / plotter.width + origMinX2D;
+          final logY =
+              (plotter.height - canvasMidY) * origSpanY / plotter.height +
+              origMinY2D;
+
+          final fracX = (logX - origMinX2D) / origSpanX;
+          final fracY = (logY - origMinY2D) / origSpanY;
+
+          final panLogicalDx = midDx * newSpanX / plotter.width;
+          final panLogicalDy = midDy * newSpanY / plotter.height;
+
+          plotter.minX2D = logX - fracX * newSpanX - panLogicalDx;
+          plotter.maxX2D = plotter.minX2D + newSpanX;
+          plotter.minY2D = logY - fracY * newSpanY + panLogicalDy;
+          plotter.maxY2D = plotter.minY2D + newSpanY;
+        }
+        updateViewportDisplay();
+      }
+      event.preventDefault();
+    }).toJS,
+  );
+
+  void handleTouchEnd(TouchEvent event) {
+    final touches = event.targetTouches;
+    final touchCount = touches.length;
+
+    if (touchCount == 1) {
+      // Re-anchor remaining finger so it does not jump
+      final t0 = touches.item(0)!;
+      touchStartX = t0.clientX.toDouble();
+      touchStartY = t0.clientY.toDouble();
+      lastTouchX = touchStartX;
+      lastTouchY = touchStartY;
+      origAzimuth = camera.azimuth;
+      origElevation = camera.elevation;
+      origMinX2D = plotter.minX2D;
+      origMaxX2D = plotter.maxX2D;
+      origMinY2D = plotter.minY2D;
+      origMaxY2D = plotter.maxY2D;
+    } else if (touchCount == 0) {
+      isTouching = false;
+      final now = DateTime.now().millisecondsSinceEpoch;
+      final elapsed = now - touchStartTime;
+      final dx = (lastTouchX - tapTouchStartX).abs();
+      final dy = (lastTouchY - tapTouchStartY).abs();
+
+      // Detect double-tap: quick tap without significant dragging
+      if (elapsed < 300 && dx < 15 && dy < 15) {
+        if (now - lastTapTime < 350) {
+          if (is3DActive) {
+            camera.reset();
+          } else {
+            plotter.minX2D = -5.0;
+            plotter.maxX2D = 5.0;
+            plotter.minY2D = -3.0;
+            plotter.maxY2D = 3.0;
+          }
+          updateViewportDisplay();
+          lastTapTime = 0;
+        } else {
+          lastTapTime = now;
+        }
+      }
+    }
+    event.preventDefault();
+  }
+
+  canvas.addEventListener(
+    'touchend',
+    ((TouchEvent event) => handleTouchEnd(event)).toJS,
+  );
+  canvas.addEventListener(
+    'touchcancel',
+    ((TouchEvent event) => handleTouchEnd(event)).toJS,
   );
 
   if (window.location.hash.startsWith('#')) {
