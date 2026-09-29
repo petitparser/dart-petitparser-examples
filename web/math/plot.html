@@ -122,7 +122,8 @@
       </p>
     </div>
 
-    <div class="card markdown-body" data-markdown>
+    <div class="card markdown-body">
+      <script type="text/markdown">
 ## About Math Plotter
 
 This real-time application demonstrates PetitParser by parsing dynamic mathematical formulas of spatial coordinates (_x_, _y_) and time (_t_), evaluating the compiled expression tree across thousands of grid points per frame, and rendering interactive 2D curves and 3D surfaces in WebGL at <span id="fps-display">60 FPS</span>.
@@ -133,6 +134,7 @@ This real-time application demonstrates PetitParser by parsing dynamic mathemati
 - **Function & Variable Bindings**: Combines combinators (`seq2`, `starSeparated`, `skip`) to parse multi-variable identifiers (`x`, `y`, `t`), mathematical constants (`pi`, `e`), and function invocations (`sin`, `cos`, `tan`, `sqrt`, `exp`, `log`, `abs`).
 - **AST Generation & Fast Evaluation**: Transforms the parsed input into an Abstract Syntax Tree ([Expression]) that is evaluated repeatedly with variable environment maps in real-time animation loops.
 - **Precise Error Diagnostics**: Leverages PetitParser's failure reporting to pinpoint exact character offsets and provide descriptive error messages as formulas are typed.
+      </script>
     </div>
 
     <footer>

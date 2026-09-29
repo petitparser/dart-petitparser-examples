@@ -51,7 +51,8 @@
       <div id="output">Click "Parse Code" to inspect the AST.</div>
     </div>
 
-    <div class="card markdown-body" data-markdown>
+    <div class="card markdown-body">
+      <script type="text/markdown">
 ## About Smalltalk-80 Grammar
 
 Smalltalk-80 is an object-oriented, dynamically typed programming language with a minimal, message-oriented syntax.
@@ -62,6 +63,7 @@ Smalltalk-80 is an object-oriented, dynamically typed programming language with 
 - **Message-Passing Syntax**: Models Smalltalk message precedence across unary (`receiver msg`), binary (`a + b`), and keyword (`receiver msg: a with: b`) messages, as well as message cascades (`receiver m1; m2`).
 - **Typed AST Nodes**: Builds an AST representing methods, sequences, blocks (`[:arg | ...]`), assignments, return statements, and pragmas.
 - **Production Switching**: Supports parsing complete methods or isolated expressions and sequences.
+      </script>
     </div>
 
     <footer>

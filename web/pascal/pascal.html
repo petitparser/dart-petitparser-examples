@@ -53,7 +53,8 @@
       <div id="output"></div>
     </div>
 
-    <div class="card markdown-body" data-markdown>
+    <div class="card markdown-body">
+      <script type="text/markdown">
 ## About Pascal Grammar
 
 Pascal is an imperative procedural language designed by Niklaus Wirth to encourage structured programming.
@@ -61,9 +62,10 @@ Pascal is an imperative procedural language designed by Niklaus Wirth to encoura
 ### Key Parser Features
 
 - **Apple Pascal Syntax**: Implements the syntax specified in the 1978 Apple Pascal Reference Manual (derived from UCSD Pascal).
-- **Declarations &amp; Types**: Parses constants, type aliases, structured records (`record ... end`), enumerations, subranges, arrays, pointer types, variable declarations, and nested procedures/functions.
+- **Declarations & Types**: Parses constants, type aliases, structured records (`record ... end`), enumerations, subranges, arrays, pointer types, variable declarations, and nested procedures/functions.
 - **Comment Syntax**: Supports both curly-brace comments (`{ ... }`) and parenthesis-star comments (`(* ... *)`).
 - **Production Modularity**: Built using PetitParser's `GrammarDefinition` pattern, allowing direct parsing from individual productions (`program`, `block`, `statement`, `expression`, `type`).
+      </script>
     </div>
 
     <footer>

@@ -81,7 +81,8 @@
       </table>
     </div>
 
-    <div class="card markdown-body" data-markdown>
+    <div class="card markdown-body">
+      <script type="text/markdown">
 ## About JSON Parser
 
 The **PetitParser JSON grammar** implements the [ECMA-404 JSON standard](https://www.json.org/) directly as composable Dart parser combinators.
@@ -92,6 +93,7 @@ The **PetitParser JSON grammar** implements the [ECMA-404 JSON standard](https:/
 - **Pure Dart Execution**: Operates entirely within Dart bytecode or WebAssembly, enabling runtime inspection, debugging, and AST customization.
 - **Extensible Grammar**: Can serve as a template to support custom variants such as JSON5, JSON with comments (JSONC), trailing commas, or alternative number formats.
 - **Comparative Benchmark**: Includes a live side-by-side benchmark comparing combinator parsing against platform-native `dart:convert`.
+      </script>
     </div>
     <footer>
       Built with <a href="https://petitparser.github.io/">PetitParser</a>.

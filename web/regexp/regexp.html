@@ -233,7 +233,8 @@
       </div>
     </div>
 
-    <div class="card markdown-body" data-markdown>
+    <div class="card markdown-body">
+      <script type="text/markdown">
 ## About Regular Expression Parser
 
 This playground demonstrates parsing regular expressions and compiling them directly into non-deterministic finite automata (**NFA**) using Thompson's construction algorithm.
@@ -244,6 +245,7 @@ This playground demonstrates parsing regular expressions and compiling them dire
 - **Combinator Grammar**: Uses PetitParser expression combinators to handle operator precedence and grouping.
 - **AST to NFA Compilation**: Each AST node compiles to an NFA fragment with epsilon transitions, character predicates, and match anchors.
 - **Inspectable State Machine**: State transitions can be inspected directly to generate transition tables and highlight matches.
+      </script>
     </div>
 
     <footer>

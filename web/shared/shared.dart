@@ -28,17 +28,19 @@ void injectAnalytics() {
   }
 }
 
-/// Renders all `[data-markdown]` containers using PetitParser's markdownToHtml.
+/// Renders all `script[type="text/markdown"]` elements using PetitParser's markdownToHtml.
 void renderMarkdownElements() {
-  final elements = document.querySelectorAll('[data-markdown]');
-  for (var i = 0; i < elements.length; i++) {
-    final element = elements.item(i) as HTMLElement;
-    final rawText = element.innerHTML.toString().trim();
+  final scripts = document.querySelectorAll('script[type="text/markdown"]');
+  for (var i = 0; i < scripts.length; i++) {
+    final script = scripts.item(i) as HTMLScriptElement;
+    final parent = script.parentElement;
+    if (parent == null) continue;
+    final rawText = script.textContent?.trim() ?? '';
     if (rawText.isNotEmpty) {
       try {
         final html = markdownToHtml(rawText);
-        element.innerHTML = html.toJS;
-        element.classList.add('markdown-body');
+        parent.innerHTML = html.toJS;
+        parent.classList.add('markdown-body');
       } catch (_) {
         // Fallback: leave content intact
       }

@@ -55,7 +55,8 @@ ancestor(X, Y) :- parent_child(X, Z), ancestor(Z, Y).</textarea>
       <div id="output" style="font-family: var(--font-mono); font-size: 1.35rem; min-height: 4rem;"></div>
     </div>
 
-    <div class="card markdown-body" data-markdown>
+    <div class="card markdown-body">
+      <script type="text/markdown">
 ## About Prolog Interpreter
 
 Prolog is a declarative logic programming language where computation is carried out by posing queries over a database of facts and rules.
@@ -66,6 +67,7 @@ Prolog is a declarative logic programming language where computation is carried 
 - **SLD Resolution**: Implements Selective Linear Definite clause resolution with search and backtracking to find satisfying variable bindings.
 - **Syntactic Unification**: Matches terms structurally and propagates substitution environments across goal evaluations.
 - **Pure Dart Execution**: Parser combinators and the resolution engine execute directly in Dart.
+      </script>
     </div>
 
     <footer>

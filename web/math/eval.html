@@ -42,7 +42,8 @@
       <div id="tree" style="font-family: var(--font-mono); font-size: 1.35rem; line-height: 1.7; background: var(--color-pre-bg); border: 1px solid var(--color-border); border-radius: 4px; padding: 1.5rem; max-height: 380px; overflow-y: auto;"></div>
     </div>
 
-    <div class="card markdown-body" data-markdown>
+    <div class="card markdown-body">
+      <script type="text/markdown">
 ## About Math Evaluator
 
 This interactive evaluator parses mathematical expressions into an abstract syntax tree (**AST**) and computes numerical results.
@@ -50,9 +51,10 @@ This interactive evaluator parses mathematical expressions into an abstract synt
 ### Key Parser Features
 
 - **ExpressionBuilder Combinator**: Uses PetitParser's `ExpressionBuilder` to define operator precedence and associativity rules concisely.
-- **Associativity and Precedence**: Differentiates standard left-associative operations (addition, subtraction, multiplication, division) and right-associative operations (exponentiation `^`).
-- **Function and Constant Support**: Parses multi-argument function calls (`sin(x)`, `atan2(y, x)`, `sqrt(x)`) and mathematical constants (`pi`, `e`).
-- **Separation of Parsing and Evaluation**: Builds an immutable `Expression` AST hierarchy that evaluates against arbitrary variable dictionaries.
+- **Associativity & Precedence**: Differentiates standard left-associative operations (addition, subtraction, multiplication, division) and right-associative operations (exponentiation `^`).
+- **Function & Constant Support**: Parses multi-argument function calls (`sin(x)`, `atan2(y, x)`, `sqrt(x)`) and mathematical constants (`pi`, `e`).
+- **Separation of Parsing & Evaluation**: Builds an immutable `Expression` AST hierarchy that evaluates against arbitrary variable dictionaries.
+      </script>
     </div>
 
     <footer>
