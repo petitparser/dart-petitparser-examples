@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'dart:js_interop';
 
-import 'package:petitparser/petitparser.dart';
 import 'package:petitparser_examples/bibtex.dart';
 import 'package:web/web.dart';
 
@@ -33,8 +32,6 @@ final nextPageBottom =
 
 final entriesList = document.querySelector('#entries-list') as HTMLElement;
 
-final parser = BibTeXDefinition().build();
-
 List<BibTeXEntry> allEntries = [];
 List<BibTeXEntry> filteredEntries = [];
 int currentPage = 1;
@@ -48,7 +45,31 @@ String escapeHtml(String text) => text
     .replaceAll('>', '&gt;')
     .replaceAll('"', '&quot;');
 
-Future<void> loadFromUrl(String url) async {
+int _currentRequestId = 0;
+XMLHttpRequest? _activeXhr;
+
+void _updateActiveExample(String currentUrl) {
+  final trimmed = currentUrl.trim();
+  final buttons = document.querySelectorAll('.source-selector .preset-btn');
+  for (var i = 0; i < buttons.length; i++) {
+    final btn = buttons.item(i) as HTMLButtonElement;
+    final url = btn.getAttribute('data-url');
+    btn.classList.toggle('active', url != null && url.trim() == trimmed);
+  }
+}
+
+Future<void> loadFromUrl(String rawUrl) async {
+  final url = rawUrl.trim();
+  if (url.isEmpty) return;
+
+  _updateActiveExample(url);
+
+  // Cancel any existing in-flight request
+  _activeXhr?.abort();
+  _activeXhr = null;
+
+  final requestId = ++_currentRequestId;
+
   loadingIndicator.style.display = 'block';
   loadingStatus.textContent = 'Connecting to $url...';
   progressBar.style.width = '0%';
@@ -59,9 +80,11 @@ Future<void> loadFromUrl(String url) async {
   final downloadWatch = Stopwatch()..start();
   final completer = Completer<String>();
   final xhr = XMLHttpRequest();
+  _activeXhr = xhr;
   xhr.open('GET', url);
 
   xhr.onprogress = ((ProgressEvent event) {
+    if (requestId != _currentRequestId) return;
     if (event.lengthComputable) {
       final percent = ((event.loaded / event.total) * 100).round();
       final loadedMb = (event.loaded / (1024 * 1024)).toStringAsFixed(1);
@@ -76,6 +99,7 @@ Future<void> loadFromUrl(String url) async {
   }).toJS;
 
   xhr.onload = ((Event _) {
+    if (requestId != _currentRequestId) return;
     if (xhr.status >= 200 && xhr.status < 300) {
       completer.complete(xhr.responseText);
     } else {
@@ -86,10 +110,12 @@ Future<void> loadFromUrl(String url) async {
   }).toJS;
 
   xhr.onerror = ((Event _) {
+    if (requestId != _currentRequestId) return;
     completer.completeError(Exception('Network error while requesting $url'));
   }).toJS;
 
   xhr.onabort = ((Event _) {
+    if (requestId != _currentRequestId) return;
     completer.completeError(Exception('Request was aborted.'));
   }).toJS;
 
@@ -97,39 +123,61 @@ Future<void> loadFromUrl(String url) async {
 
   try {
     final text = await completer.future;
+    if (requestId != _currentRequestId) return;
     final downloadMs = downloadWatch.elapsedMilliseconds;
     progressBar.style.width = '100%';
     loadingStatus.textContent =
         'Downloaded ${(text.length / (1024 * 1024)).toStringAsFixed(1)} MB. Parsing entries with PetitParser...';
     // Yield to let browser render the updated status before CPU-intensive parse
     await Future<void>.delayed(const Duration(milliseconds: 20));
-    parseBibTeX(
-      text,
-      downloadMs: downloadMs,
-      sourceLabel: 'Source: $url (${(text.length / 1024).round()} KB)',
-    );
+    if (requestId != _currentRequestId) return;
+    await parseBibTeX(text, downloadMs: downloadMs, requestId: requestId);
   } catch (e) {
+    if (requestId != _currentRequestId) return;
     loadingIndicator.style.display = 'none';
     errorBox.style.display = 'block';
     errorBox.textContent = 'Failed to load or parse: $e';
+  } finally {
+    if (_activeXhr == xhr) {
+      _activeXhr = null;
+    }
   }
 }
 
-void parseBibTeX(
+Future<void> parseBibTeX(
   String content, {
   required int downloadMs,
-  required String sourceLabel,
-}) {
+  required int requestId,
+}) async {
   loadingIndicator.style.display = 'block';
   final watch = Stopwatch()..start();
   try {
-    final result = parser.parse(content);
-    final elapsedMs = watch.elapsedMilliseconds;
-    if (result is Failure) {
-      throw Exception('${result.message} at line ${result.toPositionString()}');
+    final entries = <BibTeXEntry>[];
+    allEntries = [];
+    filteredEntries = [];
+    var count = 0;
+    var firstPageShown = false;
+
+    await for (final entry in parseStream(content)) {
+      if (requestId != _currentRequestId) return;
+      entries.add(entry);
+      count++;
+      if (count % 200 == 0) {
+        loadingStatus.textContent =
+            'Parsing entries with PetitParser: $count loaded...';
+        if (!firstPageShown && count >= pageSize) {
+          firstPageShown = true;
+          allEntries = entries;
+          populateFilters();
+          applyFilters();
+          controls.style.display = 'block';
+        }
+      }
     }
 
-    allEntries = result.value;
+    if (requestId != _currentRequestId) return;
+    allEntries = entries;
+    final elapsedMs = watch.elapsedMilliseconds;
     loadingIndicator.style.display = 'none';
     stats.style.display = 'block';
     stats.innerHTML =
@@ -140,6 +188,7 @@ void parseBibTeX(
     applyFilters();
     controls.style.display = 'block';
   } catch (e) {
+    if (requestId != _currentRequestId) return;
     loadingIndicator.style.display = 'none';
     errorBox.style.display = 'block';
     errorBox.textContent = 'Error parsing BibTeX data: $e';
@@ -152,7 +201,7 @@ void populateFilters() {
 
   for (final entry in allEntries) {
     types.add(entry.type.toLowerCase());
-    final year = entry.normalized['Year'] ?? '';
+    final year = entry['year'] ?? '';
     if (year.isNotEmpty && _yearPattern.hasMatch(year)) {
       years.add(year);
     }
@@ -204,7 +253,9 @@ String _foldDiacritics(String text) => text.toJS
 void applyFilters() {
   final rawQuery = searchInput.value.trim();
   final normalizedQuery = normalizeFieldValue(rawQuery).toLowerCase();
-  final foldedQuery = _foldDiacritics(normalizedQuery);
+  final foldedQuery = normalizedQuery.isNotEmpty
+      ? _foldDiacritics(normalizedQuery)
+      : '';
   final selectedType = typeFilter.value.toLowerCase();
   final selectedYear = yearFilter.value;
   final order = sortOrder.value;
@@ -213,25 +264,24 @@ void applyFilters() {
     if (selectedType.isNotEmpty && entry.type.toLowerCase() != selectedType) {
       return false;
     }
-    final year = entry.normalized['Year'] ?? '';
+    final year = entry['year'] ?? '';
     if (selectedYear.isNotEmpty && year != selectedYear) {
       return false;
     }
     if (normalizedQuery.isNotEmpty) {
       final key = entry.key.toLowerCase();
-      final title = entry.normalized['Title'] ?? '';
-      final author = entry.normalized['Author'] ?? '';
-      final booktitle = entry.normalized['Booktitle'] ?? '';
-      final journal = entry.normalized['Journal'] ?? '';
-      final annote = entry.normalized['Annote'] ?? '';
+      final title = entry['title'] ?? '';
+      final author = entry['author'] ?? '';
+      final booktitle = entry['booktitle'] ?? '';
+      final journal = entry['journal'] ?? '';
+      final annote = entry['annote'] ?? '';
 
       final targetText = '$key $title $author $booktitle $journal $annote'
           .toLowerCase();
-      final foldedTarget = _foldDiacritics(targetText);
 
       final matches =
           targetText.contains(normalizedQuery) ||
-          foldedTarget.contains(foldedQuery);
+          _foldDiacritics(targetText).contains(foldedQuery);
       if (!matches) return false;
     }
     return true;
@@ -241,22 +291,14 @@ void applyFilters() {
   filteredEntries.sort((a, b) {
     switch (order) {
       case 'year-asc':
-        return (a.normalized['Year'] ?? '').compareTo(
-          b.normalized['Year'] ?? '',
-        );
+        return (a['year'] ?? '').compareTo(b['year'] ?? '');
       case 'author-asc':
-        return (a.normalized['Author'] ?? '').compareTo(
-          b.normalized['Author'] ?? '',
-        );
+        return (a['author'] ?? '').compareTo(b['author'] ?? '');
       case 'title-asc':
-        return (a.normalized['Title'] ?? '').compareTo(
-          b.normalized['Title'] ?? '',
-        );
+        return (a['title'] ?? '').compareTo(b['title'] ?? '');
       case 'year-desc':
       default:
-        return (b.normalized['Year'] ?? '').compareTo(
-          a.normalized['Year'] ?? '',
-        );
+        return (b['year'] ?? '').compareTo(a['year'] ?? '');
     }
   });
 
@@ -297,16 +339,16 @@ void renderPage() {
     card.className = 'entry-card';
 
     final typeLower = entry.type.toLowerCase();
-    final title = entry.normalized['Title'] ?? '';
-    final author = entry.normalized['Author'] ?? '';
-    final year = entry.normalized['Year'] ?? '';
-    final journal = entry.normalized['Journal'] ?? '';
-    final booktitle = entry.normalized['Booktitle'] ?? '';
-    final publisher = entry.normalized['Publisher'] ?? '';
-    final school = entry.normalized['School'] ?? '';
-    final institution = entry.normalized['Institution'] ?? '';
-    final url = entry.normalized['Url'] ?? '';
-    final doi = entry.normalized['Doi'] ?? '';
+    final title = entry['title'] ?? '';
+    final author = entry['author'] ?? '';
+    final year = entry['year'] ?? '';
+    final journal = entry['journal'] ?? '';
+    final booktitle = entry['booktitle'] ?? '';
+    final publisher = entry['publisher'] ?? '';
+    final school = entry['school'] ?? '';
+    final institution = entry['institution'] ?? '';
+    final url = entry['url'] ?? '';
+    final doi = entry['doi'] ?? '';
     final effectiveUrl = url.isNotEmpty
         ? url
         : (doi.isNotEmpty
@@ -417,6 +459,30 @@ void main() {
     final url = bibSource.value.trim();
     if (url.isNotEmpty) loadFromUrl(url);
   });
+
+  bibSource.onKeyDown.listen((KeyboardEvent event) {
+    if (event.key == 'Enter') {
+      event.preventDefault();
+      final url = bibSource.value.trim();
+      if (url.isNotEmpty) loadFromUrl(url);
+    }
+  });
+
+  bibSource.onInput.listen((_) => _updateActiveExample(bibSource.value.trim()));
+
+  final exampleButtons = document.querySelectorAll(
+    '.source-selector .preset-btn',
+  );
+  for (var i = 0; i < exampleButtons.length; i++) {
+    final btn = exampleButtons.item(i) as HTMLButtonElement;
+    btn.onClick.listen((_) {
+      final url = btn.getAttribute('data-url');
+      if (url != null && url.isNotEmpty) {
+        bibSource.value = url;
+        loadFromUrl(url);
+      }
+    });
+  }
 
   searchInput.onInput.listen((_) => applyFilters());
   typeFilter.onChange.listen((_) => applyFilters());

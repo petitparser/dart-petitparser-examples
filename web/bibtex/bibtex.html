@@ -17,6 +17,48 @@
     .source-selector {
       margin-bottom: 1.5rem;
     }
+    .examples-bar {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 0.6rem;
+      margin-top: 1rem;
+    }
+    .examples-label {
+      font-size: 1.3rem;
+      font-weight: 600;
+      color: var(--color-text-muted);
+      margin-right: 0.2rem;
+    }
+    .preset-btn {
+      height: 3.2rem;
+      line-height: 3.2rem;
+      padding: 0 1.2rem;
+      font-size: 1.25rem;
+      font-weight: 500;
+      background-color: #ffffff;
+      color: var(--color-accent);
+      border: 1px solid #d1d5db;
+      border-radius: 4px;
+      margin-bottom: 0;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: background-color var(--transition-speed), border-color var(--transition-speed), color var(--transition-speed);
+    }
+    .preset-btn:hover {
+      background-color: #f3f6fa;
+      border-color: var(--color-accent);
+      color: var(--color-primary);
+    }
+    .preset-btn.active {
+      background-color: var(--color-accent);
+      color: #ffffff;
+      border-color: var(--color-accent);
+    }
+    .preset-btn:focus-visible {
+      outline: 2px solid var(--color-accent);
+      outline-offset: 2px;
+    }
     .filter-bar {
       display: flex;
       flex-direction: column;
@@ -180,6 +222,14 @@
         <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
           <input type="text" id="bib-source" value="https://raw.githubusercontent.com/scgbern/scgbib/main/scg.bib" spellcheck="false" style="flex: 1; margin-bottom: 0; min-width: 250px;" />
           <button id="load-btn" type="button" class="button" style="margin-bottom: 0;">Load &amp; Parse Database</button>
+        </div>
+        <div class="examples-bar">
+          <span class="examples-label">Examples:</span>
+          <button type="button" class="preset-btn active" data-url="https://raw.githubusercontent.com/scgbern/scgbib/main/scg.bib">SCG Bibliography (~5.3 MB)</button>
+          <button type="button" class="preset-btn" data-url="https://raw.githubusercontent.com/aibasel/bib/refs/heads/main/literatur.bib">AI Basel Literature (~680 KB)</button>
+          <button type="button" class="preset-btn" data-url="https://raw.githubusercontent.com/wkjarosz/rendering-bib/master/rendering-bibtex.bib">Computer Graphics (~1.8 MB)</button>
+          <button type="button" class="preset-btn" data-url="https://raw.githubusercontent.com/OMR-Research/omr-research.github.io/master/OMR-Research.bib">Music Recognition (~912 KB)</button>
+          <button type="button" class="preset-btn" data-url="https://raw.githubusercontent.com/iridia-ulb/references/master/biblio.bib">IRIDIA AI &amp; Swarm (~576 KB)</button>
         </div>
       </div>
 

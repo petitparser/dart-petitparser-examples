@@ -1,18 +1,5 @@
 import 'package:petitparser/petitparser.dart';
 
-/// Normalizes a BibTeX field name by capitalizing the first letter and any
-/// letter immediately following a hyphen, lowercasing all other characters.
-///
-/// ```dart
-/// normalizeFieldName('TITLE') == 'Title'
-/// normalizeFieldName('archiveprefix') == 'Archiveprefix'
-/// normalizeFieldName('booktitle') == 'Booktitle'
-/// ```
-String normalizeFieldName(String name) => name.toLowerCase().replaceAllMapped(
-  _fieldNameBoundary,
-  (m) => '${m[1]}${m[2]?.toUpperCase() ?? ''}',
-);
-
 /// Normalizes a raw BibTeX field value to a clean display string.
 ///
 /// The following transformations are applied:
@@ -21,7 +8,7 @@ String normalizeFieldName(String name) => name.toLowerCase().replaceAllMapped(
 /// - LaTeX accent sequences in braced (e.g., `\"{o}`, `\'{e}`) or unbraced (e.g., `\"o`, `\'e`, `\c s`) forms are expanded.
 /// - LaTeX special characters (e.g., `\&` → `&`, `\%` → `%`, `\_` → `_`) are unescaped.
 /// - Standard HTML entities (e.g., `&#38;` → `&`, `&mdash;` → `—`) are decoded.
-/// - Unless [fieldName] is `'url'` or `'doi'`, `---` is replaced with an em dash (`—`)
+/// - Unless [key] is `'url'` or `'doi'`, `---` is replaced with an em dash (`—`)
 ///   and `--` with an en dash (`–`).
 /// - Remaining unmatched `{` and `}` are removed.
 ///
@@ -32,16 +19,24 @@ String normalizeFieldName(String name) => name.toLowerCase().replaceAllMapped(
 /// normalizeFieldValue(r'{Chi\c{s}}') == 'Chiș'
 /// normalizeFieldValue(r'{Journal of Systems \& Software}') == 'Journal of Systems & Software'
 /// ```
-String normalizeFieldValue(String value, {String? fieldName}) {
+String normalizeFieldValue(String value, {String? key}) {
   var text = value.trim();
   while (_isEnclosed(text, '{', '}') || _isEnclosed(text, '"', '"')) {
     text = text.substring(1, text.length - 1).trim();
   }
   if (text.isEmpty) return '';
 
-  final isUrlOrDoi =
-      fieldName != null &&
-      (fieldName.toLowerCase() == 'url' || fieldName.toLowerCase() == 'doi');
+  final effectiveKey = key?.toLowerCase();
+  final isUrlOrDoi = effectiveKey == 'url' || effectiveKey == 'doi';
+
+  if (!text.contains(r'\') &&
+      !text.contains('&') &&
+      !text.contains('{') &&
+      !text.contains('}') &&
+      (isUrlOrDoi || !text.contains('--'))) {
+    return text;
+  }
+
   final decoder = isUrlOrDoi ? _urlDecoder : _normalDecoder;
   final result = decoder.parse(text);
   return result is Success ? result.value : text;
@@ -95,6 +90,7 @@ class LatexDecoderDefinition extends GrammarDefinition<String> {
     ref0(htmlEntity),
     ref0(backslashCommand),
     ref0(bracedGroup),
+    ref0(plainChunk),
     ref0(plainChar),
   ].toChoiceParser();
 
@@ -227,6 +223,10 @@ class LatexDecoderDefinition extends GrammarDefinition<String> {
   /// Stray unmatched curly braces removed.
   Parser<String> unmatchedBrace() => anyOf('{}').map((_) => '');
 
+  /// Run of characters that do not start LaTeX escapes or delimiters.
+  Parser<String> plainChunk() =>
+      pattern(convertDashes ? r'^\&{}-' : r'^\&{}').plusString();
+
   /// Plain character matcher.
   Parser<String> plainChar() => pattern('^{}');
 }
@@ -237,8 +237,6 @@ String _decodeCode(int? code, String fallback) =>
 final _normalDecoder = const LatexDecoderDefinition(convertDashes: true)
     .build();
 final _urlDecoder = const LatexDecoderDefinition(convertDashes: false).build();
-
-final _fieldNameBoundary = RegExp(r'(^|-)([a-z])');
 
 final _accents = <String, Map<String, String>>{
   '`': {

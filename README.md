@@ -47,9 +47,9 @@ void main() {
 }''');
 
   final entry = result.value.single;
-  print(entry.key);    // Reng10c
-  print(entry.type);   // inproceedings
-  print(entry.fields); // {title: "Practical Dynamic Grammars for Dynamic Languages", ...}
+  print(entry.key);      // Reng10c
+  print(entry.type);     // inproceedings
+  print(entry['title']); // Practical Dynamic Grammars for Dynamic Languages
 }
 ```
 

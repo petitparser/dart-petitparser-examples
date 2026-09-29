@@ -28,16 +28,26 @@ void main() {
       final entry = result.value.single;
       expect(entry.key, 'Reng10c');
       expect(entry.type, 'inproceedings');
-      expect(entry.fields, {
-        'title': '"Practical Dynamic Grammars for Dynamic Languages"',
-        'author': '"Lukas Renggli and Stéphane Ducasse and Tudor Gîrba and Oscar Nierstrasz"',
-        'year': '2010',
-      });
-      expect(entry.normalized, {
-        'Title': 'Practical Dynamic Grammars for Dynamic Languages',
-        'Author': 'Lukas Renggli and Stéphane Ducasse and Tudor Gîrba and Oscar Nierstrasz',
-        'Year': '2010',
-      });
+      expect(
+        entry['title'],
+        'Practical Dynamic Grammars for Dynamic Languages',
+      );
+      expect(
+        entry['author'],
+        'Lukas Renggli and Stéphane Ducasse and Tudor Gîrba and Oscar Nierstrasz',
+      );
+      expect(entry['year'], '2010');
+      expect(entry.fields, [
+        BibTeXField(
+          'title',
+          '"Practical Dynamic Grammars for Dynamic Languages"',
+        ),
+        BibTeXField(
+          'author',
+          '"Lukas Renggli and Stéphane Ducasse and Tudor Gîrba and Oscar Nierstrasz"',
+        ),
+        BibTeXField('year', '2010'),
+      ]);
     });
 
     test('Dart', () {
