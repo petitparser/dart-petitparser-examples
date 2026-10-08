@@ -1,5 +1,9 @@
 # Changelog
 
+## 7.2.0 (Unpublished)
+
+- Update BibTeX parsing (`parseEntries`, `parseStream`, `parseStreamChunks`) to use the generic streaming and iteration infrastructure in `package:petitparser/stream.dart`.
+
 ## 7.1.0
 
 - Update to Dart 3.13 and PetitParser 7.1.

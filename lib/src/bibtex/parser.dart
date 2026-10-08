@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:petitparser/petitparser.dart';
+import 'package:petitparser/stream.dart';
 
 import 'definition.dart';
 import 'entry.dart';
@@ -19,6 +20,8 @@ final Parser<BibTeXEntry> entryParser = _definition.buildFrom(
   _definition.entry(),
 );
 
+final _delimiter = char('@');
+
 /// Returns a lazily evaluated [Iterable] of [BibTeXEntry] items from [input].
 ///
 /// For example:
@@ -28,20 +31,8 @@ final Parser<BibTeXEntry> entryParser = _definition.buildFrom(
 ///   print(entry.key);
 /// }
 /// ```
-Iterable<BibTeXEntry> parseEntries(String input) sync* {
-  var pos = 0;
-  while (pos < input.length) {
-    final atIndex = input.indexOf('@', pos);
-    if (atIndex == -1) break;
-    final result = entryParser.parseOn(Context(input, atIndex));
-    if (result is Success) {
-      yield result.value;
-      pos = result.position;
-    } else {
-      pos = atIndex + 1;
-    }
-  }
-}
+Iterable<BibTeXEntry> parseEntries(String input) =>
+    entryParser.parseIterable(input, delimiter: _delimiter);
 
 /// Parses [input] into a progressive asynchronous [Stream] of [BibTeXEntry]
 /// items.
@@ -53,20 +44,8 @@ Iterable<BibTeXEntry> parseEntries(String input) sync* {
 ///   print(entry.key);
 /// }
 /// ```
-Stream<BibTeXEntry> parseStream(String input) async* {
-  var pos = 0;
-  while (pos < input.length) {
-    final atIndex = input.indexOf('@', pos);
-    if (atIndex == -1) break;
-    final result = entryParser.parseOn(Context(input, atIndex));
-    if (result is Success) {
-      yield result.value;
-      pos = result.position;
-    } else {
-      pos = atIndex + 1;
-    }
-  }
-}
+Stream<BibTeXEntry> parseStream(String input) =>
+    entryParser.parseStream(input, delimiter: _delimiter);
 
 /// Parses chunks of text from [stream] into a progressive [Stream] of
 /// [BibTeXEntry] items.
@@ -82,49 +61,5 @@ Stream<BibTeXEntry> parseStream(String input) async* {
 ///   print(entry.key);
 /// }
 /// ```
-Stream<BibTeXEntry> parseStreamChunks(Stream<String> stream) async* {
-  var buffer = '';
-  await for (final chunk in stream) {
-    buffer += chunk;
-    var pos = 0;
-    while (pos < buffer.length) {
-      final atIndex = buffer.indexOf('@', pos);
-      if (atIndex == -1) {
-        buffer = '';
-        pos = 0;
-        break;
-      }
-      final result = entryParser.parseOn(Context(buffer, atIndex));
-      if (result is Success) {
-        yield result.value;
-        pos = result.position;
-      } else {
-        final nextAt = buffer.indexOf('@', atIndex + 1);
-        if (nextAt != -1 && result.position <= nextAt) {
-          pos = atIndex + 1;
-        } else {
-          buffer = buffer.substring(atIndex);
-          pos = 0;
-          break;
-        }
-      }
-    }
-    if (pos > 0) {
-      buffer = buffer.substring(pos);
-    }
-  }
-  if (buffer.isNotEmpty) {
-    var pos = 0;
-    while (pos < buffer.length) {
-      final atIndex = buffer.indexOf('@', pos);
-      if (atIndex == -1) break;
-      final result = entryParser.parseOn(Context(buffer, atIndex));
-      if (result is Success) {
-        yield result.value;
-        pos = result.position;
-      } else {
-        pos = atIndex + 1;
-      }
-    }
-  }
-}
+Stream<BibTeXEntry> parseStreamChunks(Stream<String> stream) =>
+    entryParser.parseStreamChunks(stream, delimiter: _delimiter);
