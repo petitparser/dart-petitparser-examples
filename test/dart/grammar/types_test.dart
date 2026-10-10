@@ -1,8 +1,8 @@
 import 'package:petitparser/petitparser.dart';
 import 'package:petitparser_examples/dart.dart';
-import 'package:test/test.dart';
+import 'package:test/scaffolding.dart';
 
-import '../../utils/expect.dart';
+import '../../utils/checks.dart';
 
 void main() {
   final grammar = DartGrammarDefinition();
@@ -10,36 +10,36 @@ void main() {
 
   group('named types', () {
     test('primitive and built-in types', () {
-      expect(typ, isSuccess('int'));
-      expect(typ, isSuccess('double'));
-      expect(typ, isSuccess('num'));
-      expect(typ, isSuccess('bool'));
-      expect(typ, isSuccess('String'));
-      expect(typ, isSuccess('void'));
-      expect(typ, isSuccess('dynamic'));
-      expect(typ, isSuccess('Never'));
-      expect(typ, isSuccess('Null'));
-      expect(typ, isSuccess('Object'));
+      check(typ).isSuccess('int');
+      check(typ).isSuccess('double');
+      check(typ).isSuccess('num');
+      check(typ).isSuccess('bool');
+      check(typ).isSuccess('String');
+      check(typ).isSuccess('void');
+      check(typ).isSuccess('dynamic');
+      check(typ).isSuccess('Never');
+      check(typ).isSuccess('Null');
+      check(typ).isSuccess('Object');
     });
 
     test('qualified types', () {
-      expect(typ, isSuccess('prefix.MyClass'));
-      expect(typ, isSuccess('dart.core.String'));
+      check(typ).isSuccess('prefix.MyClass');
+      check(typ).isSuccess('dart.core.String');
     });
   });
 
   group('nullable types', () {
     test('simple nullables', () {
-      expect(typ, isSuccess('int?'));
-      expect(typ, isSuccess('String?'));
-      expect(typ, isSuccess('dynamic?'));
-      expect(typ, isSuccess('prefix.MyClass?'));
+      check(typ).isSuccess('int?');
+      check(typ).isSuccess('String?');
+      check(typ).isSuccess('dynamic?');
+      check(typ).isSuccess('prefix.MyClass?');
     });
 
     test('nested generic nullables', () {
-      expect(typ, isSuccess('List<int>?'));
-      expect(typ, isSuccess('List<int?>'));
-      expect(typ, isSuccess('Map<String?, List<int?>?>?'));
+      check(typ).isSuccess('List<int>?');
+      check(typ).isSuccess('List<int?>');
+      check(typ).isSuccess('Map<String?, List<int?>?>?');
     });
   });
 
@@ -48,90 +48,90 @@ void main() {
     final testTypUnended = grammar.buildFrom(grammar.typeTestType());
 
     test('non-nullable types succeed fully', () {
-      expect(testTyp, isSuccess('int'));
-      expect(testTyp, isSuccess('List<int?>'));
-      expect(testTyp, isSuccess('void Function(int?)'));
-      expect(testTyp, isSuccess('(int?, String)'));
+      check(testTyp).isSuccess('int');
+      check(testTyp).isSuccess('List<int?>');
+      check(testTyp).isSuccess('void Function(int?)');
+      check(testTyp).isSuccess('(int?, String)');
     });
 
     test('does not consume top-level ?', () {
-      expect(testTyp, isFailure('int?'));
-      expect(testTypUnended, isSuccess('int?', position: 3));
-      expect(testTypUnended, isSuccess('(int, String)?', position: 13));
+      check(testTyp).isFailure('int?');
+      check(testTypUnended).isSuccess('int?', position: 3);
+      check(testTypUnended).isSuccess('(int, String)?', position: 13);
     });
   });
 
   group('generics', () {
     test('type arguments', () {
-      expect(typ, isSuccess('List<int>'));
-      expect(typ, isSuccess('Map<String, int>'));
-      expect(typ, isSuccess('Map<String, List<int>>'));
-      expect(typ, isSuccess('Future<void>'));
-      expect(typ, isSuccess('Stream<List<Map<String, dynamic>>>'));
+      check(typ).isSuccess('List<int>');
+      check(typ).isSuccess('Map<String, int>');
+      check(typ).isSuccess('Map<String, List<int>>');
+      check(typ).isSuccess('Future<void>');
+      check(typ).isSuccess('Stream<List<Map<String, dynamic>>>');
     });
   });
 
   group('record types', () {
     test('empty record type', () {
-      expect(typ, isSuccess('()'));
-      expect(typ, isSuccess('()?'));
+      check(typ).isSuccess('()');
+      check(typ).isSuccess('()?');
     });
 
     test('positional only', () {
-      expect(typ, isSuccess('(int,)'));
-      expect(typ, isSuccess('(int, String)'));
-      expect(typ, isSuccess('(int, String, bool)'));
-      expect(typ, isSuccess('(int a, String b)'));
-      expect(typ, isSuccess('(int, String)?'));
+      check(typ).isSuccess('(int,)');
+      check(typ).isSuccess('(int, String)');
+      check(typ).isSuccess('(int, String, bool)');
+      check(typ).isSuccess('(int a, String b)');
+      check(typ).isSuccess('(int, String)?');
     });
 
     test('named only', () {
-      expect(typ, isSuccess('({int a})'));
-      expect(typ, isSuccess('({int a, String b})'));
-      expect(typ, isSuccess('({int a, String b,})'));
-      expect(typ, isSuccess('({int a, String b})?'));
+      check(typ).isSuccess('({int a})');
+      check(typ).isSuccess('({int a, String b})');
+      check(typ).isSuccess('({int a, String b,})');
+      check(typ).isSuccess('({int a, String b})?');
     });
 
     test('mixed positional and named', () {
-      expect(typ, isSuccess('(int, {String b})'));
-      expect(typ, isSuccess('(int a, {String b})'));
-      expect(typ, isSuccess('(int, double, {String name, bool flag})'));
-      expect(typ, isSuccess('(int, {String b,})'));
+      check(typ).isSuccess('(int, {String b})');
+      check(typ).isSuccess('(int a, {String b})');
+      check(typ).isSuccess('(int, double, {String name, bool flag})');
+      check(typ).isSuccess('(int, {String b,})');
     });
 
     test('nested record types', () {
-      expect(typ, isSuccess('((int, int), String)'));
-      expect(typ, isSuccess('({(int, String) pair, bool flag})'));
+      check(typ).isSuccess('((int, int), String)');
+      check(typ).isSuccess('({(int, String) pair, bool flag})');
     });
   });
 
   group('function types', () {
     test('standalone function types', () {
-      expect(typ, isSuccess('Function()'));
-      expect(typ, isSuccess('Function()?'));
-      expect(typ, isSuccess('Function(int)'));
-      expect(typ, isSuccess('Function(int, [String])'));
-      expect(typ, isSuccess('Function(int, {String name})'));
+      check(typ).isSuccess('Function()');
+      check(typ).isSuccess('Function()?');
+      check(typ).isSuccess('Function(int)');
+      check(typ).isSuccess('Function(int, [String])');
+      check(typ).isSuccess('Function(int, {String name})');
     });
 
     test('function types with return type', () {
-      expect(typ, isSuccess('void Function()'));
-      expect(typ, isSuccess('int Function(String)'));
-      expect(typ, isSuccess('int Function(String, [int])'));
-      expect(typ, isSuccess('int Function(String, [int])?'));
-      expect(typ, isSuccess('void Function(String, {bool flag})'));
-      expect(typ, isSuccess('void Function(String, {required bool flag})'));
+      check(typ).isSuccess('void Function()');
+      check(typ).isSuccess('int Function(String)');
+      check(typ).isSuccess('int Function(String, [int])');
+      check(typ).isSuccess('int Function(String, [int])?');
+      check(typ).isSuccess('void Function(String, {bool flag})');
+      check(typ).isSuccess('void Function(String, {required bool flag})');
     });
 
     test('generic function types', () {
-      expect(typ, isSuccess('T Function<T>(T)'));
-      expect(typ, isSuccess('R Function<T, R>(T)'));
-      expect(typ, isSuccess('T Function<T extends Object>(T)'));
+      check(typ).isSuccess('T Function<T>(T)');
+      check(typ).isSuccess('R Function<T, R>(T)');
+      check(typ).isSuccess('T Function<T extends Object>(T)');
     });
 
     test('higher order function types', () {
-      expect(typ, isSuccess('void Function(void Function())'));
-      expect(typ, isSuccess('int Function(int) Function(String)'));
+      check(typ).isSuccess('void Function(void Function())');
+      check(typ).isSuccess('int Function(int) Function(String)');
     });
   });
 
@@ -139,14 +139,14 @@ void main() {
     final typeParams = grammar.buildFrom(grammar.typeParameters()).end();
 
     test('single parameter', () {
-      expect(typeParams, isSuccess('<T>'));
-      expect(typeParams, isSuccess('<T extends Object>'));
-      expect(typeParams, isSuccess('<T extends Comparable<T>>'));
+      check(typeParams).isSuccess('<T>');
+      check(typeParams).isSuccess('<T extends Object>');
+      check(typeParams).isSuccess('<T extends Comparable<T>>');
     });
 
     test('multiple parameters', () {
-      expect(typeParams, isSuccess('<T, R>'));
-      expect(typeParams, isSuccess('<K, V extends List<K>>'));
+      check(typeParams).isSuccess('<T, R>');
+      check(typeParams).isSuccess('<K, V extends List<K>>');
     });
   });
 
@@ -154,124 +154,94 @@ void main() {
     final formalParams = grammar.buildFrom(grammar.formalParameters()).end();
 
     test('parameters with metadata annotations', () {
-      expect(formalParams, isSuccess('(@isTest int x)'));
-      expect(formalParams, isSuccess('(@foo @bar String s)'));
-      expect(formalParams, isSuccess('({@required @deprecated int? x})'));
-      expect(
+      check(formalParams).isSuccess('(@isTest int x)');
+      check(formalParams).isSuccess('(@foo @bar String s)');
+      check(formalParams).isSuccess('({@required @deprecated int? x})');
+      check(
         formalParams,
-        isSuccess('(@Deprecated("Debug only") @doNotSubmit bool solo = false)'),
+      ).isSuccess('(@Deprecated("Debug only") @doNotSubmit bool solo = false)');
+      check(formalParams).isSuccess(
+        '(Object? desc, FutureOr<dynamic> Function() body, {@Deprecated("msg") @doNotSubmit bool solo = false})',
       );
-      expect(
-        formalParams,
-        isSuccess(
-          '(Object? desc, FutureOr<dynamic> Function() body, {@Deprecated("msg") @doNotSubmit bool solo = false})',
-        ),
-      );
-      expect(formalParams, isSuccess('([@deprecated int count = 0])'));
+      check(formalParams).isSuccess('([@deprecated int count = 0])');
     });
 
     test('function-typed parameter with metadata annotations', () {
-      expect(
-        formalParams,
-        isSuccess(
-          '(@meta void cb())',
-          value: isA<List<ParameterNode>>().having(
-            (list) => list.first,
-            'first',
-            isA<FunctionTypedParameterNode>()
-                .having((p) => p.name, 'name', 'cb')
-                .having((p) => p.metadata, 'metadata', hasLength(1)),
-          ),
-        ),
+      check(formalParams).isSuccess(
+        '(@meta void cb())',
+        value: (Subject it) {
+          final node = it
+              .isA<List<ParameterNode>>()
+              .has((list) => list.first, 'first')
+              .isA<FunctionTypedParameterNode>();
+          node.has((p) => p.name, 'name').equals('cb');
+          node.has((p) => p.metadata, 'metadata').length.equals(1);
+        },
       );
-      expect(formalParams, isSuccess('(@foo @bar int Function() cb)'));
+      check(formalParams).isSuccess('(@foo @bar int Function() cb)');
     });
 
     test('optional positional parameter defaults', () {
-      expect(
-        formalParams,
-        isSuccess(
-          '([int x = 42])',
-          value: isA<List<ParameterNode>>().having(
-            (list) => list.first,
-            'first',
-            isA<SimpleParameterNode>()
-                .having((p) => p.name, 'name', 'x')
-                .having(
-                  (p) => p.defaultValue,
-                  'defaultValue',
-                  isA<IntegerLiteralNode>(),
-                ),
-          ),
-        ),
+      check(formalParams).isSuccess(
+        '([int x = 42])',
+        value: (Subject it) {
+          final node = it
+              .isA<List<ParameterNode>>()
+              .has((list) => list.first, 'first')
+              .isA<SimpleParameterNode>();
+          node.has((p) => p.name, 'name').equals('x');
+          node
+              .has((p) => p.defaultValue, 'defaultValue')
+              .isA<IntegerLiteralNode>();
+        },
       );
-      expect(
-        formalParams,
-        isSuccess(
-          '([void cb() = defaultCallback])',
-          value: isA<List<ParameterNode>>().having(
-            (list) => list.first,
-            'first',
-            isA<FunctionTypedParameterNode>()
-                .having((p) => p.name, 'name', 'cb')
-                .having(
-                  (p) => p.defaultValue,
-                  'defaultValue',
-                  isA<IdentifierNode>(),
-                ),
-          ),
-        ),
+      check(formalParams).isSuccess(
+        '([void cb() = defaultCallback])',
+        value: (Subject it) {
+          final node = it
+              .isA<List<ParameterNode>>()
+              .has((list) => list.first, 'first')
+              .isA<FunctionTypedParameterNode>();
+          node.has((p) => p.name, 'name').equals('cb');
+          node.has((p) => p.defaultValue, 'defaultValue').isA<IdentifierNode>();
+        },
       );
     });
 
     test('named function-typed parameter defaults', () {
-      expect(
-        formalParams,
-        isSuccess(
-          '({void cb() = defaultCallback})',
-          value: isA<List<ParameterNode>>().having(
-            (list) => list.first,
-            'first',
-            isA<FunctionTypedParameterNode>()
-                .having((p) => p.name, 'name', 'cb')
-                .having((p) => p.isNamed, 'isNamed', isTrue)
-                .having(
-                  (p) => p.defaultValue,
-                  'defaultValue',
-                  isA<IdentifierNode>(),
-                ),
-          ),
-        ),
+      check(formalParams).isSuccess(
+        '({void cb() = defaultCallback})',
+        value: (Subject it) {
+          final node = it
+              .isA<List<ParameterNode>>()
+              .has((list) => list.first, 'first')
+              .isA<FunctionTypedParameterNode>();
+          node.has((p) => p.name, 'name').equals('cb');
+          node.has((p) => p.isNamed, 'isNamed').isTrue();
+          node.has((p) => p.defaultValue, 'defaultValue').isA<IdentifierNode>();
+        },
       );
-      expect(
-        formalParams,
-        isSuccess(
-          '({void cb(): defaultCallback})',
-          value: isA<List<ParameterNode>>().having(
-            (list) => list.first,
-            'first',
-            isA<FunctionTypedParameterNode>()
-                .having((p) => p.name, 'name', 'cb')
-                .having(
-                  (p) => p.defaultValue,
-                  'defaultValue',
-                  isA<IdentifierNode>(),
-                ),
-          ),
-        ),
+      check(formalParams).isSuccess(
+        '({void cb(): defaultCallback})',
+        value: (Subject it) {
+          final node = it
+              .isA<List<ParameterNode>>()
+              .has((list) => list.first, 'first')
+              .isA<FunctionTypedParameterNode>();
+          node.has((p) => p.name, 'name').equals('cb');
+          node.has((p) => p.defaultValue, 'defaultValue').isA<IdentifierNode>();
+        },
       );
-      expect(
-        formalParams,
-        isSuccess(
-          '({@meta required void cb() = defaultCallback})',
-          value: isA<List<ParameterNode>>().having(
-            (list) => list.first,
-            'first',
-            isA<FunctionTypedParameterNode>()
-                .having((p) => p.metadata, 'metadata', hasLength(1))
-                .having((p) => p.isRequired, 'isRequired', isTrue),
-          ),
-        ),
+      check(formalParams).isSuccess(
+        '({@meta required void cb() = defaultCallback})',
+        value: (Subject it) {
+          final node = it
+              .isA<List<ParameterNode>>()
+              .has((list) => list.first, 'first')
+              .isA<FunctionTypedParameterNode>();
+          node.has((p) => p.metadata, 'metadata').length.equals(1);
+          node.has((p) => p.isRequired, 'isRequired').isTrue();
+        },
       );
     });
   });

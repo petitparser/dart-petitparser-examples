@@ -1,8 +1,8 @@
 import 'package:petitparser/petitparser.dart';
 import 'package:petitparser_examples/python.dart';
-import 'package:test/test.dart';
+import 'package:test/scaffolding.dart';
 
-import '../../utils/expect.dart';
+import '../../utils/checks.dart';
 
 void main() {
   final grammar = PythonGrammarDefinition();
@@ -10,82 +10,82 @@ void main() {
 
   group('literal and singleton patterns', () {
     test('singletons', () {
-      expect(pat, isSuccess('None'));
-      expect(pat, isSuccess('True'));
-      expect(pat, isSuccess('False'));
+      check(pat).isSuccess('None');
+      check(pat).isSuccess('True');
+      check(pat).isSuccess('False');
     });
 
     test('numbers and strings', () {
-      expect(pat, isSuccess('42'));
-      expect(pat, isSuccess('3.14'));
-      expect(pat, isSuccess('"hello"'));
+      check(pat).isSuccess('42');
+      check(pat).isSuccess('3.14');
+      check(pat).isSuccess('"hello"');
     });
   });
 
   group('wildcard and capture patterns', () {
     test('wildcard', () {
-      expect(pat, isSuccess('_'));
+      check(pat).isSuccess('_');
     });
 
     test('capture variable', () {
-      expect(pat, isSuccess('x'));
-      expect(pat, isSuccess('point_name'));
+      check(pat).isSuccess('x');
+      check(pat).isSuccess('point_name');
     });
   });
 
   group('as and or patterns', () {
     test('as pattern', () {
-      expect(pat, isSuccess('42 as x'));
-      expect(pat, isSuccess('Point(x, y) as p'));
+      check(pat).isSuccess('42 as x');
+      check(pat).isSuccess('Point(x, y) as p');
     });
 
     test('or pattern', () {
-      expect(pat, isSuccess('1 | 2'));
-      expect(pat, isSuccess('401 | 403 | 404'));
-      expect(pat, isSuccess('Point(0, 0) | Point(1, 1)'));
+      check(pat).isSuccess('1 | 2');
+      check(pat).isSuccess('401 | 403 | 404');
+      check(pat).isSuccess('Point(0, 0) | Point(1, 1)');
     });
   });
 
   group('sequence patterns', () {
     test('list sequence', () {
-      expect(pat, isSuccess('[]'));
-      expect(pat, isSuccess('[1, 2]'));
-      expect(pat, isSuccess('[first, *rest]'));
-      expect(pat, isSuccess('[*_, last]'));
+      check(pat).isSuccess('[]');
+      check(pat).isSuccess('[1, 2]');
+      check(pat).isSuccess('[first, *rest]');
+      check(pat).isSuccess('[*_, last]');
     });
 
     test('tuple sequence', () {
-      expect(pat, isSuccess('()'));
-      expect(pat, isSuccess('(1,)'));
-      expect(pat, isSuccess('(1, 2)'));
-      expect(pat, isSuccess('(head, *middle, tail)'));
+      check(pat).isSuccess('()');
+      check(pat).isSuccess('(1,)');
+      check(pat).isSuccess('(1, 2)');
+      check(pat).isSuccess('(head, *middle, tail)');
     });
   });
 
   group('mapping patterns', () {
     test('empty and simple mapping', () {
-      expect(pat, isSuccess('{}'));
-      expect(pat, isSuccess('{"key": "value"}'));
-      expect(pat, isSuccess('{"x": 1, "y": 2}'));
+      check(pat).isSuccess('{}');
+      check(pat).isSuccess('{"key": "value"}');
+      check(pat).isSuccess('{"x": 1, "y": 2}');
     });
 
     test('mapping with double star rest', () {
-      expect(pat, isSuccess('{**rest}'));
-      expect(pat, isSuccess('{"type": "admin", **details}'));
+      check(pat).isSuccess('{**rest}');
+      check(pat).isSuccess('{"type": "admin", **details}');
     });
   });
 
   group('class patterns', () {
     test('positional and keyword arguments', () {
-      expect(pat, isSuccess('Point()'));
-      expect(pat, isSuccess('Point(x, y)'));
-      expect(pat, isSuccess('Point(x=1, y=2)'));
-      expect(pat, isSuccess('Color(r, g, b, alpha=1.0)'));
+      check(pat).isSuccess('Point()');
+      check(pat).isSuccess('Point(x, y)');
+      check(pat).isSuccess('Point(x=1, y=2)');
+      check(pat).isSuccess('Color(r, g, b, alpha=1.0)');
     });
 
     test('dotted class name', () {
-      expect(pat, isSuccess('geom.Point(x, y)'));
-      expect(pat, isSuccess('pkg.subpkg.Class()'));
+      check(pat).isSuccess('geom.Point(x, y)');
+      check(pat).isSuccess('pkg.subpkg.Class()');
     });
   });
 }

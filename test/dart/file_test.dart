@@ -5,7 +5,7 @@ import 'dart:io';
 
 import 'package:petitparser/core.dart';
 import 'package:petitparser_examples/dart.dart';
-import 'package:test/test.dart';
+import 'package:test/scaffolding.dart';
 
 void main() {
   final dartFiles =
@@ -23,7 +23,7 @@ void main() {
       try {
         parseDart(content);
       } on ParserException catch (exception) {
-        fail(
+        throw TestFailure(
           '${file.path}:${exception.failure.toPositionString()}: '
           '${exception.failure.message}',
         );

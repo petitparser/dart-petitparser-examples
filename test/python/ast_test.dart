@@ -1,5 +1,6 @@
+import 'package:checks/checks.dart';
 import 'package:petitparser_examples/python.dart';
-import 'package:test/test.dart';
+import 'package:test/scaffolding.dart';
 
 void main() {
   group('Python AST verification', () {
@@ -21,42 +22,42 @@ def main():
     print(p1.distance(p2))
 ''');
 
-      expect(module.body, hasLength(3));
+      check(module.body).length.equals(3);
 
       // 1. Import
-      expect(module.body[0], isA<ImportNode>());
+      check(module.body[0]).isA<ImportNode>();
       final importNode = module.body[0] as ImportNode;
-      expect(importNode.names.first.name, 'math');
+      check(importNode.names.first.name).equals('math');
 
       // 2. Class
-      expect(module.body[1], isA<ClassDefNode>());
+      check(module.body[1]).isA<ClassDefNode>();
       final classNode = module.body[1] as ClassDefNode;
-      expect(classNode.name, 'Point');
-      expect(classNode.body, hasLength(2));
-      expect(classNode.body[0], isA<FunctionDefNode>());
-      expect(classNode.body[1], isA<FunctionDefNode>());
+      check(classNode.name).equals('Point');
+      check(classNode.body).length.equals(2);
+      check(classNode.body[0]).isA<FunctionDefNode>();
+      check(classNode.body[1]).isA<FunctionDefNode>();
 
       final initDef = classNode.body[0] as FunctionDefNode;
-      expect(initDef.name, '__init__');
-      expect(initDef.args.args, hasLength(3));
-      expect(initDef.args.args[0].arg, 'self');
-      expect(initDef.args.args[1].arg, 'x');
-      expect(initDef.args.args[2].arg, 'y');
+      check(initDef.name).equals('__init__');
+      check(initDef.args.args).length.equals(3);
+      check(initDef.args.args[0].arg).equals('self');
+      check(initDef.args.args[1].arg).equals('x');
+      check(initDef.args.args[2].arg).equals('y');
 
       final distDef = classNode.body[1] as FunctionDefNode;
-      expect(distDef.name, 'distance');
-      expect(distDef.returns, isA<NameNode>());
-      expect((distDef.returns as NameNode).id, 'float');
-      expect(distDef.body.first, isA<ReturnNode>());
+      check(distDef.name).equals('distance');
+      check(distDef.returns).isA<NameNode>();
+      check((distDef.returns as NameNode).id).equals('float');
+      check(distDef.body.first).isA<ReturnNode>();
 
       // 3. Function main
-      expect(module.body[2], isA<FunctionDefNode>());
+      check(module.body[2]).isA<FunctionDefNode>();
       final mainDef = module.body[2] as FunctionDefNode;
-      expect(mainDef.name, 'main');
-      expect(mainDef.body, hasLength(3));
-      expect(mainDef.body[0], isA<AssignNode>());
-      expect(mainDef.body[1], isA<AssignNode>());
-      expect(mainDef.body[2], isA<ExprStatementNode>());
+      check(mainDef.name).equals('main');
+      check(mainDef.body).length.equals(3);
+      check(mainDef.body[0]).isA<AssignNode>();
+      check(mainDef.body[1]).isA<AssignNode>();
+      check(mainDef.body[2]).isA<ExprStatementNode>();
     });
 
     test('pattern matching AST', () {
@@ -69,17 +70,17 @@ match command:
     case _:
         pass
 ''');
-      expect(module.body, hasLength(1));
-      expect(module.body.first, isA<MatchNode>());
+      check(module.body).length.equals(1);
+      check(module.body.first).isA<MatchNode>();
 
       final matchNode = module.body.first as MatchNode;
-      expect(matchNode.subject, isA<NameNode>());
-      expect((matchNode.subject as NameNode).id, 'command');
-      expect(matchNode.cases, hasLength(3));
+      check(matchNode.subject).isA<NameNode>();
+      check((matchNode.subject as NameNode).id).equals('command');
+      check(matchNode.cases).length.equals(3);
 
-      expect(matchNode.cases[0].pattern, isA<MatchValueNode>());
-      expect(matchNode.cases[1].pattern, isA<MatchSequenceNode>());
-      expect(matchNode.cases[2].pattern, isA<MatchStarNode>());
+      check(matchNode.cases[0].pattern).isA<MatchValueNode>();
+      check(matchNode.cases[1].pattern).isA<MatchSequenceNode>();
+      check(matchNode.cases[2].pattern).isA<MatchStarNode>();
     });
 
     test('PEP 695 generic function AST', () {
@@ -87,33 +88,33 @@ match command:
 def identity[T: str](x: T) -> T:
     return x
 ''');
-      expect(module.body, hasLength(1));
+      check(module.body).length.equals(1);
       final fn = module.body.first as FunctionDefNode;
-      expect(fn.name, 'identity');
-      expect(fn.typeParams, hasLength(1));
-      expect(fn.typeParams.first, isA<TypeVarParamNode>());
+      check(fn.name).equals('identity');
+      check(fn.typeParams).length.equals(1);
+      check(fn.typeParams.first).isA<TypeVarParamNode>();
       final tParam = fn.typeParams.first as TypeVarParamNode;
-      expect(tParam.name, 'T');
-      expect(tParam.bound, isA<NameNode>());
+      check(tParam.name).equals('T');
+      check(tParam.bound).isA<NameNode>();
     });
 
     group('root and module nodes', () {
       test('ModuleNode', () {
         const node = ModuleNode(body: [PassNode()]);
-        expect(node.body, hasLength(1));
-        expect(node.toString(), 'ModuleNode(body: 1 statements)');
+        check(node.body).length.equals(1);
+        check(node.toString()).equals('ModuleNode(body: 1 statements)');
       });
 
       test('InteractiveNode', () {
         const node = InteractiveNode(body: [PassNode(), BreakNode()]);
-        expect(node.body, hasLength(2));
-        expect(node.toString(), 'InteractiveNode(body: 2 statements)');
+        check(node.body).length.equals(2);
+        check(node.toString()).equals('InteractiveNode(body: 2 statements)');
       });
 
       test('ExpressionModuleNode', () {
         const node = ExpressionModuleNode(ConstantNode(42));
-        expect(node.body, isA<ConstantNode>());
-        expect(node.toString(), contains('ExpressionModuleNode'));
+        check(node.body).isA<ConstantNode>();
+        check(node.toString()).contains('ExpressionModuleNode');
       });
     });
 
@@ -126,16 +127,16 @@ def identity[T: str](x: T) -> T:
           decoratorList: [NameNode('dec')],
           returns: NameNode('int'),
         );
-        expect(node.name, 'fetch');
-        expect(node.decoratorList, hasLength(1));
-        expect(node.returns, isA<NameNode>());
-        expect(node.toString(), contains('AsyncFunctionDefNode(name: fetch'));
+        check(node.name).equals('fetch');
+        check(node.decoratorList).length.equals(1);
+        check(node.returns).isA<NameNode>();
+        check(node.toString()).contains('AsyncFunctionDefNode(name: fetch');
       });
 
       test('DeleteNode', () {
         const node = DeleteNode([NameNode('x')]);
-        expect(node.targets, hasLength(1));
-        expect(node.toString(), contains('DeleteNode'));
+        check(node.targets).length.equals(1);
+        check(node.toString()).contains('DeleteNode');
       });
 
       test('AssignNode & AugAssignNode & AnnAssignNode', () {
@@ -143,27 +144,25 @@ def identity[T: str](x: T) -> T:
           targets: [NameNode('x')],
           value: ConstantNode(1),
         );
-        expect(assign.targets, hasLength(1));
-        expect(assign.toString(), contains('AssignNode'));
+        check(assign.targets).length.equals(1);
+        check(assign.toString()).contains('AssignNode');
 
         const aug = AugAssignNode(
           target: NameNode('x'),
           operator: '+=',
           value: ConstantNode(2),
         );
-        expect(aug.operator, '+=');
-        expect(
-          aug.toString(),
-          contains('AugAssignNode(NameNode(x) += ConstantNode(2))'),
-        );
+        check(aug.operator).equals('+=');
+        check(aug.toString())
+            .contains('AugAssignNode(NameNode(x) += ConstantNode(2))');
 
         const ann = AnnAssignNode(
           target: NameNode('x'),
           annotation: NameNode('int'),
           value: ConstantNode(3),
         );
-        expect(ann.annotation, isA<NameNode>());
-        expect(ann.toString(), contains('AnnAssignNode'));
+        check(ann.annotation).isA<NameNode>();
+        check(ann.toString()).contains('AnnAssignNode');
       });
 
       test('TypeAliasNode', () {
@@ -172,11 +171,8 @@ def identity[T: str](x: T) -> T:
           value: NameNode('list'),
           typeParams: [TypeVarParamNode('T')],
         );
-        expect(node.typeParams, hasLength(1));
-        expect(
-          node.toString(),
-          contains('TypeAliasNode(name: NameNode(Vector)'),
-        );
+        check(node.typeParams).length.equals(1);
+        check(node.toString()).contains('TypeAliasNode(name: NameNode(Vector)');
       });
 
       test('ForNode & AsyncForNode', () {
@@ -186,16 +182,16 @@ def identity[T: str](x: T) -> T:
           body: [PassNode()],
           orelse: [BreakNode()],
         );
-        expect(forNode.orelse, hasLength(1));
-        expect(forNode.toString(), contains('ForNode(target: NameNode(i)'));
+        check(forNode.orelse).length.equals(1);
+        check(forNode.toString()).contains('ForNode(target: NameNode(i)');
 
         const asyncFor = AsyncForNode(
           target: NameNode('x'),
           iter: NameNode('stream'),
           body: [PassNode()],
         );
-        expect(asyncFor.body, hasLength(1));
-        expect(asyncFor.toString(), contains('AsyncForNode'));
+        check(asyncFor.body).length.equals(1);
+        check(asyncFor.toString()).contains('AsyncForNode');
       });
 
       test('WhileNode & IfNode', () {
@@ -204,16 +200,16 @@ def identity[T: str](x: T) -> T:
           body: [PassNode()],
           orelse: [PassNode()],
         );
-        expect(whileNode.test, isA<ConstantNode>());
-        expect(whileNode.toString(), contains('WhileNode'));
+        check(whileNode.test).isA<ConstantNode>();
+        check(whileNode.toString()).contains('WhileNode');
 
         const ifNode = IfNode(
           test: ConstantNode(false),
           body: [PassNode()],
           orelse: [ContinueNode()],
         );
-        expect(ifNode.orelse, hasLength(1));
-        expect(ifNode.toString(), contains('IfNode'));
+        check(ifNode.orelse).length.equals(1);
+        check(ifNode.toString()).contains('IfNode');
       });
 
       test('WithNode & AsyncWithNode', () {
@@ -221,15 +217,15 @@ def identity[T: str](x: T) -> T:
           items: [WithItemNode(contextExpr: NameNode('lock'))],
           body: [PassNode()],
         );
-        expect(withNode.items, hasLength(1));
-        expect(withNode.toString(), contains('WithNode'));
+        check(withNode.items).length.equals(1);
+        check(withNode.toString()).contains('WithNode');
 
         const asyncWith = AsyncWithNode(
           items: [WithItemNode(contextExpr: NameNode('async_lock'))],
           body: [PassNode()],
         );
-        expect(asyncWith.items, hasLength(1));
-        expect(asyncWith.toString(), contains('AsyncWithNode'));
+        check(asyncWith.items).length.equals(1);
+        check(asyncWith.toString()).contains('AsyncWithNode');
       });
 
       test('RaiseNode', () {
@@ -237,9 +233,9 @@ def identity[T: str](x: T) -> T:
           exc: NameNode('ValueError'),
           cause: NameNode('err'),
         );
-        expect(node.exc, isA<NameNode>());
-        expect(node.cause, isA<NameNode>());
-        expect(node.toString(), contains('RaiseNode'));
+        check(node.exc).isA<NameNode>();
+        check(node.cause).isA<NameNode>();
+        check(node.toString()).contains('RaiseNode');
       });
 
       test('TryNode & TryStarNode', () {
@@ -251,8 +247,8 @@ def identity[T: str](x: T) -> T:
           orelse: [PassNode()],
           finalbody: [PassNode()],
         );
-        expect(tryNode.handlers, hasLength(1));
-        expect(tryNode.toString(), contains('TryNode'));
+        check(tryNode.handlers).length.equals(1);
+        check(tryNode.toString()).contains('TryNode');
 
         const tryStar = TryStarNode(
           body: [PassNode()],
@@ -263,8 +259,8 @@ def identity[T: str](x: T) -> T:
             ),
           ],
         );
-        expect(tryStar.handlers, hasLength(1));
-        expect(tryStar.toString(), contains('TryStarNode'));
+        check(tryStar.handlers).length.equals(1);
+        check(tryStar.toString()).contains('TryStarNode');
       });
 
       test('AssertNode', () {
@@ -272,8 +268,8 @@ def identity[T: str](x: T) -> T:
           test: ConstantNode(true),
           msg: ConstantNode('failed'),
         );
-        expect(node.msg, isA<ConstantNode>());
-        expect(node.toString(), contains('AssertNode'));
+        check(node.msg).isA<ConstantNode>();
+        check(node.toString()).contains('AssertNode');
       });
 
       test('ImportFromNode', () {
@@ -282,28 +278,28 @@ def identity[T: str](x: T) -> T:
           names: [AliasNode(name: 'sqrt', asname: 'sq')],
           level: 0,
         );
-        expect(node.module, 'math');
-        expect(node.names.first.asname, 'sq');
-        expect(node.toString(), contains('ImportFromNode(module: math'));
+        check(node.module).equals('math');
+        check(node.names.first.asname).equals('sq');
+        check(node.toString()).contains('ImportFromNode(module: math');
       });
 
       test('GlobalNode & NonlocalNode', () {
         const g = GlobalNode(['a', 'b']);
-        expect(g.names, ['a', 'b']);
-        expect(g.toString(), 'GlobalNode([a, b])');
+        check(g.names).deepEquals(['a', 'b']);
+        check(g.toString()).equals('GlobalNode([a, b])');
 
         const nl = NonlocalNode(['c']);
-        expect(nl.names, ['c']);
-        expect(nl.toString(), 'NonlocalNode([c])');
+        check(nl.names).deepEquals(['c']);
+        check(nl.toString()).equals('NonlocalNode([c])');
       });
 
       test('PassNode, BreakNode, ContinueNode', () {
         const p = PassNode();
         const b = BreakNode();
         const c = ContinueNode();
-        expect(p.toString(), 'PassNode()');
-        expect(b.toString(), 'BreakNode()');
-        expect(c.toString(), 'ContinueNode()');
+        check(p.toString()).equals('PassNode()');
+        check(b.toString()).equals('BreakNode()');
+        check(c.toString()).equals('ContinueNode()');
       });
     });
 
@@ -313,15 +309,15 @@ def identity[T: str](x: T) -> T:
           operator: 'and',
           values: [ConstantNode(true), ConstantNode(false)],
         );
-        expect(boolOp.operator, 'and');
-        expect(boolOp.toString(), contains('BoolOpNode(and'));
+        check(boolOp.operator).equals('and');
+        check(boolOp.toString()).contains('BoolOpNode(and');
 
         const named = NamedExprNode(
           target: NameNode('x'),
           value: ConstantNode(10),
         );
-        expect((named.target as NameNode).id, 'x');
-        expect(named.toString(), contains('NamedExprNode'));
+        check((named.target as NameNode).id).equals('x');
+        check(named.toString()).contains('NamedExprNode');
       });
 
       test('BinOpNode & UnaryOpNode', () {
@@ -330,12 +326,12 @@ def identity[T: str](x: T) -> T:
           operator: '+',
           right: ConstantNode(2),
         );
-        expect(bin.operator, '+');
-        expect(bin.toString(), contains('BinOpNode'));
+        check(bin.operator).equals('+');
+        check(bin.toString()).contains('BinOpNode');
 
         const unary = UnaryOpNode(operator: '-', operand: ConstantNode(5));
-        expect(unary.operator, '-');
-        expect(unary.toString(), contains('UnaryOpNode'));
+        check(unary.operator).equals('-');
+        check(unary.toString()).contains('UnaryOpNode');
       });
 
       test('LambdaNode & IfExpNode', () {
@@ -343,16 +339,16 @@ def identity[T: str](x: T) -> T:
           args: ArgumentsNode(),
           body: ConstantNode(42),
         );
-        expect(lambda.body, isA<ConstantNode>());
-        expect(lambda.toString(), contains('LambdaNode'));
+        check(lambda.body).isA<ConstantNode>();
+        check(lambda.toString()).contains('LambdaNode');
 
         const ifExp = IfExpNode(
           body: ConstantNode(1),
           test: ConstantNode(true),
           orelse: ConstantNode(2),
         );
-        expect(ifExp.test, isA<ConstantNode>());
-        expect(ifExp.toString(), contains('IfExpNode'));
+        check(ifExp.test).isA<ConstantNode>();
+        check(ifExp.toString()).contains('IfExpNode');
       });
 
       test('DictNode & SetNode', () {
@@ -360,12 +356,12 @@ def identity[T: str](x: T) -> T:
           keys: [ConstantNode('k')],
           values: [ConstantNode('v')],
         );
-        expect(dict.keys, hasLength(1));
-        expect(dict.toString(), contains('DictNode(pairs: 1)'));
+        check(dict.keys).length.equals(1);
+        check(dict.toString()).contains('DictNode(pairs: 1)');
 
         const setNode = SetNode(elements: [ConstantNode(1), ConstantNode(2)]);
-        expect(setNode.elements, hasLength(2));
-        expect(setNode.toString(), contains('SetNode'));
+        check(setNode.elements).length.equals(2);
+        check(setNode.toString()).contains('SetNode');
       });
 
       test('Comprehensions: ListCompNode, SetCompNode, DictCompNode, GeneratorExpNode', () {
@@ -375,48 +371,48 @@ def identity[T: str](x: T) -> T:
           ifs: [ConstantNode(true)],
           isAsync: false,
         );
-        expect(comp.ifs, hasLength(1));
-        expect(comp.toString(), contains('ComprehensionNode'));
+        check(comp.ifs).length.equals(1);
+        check(comp.toString()).contains('ComprehensionNode');
 
         const listComp = ListCompNode(
           element: NameNode('x'),
           generators: [comp],
         );
-        expect(listComp.generators, hasLength(1));
-        expect(listComp.toString(), contains('ListCompNode'));
+        check(listComp.generators).length.equals(1);
+        check(listComp.toString()).contains('ListCompNode');
 
         const setComp = SetCompNode(element: NameNode('x'), generators: [comp]);
-        expect(setComp.generators, hasLength(1));
-        expect(setComp.toString(), contains('SetCompNode'));
+        check(setComp.generators).length.equals(1);
+        check(setComp.toString()).contains('SetCompNode');
 
         const dictComp = DictCompNode(
           key: NameNode('k'),
           value: NameNode('v'),
           generators: [comp],
         );
-        expect(dictComp.generators, hasLength(1));
-        expect(dictComp.toString(), contains('DictCompNode'));
+        check(dictComp.generators).length.equals(1);
+        check(dictComp.toString()).contains('DictCompNode');
 
         const genExp = GeneratorExpNode(
           element: NameNode('x'),
           generators: [comp],
         );
-        expect(genExp.generators, hasLength(1));
-        expect(genExp.toString(), contains('GeneratorExpNode'));
+        check(genExp.generators).length.equals(1);
+        check(genExp.toString()).contains('GeneratorExpNode');
       });
 
       test('AwaitNode, YieldNode, YieldFromNode', () {
         const a = AwaitNode(NameNode('f'));
-        expect(a.value, isA<NameNode>());
-        expect(a.toString(), 'AwaitNode(NameNode(f))');
+        check(a.value).isA<NameNode>();
+        check(a.toString()).equals('AwaitNode(NameNode(f))');
 
         const y = YieldNode(ConstantNode(1));
-        expect(y.value, isA<ConstantNode>());
-        expect(y.toString(), 'YieldNode(ConstantNode(1))');
+        check(y.value).isA<ConstantNode>();
+        check(y.toString()).equals('YieldNode(ConstantNode(1))');
 
         const yf = YieldFromNode(NameNode('gen'));
-        expect(yf.value, isA<NameNode>());
-        expect(yf.toString(), 'YieldFromNode(NameNode(gen))');
+        check(yf.value).isA<NameNode>();
+        check(yf.toString()).equals('YieldFromNode(NameNode(gen))');
       });
 
       test('CompareNode', () {
@@ -425,8 +421,8 @@ def identity[T: str](x: T) -> T:
           operators: ['<', '<='],
           comparators: [ConstantNode(2), ConstantNode(3)],
         );
-        expect(cmp.operators, hasLength(2));
-        expect(cmp.toString(), contains('CompareNode'));
+        check(cmp.operators).length.equals(2);
+        check(cmp.toString()).contains('CompareNode');
       });
 
       test('CallNode & KeywordNode', () {
@@ -435,12 +431,10 @@ def identity[T: str](x: T) -> T:
           args: [ConstantNode(1)],
           keywords: [KeywordNode(arg: 'kw', value: ConstantNode(2))],
         );
-        expect(call.keywords.first.arg, 'kw');
-        expect(
-          call.keywords.first.toString(),
-          'KeywordNode(kw=ConstantNode(2))',
-        );
-        expect(call.toString(), contains('CallNode'));
+        check(call.keywords.first.arg).equals('kw');
+        check(call.keywords.first.toString())
+            .equals('KeywordNode(kw=ConstantNode(2))');
+        check(call.toString()).contains('CallNode');
       });
 
       test('FormattedValueNode & JoinedStrNode', () {
@@ -449,65 +443,65 @@ def identity[T: str](x: T) -> T:
           conversion: 'r',
           formatSpec: '.2f',
         );
-        expect(fv.conversion, 'r');
-        expect(fv.formatSpec, '.2f');
-        expect(fv.toString(), contains('FormattedValueNode'));
+        check(fv.conversion).equals('r');
+        check(fv.formatSpec).equals('.2f');
+        check(fv.toString()).contains('FormattedValueNode');
 
         const js = JoinedStrNode([ConstantNode('hello')]);
-        expect(js.values, hasLength(1));
-        expect(js.toString(), contains('JoinedStrNode'));
+        check(js.values).length.equals(1);
+        check(js.toString()).contains('JoinedStrNode');
       });
 
       test('AttributeNode, SubscriptNode, StarredNode, ListNode, TupleNode, SliceNode', () {
         const attr = AttributeNode(value: NameNode('obj'), attribute: 'prop');
-        expect(attr.attribute, 'prop');
-        expect(attr.toString(), 'AttributeNode(NameNode(obj).prop)');
+        check(attr.attribute).equals('prop');
+        check(attr.toString()).equals('AttributeNode(NameNode(obj).prop)');
 
         const sub = SubscriptNode(
           value: NameNode('lst'),
           slice: ConstantNode(0),
         );
-        expect(sub.slice, isA<ConstantNode>());
-        expect(sub.toString(), 'SubscriptNode(NameNode(lst)[ConstantNode(0)])');
+        check(sub.slice).isA<ConstantNode>();
+        check(sub.toString())
+            .equals('SubscriptNode(NameNode(lst)[ConstantNode(0)])');
 
         const starred = StarredNode(NameNode('args'));
-        expect(starred.value, isA<NameNode>());
-        expect(starred.toString(), 'StarredNode(*NameNode(args))');
+        check(starred.value).isA<NameNode>();
+        check(starred.toString()).equals('StarredNode(*NameNode(args))');
 
         const listNode = ListNode(elements: [ConstantNode(1)]);
-        expect(listNode.elements, hasLength(1));
-        expect(listNode.toString(), 'ListNode([ConstantNode(1)])');
+        check(listNode.elements).length.equals(1);
+        check(listNode.toString()).equals('ListNode([ConstantNode(1)])');
 
         const tupleNode = TupleNode(elements: [ConstantNode(2)]);
-        expect(tupleNode.elements, hasLength(1));
-        expect(tupleNode.toString(), 'TupleNode([ConstantNode(2)])');
+        check(tupleNode.elements).length.equals(1);
+        check(tupleNode.toString()).equals('TupleNode([ConstantNode(2)])');
 
         const slice = SliceNode(
           lower: ConstantNode(1),
           upper: ConstantNode(5),
           step: ConstantNode(2),
         );
-        expect(slice.step, isA<ConstantNode>());
-        expect(
+        check(slice.step).isA<ConstantNode>();
+        check(
           slice.toString(),
-          'SliceNode(ConstantNode(1):ConstantNode(5):ConstantNode(2))',
-        );
+        ).equals('SliceNode(ConstantNode(1):ConstantNode(5):ConstantNode(2))');
       });
     });
 
     group('pattern matching nodes', () {
       test('MatchSingletonNode, MatchMappingNode, MatchClassNode, MatchAsNode, MatchOrNode', () {
         const singleton = MatchSingletonNode(null);
-        expect(singleton.value, isNull);
-        expect(singleton.toString(), 'MatchSingletonNode(null)');
+        check(singleton.value).isNull();
+        check(singleton.toString()).equals('MatchSingletonNode(null)');
 
         const mapping = MatchMappingNode(
           keys: [ConstantNode('key')],
           patterns: [MatchValueNode(ConstantNode('val'))],
           rest: 'rest',
         );
-        expect(mapping.rest, 'rest');
-        expect(mapping.toString(), contains('MatchMappingNode'));
+        check(mapping.rest).equals('rest');
+        check(mapping.toString()).contains('MatchMappingNode');
 
         const cls = MatchClassNode(
           cls: NameNode('Point'),
@@ -515,35 +509,35 @@ def identity[T: str](x: T) -> T:
           kwdAttrs: ['y'],
           kwdPatterns: [MatchValueNode(ConstantNode(0))],
         );
-        expect(cls.kwdAttrs, ['y']);
-        expect(cls.toString(), contains('MatchClassNode'));
+        check(cls.kwdAttrs).deepEquals(['y']);
+        check(cls.toString()).contains('MatchClassNode');
 
         const asNode = MatchAsNode(
           pattern: MatchValueNode(ConstantNode(1)),
           name: 'x',
         );
-        expect(asNode.name, 'x');
-        expect(asNode.toString(), contains('MatchAsNode'));
+        check(asNode.name).equals('x');
+        check(asNode.toString()).contains('MatchAsNode');
 
         const orNode = MatchOrNode([
           MatchValueNode(ConstantNode(1)),
           MatchValueNode(ConstantNode(2)),
         ]);
-        expect(orNode.patterns, hasLength(2));
-        expect(orNode.toString(), contains('MatchOrNode'));
+        check(orNode.patterns).length.equals(2);
+        check(orNode.toString()).contains('MatchOrNode');
       });
     });
 
     group('type parameters and helper nodes', () {
       test('ParamSpecNode & TypeVarTupleNode', () {
         const ps = ParamSpecNode('P', defaultValue: NameNode('int'));
-        expect(ps.name, 'P');
-        expect(ps.defaultValue, isA<NameNode>());
-        expect(ps.toString(), 'ParamSpecNode(P)');
+        check(ps.name).equals('P');
+        check(ps.defaultValue).isA<NameNode>();
+        check(ps.toString()).equals('ParamSpecNode(P)');
 
         const tvt = TypeVarTupleNode('Ts');
-        expect(tvt.name, 'Ts');
-        expect(tvt.toString(), 'TypeVarTupleNode(Ts)');
+        check(tvt.name).equals('Ts');
+        check(tvt.toString()).equals('TypeVarTupleNode(Ts)');
       });
 
       test('WithItemNode & MatchCaseNode', () {
@@ -551,16 +545,16 @@ def identity[T: str](x: T) -> T:
           contextExpr: NameNode('ctx'),
           optionalVars: NameNode('var'),
         );
-        expect(item.optionalVars, isA<NameNode>());
-        expect(item.toString(), contains('WithItemNode'));
+        check(item.optionalVars).isA<NameNode>();
+        check(item.toString()).contains('WithItemNode');
 
         const mc = MatchCaseNode(
           pattern: MatchValueNode(ConstantNode(1)),
           guard: ConstantNode(true),
           body: [PassNode()],
         );
-        expect(mc.guard, isA<ConstantNode>());
-        expect(mc.toString(), contains('MatchCaseNode'));
+        check(mc.guard).isA<ConstantNode>();
+        check(mc.toString()).contains('MatchCaseNode');
       });
     });
   });

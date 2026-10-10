@@ -1,8 +1,8 @@
 import 'package:petitparser/petitparser.dart';
 import 'package:petitparser_examples/markdown.dart';
-import 'package:test/test.dart';
+import 'package:test/scaffolding.dart';
 
-import '../../utils/expect.dart';
+import '../../utils/checks.dart';
 
 void main() {
   final grammar = MarkdownGrammarDefinition();
@@ -10,55 +10,55 @@ void main() {
   group('lexical grammar', () {
     test('newlineSequence', () {
       final p = grammar.buildFrom(grammar.newlineSequence()).end();
-      expect(p, isSuccess('\n', value: '\n'));
-      expect(p, isSuccess('\r\n', value: '\r\n'));
-      expect(p, isSuccess('\r', value: '\r'));
-      expect(p, isFailure(' '));
+      check(p).isSuccess('\n', value: '\n');
+      check(p).isSuccess('\r\n', value: '\r\n');
+      check(p).isSuccess('\r', value: '\r');
+      check(p).isFailure(' ');
     });
 
     test('nonIndentSpace', () {
       final p = grammar.buildFrom(grammar.nonIndentSpace()).end();
-      expect(p, isSuccess('', value: ''));
-      expect(p, isSuccess(' ', value: ' '));
-      expect(p, isSuccess('  ', value: '  '));
-      expect(p, isSuccess('   ', value: '   '));
-      expect(p, isFailure('    '));
+      check(p).isSuccess('', value: '');
+      check(p).isSuccess(' ', value: ' ');
+      check(p).isSuccess('  ', value: '  ');
+      check(p).isSuccess('   ', value: '   ');
+      check(p).isFailure('    ');
     });
 
     test('indent', () {
       final p = grammar.buildFrom(grammar.indent()).end();
-      expect(p, isSuccess('    ', value: '    '));
-      expect(p, isSuccess('\t', value: '\t'));
-      expect(p, isFailure('   '));
+      check(p).isSuccess('    ', value: '    ');
+      check(p).isSuccess('\t', value: '\t');
+      check(p).isFailure('   ');
     });
 
     test('escapedChar', () {
       final p = grammar.buildFrom(grammar.escapedChar()).end();
-      expect(p, isSuccess(r'\*', value: '*'));
-      expect(p, isSuccess(r'\_', value: '_'));
-      expect(p, isSuccess(r'\[', value: '['));
-      expect(p, isSuccess(r'\]', value: ']'));
-      expect(p, isSuccess(r'\`', value: '`'));
-      expect(p, isSuccess(r'\\', value: r'\'));
-      expect(p, isFailure(r'\a'));
+      check(p).isSuccess(r'\*', value: '*');
+      check(p).isSuccess(r'\_', value: '_');
+      check(p).isSuccess(r'\[', value: '[');
+      check(p).isSuccess(r'\]', value: ']');
+      check(p).isSuccess(r'\`', value: '`');
+      check(p).isSuccess(r'\\', value: r'\');
+      check(p).isFailure(r'\a');
     });
 
     test('blankLine', () {
       final p = grammar.buildFrom(grammar.blankLine()).end();
-      expect(p, isSuccess('\n'));
-      expect(p, isSuccess('   \n'));
-      expect(p, isSuccess('\t\r\n'));
-      expect(p, isFailure('foo\n'));
+      check(p).isSuccess('\n');
+      check(p).isSuccess('   \n');
+      check(p).isSuccess('\t\r\n');
+      check(p).isFailure('foo\n');
     });
 
     test('htmlEntity', () {
       final p = grammar.buildFrom(grammar.htmlEntity()).end();
-      expect(p, isSuccess('&amp;', value: '&amp;'));
-      expect(p, isSuccess('&lt;', value: '&lt;'));
-      expect(p, isSuccess('&gt;', value: '&gt;'));
-      expect(p, isSuccess('&#160;', value: '&#160;'));
-      expect(p, isSuccess('&#xA0;', value: '&#xA0;'));
-      expect(p, isFailure('&amp'));
+      check(p).isSuccess('&amp;', value: '&amp;');
+      check(p).isSuccess('&lt;', value: '&lt;');
+      check(p).isSuccess('&gt;', value: '&gt;');
+      check(p).isSuccess('&#160;', value: '&#160;');
+      check(p).isSuccess('&#xA0;', value: '&#xA0;');
+      check(p).isFailure('&amp');
     });
   });
 }

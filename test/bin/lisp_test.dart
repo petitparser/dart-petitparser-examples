@@ -5,17 +5,13 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:checks/checks.dart';
 import 'package:petitparser_examples/lisp.dart';
-import 'package:test/test.dart';
+import 'package:test/scaffolding.dart';
 
 import '../../bin/lisp/lisp.dart';
 
-final dartExecutable = () {
-  const sdkDart =
-      '/opt/homebrew/Caskroom/flutter/3.29.3/flutter/bin/cache/dart-sdk/bin/dart';
-  if (File(sdkDart).existsSync()) return sdkDart;
-  return Platform.resolvedExecutable;
-}();
+final dartExecutable = Platform.resolvedExecutable;
 
 void main() {
   group('evalInteractive', () {
@@ -45,10 +41,10 @@ void main() {
       await pumpEventQueue();
 
       final out = utf8.decode(outBytes);
-      expect(out, contains('>> '));
-      expect(out, contains('=> 5'));
-      expect(out, contains('=> 42'));
-      expect(utf8.decode(errBytes), isEmpty);
+      check(out).contains('>> ');
+      check(out).contains('=> 5');
+      check(out).contains('=> 42');
+      check(utf8.decode(errBytes)).isEmpty();
 
       await inputController.close();
       await outSink.close();
@@ -82,8 +78,8 @@ void main() {
       await pumpEventQueue();
 
       final err = utf8.decode(errBytes);
-      expect(err, contains('Parser error:'));
-      expect(err, contains('Argument error:'));
+      check(err).contains('Parser error:');
+      check(err).contains('Argument error:');
 
       await inputController.close();
       await outSink.close();
@@ -97,12 +93,9 @@ void main() {
         'bin/lisp/lisp.dart',
         '-?',
       ]);
-      expect(res.exitCode, equals(0));
-      expect(res.stdout.toString(), contains('lisp.dart -n -i [files]'));
-      expect(
-        res.stdout.toString(),
-        contains('-i enforces the interactive mode'),
-      );
+      check(res.exitCode).equals(0);
+      check(res.stdout.toString()).contains('lisp.dart -n -i [files]');
+      check(res.stdout.toString()).contains('-i enforces the interactive mode');
     });
 
     test('exits with code 1 on unknown option', () async {
@@ -110,8 +103,8 @@ void main() {
         'bin/lisp/lisp.dart',
         '-invalid',
       ]);
-      expect(res.exitCode, equals(1));
-      expect(res.stdout.toString(), contains('Unknown option: -invalid'));
+      check(res.exitCode).equals(1);
+      check(res.stdout.toString()).contains('Unknown option: -invalid');
     });
 
     test('exits with code 2 on missing file', () async {
@@ -119,11 +112,9 @@ void main() {
         'bin/lisp/lisp.dart',
         'nonexistent_test_script.lisp',
       ]);
-      expect(res.exitCode, equals(2));
-      expect(
-        res.stdout.toString(),
-        contains('File not found: nonexistent_test_script.lisp'),
-      );
+      check(res.exitCode).equals(2);
+      check(res.stdout.toString())
+          .contains('File not found: nonexistent_test_script.lisp');
     });
 
     test('executes lisp file from argument', () async {
@@ -135,7 +126,7 @@ void main() {
         'bin/lisp/lisp.dart',
         scriptFile.path,
       ]);
-      expect(res.exitCode, equals(0));
+      check(res.exitCode).equals(0);
 
       tempDir.deleteSync(recursive: true);
     });

@@ -1,8 +1,8 @@
 import 'package:petitparser/petitparser.dart';
 import 'package:petitparser_examples/python.dart';
-import 'package:test/test.dart';
+import 'package:test/scaffolding.dart';
 
-import '../../utils/expect.dart';
+import '../../utils/checks.dart';
 
 void main() {
   final grammar = PythonGrammarDefinition();
@@ -13,27 +13,27 @@ void main() {
         .end();
 
     test('inline whitespace', () {
-      expect(whitespaceParser, isSuccess(' '));
-      expect(whitespaceParser, isSuccess('\t'));
-      expect(whitespaceParser, isSuccess('   \t  '));
+      check(whitespaceParser).isSuccess(' ');
+      check(whitespaceParser).isSuccess('\t');
+      check(whitespaceParser).isSuccess('   \t  ');
     });
 
     test('comment', () {
-      expect(whitespaceParser, isSuccess('# simple comment'));
-      expect(whitespaceParser, isSuccess('#'));
-      expect(whitespaceParser, isSuccess('   # spaced comment'));
+      check(whitespaceParser).isSuccess('# simple comment');
+      check(whitespaceParser).isSuccess('#');
+      check(whitespaceParser).isSuccess('   # spaced comment');
     });
 
     test('explicit line continuation', () {
-      expect(whitespaceParser, isSuccess('\\\n'));
-      expect(whitespaceParser, isSuccess('\\\r\n'));
+      check(whitespaceParser).isSuccess('\\\n');
+      check(whitespaceParser).isSuccess('\\\r\n');
     });
 
     test('blank lines', () {
       final blankLinesParser = grammar.buildFrom(grammar.blankLines()).end();
-      expect(blankLinesParser, isSuccess(''));
-      expect(blankLinesParser, isSuccess('\n'));
-      expect(blankLinesParser, isSuccess('  \n\n  # comment\n'));
+      check(blankLinesParser).isSuccess('');
+      check(blankLinesParser).isSuccess('\n');
+      check(blankLinesParser).isSuccess('  \n\n  # comment\n');
     });
 
     test('ignore tracks bracket nesting', () {
@@ -41,8 +41,8 @@ void main() {
         grammar.ignore(grammar.hiddenWhitespace()),
       );
       // Newlines are accepted as hidden whitespace inside ignore:
-      expect(whitespaceWithIgnore, isSuccess('\n'));
-      expect(whitespaceWithIgnore, isSuccess('  \n\t  '));
+      check(whitespaceWithIgnore).isSuccess('\n');
+      check(whitespaceWithIgnore).isSuccess('  \n\t  ');
     });
   });
 
@@ -50,41 +50,41 @@ void main() {
     final idParser = grammar.buildFrom(grammar.identifier()).end();
 
     test('valid identifiers', () {
-      expect(idParser, isSuccess('a'));
-      expect(idParser, isSuccess('z'));
-      expect(idParser, isSuccess('A'));
-      expect(idParser, isSuccess('Z'));
-      expect(idParser, isSuccess('_'));
-      expect(idParser, isSuccess('__'));
-      expect(idParser, isSuccess('__init__'));
-      expect(idParser, isSuccess('foo_bar'));
-      expect(idParser, isSuccess('var123'));
+      check(idParser).isSuccess('a');
+      check(idParser).isSuccess('z');
+      check(idParser).isSuccess('A');
+      check(idParser).isSuccess('Z');
+      check(idParser).isSuccess('_');
+      check(idParser).isSuccess('__');
+      check(idParser).isSuccess('__init__');
+      check(idParser).isSuccess('foo_bar');
+      check(idParser).isSuccess('var123');
     });
 
     test('identifiers with keyword prefixes', () {
-      expect(idParser, isSuccess('is_active'));
-      expect(idParser, isSuccess('if_condition'));
-      expect(idParser, isSuccess('for_loop'));
-      expect(idParser, isSuccess('class_name'));
-      expect(idParser, isSuccess('def_val'));
+      check(idParser).isSuccess('is_active');
+      check(idParser).isSuccess('if_condition');
+      check(idParser).isSuccess('for_loop');
+      check(idParser).isSuccess('class_name');
+      check(idParser).isSuccess('def_val');
     });
 
     test('reserved keywords rejected as identifiers', () {
-      expect(idParser, isFailure('def'));
-      expect(idParser, isFailure('class'));
-      expect(idParser, isFailure('return'));
-      expect(idParser, isFailure('if'));
-      expect(idParser, isFailure('elif'));
-      expect(idParser, isFailure('else'));
-      expect(idParser, isFailure('True'));
-      expect(idParser, isFailure('False'));
-      expect(idParser, isFailure('None'));
+      check(idParser).isFailure('def');
+      check(idParser).isFailure('class');
+      check(idParser).isFailure('return');
+      check(idParser).isFailure('if');
+      check(idParser).isFailure('elif');
+      check(idParser).isFailure('else');
+      check(idParser).isFailure('True');
+      check(idParser).isFailure('False');
+      check(idParser).isFailure('None');
     });
 
     test('soft keywords allowed as identifiers', () {
-      expect(idParser, isSuccess('match'));
-      expect(idParser, isSuccess('case'));
-      expect(idParser, isSuccess('type'));
+      check(idParser).isSuccess('match');
+      check(idParser).isSuccess('case');
+      check(idParser).isSuccess('type');
     });
   });
 
@@ -92,31 +92,31 @@ void main() {
     final numParser = grammar.buildFrom(grammar.numberLiteral()).end();
 
     test('integers', () {
-      expect(numParser, isSuccess('0'));
-      expect(numParser, isSuccess('42'));
-      expect(numParser, isSuccess('1_000_000'));
+      check(numParser).isSuccess('0');
+      check(numParser).isSuccess('42');
+      check(numParser).isSuccess('1_000_000');
     });
 
     test('hex, octal, binary', () {
-      expect(numParser, isSuccess('0x1f'));
-      expect(numParser, isSuccess('0XFF_AA'));
-      expect(numParser, isSuccess('0o777'));
-      expect(numParser, isSuccess('0O755'));
-      expect(numParser, isSuccess('0b1010'));
-      expect(numParser, isSuccess('0B11_00'));
+      check(numParser).isSuccess('0x1f');
+      check(numParser).isSuccess('0XFF_AA');
+      check(numParser).isSuccess('0o777');
+      check(numParser).isSuccess('0O755');
+      check(numParser).isSuccess('0b1010');
+      check(numParser).isSuccess('0B11_00');
     });
 
     test('floats', () {
-      expect(numParser, isSuccess('3.14'));
-      expect(numParser, isSuccess('.5'));
-      expect(numParser, isSuccess('1e-5'));
-      expect(numParser, isSuccess('2.5e+3'));
-      expect(numParser, isSuccess('1_000.500_1'));
+      check(numParser).isSuccess('3.14');
+      check(numParser).isSuccess('.5');
+      check(numParser).isSuccess('1e-5');
+      check(numParser).isSuccess('2.5e+3');
+      check(numParser).isSuccess('1_000.500_1');
     });
 
     test('complex numbers', () {
-      expect(numParser, isSuccess('3j'));
-      expect(numParser, isSuccess('4.5J'));
+      check(numParser).isSuccess('3j');
+      check(numParser).isSuccess('4.5J');
     });
   });
 
@@ -124,64 +124,62 @@ void main() {
     final strParser = grammar.buildFrom(grammar.stringLiteral()).end();
 
     test('single and double quotes', () {
-      expect(strParser, isSuccess("'hello'"));
-      expect(strParser, isSuccess('"world"'));
-      expect(strParser, isSuccess(r"'hello\nworld'"));
+      check(strParser).isSuccess("'hello'");
+      check(strParser).isSuccess('"world"');
+      check(strParser).isSuccess(r"'hello\nworld'");
     });
 
     test('triple quotes', () {
-      expect(strParser, isSuccess("'''hello\nworld'''"));
-      expect(strParser, isSuccess('"""multi\nline"""'));
+      check(strParser).isSuccess("'''hello\nworld'''");
+      check(strParser).isSuccess('"""multi\nline"""');
     });
 
     test('raw and byte string prefixes', () {
-      expect(strParser, isSuccess(r"r'hello\n'"));
-      expect(strParser, isSuccess(r"b'bytes'"));
-      expect(strParser, isSuccess(r'u"unicode"'));
-      expect(strParser, isSuccess(r'R"raw"'));
-      expect(strParser, isSuccess(r'B"BYTES"'));
-      expect(strParser, isSuccess(r'U"unicode"'));
+      check(strParser).isSuccess(r"r'hello\n'");
+      check(strParser).isSuccess(r"b'bytes'");
+      check(strParser).isSuccess(r'u"unicode"');
+      check(strParser).isSuccess(r'R"raw"');
+      check(strParser).isSuccess(r'B"BYTES"');
+      check(strParser).isSuccess(r'U"unicode"');
     });
 
     test('raw byte string two-char prefixes', () {
-      expect(strParser, isSuccess(r"rb'raw bytes'"));
-      expect(strParser, isSuccess(r'rb"raw bytes"'));
-      expect(strParser, isSuccess(r"br'raw bytes'"));
-      expect(strParser, isSuccess(r'br"raw bytes"'));
-      expect(strParser, isSuccess(r'RB"RAW BYTES"'));
-      expect(strParser, isSuccess(r'BR"RAW BYTES"'));
-      expect(strParser, isSuccess(r'Rb"mixed case"'));
-      expect(strParser, isSuccess(r'bR"mixed case"'));
-      expect(strParser, isSuccess(r'rB"mixed case"'));
-      expect(strParser, isSuccess(r'Br"mixed case"'));
+      check(strParser).isSuccess(r"rb'raw bytes'");
+      check(strParser).isSuccess(r'rb"raw bytes"');
+      check(strParser).isSuccess(r"br'raw bytes'");
+      check(strParser).isSuccess(r'br"raw bytes"');
+      check(strParser).isSuccess(r'RB"RAW BYTES"');
+      check(strParser).isSuccess(r'BR"RAW BYTES"');
+      check(strParser).isSuccess(r'Rb"mixed case"');
+      check(strParser).isSuccess(r'bR"mixed case"');
+      check(strParser).isSuccess(r'rB"mixed case"');
+      check(strParser).isSuccess(r'Br"mixed case"');
     });
 
     test('string concatenation', () {
-      expect(strParser, isSuccess("'hello ' 'world'"));
+      check(strParser).isSuccess("'hello ' 'world'");
     });
 
     test('f-string concatenation with strings', () {
-      expect(
-        strParser,
-        isSuccess(
-          '"hello " f"{name}"',
-          value: isA<JoinedStrNode>().having(
-            (node) => node.values,
-            'values',
-            hasLength(2),
-          ),
-        ),
+      check(strParser).isSuccess(
+        '"hello " f"{name}"',
+        value: (Subject it) {
+          it
+              .isA<JoinedStrNode>()
+              .has((node) => node.values, 'values')
+              .length
+              .equals(2);
+        },
       );
-      expect(
-        strParser,
-        isSuccess(
-          'f"{a} " "middle " f"{b}"',
-          value: isA<JoinedStrNode>().having(
-            (node) => node.values,
-            'values',
-            hasLength(4),
-          ),
-        ),
+      check(strParser).isSuccess(
+        'f"{a} " "middle " f"{b}"',
+        value: (Subject it) {
+          it
+              .isA<JoinedStrNode>()
+              .has((node) => node.values, 'values')
+              .length
+              .equals(4);
+        },
       );
     });
   });
@@ -190,36 +188,34 @@ void main() {
     final fStrParser = grammar.buildFrom(grammar.stringLiteral()).end();
 
     test('simple f-string', () {
-      expect(fStrParser, isSuccess('f"hello {name}"'));
-      expect(fStrParser, isSuccess("f'count: {1 + 2}'"));
+      check(fStrParser).isSuccess('f"hello {name}"');
+      check(fStrParser).isSuccess("f'count: {1 + 2}'");
     });
 
     test('constant-only f-string produces ConstantNode', () {
-      expect(
-        fStrParser,
-        isSuccess(
-          'f"simple text"',
-          value: isA<ConstantNode>().having(
-            (node) => node.value,
-            'value',
-            'simple text',
-          ),
-        ),
+      check(fStrParser).isSuccess(
+        'f"simple text"',
+        value: (Subject it) {
+          it
+              .isA<ConstantNode>()
+              .has((node) => node.value, 'value')
+              .equals('simple text');
+        },
       );
     });
 
     test('f-string with format specifier', () {
-      expect(fStrParser, isSuccess('f"{pi:.2f}"'));
+      check(fStrParser).isSuccess('f"{pi:.2f}"');
     });
 
     test('f-string with conversion', () {
-      expect(fStrParser, isSuccess('f"{val!r}"'));
-      expect(fStrParser, isSuccess('f"{val!s}"'));
-      expect(fStrParser, isSuccess('f"{val!a}"'));
+      check(fStrParser).isSuccess('f"{val!r}"');
+      check(fStrParser).isSuccess('f"{val!s}"');
+      check(fStrParser).isSuccess('f"{val!a}"');
     });
 
     test('f-string escaped braces', () {
-      expect(fStrParser, isSuccess('f"{{literal}}"'));
+      check(fStrParser).isSuccess('f"{{literal}}"');
     });
   });
 }

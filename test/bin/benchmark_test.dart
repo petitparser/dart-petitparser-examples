@@ -3,31 +3,27 @@ library;
 
 import 'dart:io';
 
-import 'package:test/test.dart';
+import 'package:checks/checks.dart';
+import 'package:test/scaffolding.dart';
 
 import '../../bin/benchmark/benchmark.dart' as benchmark_cli;
 import '../../bin/benchmark/utils/runner.dart' as runner;
 
-final dartExecutable = () {
-  const sdkDart =
-      '/opt/homebrew/Caskroom/flutter/3.29.3/flutter/bin/cache/dart-sdk/bin/dart';
-  if (File(sdkDart).existsSync()) return sdkDart;
-  return Platform.resolvedExecutable;
-}();
+final dartExecutable = Platform.resolvedExecutable;
 
 void main() {
   group('benchmark ArgParser configuration', () {
     final parser = benchmark_cli.arguments;
 
     test('defines required flags and options', () {
-      expect(parser.options.containsKey('help'), isTrue);
-      expect(parser.options.containsKey('verify'), isTrue);
-      expect(parser.options.containsKey('benchmark'), isTrue);
-      expect(parser.options.containsKey('stderr'), isTrue);
-      expect(parser.options.containsKey('confidence'), isTrue);
-      expect(parser.options.containsKey('filter'), isTrue);
-      expect(parser.options.containsKey('separator'), isTrue);
-      expect(parser.options.containsKey('human'), isTrue);
+      check(parser.options.containsKey('help')).isTrue();
+      check(parser.options.containsKey('verify')).isTrue();
+      check(parser.options.containsKey('benchmark')).isTrue();
+      check(parser.options.containsKey('stderr')).isTrue();
+      check(parser.options.containsKey('confidence')).isTrue();
+      check(parser.options.containsKey('filter')).isTrue();
+      check(parser.options.containsKey('separator')).isTrue();
+      check(parser.options.containsKey('human')).isTrue();
     });
 
     test('parses options and sets runner properties via callbacks', () {
@@ -41,13 +37,13 @@ void main() {
         '--no-human',
       ]);
 
-      expect(runner.optionBenchmark, isFalse);
-      expect(runner.optionVerification, isFalse);
-      expect(runner.optionPrintStandardError, isTrue);
-      expect(runner.optionPrintConfidenceIntervals, isTrue);
-      expect(runner.optionFilter, equals('json'));
-      expect(runner.optionSeparator, equals(','));
-      expect(runner.optionHumanReadable, isFalse);
+      check(runner.optionBenchmark).isFalse();
+      check(runner.optionVerification).isFalse();
+      check(runner.optionPrintStandardError).isTrue();
+      check(runner.optionPrintConfidenceIntervals).isTrue();
+      check(runner.optionFilter).equals('json');
+      check(runner.optionSeparator).equals(',');
+      check(runner.optionHumanReadable).isFalse();
 
       // Restore defaults
       runner.optionBenchmark = true;
@@ -66,9 +62,9 @@ void main() {
         'bin/benchmark/benchmark.dart',
         '--help',
       ]);
-      expect(res.exitCode, equals(1));
-      expect(res.stdout.toString(), contains('-h, --[no-]help'));
-      expect(res.stdout.toString(), contains('-v, --[no-]verify'));
+      check(res.exitCode).equals(1);
+      check(res.stdout.toString()).contains('-h, --[no-]help');
+      check(res.stdout.toString()).contains('-v, --[no-]verify');
     });
 
     test('exits with 1 on unexpected positional argument', () async {
@@ -76,8 +72,8 @@ void main() {
         'bin/benchmark/benchmark.dart',
         'unexpected_arg',
       ]);
-      expect(res.exitCode, equals(1));
-      expect(res.stdout.toString(), contains('show the help text'));
+      check(res.exitCode).equals(1);
+      check(res.stdout.toString()).contains('show the help text');
     });
 
     test(
@@ -89,8 +85,8 @@ void main() {
           '--filter',
           'json',
         ]);
-        expect(res.exitCode, equals(0));
-        expect(res.stdout.toString(), contains('OK'));
+        check(res.exitCode).equals(0);
+        check(res.stdout.toString()).contains('OK');
       },
     );
 
@@ -103,8 +99,8 @@ void main() {
           '--filter',
           'char',
         ]);
-        expect(res.exitCode, equals(0));
-        expect(res.stdout.toString(), contains('OK'));
+        check(res.exitCode).equals(0);
+        check(res.stdout.toString()).contains('OK');
       },
     );
   });

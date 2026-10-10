@@ -1,14 +1,20 @@
 import 'package:petitparser/petitparser.dart';
 import 'package:petitparser/reflection.dart';
 import 'package:petitparser_examples/regexp.dart';
-import 'package:test/test.dart';
+import 'package:test/scaffolding.dart';
 
-import 'utils/expect.dart';
+import 'utils/checks.dart';
+
+extension NodeChecks on Subject<Node> {
+  void isEqualToNode(Node expected) {
+    equals(expected);
+    has((n) => n.hashCode, 'hashCode').equals(expected.hashCode);
+    has((n) => n.toString(), 'toString').equals(expected.toString());
+  }
+}
 
 void expectedEqual(Node actual, Node expected) {
-  expect(actual, expected);
-  expect(actual.hashCode, expected.hashCode);
-  expect(actual.toString(), expected.toString());
+  check(actual).isEqualToNode(expected);
 }
 
 void main() {
@@ -41,12 +47,12 @@ void main() {
       expectedEqual(Node.fromString(r'\e'), LiteralNode('\x1b'));
     });
     test('escape classes', () {
-      expect(Node.fromString(r'\s'), isA<AlternationNode>());
-      expect(Node.fromString(r'\S'), isA<ComplementNode>());
-      expect(Node.fromString(r'\d'), isA<RangeNode>());
-      expect(Node.fromString(r'\D'), isA<ComplementNode>());
-      expect(Node.fromString(r'\w'), isA<AlternationNode>());
-      expect(Node.fromString(r'\W'), isA<ComplementNode>());
+      check(Node.fromString(r'\s')).isA<AlternationNode>();
+      check(Node.fromString(r'\S')).isA<ComplementNode>();
+      check(Node.fromString(r'\d')).isA<RangeNode>();
+      check(Node.fromString(r'\D')).isA<ComplementNode>();
+      check(Node.fromString(r'\w')).isA<AlternationNode>();
+      check(Node.fromString(r'\W')).isA<ComplementNode>();
     });
     test('escape other', () {
       expectedEqual(Node.fromString(r'\.'), LiteralNode('.'));
@@ -100,8 +106,8 @@ void main() {
       );
     });
     test('invalid range throws ArgumentError', () {
-      expect(() => RangeNode('z', 'a'), throwsArgumentError);
-      expect(() => Node.fromString(r'[z-a]'), throwsArgumentError);
+      check(() => RangeNode('z', 'a')).throws<ArgumentError>();
+      check(() => Node.fromString(r'[z-a]')).throws<ArgumentError>();
     });
     test('concatenation', () {
       expectedEqual(Node.fromString(r'ab'), ConcatenationNode(la, lb));
@@ -162,9 +168,9 @@ void main() {
       );
     });
     test('repeat invalid', () {
-      expect(() => Node.fromString('a{3,2}'), throwsRangeError);
-      expect(() => QuantificationNode(la, -1), throwsRangeError);
-      expect(() => QuantificationNode(la, 5, 2), throwsRangeError);
+      check(() => Node.fromString('a{3,2}')).throws<RangeError>();
+      check(() => QuantificationNode(la, -1)).throws<RangeError>();
+      check(() => QuantificationNode(la, 5, 2)).throws<RangeError>();
     });
     test('concat and or', () {
       expectedEqual(
@@ -191,193 +197,197 @@ void main() {
     for (final testData in tests) {
       test('"${testData.pattern}" (${testData.expects.length})', () {
         if (testData.expects.isEmpty) {
-          expect(
-            () => Node.fromString(testData.pattern).toNfa(),
-            throwsException,
-          );
+          check(() => Node.fromString(testData.pattern).toNfa())
+              .throws<Exception>();
           return;
         }
         final pattern = Nfa.fromString(testData.pattern);
         for (final expectData in testData.expects) {
-          expect(
-            pattern.tryMatch(expectData.input, 0, expectData.input.length) ==
-                expectData.input.length,
-            expectData.match,
-            reason:
+          check(
+            because:
                 '"${testData.pattern}" '
                 '${expectData.match ? 'matches' : 'does not match'} '
                 '"${expectData.input}"',
-          );
+            pattern.tryMatch(expectData.input, 0, expectData.input.length) ==
+                expectData.input.length,
+          ).equals(expectData.match);
         }
       });
     }
     test('unsupported', () {
-      expect(() => Node.fromString(r'a&b').toNfa(), throwsUnsupportedError);
+      check(() => Node.fromString(r'a&b').toNfa()).throws<UnsupportedError>();
     });
     test('zero-quantification matches empty string and rejects non-empty', () {
       final nfa = Nfa.fromString(r'^a{0}$');
-      expect(nfa.tryMatch('', 0, 0), equals(0));
-      expect(nfa.tryMatch('a', 0, 1), equals(-1));
+      check(nfa.tryMatch('', 0, 0)).equals(0);
+      check(nfa.tryMatch('a', 0, 1)).equals(-1);
 
       final unanchored = Nfa.fromString('a{0}');
-      expect(unanchored.tryMatch('', 0, 0) == 0, isTrue);
-      expect(unanchored.tryMatch('a', 0, 1) == 1, isFalse);
+      check(unanchored.tryMatch('', 0, 0) == 0).isTrue();
+      check(unanchored.tryMatch('a', 0, 1) == 1).isFalse();
     });
   });
   group('pattern', () {
     final pattern = Node.fromString(r'a+').toNfa();
     test('matchAsPrefix', () {
       final match = pattern.matchAsPrefix('aaa')!;
-      expect(match.pattern, pattern);
-      expect(match.input, 'aaa');
-      expect(match.start, 0);
-      expect(match.end, 3);
-      expect(match.groupCount, 0);
-      expect(match.group(0), 'aaa');
-      expect(match[0], 'aaa');
-      expect(match.groups([0, 1]), ['aaa', null]);
+      check(match.pattern).equals(pattern);
+      check(match.input).equals('aaa');
+      check(match.start).equals(0);
+      check(match.end).equals(3);
+      check(match.groupCount).equals(0);
+      check(match.group(0)).equals('aaa');
+      check(match[0]).equals('aaa');
+      check(match.groups([0, 1])).deepEquals(['aaa', null]);
     });
     test('matchAsPrefix with non-matching input', () {
       final noMatch = pattern.matchAsPrefix('baaa');
-      expect(noMatch, isNull);
+      check(noMatch).isNull();
     });
     test('matchAsPrefix with start index', () {
       final match = pattern.matchAsPrefix('baaa', 1)!;
-      expect(match.pattern, pattern);
-      expect(match.input, 'baaa');
-      expect(match.start, 1);
-      expect(match.end, 4);
-      expect(match.group(0), 'aaa');
+      check(match.pattern).equals(pattern);
+      check(match.input).equals('baaa');
+      check(match.start).equals(1);
+      check(match.end).equals(4);
+      check(match.group(0)).equals('aaa');
     });
     test('allMatches', () {
-      expect(pattern.allMatches('').map((each) => each[0]), []);
-      expect(pattern.allMatches('a').map((each) => each[0]), ['a']);
-      expect(pattern.allMatches('aa').map((each) => each[0]), ['aa']);
-      expect(pattern.allMatches('aaa').map((each) => each[0]), ['aaa']);
-      expect(pattern.allMatches('baab').map((each) => each[0]), ['aa']);
-      expect(pattern.allMatches('babaab').map((each) => each[0]), ['a', 'aa']);
+      check(pattern.allMatches('').map((each) => each[0])).deepEquals([]);
+      check(pattern.allMatches('a').map((each) => each[0])).deepEquals(['a']);
+      check(pattern.allMatches('aa').map((each) => each[0])).deepEquals(['aa']);
+      check(pattern.allMatches('aaa').map((each) => each[0]))
+          .deepEquals(['aaa']);
+      check(pattern.allMatches('baab').map((each) => each[0]))
+          .deepEquals(['aa']);
+      check(pattern.allMatches('babaab').map((each) => each[0]))
+          .deepEquals(['a', 'aa']);
     });
     test('allMatches with start index', () {
-      expect(pattern.allMatches('babaab', 2).map((each) => each[0]), ['aa']);
-      expect(pattern.allMatches('babaab', 3).map((each) => each[0]), ['aa']);
-      expect(pattern.allMatches('babaab', 4).map((each) => each[0]), ['a']);
+      check(pattern.allMatches('babaab', 2).map((each) => each[0]))
+          .deepEquals(['aa']);
+      check(pattern.allMatches('babaab', 3).map((each) => each[0]))
+          .deepEquals(['aa']);
+      check(pattern.allMatches('babaab', 4).map((each) => each[0]))
+          .deepEquals(['a']);
     });
     test('allMatches with zero-length matches', () {
       final starPattern = Node.fromString(r'a*').toNfa();
-      expect(starPattern.allMatches('').map((each) => each[0]), ['']);
-      expect(starPattern.allMatches('b').map((each) => each[0]), ['', '']);
-      expect(starPattern.allMatches('baab').map((each) => each[0]), [
-        '',
-        'aa',
-        '',
-        '',
-      ]);
+      check(starPattern.allMatches('').map((each) => each[0])).deepEquals(['']);
+      check(starPattern.allMatches('b').map((each) => each[0]))
+          .deepEquals(['', '']);
+      check(starPattern.allMatches('baab').map((each) => each[0]))
+          .deepEquals(['', 'aa', '', '']);
     });
     test('anchors matchAsPrefix', () {
       final startAnchor = Node.fromString(r'^a').toNfa();
-      expect(startAnchor.allMatches('a').map((each) => each[0]), ['a']);
-      expect(startAnchor.allMatches('ba').map((each) => each[0]), []);
-      expect(startAnchor.allMatches('ab').map((each) => each[0]), ['a']);
+      check(startAnchor.allMatches('a').map((each) => each[0]))
+          .deepEquals(['a']);
+      check(startAnchor.allMatches('ba').map((each) => each[0])).deepEquals([]);
+      check(startAnchor.allMatches('ab').map((each) => each[0]))
+          .deepEquals(['a']);
     });
     test('anchors allMatches', () {
       final endAnchor = Node.fromString(r'a$').toNfa();
-      expect(endAnchor.allMatches('a').map((each) => each[0]), ['a']);
-      expect(endAnchor.allMatches('ba').map((each) => each[0]), ['a']);
-      expect(endAnchor.allMatches('ab').map((each) => each[0]), []);
-      expect(endAnchor.allMatches('babaa').map((each) => each[0]), ['a']);
+      check(endAnchor.allMatches('a').map((each) => each[0])).deepEquals(['a']);
+      check(endAnchor.allMatches('ba').map((each) => each[0]))
+          .deepEquals(['a']);
+      check(endAnchor.allMatches('ab').map((each) => each[0])).deepEquals([]);
+      check(endAnchor.allMatches('babaa').map((each) => each[0]))
+          .deepEquals(['a']);
     });
     test('RegexpMatch direct instantiation and typing', () {
       final nfa = Nfa.fromString('test');
-      expect(nfa, isA<RegexpPattern>());
-      expect(nfa, isA<Pattern>());
+      check(nfa).isA<RegexpPattern>();
+      check(nfa).isA<Pattern>();
 
       final match = RegexpMatch(nfa, 'test string', 0, 4);
-      expect(match, isA<RegexpMatch>());
-      expect(match, isA<Match>());
-      expect(match.pattern, same(nfa));
-      expect(match.input, equals('test string'));
-      expect(match.start, equals(0));
-      expect(match.end, equals(4));
-      expect(match.groupCount, equals(0));
-      expect(match.group(0), equals('test'));
-      expect(match[0], equals('test'));
-      expect(match.group(1), isNull);
-      expect(match[1], isNull);
-      expect(match.groups([0, 1]), equals(['test', null]));
+      check(match).isA<RegexpMatch>();
+      check(match).isA<Match>();
+      check(match.pattern).identicalTo(nfa);
+      check(match.input).equals('test string');
+      check(match.start).equals(0);
+      check(match.end).equals(4);
+      check(match.groupCount).equals(0);
+      check(match.group(0)).equals('test');
+      check(match[0]).equals('test');
+      check(match.group(1)).isNull();
+      check(match[1]).isNull();
+      check(match.groups([0, 1])).deepEquals(['test', null]);
     });
     test('boundary behaviors and range checks', () {
       final RegexpPattern pattern = Nfa.fromString('abc');
-      expect(() => pattern.matchAsPrefix('abc', -1), throwsRangeError);
-      expect(() => pattern.matchAsPrefix('abc', 5), throwsRangeError);
-      expect(pattern.matchAsPrefix('abc', 3), isNull);
+      check(() => pattern.matchAsPrefix('abc', -1)).throws<RangeError>();
+      check(() => pattern.matchAsPrefix('abc', 5)).throws<RangeError>();
+      check(pattern.matchAsPrefix('abc', 3)).isNull();
 
       final RegexpPattern emptyPattern = Nfa.fromString('');
       final emptyMatch = emptyPattern.matchAsPrefix('abc', 3);
-      expect(emptyMatch, isNotNull);
-      expect(emptyMatch!.start, equals(3));
-      expect(emptyMatch.end, equals(3));
+      check(emptyMatch).isNotNull();
+      check(emptyMatch!.start).equals(3);
+      check(emptyMatch.end).equals(3);
     });
   });
   group('nodeParser failures & malformed input', () {
     test('unclosed parenthesis', () {
-      expect(nodeParser, isFailure('('));
-      expect(nodeParser, isFailure('(a'));
-      expect(nodeParser, isFailure('a(b'));
-      expect(nodeParser, isFailure('a(b(c)'));
-      expect(nodeParser, isFailure('((a)'));
-      expect(() => Node.fromString('('), throwsA(isA<ParserException>()));
-      expect(() => Node.fromString('(abc'), throwsA(isA<ParserException>()));
+      check(nodeParser).isFailure('(');
+      check(nodeParser).isFailure('(a');
+      check(nodeParser).isFailure('a(b');
+      check(nodeParser).isFailure('a(b(c)');
+      check(nodeParser).isFailure('((a)');
+      check(() => Node.fromString('(')).throws<ParserException>();
+      check(() => Node.fromString('(abc')).throws<ParserException>();
     });
 
     test('unexpected closing parenthesis', () {
-      expect(nodeParser, isFailure(')'));
-      expect(nodeParser, isFailure('a)'));
-      expect(nodeParser, isFailure('a)b'));
-      expect(nodeParser, isFailure('((a)))'));
-      expect(() => Node.fromString(')'), throwsA(isA<ParserException>()));
-      expect(() => Node.fromString('a)b'), throwsA(isA<ParserException>()));
+      check(nodeParser).isFailure(')');
+      check(nodeParser).isFailure('a)');
+      check(nodeParser).isFailure('a)b');
+      check(nodeParser).isFailure('((a)))');
+      check(() => Node.fromString(')')).throws<ParserException>();
+      check(() => Node.fromString('a)b')).throws<ParserException>();
     });
 
     test('character class sub-parser failures', () {
       final charClassParser = RegexpParserDefinition()
           .buildFrom(RegexpParserDefinition().charClass())
           .end();
-      expect(charClassParser, isFailure('['));
-      expect(charClassParser, isFailure('[a'));
-      expect(charClassParser, isFailure('[a-z'));
-      expect(charClassParser, isFailure('[^abc'));
-      expect(charClassParser, isFailure('[]'));
-      expect(charClassParser, isFailure('[^]'));
+      check(charClassParser).isFailure('[');
+      check(charClassParser).isFailure('[a');
+      check(charClassParser).isFailure('[a-z');
+      check(charClassParser).isFailure('[^abc');
+      check(charClassParser).isFailure('[]');
+      check(charClassParser).isFailure('[^]');
     });
 
     test('escape sub-parser trailing slash failure', () {
       final escapeParser = RegexpParserDefinition()
           .buildFrom(RegexpParserDefinition().escape())
           .end();
-      expect(escapeParser, isFailure(r'\'));
+      check(escapeParser).isFailure(r'\');
     });
 
     test('range sub-parser failures', () {
       final rangeParser = RegexpParserDefinition()
           .buildFrom(RegexpParserDefinition().range())
           .end();
-      expect(rangeParser, isFailure('{'));
-      expect(rangeParser, isFailure('{1'));
-      expect(rangeParser, isFailure('{1,'));
-      expect(rangeParser, isFailure('{1,2'));
-      expect(rangeParser, isFailure('{,5'));
-      expect(rangeParser, isFailure('{abc}'));
+      check(rangeParser).isFailure('{');
+      check(rangeParser).isFailure('{1');
+      check(rangeParser).isFailure('{1,');
+      check(rangeParser).isFailure('{1,2');
+      check(rangeParser).isFailure('{,5');
+      check(rangeParser).isFailure('{abc}');
     });
 
     test('semantic range validation errors', () {
-      expect(() => Node.fromString('a{3,2}'), throwsRangeError);
-      expect(() => Node.fromString('a{10,5}'), throwsRangeError);
-      expect(() => Node.fromString(r'[z-a]'), throwsArgumentError);
-      expect(() => Node.fromString(r'[9-0]'), throwsArgumentError);
+      check(() => Node.fromString('a{3,2}')).throws<RangeError>();
+      check(() => Node.fromString('a{10,5}')).throws<RangeError>();
+      check(() => Node.fromString(r'[z-a]')).throws<ArgumentError>();
+      check(() => Node.fromString(r'[9-0]')).throws<ArgumentError>();
     });
   });
   test('linter', () {
-    expect(linter(nodeParser), isEmpty);
+    check(linter(nodeParser)).isEmpty();
   });
 }
 

@@ -1,5 +1,6 @@
+import 'package:checks/checks.dart';
 import 'package:petitparser_examples/bibtex.dart';
-import 'package:test/test.dart';
+import 'package:test/scaffolding.dart';
 
 void main() {
   final parser = BibTeXDefinition().build();
@@ -11,17 +12,17 @@ void main() {
         key: 'knuth1984',
         fields: [BibTeXField('title', '{Literate Programming}')],
       );
-      expect(entry.type, 'article');
-      expect(entry.key, 'knuth1984');
-      expect(entry.fields, hasLength(1));
-      expect(entry.fields.first.key, 'title');
+      check(entry.type).equals('article');
+      check(entry.key).equals('knuth1984');
+      check(entry.fields).length.equals(1);
+      check(entry.fields.first.key).equals('title');
     });
 
     test('default empty fields', () {
       const entry = BibTeXEntry(type: 'misc', key: 'empty');
-      expect(entry.type, 'misc');
-      expect(entry.key, 'empty');
-      expect(entry.fields, isEmpty);
+      check(entry.type).equals('misc');
+      check(entry.key).equals('empty');
+      check(entry.fields).isEmpty();
     });
   });
 
@@ -31,20 +32,20 @@ void main() {
           .parse('@article{k, Title = {My Title}, author = "Me"}')
           .value
           .single;
-      expect(entry['Title'], 'My Title');
-      expect(entry['title'], 'My Title');
-      expect(entry['AUTHOR'], 'Me');
-      expect(entry.getField('title')?.rawKey, 'Title');
-      expect(entry.getField('title')?.rawValue, '{My Title}');
-      expect(entry.getField('title')?.key, 'title');
-      expect(entry.getField('title')?.value, 'My Title');
-      expect(entry.getField('Author')?.value, 'Me');
-      expect(entry.getField('unknown'), isNull);
-      expect(entry.getRaw('title'), '{My Title}');
-      expect(entry.getRaw('unknown'), isNull);
-      expect(entry.containsField('title'), isTrue);
-      expect(entry.containsField('author'), isTrue);
-      expect(entry.containsField('unknown'), isFalse);
+      check(entry['Title']).equals('My Title');
+      check(entry['title']).equals('My Title');
+      check(entry['AUTHOR']).equals('Me');
+      check(entry.getField('title')?.rawKey).equals('Title');
+      check(entry.getField('title')?.rawValue).equals('{My Title}');
+      check(entry.getField('title')?.key).equals('title');
+      check(entry.getField('title')?.value).equals('My Title');
+      check(entry.getField('Author')?.value).equals('Me');
+      check(entry.getField('unknown')).isNull();
+      check(entry.getRaw('title')).equals('{My Title}');
+      check(entry.getRaw('unknown')).isNull();
+      check(entry.containsField('title')).isTrue();
+      check(entry.containsField('author')).isTrue();
+      check(entry.containsField('unknown')).isFalse();
     });
 
     test('normalized fields from parsed entry', () {
@@ -56,25 +57,19 @@ void main() {
           '\tYear = 2010,\n'
           '\tUrl = {http://scg.unibe.ch/archive/papers/Reng10cDynamicGrammars.pdf}}';
       final entry = parser.parse(input).value.single;
-      expect(
-        entry['title'],
-        'Practical Dynamic Grammars for Dynamic Languages',
-      );
-      expect(
-        entry['author'],
+      check(entry['title'])
+          .equals('Practical Dynamic Grammars for Dynamic Languages');
+      check(entry['author']).equals(
         'Lukas Renggli and Stéphane Ducasse and Tudor Gîrba and Oscar Nierstrasz',
       );
-      expect(entry['month'], 'jun');
-      expect(entry['year'], '2010');
-      expect(
+      check(entry['month']).equals('jun');
+      check(entry['year']).equals('2010');
+      check(
         entry['url'],
-        'http://scg.unibe.ch/archive/papers/Reng10cDynamicGrammars.pdf',
-      );
-      expect(
-        entry.getField('title')?.value,
-        'Practical Dynamic Grammars for Dynamic Languages',
-      );
-      expect(entry.getField('title')?.key, 'title');
+      ).equals('http://scg.unibe.ch/archive/papers/Reng10cDynamicGrammars.pdf');
+      check(entry.getField('title')?.value)
+          .equals('Practical Dynamic Grammars for Dynamic Languages');
+      check(entry.getField('title')?.key).equals('title');
     });
   });
 
@@ -88,10 +83,8 @@ void main() {
           BibTeXField('year', '2024'),
         ],
       );
-      expect(
-        entry.toString(),
-        '@misc{k1,\n\tauthor = John Doe,\n\tyear = 2024}',
-      );
+      check(entry.toString())
+          .equals('@misc{k1,\n\tauthor = John Doe,\n\tyear = 2024}');
     });
   });
 
@@ -122,11 +115,11 @@ void main() {
         key: 'k1',
         fields: [BibTeXField('title', 'T2')],
       );
-      expect(e1, equals(e2));
-      expect(e1.hashCode, equals(e2.hashCode));
-      expect(e1, isNot(equals(e3)));
-      expect(e1, isNot(equals(e4)));
-      expect(e1, isNot(equals(e5)));
+      check(e1).equals(e2);
+      check(e1.hashCode).equals(e2.hashCode);
+      check(e1).not((it) => it.equals(e3));
+      check(e1).not((it) => it.equals(e4));
+      check(e1).not((it) => it.equals(e5));
     });
   });
 }

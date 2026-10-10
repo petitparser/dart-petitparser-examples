@@ -2,9 +2,10 @@ import 'package:meta/meta.dart';
 import 'package:petitparser/petitparser.dart';
 import 'package:petitparser/reflection.dart';
 import 'package:petitparser_examples/smalltalk.dart';
-import 'package:test/test.dart';
+import 'package:test/scaffolding.dart';
 
-import 'utils/expect.dart';
+import 'smalltalk/smalltalk_checks.dart';
+import 'utils/checks.dart';
 
 final parser = SmalltalkParserDefinition();
 final grammar = parser;
@@ -37,112 +38,17 @@ void verify(
   String source,
   Parser Function() grammarProduction,
   Parser Function() parserProduction,
-  Matcher parseMatcher,
+  Condition<Object?> parseMatcher,
 ) {
   group(name, () {
     test('grammar', () => parse(source, grammarProduction));
     test('parser', () {
       final ast = parse(source, parserProduction);
-      expect(NodeCollector.allNodes(ast), isNotEmpty);
-      expect(ast, parseMatcher);
+      check(NodeCollector.allNodes(ast)).isNotEmpty();
+      check(ast).which(parseMatcher);
     });
   });
 }
-
-// Node matchers
-
-TypeMatcher<LiteralNode> isLiteralNode(dynamic value) =>
-    isA<LiteralNode>().having((node) => node.value, 'value', value);
-
-TypeMatcher<VariableNode> isVariableNode(String name) =>
-    isA<VariableNode>().having((node) => node.name, 'name', name);
-
-TypeMatcher<MessageNode> isMessageNode(
-  Matcher receiver,
-  String selector,
-  SelectorType selectorType, {
-  List<Matcher> arguments = const [],
-}) => isA<MessageNode>()
-    .having((node) => node.receiver, 'receiver', receiver)
-    .having((node) => node.selector, 'selector', selector)
-    .having((node) => node.selectorType, 'selectorType', selectorType)
-    .having((node) => node.arguments, 'arguments', arguments);
-
-TypeMatcher<CascadeNode> isCascadeNode(List<Matcher> messages) =>
-    isA<CascadeNode>().having((node) => node.messages, 'messages', messages);
-
-TypeMatcher<AssignmentNode> isAssignmentNode(String name, Matcher value) =>
-    isA<AssignmentNode>()
-        .having((node) => node.variable, 'variable', isVariableNode(name))
-        .having((node) => node.value, 'value', value);
-
-TypeMatcher<ArrayNode> isArrayNode({List<Matcher> statements = const []}) =>
-    isA<ArrayNode>().having(
-      (node) => node.statements,
-      'statements',
-      statements,
-    );
-
-TypeMatcher<SequenceNode> isSequenceNode({
-  List<String> temporaries = const [],
-  List<Matcher> statements = const [],
-}) => isA<SequenceNode>()
-    .having(
-      (node) => node.temporaries,
-      'temporaries',
-      temporaries.map(isVariableNode),
-    )
-    .having((node) => node.statements, 'statements', statements);
-
-TypeMatcher<ReturnNode> isReturnNode(Matcher value) =>
-    isA<ReturnNode>().having((node) => node.value, 'value', value);
-
-TypeMatcher<BlockNode> isBlockNode({
-  List<String> arguments = const [],
-  List<String> temporaries = const [],
-  List<Matcher> statements = const [],
-}) => isA<BlockNode>()
-    .having(
-      (node) => node.arguments,
-      'arguments',
-      arguments.map(isVariableNode),
-    )
-    .having(
-      (node) => node.body,
-      'body',
-      isSequenceNode(temporaries: temporaries, statements: statements),
-    );
-
-TypeMatcher<PragmaNode> isPragmaNode(
-  String selector,
-  SelectorType selectorType, {
-  List<Matcher> arguments = const [],
-}) => isA<PragmaNode>()
-    .having((node) => node.selector, 'selector', selector)
-    .having((node) => node.selectorType, 'selectorType', selectorType)
-    .having((node) => node.arguments, 'arguments', arguments);
-
-TypeMatcher<MethodNode> isMethodNode(
-  String selector,
-  SelectorType selectorType, {
-  List<String> arguments = const [],
-  List<Matcher> pragmas = const [],
-  List<String> temporaries = const [],
-  List<Matcher> statements = const [],
-}) => isA<MethodNode>()
-    .having((node) => node.selector, 'selector', selector)
-    .having((node) => node.selectorType, 'selectorType', selectorType)
-    .having(
-      (node) => node.arguments,
-      'arguments',
-      arguments.map(isVariableNode),
-    )
-    .having((node) => node.pragmas, 'pragmas', pragmas)
-    .having(
-      (node) => node.body,
-      'body',
-      isSequenceNode(temporaries: temporaries, statements: statements),
-    );
 
 void main() {
   group('grammar', () {
@@ -166,10 +72,10 @@ exampleWithNumber: x
   ^ x < y''', grammar.start);
     });
     test('token', () {
-      expect(() => grammar.token(123), throwsArgumentError);
+      check(() => grammar.token(123)).throws<ArgumentError>();
     });
     test('linter', () {
-      expect(linter(grammar.build()), isEmpty);
+      check(linter(grammar.build())).isEmpty();
     });
     // All the productions and production actions of the grammar and parser.
     verify('Array1', '{}', grammar.array, parser.array, isArrayNode());
@@ -1526,57 +1432,57 @@ exampleWithNumber: x
       ),
     );
     test('parser linter', () {
-      expect(linter(parser.build()), isEmpty);
+      check(linter(parser.build())).isEmpty();
     });
     group('negative syntax edge-cases', () {
       final methodParser = parser.build();
 
       test('empty and incomplete methods', () {
-        expect(methodParser, isFailure(''));
-        expect(methodParser, isFailure('   '));
-        expect(methodParser, isFailure('123'));
-        expect(methodParser, isFailure('foo:'));
-        expect(methodParser, isFailure('foo ^'));
-        expect(methodParser, isFailure('foo :='));
-        expect(methodParser, isFailure('foo: a bar:'));
+        check(methodParser).isFailure('');
+        check(methodParser).isFailure('   ');
+        check(methodParser).isFailure('123');
+        check(methodParser).isFailure('foo:');
+        check(methodParser).isFailure('foo ^');
+        check(methodParser).isFailure('foo :=');
+        check(methodParser).isFailure('foo: a bar:');
       });
 
       test('unclosed block closures', () {
-        expect(methodParser, isFailure('foo [ :x | x + 1'));
-        expect(methodParser, isFailure('foo [ 1 + 2'));
-        expect(methodParser, isFailure('foo [ | a | a := 1'));
-        expect(methodParser, isFailure('foo [ [ 1 + 2 ]'));
+        check(methodParser).isFailure('foo [ :x | x + 1');
+        check(methodParser).isFailure('foo [ 1 + 2');
+        check(methodParser).isFailure('foo [ | a | a := 1');
+        check(methodParser).isFailure('foo [ [ 1 + 2 ]');
       });
 
       test('unclosed parenthesized expressions', () {
-        expect(methodParser, isFailure('foo ( 1 + 2'));
-        expect(methodParser, isFailure('foo (( 1 )'));
-        expect(methodParser, isFailure('foo ( 1'));
-        expect(methodParser, isFailure('foo 1 + (2 * 3'));
+        check(methodParser).isFailure('foo ( 1 + 2');
+        check(methodParser).isFailure('foo (( 1 )');
+        check(methodParser).isFailure('foo ( 1');
+        check(methodParser).isFailure('foo 1 + (2 * 3');
       });
 
       test('unclosed literal and byte arrays', () {
-        expect(methodParser, isFailure('foo #( 1 2'));
-        expect(methodParser, isFailure('foo #[ 1 2'));
-        expect(methodParser, isFailure('foo #( #a #b'));
+        check(methodParser).isFailure('foo #( 1 2');
+        check(methodParser).isFailure('foo #[ 1 2');
+        check(methodParser).isFailure('foo #( #a #b');
       });
 
       test('unclosed strings and comments', () {
-        expect(methodParser, isFailure("foo 'unclosed string"));
-        expect(methodParser, isFailure('foo "unclosed comment'));
+        check(methodParser).isFailure("foo 'unclosed string");
+        check(methodParser).isFailure('foo "unclosed comment');
       });
 
       test('invalid number representations', () {
         final numberParser = parser.buildFrom(parser.number()).end();
-        expect(numberParser, isFailure('12r'));
-        expect(numberParser, isFailure('1.2e'));
-        expect(numberParser, isFailure('1.2e+'));
-        expect(numberParser, isFailure('1.'));
+        check(numberParser).isFailure('12r');
+        check(numberParser).isFailure('1.2e');
+        check(numberParser).isFailure('1.2e+');
+        check(numberParser).isFailure('1.');
       });
 
       test('malformed cascades and pragmas', () {
-        expect(methodParser, isFailure('; cascadeWithoutReceiver'));
-        expect(methodParser, isFailure('foo < pragma'));
+        check(methodParser).isFailure('; cascadeWithoutReceiver');
+        check(methodParser).isFailure('foo < pragma');
       });
     });
   });

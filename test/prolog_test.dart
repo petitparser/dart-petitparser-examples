@@ -1,35 +1,34 @@
+import 'package:checks/checks.dart';
 import 'package:petitparser/petitparser.dart';
 import 'package:petitparser/reflection.dart';
 import 'package:petitparser_examples/prolog.dart';
-import 'package:test/test.dart';
+import 'package:test/scaffolding.dart';
 
 void main() {
   group('database', () {
     test('linter', () {
-      expect(
+      check(
         linter(
           rulesParser,
           excludedTypes: {},
           excludedRules: {'Duplicate parser'},
         ),
-        isEmpty,
-      );
+      ).isEmpty();
     });
     test('empty', () {
       final db = Database.parse('foo.');
-      expect(db.toString(), 'foo :- true.');
+      check(db.toString()).equals('foo :- true.');
     });
     test('single', () {
       final db = Database.parse('foo(a, b).');
-      expect(db.toString(), 'foo(a, b) :- true.');
+      check(db.toString()).equals('foo(a, b) :- true.');
     });
     test('multiple', () {
       final db = Database.parse('''
         foo(X, Y) :- foo(Y, X).
         foo(X, Z) :- foo(X, Y), foo(Y, Z).
       ''');
-      expect(
-        db.toString(),
+      check(db.toString()).equals(
         'foo(X, Y) :- foo(Y, X).\n'
         'foo(X, Z) :- foo(X, Y), foo(Y, Z).',
       );
@@ -40,56 +39,44 @@ void main() {
         foo(X, Y) :- foo(Y, X).
         foo(X, Z) :- foo(X, Y), foo(Y, Z).
       ''');
-      expect(
-        db.toString(),
+      check(db.toString()).equals(
         'foo(a, b) :- true.\n'
         'foo(X, Y) :- foo(Y, X).\n'
         'foo(X, Z) :- foo(X, Y), foo(Y, Z).',
       );
     });
     test('parse error', () {
-      expect(
-        () => Database.parse('1'),
-        throwsA(
-          isA<ParserException>()
-              .having((e) => e.message, 'message', 'end of input expected')
-              .having((e) => e.offset, 'offset', 0),
-        ),
-      );
+      final error = check(() => Database.parse('1')).throws<ParserException>();
+      error.has((e) => e.message, 'message').equals('end of input expected');
+      error.has((e) => e.offset, 'offset').equals(0);
     });
   });
   group('term', () {
     test('linter', () {
-      expect(
+      check(
         linter(
           termParser,
           excludedTypes: {},
           excludedRules: {'Duplicate parser'},
         ),
-        isEmpty,
-      );
+      ).isEmpty();
     });
     test('empty', () {
       final query = Term.parse('foo');
-      expect(query.toString(), 'foo');
+      check(query.toString()).equals('foo');
     });
     test('one', () {
       final query = Term.parse('foo(bar)');
-      expect(query.toString(), 'foo(bar)');
+      check(query.toString()).equals('foo(bar)');
     });
     test('two', () {
       final query = Term.parse('foo(bar, zork)');
-      expect(query.toString(), 'foo(bar, zork)');
+      check(query.toString()).equals('foo(bar, zork)');
     });
     test('parse error', () {
-      expect(
-        () => Term.parse('1'),
-        throwsA(
-          isA<ParserException>()
-              .having((e) => e.message, 'message', 'Value expected')
-              .having((e) => e.offset, 'offset', 0),
-        ),
-      );
+      final error = check(() => Term.parse('1')).throws<ParserException>();
+      error.has((e) => e.message, 'message').equals('Value expected');
+      error.has((e) => e.offset, 'offset').equals(0);
     });
   });
   group('Forrester family', () {
@@ -112,11 +99,12 @@ void main() {
     ''');
     test('eric son of thorne', () async {
       final query = Term.parse('father_child(eric, thorne)');
-      expect(db.query(query), [Term.parse('father_child(eric, thorne)')]);
+      check(db.query(query))
+          .deepEquals([Term.parse('father_child(eric, thorne)')]);
     });
     test('children of stephanie', () async {
       final query = Term.parse('mother_child(stephanie, X)');
-      expect(db.query(query), [
+      check(db.query(query)).deepEquals([
         Term.parse('mother_child(stephanie, thorne)'),
         Term.parse('mother_child(stephanie, kristen)'),
         Term.parse('mother_child(stephanie, felicia)'),
@@ -124,7 +112,7 @@ void main() {
     });
     test('fathers and children', () async {
       final query = Term.parse('father_child(X, Y)');
-      expect(db.query(query), [
+      check(db.query(query)).deepEquals([
         Term.parse('father_child(massimo, ridge)'),
         Term.parse('father_child(eric, thorne)'),
         Term.parse('father_child(thorne, alexandria)'),
@@ -132,14 +120,14 @@ void main() {
     });
     test('parents of thorne', () async {
       final query = Term.parse('parent_child(X, thorne)');
-      expect(db.query(query), [
+      check(db.query(query)).deepEquals([
         Term.parse('parent_child(eric, thorne)'),
         Term.parse('parent_child(stephanie, thorne)'),
       ]);
     });
     test('parents and children', () async {
       final query = Term.parse('parent_child(X, Y)');
-      expect(db.query(query), [
+      check(db.query(query)).deepEquals([
         Term.parse('parent_child(massimo, ridge)'),
         Term.parse('parent_child(eric, thorne)'),
         Term.parse('parent_child(thorne, alexandria)'),
@@ -150,7 +138,7 @@ void main() {
     });
     test('siblings of felicia', () async {
       final query = Term.parse('sibling(X, felicia)');
-      expect(db.query(query), [
+      check(db.query(query)).deepEquals([
         Term.parse('sibling(thorne, felicia)'),
         Term.parse('sibling(kristen, felicia)'),
         Term.parse('sibling(felicia, felicia)'),
@@ -158,7 +146,7 @@ void main() {
     });
     test('ancestors of alexandria', () {
       final query = Term.parse('ancestor(X, alexandria)');
-      expect(db.query(query), [
+      check(db.query(query)).deepEquals([
         Term.parse('ancestor(thorne, alexandria)'),
         Term.parse('ancestor(eric, alexandria)'),
         Term.parse('ancestor(stephanie, alexandria)'),
@@ -215,7 +203,7 @@ void main() {
     ''');
     test('Who Owns the Fish?', () {
       final query = Term.parse('solution(FishOwner)');
-      expect(db.query(query), [Term.parse('solution(german)')]);
+      check(db.query(query)).deepEquals([Term.parse('solution(german)')]);
     });
   });
   group('AST nodes and evaluation methods', () {
@@ -226,11 +214,11 @@ void main() {
       const v2 = Variable('X');
       const v3 = Variable('Y');
 
-      expect(v1, equals(v2));
-      expect(v1.hashCode, equals(v2.hashCode));
-      expect(v1, isNot(equals(v3)));
-      expect(v1.hashCode, isNot(equals(v3.hashCode)));
-      expect(v1.toString(), 'X');
+      check(v1).equals(v2);
+      check(v1.hashCode).equals(v2.hashCode);
+      check(v1).not((it) => it.equals(v3));
+      check(v1.hashCode).not((it) => it.equals(v3.hashCode));
+      check(v1.toString()).equals('X');
     });
 
     test('Term equality and hashCode', () {
@@ -238,10 +226,10 @@ void main() {
       final t2 = Term('parent', const [Variable('X'), Value('bob')]);
       final t3 = Term('parent', const [Variable('Y'), Value('bob')]);
 
-      expect(t1, equals(t2));
-      expect(t1.hashCode, equals(t2.hashCode));
-      expect(t1, isNot(equals(t3)));
-      expect(t1.toString(), 'parent(X, bob)');
+      check(t1).equals(t2);
+      check(t1.hashCode).equals(t2.hashCode);
+      check(t1).not((it) => it.equals(t3));
+      check(t1.toString()).equals('parent(X, bob)');
     });
 
     test('Value equality, hashCode and query', () {
@@ -249,11 +237,11 @@ void main() {
       const val2 = Value('apple');
       const val3 = Value('banana');
 
-      expect(val1, equals(val2));
-      expect(val1.hashCode, equals(val2.hashCode));
-      expect(val1, isNot(equals(val3)));
-      expect(val1.query(db), [val1]);
-      expect(val1.toString(), 'apple');
+      check(val1).equals(val2);
+      check(val1.hashCode).equals(val2.hashCode);
+      check(val1).not((it) => it.equals(val3));
+      check(val1.query(db)).deepEquals([val1]);
+      check(val1.toString()).equals('apple');
     });
 
     test('Conjunction equality and hashCode', () {
@@ -262,12 +250,12 @@ void main() {
       final c3 = Conjunction(const [Value('a'), Value('c')]);
       final c4 = Conjunction(const [Value('a')]);
 
-      expect(c1, equals(c2));
-      expect(c1.hashCode, equals(c2.hashCode));
-      expect(c1, isNot(equals(c3)));
-      expect(c1, isNot(equals(c4)));
-      expect(c1, isNot(equals(const Value('a'))));
-      expect(c1.toString(), 'a, b');
+      check(c1).equals(c2);
+      check(c1.hashCode).equals(c2.hashCode);
+      check(c1).not((it) => it.equals(c3));
+      check(c1).not((it) => it.equals(c4));
+      check(c1 as Object).not((it) => it.equals(const Value('a')));
+      check(c1.toString()).equals('a, b');
     });
   });
 }

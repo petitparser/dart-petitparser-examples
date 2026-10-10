@@ -1,8 +1,8 @@
 import 'package:petitparser/petitparser.dart';
 import 'package:petitparser_examples/dart.dart';
-import 'package:test/test.dart';
+import 'package:test/scaffolding.dart';
 
-import '../../utils/expect.dart';
+import '../../utils/checks.dart';
 
 void main() {
   final grammar = DartGrammarDefinition();
@@ -13,37 +13,35 @@ void main() {
         .end();
 
     test('simple whitespace', () {
-      expect(whitespaceParser, isSuccess(' '));
-      expect(whitespaceParser, isSuccess('\t'));
-      expect(whitespaceParser, isSuccess('\n'));
-      expect(whitespaceParser, isSuccess('\r\n'));
-      expect(whitespaceParser, isSuccess('   \t\r\n  '));
+      check(whitespaceParser).isSuccess(' ');
+      check(whitespaceParser).isSuccess('\t');
+      check(whitespaceParser).isSuccess('\n');
+      check(whitespaceParser).isSuccess('\r\n');
+      check(whitespaceParser).isSuccess('   \t\r\n  ');
     });
 
     test('single line comment', () {
-      expect(whitespaceParser, isSuccess('// simple\n'));
-      expect(whitespaceParser, isSuccess('/// doc comment\n'));
-      expect(whitespaceParser, isSuccess('//\n'));
+      check(whitespaceParser).isSuccess('// simple\n');
+      check(whitespaceParser).isSuccess('/// doc comment\n');
+      check(whitespaceParser).isSuccess('//\n');
     });
 
     test('multi line comment', () {
-      expect(whitespaceParser, isSuccess('/* simple */'));
-      expect(whitespaceParser, isSuccess('/** doc */'));
-      expect(whitespaceParser, isSuccess('/* multi\nline */'));
-      expect(whitespaceParser, isSuccess('/* outer /* inner */ */'));
-      expect(
-        whitespaceParser,
-        isSuccess('/* outer /* middle /* inner */ */ end */'),
-      );
+      check(whitespaceParser).isSuccess('/* simple */');
+      check(whitespaceParser).isSuccess('/** doc */');
+      check(whitespaceParser).isSuccess('/* multi\nline */');
+      check(whitespaceParser).isSuccess('/* outer /* inner */ */');
+      check(whitespaceParser)
+          .isSuccess('/* outer /* middle /* inner */ */ end */');
     });
 
     test('mixed whitespace and comments', () {
-      expect(whitespaceParser, isSuccess('  // comment\n  /* block */ \t\n'));
+      check(whitespaceParser).isSuccess('  // comment\n  /* block */ \t\n');
     });
 
     test('invalid comment', () {
-      expect(whitespaceParser, isFailure('/* unclosed'));
-      expect(whitespaceParser, isFailure('/* unclosed /* inner */'));
+      check(whitespaceParser).isFailure('/* unclosed');
+      check(whitespaceParser).isFailure('/* unclosed /* inner */');
     });
   });
 
@@ -51,52 +49,52 @@ void main() {
     final idParser = grammar.buildFrom(grammar.identifier()).end();
 
     test('valid identifiers', () {
-      expect(idParser, isSuccess('a'));
-      expect(idParser, isSuccess('z'));
-      expect(idParser, isSuccess('A'));
-      expect(idParser, isSuccess('Z'));
-      expect(idParser, isSuccess('_'));
-      expect(idParser, isSuccess('__'));
-      expect(idParser, isSuccess(r'$'));
-      expect(idParser, isSuccess(r'$foo'));
-      expect(idParser, isSuccess(r'foo$bar'));
-      expect(idParser, isSuccess('camelCase'));
-      expect(idParser, isSuccess('PascalCase'));
-      expect(idParser, isSuccess('snake_case'));
-      expect(idParser, isSuccess('_private'));
-      expect(idParser, isSuccess('ident123'));
+      check(idParser).isSuccess('a');
+      check(idParser).isSuccess('z');
+      check(idParser).isSuccess('A');
+      check(idParser).isSuccess('Z');
+      check(idParser).isSuccess('_');
+      check(idParser).isSuccess('__');
+      check(idParser).isSuccess(r'$');
+      check(idParser).isSuccess(r'$foo');
+      check(idParser).isSuccess(r'foo$bar');
+      check(idParser).isSuccess('camelCase');
+      check(idParser).isSuccess('PascalCase');
+      check(idParser).isSuccess('snake_case');
+      check(idParser).isSuccess('_private');
+      check(idParser).isSuccess('ident123');
     });
 
     test('identifiers starting with keyword prefixes', () {
-      expect(idParser, isSuccess('nullLiteral'));
-      expect(idParser, isSuccess('variable'));
-      expect(idParser, isSuccess('finallyDone'));
-      expect(idParser, isSuccess('classNames'));
-      expect(idParser, isSuccess('assertValid'));
-      expect(idParser, isSuccess('defaultSettings'));
-      expect(idParser, isSuccess('importPath'));
-      expect(idParser, isSuccess('isDone'));
-      expect(idParser, isSuccess('asString'));
+      check(idParser).isSuccess('nullLiteral');
+      check(idParser).isSuccess('variable');
+      check(idParser).isSuccess('finallyDone');
+      check(idParser).isSuccess('classNames');
+      check(idParser).isSuccess('assertValid');
+      check(idParser).isSuccess('defaultSettings');
+      check(idParser).isSuccess('importPath');
+      check(idParser).isSuccess('isDone');
+      check(idParser).isSuccess('asString');
     });
 
     test('reserved keywords rejected as identifiers', () {
-      expect(idParser, isFailure('class'));
-      expect(idParser, isFailure('var'));
-      expect(idParser, isFailure('final'));
-      expect(idParser, isFailure('void'));
-      expect(idParser, isFailure('null'));
-      expect(idParser, isFailure('true'));
-      expect(idParser, isFailure('false'));
-      expect(idParser, isFailure('if'));
-      expect(idParser, isFailure('else'));
-      expect(idParser, isFailure('return'));
+      check(idParser).isFailure('class');
+      check(idParser).isFailure('var');
+      check(idParser).isFailure('final');
+      check(idParser).isFailure('void');
+      check(idParser).isFailure('null');
+      check(idParser).isFailure('true');
+      check(idParser).isFailure('false');
+      check(idParser).isFailure('if');
+      check(idParser).isFailure('else');
+      check(idParser).isFailure('return');
     });
 
     test('invalid identifier starts', () {
-      expect(idParser, isFailure('123'));
-      expect(idParser, isFailure('1abc'));
-      expect(idParser, isFailure('@foo'));
-      expect(idParser, isFailure('#foo'));
+      check(idParser).isFailure('123');
+      check(idParser).isFailure('1abc');
+      check(idParser).isFailure('@foo');
+      check(idParser).isFailure('#foo');
     });
   });
 
@@ -104,35 +102,35 @@ void main() {
     final numParser = grammar.buildFrom(grammar.numericLiteral()).end();
 
     test('integer decimals', () {
-      expect(numParser, isSuccess('0'));
-      expect(numParser, isSuccess('1'));
-      expect(numParser, isSuccess('42'));
-      expect(numParser, isSuccess('1000000'));
-      expect(numParser, isSuccess('1_000_000'));
-      expect(numParser, isSuccess('12_34_56'));
+      check(numParser).isSuccess('0');
+      check(numParser).isSuccess('1');
+      check(numParser).isSuccess('42');
+      check(numParser).isSuccess('1000000');
+      check(numParser).isSuccess('1_000_000');
+      check(numParser).isSuccess('12_34_56');
     });
 
     test('hexadecimal integers', () {
-      expect(numParser, isSuccess('0x0'));
-      expect(numParser, isSuccess('0x123'));
-      expect(numParser, isSuccess('0xCAFE'));
-      expect(numParser, isSuccess('0xcafe'));
-      expect(numParser, isSuccess('0XDEAD_BEEF'));
-      expect(numParser, isFailure('0x'));
-      expect(numParser, isFailure('0xGHI'));
+      check(numParser).isSuccess('0x0');
+      check(numParser).isSuccess('0x123');
+      check(numParser).isSuccess('0xCAFE');
+      check(numParser).isSuccess('0xcafe');
+      check(numParser).isSuccess('0XDEAD_BEEF');
+      check(numParser).isFailure('0x');
+      check(numParser).isFailure('0xGHI');
     });
 
     test('doubles', () {
-      expect(numParser, isSuccess('0.0'));
-      expect(numParser, isSuccess('3.14159'));
-      expect(numParser, isSuccess('1_000.50_001'));
-      expect(numParser, isSuccess('.5'));
-      expect(numParser, isSuccess('.1234'));
-      expect(numParser, isSuccess('1e5'));
-      expect(numParser, isSuccess('1E5'));
-      expect(numParser, isSuccess('1.2e3'));
-      expect(numParser, isSuccess('1.2E-3'));
-      expect(numParser, isSuccess('.5e+2'));
+      check(numParser).isSuccess('0.0');
+      check(numParser).isSuccess('3.14159');
+      check(numParser).isSuccess('1_000.50_001');
+      check(numParser).isSuccess('.5');
+      check(numParser).isSuccess('.1234');
+      check(numParser).isSuccess('1e5');
+      check(numParser).isSuccess('1E5');
+      check(numParser).isSuccess('1.2e3');
+      check(numParser).isSuccess('1.2E-3');
+      check(numParser).isSuccess('.5e+2');
     });
   });
 
@@ -140,12 +138,12 @@ void main() {
     final lit = grammar.buildFrom(grammar.literal()).end();
 
     test('boolean', () {
-      expect(lit, isSuccess('true'));
-      expect(lit, isSuccess('false'));
+      check(lit).isSuccess('true');
+      check(lit).isSuccess('false');
     });
 
     test('null', () {
-      expect(lit, isSuccess('null'));
+      check(lit).isSuccess('null');
     });
   });
 
@@ -153,38 +151,38 @@ void main() {
     final sym = grammar.buildFrom(grammar.symbolLiteral()).end();
 
     test('identifier symbols', () {
-      expect(sym, isSuccess('#foo'));
-      expect(sym, isSuccess('#_bar'));
-      expect(sym, isSuccess(r'#$baz'));
-      expect(sym, isSuccess('#camelCase'));
+      check(sym).isSuccess('#foo');
+      check(sym).isSuccess('#_bar');
+      check(sym).isSuccess(r'#$baz');
+      check(sym).isSuccess('#camelCase');
     });
 
     test('operator symbols', () {
-      expect(sym, isSuccess('#+'));
-      expect(sym, isSuccess('#-'));
-      expect(sym, isSuccess('#*'));
-      expect(sym, isSuccess('#/'));
-      expect(sym, isSuccess('#~/'));
-      expect(sym, isSuccess('#%'));
-      expect(sym, isSuccess('#=='));
-      expect(sym, isSuccess('#[]'));
-      expect(sym, isSuccess('#[]='));
-      expect(sym, isSuccess('#<'));
-      expect(sym, isSuccess('#<='));
-      expect(sym, isSuccess('#>'));
-      expect(sym, isSuccess('#>='));
-      expect(sym, isSuccess('#&'));
-      expect(sym, isSuccess('#|'));
-      expect(sym, isSuccess('#^'));
-      expect(sym, isSuccess('#~'));
-      expect(sym, isSuccess('#<<'));
-      expect(sym, isSuccess('#>>'));
-      expect(sym, isSuccess('#>>>'));
+      check(sym).isSuccess('#+');
+      check(sym).isSuccess('#-');
+      check(sym).isSuccess('#*');
+      check(sym).isSuccess('#/');
+      check(sym).isSuccess('#~/');
+      check(sym).isSuccess('#%');
+      check(sym).isSuccess('#==');
+      check(sym).isSuccess('#[]');
+      check(sym).isSuccess('#[]=');
+      check(sym).isSuccess('#<');
+      check(sym).isSuccess('#<=');
+      check(sym).isSuccess('#>');
+      check(sym).isSuccess('#>=');
+      check(sym).isSuccess('#&');
+      check(sym).isSuccess('#|');
+      check(sym).isSuccess('#^');
+      check(sym).isSuccess('#~');
+      check(sym).isSuccess('#<<');
+      check(sym).isSuccess('#>>');
+      check(sym).isSuccess('#>>>');
     });
 
     test('invalid symbols', () {
-      expect(sym, isFailure('#'));
-      expect(sym, isFailure('#123'));
+      check(sym).isFailure('#');
+      check(sym).isFailure('#123');
     });
   });
 
@@ -192,64 +190,63 @@ void main() {
     final str = grammar.buildFrom(grammar.stringLiteral()).end();
 
     test('single-line single-quoted', () {
-      expect(str, isSuccess("''"));
-      expect(str, isSuccess("'hello'"));
-      expect(str, isSuccess("'hello world'"));
-      expect(str, isSuccess(r"'escaped \' quote'"));
-      expect(str, isSuccess(r"'newline \n test'"));
-      expect(str, isSuccess(r"'\\'"));
-      expect(str, isSuccess(r"'a\\b'"));
+      check(str).isSuccess("''");
+      check(str).isSuccess("'hello'");
+      check(str).isSuccess("'hello world'");
+      check(str).isSuccess(r"'escaped \' quote'");
+      check(str).isSuccess(r"'newline \n test'");
+      check(str).isSuccess(r"'\\'");
+      check(str).isSuccess(r"'a\\b'");
     });
 
     test('single-line double-quoted', () {
-      expect(str, isSuccess('""'));
-      expect(str, isSuccess('"hello"'));
-      expect(str, isSuccess('"hello world"'));
-      expect(str, isSuccess(r'"escaped \" quote"'));
-      expect(str, isSuccess(r'"\\"'));
-      expect(str, isSuccess(r'"a\\b"'));
+      check(str).isSuccess('""');
+      check(str).isSuccess('"hello"');
+      check(str).isSuccess('"hello world"');
+      check(str).isSuccess(r'"escaped \" quote"');
+      check(str).isSuccess(r'"\\"');
+      check(str).isSuccess(r'"a\\b"');
     });
 
     test('multi-line strings', () {
-      expect(str, isSuccess("''''''"));
-      expect(str, isSuccess('""""""'));
-      expect(str, isSuccess("'''first line\nsecond line'''"));
-      expect(str, isSuccess('"""multi\r\nline\r\nstring"""'));
+      check(str).isSuccess("''''''");
+      check(str).isSuccess('""""""');
+      check(str).isSuccess("'''first line\nsecond line'''");
+      check(str).isSuccess('"""multi\r\nline\r\nstring"""');
     });
 
     test('raw strings', () {
-      expect(str, isSuccess("r'raw'"));
-      expect(str, isSuccess('r"raw"'));
-      expect(str, isSuccess(r"r'no \n escape'"));
-      expect(str, isSuccess(r'r"no \t escape"'));
-      expect(str, isSuccess(r"r'no $interp'"));
-      expect(str, isSuccess("r'''raw multi'''"));
-      expect(str, isSuccess('r"""raw multi"""'));
+      check(str).isSuccess("r'raw'");
+      check(str).isSuccess('r"raw"');
+      check(str).isSuccess(r"r'no \n escape'");
+      check(str).isSuccess(r'r"no \t escape"');
+      check(str).isSuccess(r"r'no $interp'");
+      check(str).isSuccess("r'''raw multi'''");
+      check(str).isSuccess('r"""raw multi"""');
     });
 
     test('string interpolation', () {
-      expect(str, isSuccess(r'"$name"'));
-      expect(str, isSuccess(r'"hello $name"'));
-      expect(str, isSuccess(r'"${1 + 2}"'));
-      expect(str, isSuccess(r'"prefix ${user.name} suffix"'));
-      expect(str, isSuccess(r"'$a and $b'"));
-      expect(str, isSuccess(r"'nested ${1 + int.parse('2')}'"));
-      expect(str, isSuccess(r'"price is $50"'));
-      expect(str, isSuccess("'''\n\${1 + 2}\n'''"));
-      expect(str, isSuccess('"""\n\${foo.bar}\n"""'));
-      expect(str, isSuccess("'''cost is \$50 and \${count} items'''"));
-      expect(str, isSuccess('"""he said "hi" and \$name answered"""'));
-      expect(str, isSuccess("'''it's working and \$name answered'''"));
-      expect(
+      check(str).isSuccess(r'"$name"');
+      check(str).isSuccess(r'"hello $name"');
+      check(str).isSuccess(r'"${1 + 2}"');
+      check(str).isSuccess(r'"prefix ${user.name} suffix"');
+      check(str).isSuccess(r"'$a and $b'");
+      check(str).isSuccess(r"'nested ${1 + int.parse('2')}'");
+      check(str).isSuccess(r'"price is $50"');
+      check(str).isSuccess("'''\n\${1 + 2}\n'''");
+      check(str).isSuccess('"""\n\${foo.bar}\n"""');
+      check(str).isSuccess("'''cost is \$50 and \${count} items'''");
+      check(str).isSuccess('"""he said "hi" and \$name answered"""');
+      check(str).isSuccess("'''it's working and \$name answered'''");
+      check(
         str,
-        isSuccess("'''\n\${list.map((e) => '''<tr>\${e}</tr>''').join()}\n'''"),
-      );
+      ).isSuccess("'''\n\${list.map((e) => '''<tr>\${e}</tr>''').join()}\n'''");
     });
 
     test('adjacent strings', () {
-      expect(str, isSuccess("'hello ' 'world'"));
-      expect(str, isSuccess('"a" "b" "c"'));
-      expect(str, isSuccess(r"'hello ' '$name'"));
+      check(str).isSuccess("'hello ' 'world'");
+      check(str).isSuccess('"a" "b" "c"');
+      check(str).isSuccess(r"'hello ' '$name'");
     });
   });
 }

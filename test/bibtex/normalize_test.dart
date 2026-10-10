@@ -1,262 +1,237 @@
+import 'package:checks/checks.dart';
 import 'package:petitparser/reflection.dart';
 import 'package:petitparser_examples/bibtex.dart';
-import 'package:test/test.dart';
+import 'package:test/scaffolding.dart';
 
 void main() {
   test('latex decoder linter', () {
     final decoder = const LatexDecoderDefinition().build();
-    expect(
+    check(
       linter(
         decoder,
         excludedRules: {'Duplicate parser', 'Nested choice'},
         excludedTypes: {},
       ),
-      isEmpty,
-    );
+    ).isEmpty();
   });
 
   group('normalizeFieldValue', () {
     test('handles empty and blank values', () {
-      expect(normalizeFieldValue(''), '');
-      expect(normalizeFieldValue('{}'), '');
-      expect(normalizeFieldValue('""'), '');
+      check(normalizeFieldValue('')).equals('');
+      check(normalizeFieldValue('{}')).equals('');
+      check(normalizeFieldValue('""')).equals('');
     });
 
     test('strips outer braces', () {
-      expect(normalizeFieldValue('{hello}'), 'hello');
+      check(normalizeFieldValue('{hello}')).equals('hello');
     });
 
     test('strips outer quotes', () {
-      expect(normalizeFieldValue('"hello"'), 'hello');
+      check(normalizeFieldValue('"hello"')).equals('hello');
     });
 
     test('replaces --- with em dash', () {
-      expect(normalizeFieldValue('{A---B}'), 'A\u2014B');
+      check(normalizeFieldValue('{A---B}')).equals('A\u2014B');
     });
 
     test('replaces -- with en dash', () {
-      expect(normalizeFieldValue('{10--20}'), '10\u201320');
+      check(normalizeFieldValue('{10--20}')).equals('10\u201320');
     });
 
     test('does not affect single hyphens', () {
-      expect(normalizeFieldValue('{well-known}'), 'well-known');
+      check(normalizeFieldValue('{well-known}')).equals('well-known');
     });
 
     test(
       'strips matching outer delimiters without corrupting multiple tokens',
       () {
-        expect(normalizeFieldValue('{Knuth} and {Steele}'), 'Knuth and Steele');
-        expect(
-          normalizeFieldValue('"Knuth" and "Steele"'),
-          '"Knuth" and "Steele"',
-        );
-        expect(normalizeFieldValue('{{Knuth and Steele}}'), 'Knuth and Steele');
-        expect(normalizeFieldValue('"{Knuth and Steele}"'), 'Knuth and Steele');
-        expect(
-          normalizeFieldValue(r'{\{foo\} and \{bar\}}'),
-          '{foo} and {bar}',
-        );
+        check(normalizeFieldValue('{Knuth} and {Steele}'))
+            .equals('Knuth and Steele');
+        check(normalizeFieldValue('"Knuth" and "Steele"'))
+            .equals('"Knuth" and "Steele"');
+        check(normalizeFieldValue('{{Knuth and Steele}}'))
+            .equals('Knuth and Steele');
+        check(normalizeFieldValue('"{Knuth and Steele}"'))
+            .equals('Knuth and Steele');
+        check(normalizeFieldValue(r'{\{foo\} and \{bar\}}'))
+            .equals('{foo} and {bar}');
       },
     );
 
     test('expands LaTeX accents', () {
-      expect(normalizeFieldValue(r"{\'e}"), 'é');
-      expect(normalizeFieldValue(r'{\`e}'), 'è');
-      expect(normalizeFieldValue(r'{D\"{o}derlein}'), 'Döderlein');
-      expect(normalizeFieldValue(r'{D\"oderlein}'), 'Döderlein');
-      expect(normalizeFieldValue(r"{S\'{e}bastien}"), 'Sébastien');
-      expect(normalizeFieldValue(r"{S\'ebastien}"), 'Sébastien');
-      expect(normalizeFieldValue(r"{S{\'e}bastien}"), 'Sébastien');
-      expect(normalizeFieldValue(r'{Chi\c{s}}'), 'Chiș');
-      expect(normalizeFieldValue(r'{Chi\cs}'), 'Chiș');
-      expect(normalizeFieldValue(r'{Chi\c s}'), 'Chiș');
-      expect(normalizeFieldValue(r'{B\"{u}hlmann}'), 'Bühlmann');
-      expect(normalizeFieldValue(r'{B\"uhlmann}'), 'Bühlmann');
-      expect(normalizeFieldValue(r"{Ot\'{a}vio}"), 'Otávio');
-      expect(normalizeFieldValue(r"{Ot\'avio}"), 'Otávio');
-      expect(normalizeFieldValue(r"{Dvo\v{r}\'{a}k}"), 'Dvořák');
-      expect(normalizeFieldValue(r"{\v{C}ern\'{y}}"), 'Černý');
+      check(normalizeFieldValue(r"{\'e}")).equals('é');
+      check(normalizeFieldValue(r'{\`e}')).equals('è');
+      check(normalizeFieldValue(r'{D\"{o}derlein}')).equals('Döderlein');
+      check(normalizeFieldValue(r'{D\"oderlein}')).equals('Döderlein');
+      check(normalizeFieldValue(r"{S\'{e}bastien}")).equals('Sébastien');
+      check(normalizeFieldValue(r"{S\'ebastien}")).equals('Sébastien');
+      check(normalizeFieldValue(r"{S{\'e}bastien}")).equals('Sébastien');
+      check(normalizeFieldValue(r'{Chi\c{s}}')).equals('Chiș');
+      check(normalizeFieldValue(r'{Chi\cs}')).equals('Chiș');
+      check(normalizeFieldValue(r'{Chi\c s}')).equals('Chiș');
+      check(normalizeFieldValue(r'{B\"{u}hlmann}')).equals('Bühlmann');
+      check(normalizeFieldValue(r'{B\"uhlmann}')).equals('Bühlmann');
+      check(normalizeFieldValue(r"{Ot\'{a}vio}")).equals('Otávio');
+      check(normalizeFieldValue(r"{Ot\'avio}")).equals('Otávio');
+      check(normalizeFieldValue(r"{Dvo\v{r}\'{a}k}")).equals('Dvořák');
+      check(normalizeFieldValue(r"{\v{C}ern\'{y}}")).equals('Černý');
     });
 
     test('handles whitespace around accents and letters', () {
-      expect(normalizeFieldValue(r'{\c{ s }}'), 'ș');
-      expect(normalizeFieldValue(r'{\" {o} }'), 'ö');
-      expect(normalizeFieldValue(r'{\"  o }'), 'ö');
-      expect(normalizeFieldValue(r'{\" o}'), 'ö');
-      expect(normalizeFieldValue(r'\~ {n}'), 'ñ');
-      expect(normalizeFieldValue(r'\^ {a}'), 'â');
+      check(normalizeFieldValue(r'{\c{ s }}')).equals('ș');
+      check(normalizeFieldValue(r'{\" {o} }')).equals('ö');
+      check(normalizeFieldValue(r'{\"  o }')).equals('ö');
+      check(normalizeFieldValue(r'{\" o}')).equals('ö');
+      check(normalizeFieldValue(r'\~ {n}')).equals('ñ');
+      check(normalizeFieldValue(r'\^ {a}')).equals('â');
     });
 
     test('expands uppercase accents', () {
-      expect(normalizeFieldValue(r'{\"A}'), 'Ä');
-      expect(normalizeFieldValue(r'{\"O}'), 'Ö');
-      expect(normalizeFieldValue(r'{\"U}'), 'Ü');
-      expect(normalizeFieldValue(r"{\'E}"), 'É');
-      expect(normalizeFieldValue(r'{\`A}'), 'À');
-      expect(normalizeFieldValue(r'{\^{I}}'), 'Î');
-      expect(normalizeFieldValue(r'{\v{S}}'), 'Š');
-      expect(normalizeFieldValue(r'{\c{S}}'), 'Ș');
-      expect(normalizeFieldValue(r'{\c{C}}'), 'Ç');
+      check(normalizeFieldValue(r'{\"A}')).equals('Ä');
+      check(normalizeFieldValue(r'{\"O}')).equals('Ö');
+      check(normalizeFieldValue(r'{\"U}')).equals('Ü');
+      check(normalizeFieldValue(r"{\'E}")).equals('É');
+      check(normalizeFieldValue(r'{\`A}')).equals('À');
+      check(normalizeFieldValue(r'{\^{I}}')).equals('Î');
+      check(normalizeFieldValue(r'{\v{S}}')).equals('Š');
+      check(normalizeFieldValue(r'{\c{S}}')).equals('Ș');
+      check(normalizeFieldValue(r'{\c{C}}')).equals('Ç');
     });
 
     test('expands dotless i and j accents', () {
-      expect(normalizeFieldValue(r"{\'{\i}}"), 'í');
-      expect(normalizeFieldValue(r"{\'\i}"), 'í');
-      expect(normalizeFieldValue(r"{\^{\i}}"), 'î');
-      expect(normalizeFieldValue(r'{\`{\i}}'), 'ì');
-      expect(normalizeFieldValue(r'{\"{\i}}'), 'ï');
-      expect(normalizeFieldValue(r'{\~{\i}}'), 'ĩ');
-      expect(normalizeFieldValue(r'{\={\i}}'), 'ī');
-      expect(normalizeFieldValue(r'{\i}'), 'ı');
-      expect(normalizeFieldValue(r'{\j}'), 'ȷ');
+      check(normalizeFieldValue(r"{\'{\i}}")).equals('í');
+      check(normalizeFieldValue(r"{\'\i}")).equals('í');
+      check(normalizeFieldValue(r"{\^{\i}}")).equals('î');
+      check(normalizeFieldValue(r'{\`{\i}}')).equals('ì');
+      check(normalizeFieldValue(r'{\"{\i}}')).equals('ï');
+      check(normalizeFieldValue(r'{\~{\i}}')).equals('ĩ');
+      check(normalizeFieldValue(r'{\={\i}}')).equals('ī');
+      check(normalizeFieldValue(r'{\i}')).equals('ı');
+      check(normalizeFieldValue(r'{\j}')).equals('ȷ');
     });
 
     test('expands all accent families', () {
-      expect(normalizeFieldValue(r'\~{a}\~{n}\~{o}\~{A}\~{N}\~{O}'), 'ãñõÃÑÕ');
-      expect(normalizeFieldValue(r'\={a}\={e}\={i}\={o}\={u}'), 'āēīōū');
-      expect(normalizeFieldValue(r'\u{g}\u{G}\u{a}\u{e}'), 'ğĞăĕ');
-      expect(normalizeFieldValue(r'\.{z}\.{Z}\.{c}\.{g}\.{e}'), 'żŻċġė');
-      expect(normalizeFieldValue(r'\H{o}\H{O}\H{u}\H{U}'), 'őŐűŰ');
-      expect(normalizeFieldValue(r'\r{a}\r{A}\r{u}\r{U}'), 'åÅůŮ');
-      expect(normalizeFieldValue(r'\k{a}\k{A}\k{e}\k{E}'), 'ąĄęĘ');
-      expect(normalizeFieldValue(r'\d{a}\d{e}\d{i}\d{o}\d{u}'), 'ạẹịọụ');
-      expect(normalizeFieldValue(r'\b{a}\b{A}'), 'ḇḆ');
+      check(normalizeFieldValue(r'\~{a}\~{n}\~{o}\~{A}\~{N}\~{O}'))
+          .equals('ãñõÃÑÕ');
+      check(normalizeFieldValue(r'\={a}\={e}\={i}\={o}\={u}')).equals('āēīōū');
+      check(normalizeFieldValue(r'\u{g}\u{G}\u{a}\u{e}')).equals('ğĞăĕ');
+      check(normalizeFieldValue(r'\.{z}\.{Z}\.{c}\.{g}\.{e}')).equals('żŻċġė');
+      check(normalizeFieldValue(r'\H{o}\H{O}\H{u}\H{U}')).equals('őŐűŰ');
+      check(normalizeFieldValue(r'\r{a}\r{A}\r{u}\r{U}')).equals('åÅůŮ');
+      check(normalizeFieldValue(r'\k{a}\k{A}\k{e}\k{E}')).equals('ąĄęĘ');
+      check(normalizeFieldValue(r'\d{a}\d{e}\d{i}\d{o}\d{u}')).equals('ạẹịọụ');
+      check(normalizeFieldValue(r'\b{a}\b{A}')).equals('ḇḆ');
     });
 
     test('expands special macros', () {
-      expect(normalizeFieldValue(r'{\ss}'), 'ß');
-      expect(normalizeFieldValue(r'\ss{}'), 'ß');
-      expect(normalizeFieldValue(r'{\aa}'), 'å');
-      expect(normalizeFieldValue(r'{\AA}'), 'Å');
-      expect(normalizeFieldValue(r'{\o}'), 'ø');
-      expect(normalizeFieldValue(r'{\O}'), 'Ø');
-      expect(normalizeFieldValue(r'{\ae}'), 'æ');
-      expect(normalizeFieldValue(r'{\AE}'), 'Æ');
-      expect(normalizeFieldValue(r'{\oe}'), 'œ');
-      expect(normalizeFieldValue(r'{\OE}'), 'Œ');
-      expect(normalizeFieldValue(r'{\l}'), 'ł');
-      expect(normalizeFieldValue(r'{\L}'), 'Ł');
-      expect(normalizeFieldValue(r'{\i}'), 'ı');
+      check(normalizeFieldValue(r'{\ss}')).equals('ß');
+      check(normalizeFieldValue(r'\ss{}')).equals('ß');
+      check(normalizeFieldValue(r'{\aa}')).equals('å');
+      check(normalizeFieldValue(r'{\AA}')).equals('Å');
+      check(normalizeFieldValue(r'{\o}')).equals('ø');
+      check(normalizeFieldValue(r'{\O}')).equals('Ø');
+      check(normalizeFieldValue(r'{\ae}')).equals('æ');
+      check(normalizeFieldValue(r'{\AE}')).equals('Æ');
+      check(normalizeFieldValue(r'{\oe}')).equals('œ');
+      check(normalizeFieldValue(r'{\OE}')).equals('Œ');
+      check(normalizeFieldValue(r'{\l}')).equals('ł');
+      check(normalizeFieldValue(r'{\L}')).equals('Ł');
+      check(normalizeFieldValue(r'{\i}')).equals('ı');
     });
 
     test('expands math symbols, Greek letters, and branding macros', () {
-      expect(
-        normalizeFieldValue(r'\alpha \beta \gamma \lambda \omega \Theta'),
-        'α β γ λ ω Θ',
-      );
-      expect(
+      check(normalizeFieldValue(r'\alpha \beta \gamma \lambda \omega \Theta'))
+          .equals('α β γ λ ω Θ');
+      check(
         normalizeFieldValue(
           r'\times \wedge \sim \neq \tau \pi \nu \pm \le \ge',
         ),
-        '× ∧ ~ ≠ τ π ν ± ≤ ≥',
-      );
-      expect(normalizeFieldValue(r'\ie, \eg'), 'i.e., e.g.');
-      expect(
-        normalizeFieldValue(r'\LaTeX{} and \TeX{} and \BibTeX{}'),
-        'LaTeX and TeX and BibTeX',
-      );
+      ).equals('× ∧ ~ ≠ τ π ν ± ≤ ≥');
+      check(normalizeFieldValue(r'\ie, \eg')).equals('i.e., e.g.');
+      check(normalizeFieldValue(r'\LaTeX{} and \TeX{} and \BibTeX{}'))
+          .equals('LaTeX and TeX and BibTeX');
     });
 
     test('unescapes LaTeX symbols', () {
-      expect(
-        normalizeFieldValue(r'{Journal of Systems \& Software, 2021}'),
-        'Journal of Systems & Software, 2021',
-      );
-      expect(normalizeFieldValue(r'{100\%}'), '100%');
-      expect(normalizeFieldValue(r'{\$10}'), '\$10');
-      expect(normalizeFieldValue(r'{\#1}'), '#1');
-      expect(normalizeFieldValue(r'{foo\_bar}'), 'foo_bar');
-      expect(normalizeFieldValue(r'\{foo\}'), '{foo}');
+      check(normalizeFieldValue(r'{Journal of Systems \& Software, 2021}'))
+          .equals('Journal of Systems & Software, 2021');
+      check(normalizeFieldValue(r'{100\%}')).equals('100%');
+      check(normalizeFieldValue(r'{\$10}')).equals('\$10');
+      check(normalizeFieldValue(r'{\#1}')).equals('#1');
+      check(normalizeFieldValue(r'{foo\_bar}')).equals('foo_bar');
+      check(normalizeFieldValue(r'\{foo\}')).equals('{foo}');
     });
 
     test('handles punctuation, spacing, and linebreaks', () {
-      expect(
-        normalizeFieldValue(r'{Zurich\\ Switzerland}'),
-        'Zurich Switzerland',
-      );
-      expect(normalizeFieldValue(r'{Ratio 1\:2}'), 'Ratio 1:2');
-      expect(normalizeFieldValue(r'{soft\-hyphen}'), 'softhyphen');
-      expect(normalizeFieldValue(r'{italic\/correction}'), 'italiccorrection');
-      expect(normalizeFieldValue(r'{input\slash{}output}'), 'input/output');
-      expect(normalizeFieldValue(r'{A\ldots B\dots C}'), 'A… B… C');
-      expect(
+      check(normalizeFieldValue(r'{Zurich\\ Switzerland}'))
+          .equals('Zurich Switzerland');
+      check(normalizeFieldValue(r'{Ratio 1\:2}')).equals('Ratio 1:2');
+      check(normalizeFieldValue(r'{soft\-hyphen}')).equals('softhyphen');
+      check(normalizeFieldValue(r'{italic\/correction}'))
+          .equals('italiccorrection');
+      check(normalizeFieldValue(r'{input\slash{}output}'))
+          .equals('input/output');
+      check(normalizeFieldValue(r'{A\ldots B\dots C}')).equals('A… B… C');
+      check(
         normalizeFieldValue(
           r'\textquoteleft{}left\textquoteright{} and \textquotedblleft{}double\textquotedblright',
         ),
-        '‘left’ and “double”',
-      );
-      expect(
-        normalizeFieldValue(r'\textemdash and \textendash and \–'),
-        '— and – and –',
-      );
+      ).equals('‘left’ and “double”');
+      check(normalizeFieldValue(r'\textemdash and \textendash and \–'))
+          .equals('— and – and –');
     });
 
     test('strips formatting markup and font switches', () {
-      expect(normalizeFieldValue(r'{{\em foo}}'), 'foo');
-      expect(normalizeFieldValue(r'{\emph{important}}'), 'important');
-      expect(normalizeFieldValue(r'{\textbf{bold}}'), 'bold');
-      expect(normalizeFieldValue(r'{\textit{italic}}'), 'italic');
-      expect(normalizeFieldValue(r'{\texttt{code}}'), 'code');
-      expect(normalizeFieldValue(r'{\textsc{smallcaps}}'), 'smallcaps');
-      expect(
-        normalizeFieldValue(r'{\url{https://example.com}}'),
-        'https://example.com',
-      );
-      expect(normalizeFieldValue(r'{\path{/usr/bin}}'), '/usr/bin');
-      expect(normalizeFieldValue(r'{\cite{knuth1984}}'), 'knuth1984');
-      expect(normalizeFieldValue(r'{\textbf{\emph{deep}}}'), 'deep');
-      expect(
+      check(normalizeFieldValue(r'{{\em foo}}')).equals('foo');
+      check(normalizeFieldValue(r'{\emph{important}}')).equals('important');
+      check(normalizeFieldValue(r'{\textbf{bold}}')).equals('bold');
+      check(normalizeFieldValue(r'{\textit{italic}}')).equals('italic');
+      check(normalizeFieldValue(r'{\texttt{code}}')).equals('code');
+      check(normalizeFieldValue(r'{\textsc{smallcaps}}')).equals('smallcaps');
+      check(normalizeFieldValue(r'{\url{https://example.com}}'))
+          .equals('https://example.com');
+      check(normalizeFieldValue(r'{\path{/usr/bin}}')).equals('/usr/bin');
+      check(normalizeFieldValue(r'{\cite{knuth1984}}')).equals('knuth1984');
+      check(normalizeFieldValue(r'{\textbf{\emph{deep}}}')).equals('deep');
+      check(
         normalizeFieldValue(
           r'{\bf bold} and {\it italic} and {\rm roman} and {\sf sans} and {\tt mono}',
         ),
-        'bold and italic and roman and sans and mono',
-      );
-      expect(normalizeFieldValue(r'{\fIpersistent\fR}'), 'persistent');
+      ).equals('bold and italic and roman and sans and mono');
+      check(normalizeFieldValue(r'{\fIpersistent\fR}')).equals('persistent');
     });
 
     test('decodes HTML entities', () {
-      expect(
-        normalizeFieldValue(r'{Systems \&#38; Software}'),
-        'Systems & Software',
-      );
-      expect(normalizeFieldValue(r'{A &mdash; B}'), 'A — B');
-      expect(normalizeFieldValue(r"{it&rsquo;s}"), 'it’s');
-      expect(normalizeFieldValue(r'{G&ouml;del}'), 'Gödel');
-      expect(normalizeFieldValue(r'{&#60;tag&#62;}'), '<tag>');
-      expect(normalizeFieldValue(r'{&#x26; and &#X3C;}'), '& and <');
-      expect(normalizeFieldValue(r'{\&#x26; and \&amp;}'), '& and &');
+      check(normalizeFieldValue(r'{Systems \&#38; Software}'))
+          .equals('Systems & Software');
+      check(normalizeFieldValue(r'{A &mdash; B}')).equals('A — B');
+      check(normalizeFieldValue(r"{it&rsquo;s}")).equals('it’s');
+      check(normalizeFieldValue(r'{G&ouml;del}')).equals('Gödel');
+      check(normalizeFieldValue(r'{&#60;tag&#62;}')).equals('<tag>');
+      check(normalizeFieldValue(r'{&#x26; and &#X3C;}')).equals('& and <');
+      check(normalizeFieldValue(r'{\&#x26; and \&amp;}')).equals('& and &');
     });
 
     test('preserves dashes in URLs and DOIs', () {
-      expect(
-        normalizeFieldValue('{https://example.com/foo--bar}', key: 'url'),
-        'https://example.com/foo--bar',
-      );
-      expect(
-        normalizeFieldValue('{10.1007/978-3-540-27836-8--53}', key: 'doi'),
-        '10.1007/978-3-540-27836-8--53',
-      );
+      check(normalizeFieldValue('{https://example.com/foo--bar}', key: 'url'))
+          .equals('https://example.com/foo--bar');
+      check(normalizeFieldValue('{10.1007/978-3-540-27836-8--53}', key: 'doi'))
+          .equals('10.1007/978-3-540-27836-8--53');
     });
 
     test('handles unmatched braces and raw UTF-8 content', () {
-      expect(normalizeFieldValue(r'{{\em foo}}'), 'foo');
-      expect(normalizeFieldValue(r'foo{bar'), 'foobar');
-      expect(normalizeFieldValue(r'foo}bar'), 'foobar');
-      expect(
-        normalizeFieldValue(r'{The {DNA} of {PETIT}}'),
-        'The DNA of PETIT',
-      );
-      expect(normalizeFieldValue(r'{{A} and {B}}'), 'A and B');
-      expect(normalizeFieldValue(r'{{'), '');
-      expect(normalizeFieldValue(r'}}'), '');
-      expect(
-        normalizeFieldValue(r'München and Z\~urich'),
-        'München and Zũrich',
-      );
-      expect(
-        normalizeFieldValue(r'Dvořák and Jan\v{a}\v{c}ek'),
-        'Dvořák and Janǎček',
-      );
+      check(normalizeFieldValue(r'{{\em foo}}')).equals('foo');
+      check(normalizeFieldValue(r'foo{bar')).equals('foobar');
+      check(normalizeFieldValue(r'foo}bar')).equals('foobar');
+      check(normalizeFieldValue(r'{The {DNA} of {PETIT}}'))
+          .equals('The DNA of PETIT');
+      check(normalizeFieldValue(r'{{A} and {B}}')).equals('A and B');
+      check(normalizeFieldValue(r'{{')).equals('');
+      check(normalizeFieldValue(r'}}')).equals('');
+      check(normalizeFieldValue(r'München and Z\~urich'))
+          .equals('München and Zũrich');
+      check(normalizeFieldValue(r'Dvořák and Jan\v{a}\v{c}ek'))
+          .equals('Dvořák and Janǎček');
     });
   });
 }

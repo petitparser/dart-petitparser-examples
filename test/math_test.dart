@@ -2,9 +2,9 @@ import 'dart:math';
 
 import 'package:petitparser/reflection.dart';
 import 'package:petitparser_examples/math.dart';
-import 'package:test/test.dart';
+import 'package:test/scaffolding.dart';
 
-import 'utils/expect.dart';
+import 'utils/checks.dart';
 
 void verify(
   String input,
@@ -13,13 +13,13 @@ void verify(
   double epsilon = 0.00001,
 }) {
   final ast = parser.parse(input).value;
-  expect(ast.eval(variables), closeTo(result, epsilon));
-  expect(ast.toString(), isNotNull);
+  check(ast.eval(variables)).isCloseTo(result, epsilon);
+  check(ast.toString()).isNotNull();
 }
 
 void main() {
   test('linter', () {
-    expect(linter(parser, excludedRules: {}), isEmpty);
+    check(linter(parser, excludedRules: {})).isEmpty();
   });
   test('number', () {
     verify('0', 0);
@@ -31,7 +31,7 @@ void main() {
   test('variable', () {
     verify('x', 42, variables: {'x': 42});
     verify('x / y', 0.5, variables: {'x': 1, 'y': 2});
-    expect(() => verify('x', double.nan, variables: {}), throwsArgumentError);
+    check(() => verify('x', double.nan, variables: {})).throws<ArgumentError>();
   });
   test('constants', () {
     verify('pi', pi);
@@ -61,9 +61,9 @@ void main() {
     verify('pow(2, 3)', pow(2, 3));
   });
   test('unknown functions throw ArgumentError', () {
-    expect(() => parser.parse('unknown(1)'), throwsArgumentError);
-    expect(() => parser.parse('unknown(1, 2)'), throwsArgumentError);
-    expect(() => parser.parse('foo(1, 2, 3)'), throwsArgumentError);
+    check(() => parser.parse('unknown(1)')).throws<ArgumentError>();
+    check(() => parser.parse('unknown(1, 2)')).throws<ArgumentError>();
+    check(() => parser.parse('foo(1, 2, 3)')).throws<ArgumentError>();
   });
   test('prefix', () {
     verify('+2', 2);
@@ -94,23 +94,23 @@ void main() {
   });
   group('failures', () {
     test('empty', () {
-      expect(parser, isFailure(''));
+      check(parser).isFailure('');
     });
     test('trailing operator', () {
-      expect(parser, isFailure('1 +'));
-      expect(parser, isFailure('2 *'));
-      expect(parser, isFailure('2 ^'));
+      check(parser).isFailure('1 +');
+      check(parser).isFailure('2 *');
+      check(parser).isFailure('2 ^');
     });
     test('unbalanced parentheses', () {
-      expect(parser, isFailure('('));
-      expect(parser, isFailure('(1 + 2'));
-      expect(parser, isFailure('1 + 2)'));
-      expect(parser, isFailure('()'));
+      check(parser).isFailure('(');
+      check(parser).isFailure('(1 + 2');
+      check(parser).isFailure('1 + 2)');
+      check(parser).isFailure('()');
     });
     test('invalid tokens', () {
-      expect(parser, isFailure('1.'));
-      expect(parser, isFailure('@'));
-      expect(parser, isFailure('1 & 2'));
+      check(parser).isFailure('1.');
+      check(parser).isFailure('@');
+      check(parser).isFailure('1 & 2');
     });
   });
 }

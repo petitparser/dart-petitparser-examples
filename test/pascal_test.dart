@@ -1,9 +1,9 @@
 import 'package:petitparser/petitparser.dart';
 import 'package:petitparser/reflection.dart';
 import 'package:petitparser_examples/pascal.dart';
-import 'package:test/test.dart';
+import 'package:test/scaffolding.dart';
 
-import 'utils/expect.dart';
+import 'utils/checks.dart';
 
 final definition = PascalParserDefinition();
 final parser = definition.build();
@@ -12,383 +12,377 @@ void main() {
   group('productions', () {
     test('program', () {
       final parser = definition.buildFrom(definition.program()).end();
-      expect(parser, isSuccess('program foo; begin end.'));
-      expect(parser, isSuccess('program foo(a); begin end.'));
-      expect(parser, isSuccess('program foo(a, b); begin end.'));
+      check(parser).isSuccess('program foo; begin end.');
+      check(parser).isSuccess('program foo(a); begin end.');
+      check(parser).isSuccess('program foo(a, b); begin end.');
     });
     test('statement', () {
       final parser = definition.buildFrom(definition.statement()).end();
-      expect(parser, isSuccess('foo'));
-      expect(parser, isSuccess('foo(1)'));
-      expect(parser, isSuccess('123: a := 1'));
-      expect(parser, isSuccess('123: a(1, 2)'));
+      check(parser).isSuccess('foo');
+      check(parser).isSuccess('foo(1)');
+      check(parser).isSuccess('123: a := 1');
+      check(parser).isSuccess('123: a(1, 2)');
     });
     test('labelled statements', () {
       final parser = definition.buildFrom(definition.statement()).end();
 
       final compound =
           parser.parse('10: begin a := 1 end').value as CompoundStatementNode;
-      expect(compound.label, '10');
-      expect(compound.statements, hasLength(1));
+      check(compound.label).equals('10');
+      check(compound.statements).length.equals(1);
 
       final ifStmt =
           parser.parse('20: if a > 0 then b := 1').value as IfStatementNode;
-      expect(ifStmt.label, '20');
-      expect(ifStmt.elseStatement, isNull);
+      check(ifStmt.label).equals('20');
+      check(ifStmt.elseStatement).isNull();
 
       final caseStmt =
           parser.parse('30: case a of 1: b := 1 end').value
               as CaseStatementNode;
-      expect(caseStmt.label, '30');
-      expect(caseStmt.cases, hasLength(1));
+      check(caseStmt.label).equals('30');
+      check(caseStmt.cases).length.equals(1);
 
       final whileStmt =
           parser.parse('40: while a > 0 do a := a - 1').value
               as WhileStatementNode;
-      expect(whileStmt.label, '40');
+      check(whileStmt.label).equals('40');
 
       final repeatStmt =
           parser.parse('50: repeat a := a + 1 until a > 10').value
               as RepeatStatementNode;
-      expect(repeatStmt.label, '50');
+      check(repeatStmt.label).equals('50');
 
       final forStmt =
           parser.parse('60: for i := 1 to 10 do a := a + 1').value
               as ForStatementNode;
-      expect(forStmt.label, '60');
+      check(forStmt.label).equals('60');
 
       final withStmt =
           parser.parse('70: with rec do a := 1').value as WithStatementNode;
-      expect(withStmt.label, '70');
+      check(withStmt.label).equals('70');
 
       final gotoStmt = parser.parse('80: goto 99').value as GotoStatementNode;
-      expect(gotoStmt.label, '80');
-      expect(gotoStmt.targetLabel, '99');
+      check(gotoStmt.label).equals('80');
+      check(gotoStmt.targetLabel).equals('99');
 
       final emptyStmt = parser.parse('90:').value as EmptyStatementNode;
-      expect(emptyStmt.label, '90');
+      check(emptyStmt.label).equals('90');
     });
     test('statement assign', () {
       final parser = definition.buildFrom(definition.statementAssign()).end();
-      expect(parser, isSuccess('a := 1'));
-      expect(parser, isSuccess('a := b'));
-      expect(parser, isSuccess('a := b + 1'));
+      check(parser).isSuccess('a := 1');
+      check(parser).isSuccess('a := b');
+      check(parser).isSuccess('a := b + 1');
     });
     test('statement call', () {
       final parser = definition.buildFrom(definition.statementCall()).end();
-      expect(parser, isSuccess('a'));
-      expect(parser, isSuccess('a(1)'));
-      expect(parser, isSuccess('a(1, 2)'));
+      check(parser).isSuccess('a');
+      check(parser).isSuccess('a(1)');
+      check(parser).isSuccess('a(1, 2)');
     });
     test('statement block', () {
       final parser = definition.buildFrom(definition.statementBlock()).end();
-      expect(parser, isSuccess('begin foo end'));
-      expect(parser, isSuccess('begin foo; bar end'));
+      check(parser).isSuccess('begin foo end');
+      check(parser).isSuccess('begin foo; bar end');
     });
     test('statement if', () {
       final parser = definition.buildFrom(definition.statementIf()).end();
-      expect(parser, isSuccess('if a then foo'));
-      expect(parser, isSuccess('if a then foo else bar'));
+      check(parser).isSuccess('if a then foo');
+      check(parser).isSuccess('if a then foo else bar');
     });
     test('statement repeat', () {
       final parser = definition.buildFrom(definition.statementRepeat()).end();
-      expect(parser, isSuccess('repeat foo until a'));
-      expect(parser, isSuccess('repeat foo; bar until a'));
+      check(parser).isSuccess('repeat foo until a');
+      check(parser).isSuccess('repeat foo; bar until a');
     });
     test('statement while', () {
       final parser = definition.buildFrom(definition.statementWhile()).end();
-      expect(parser, isSuccess('while a do foo'));
+      check(parser).isSuccess('while a do foo');
     });
     test('statement for', () {
       final parser = definition.buildFrom(definition.statementFor()).end();
-      expect(parser, isSuccess('for i := a to b do foo'));
-      expect(parser, isSuccess('for i := a downto b do foo'));
+      check(parser).isSuccess('for i := a to b do foo');
+      check(parser).isSuccess('for i := a downto b do foo');
     });
     test('statement case', () {
       final parser = definition.buildFrom(definition.statementCase()).end();
-      expect(parser, isSuccess('case a of 1: foo end'));
-      expect(parser, isSuccess('case a of 1, 2: foo end'));
-      expect(parser, isSuccess('case a of 1: foo; 2: bar end'));
+      check(parser).isSuccess('case a of 1: foo end');
+      check(parser).isSuccess('case a of 1, 2: foo end');
+      check(parser).isSuccess('case a of 1: foo; 2: bar end');
     });
     test('statement with', () {
       final parser = definition.buildFrom(definition.statementWith()).end();
-      expect(parser, isSuccess('with a do a := 1'));
-      expect(parser, isSuccess('with a, b do a := 1'));
+      check(parser).isSuccess('with a do a := 1');
+      check(parser).isSuccess('with a, b do a := 1');
     });
     test('statement goto', () {
       final parser = definition.buildFrom(definition.statementGoto()).end();
-      expect(parser, isSuccess('goto 1'));
+      check(parser).isSuccess('goto 1');
     });
     test('statement exit', () {
       final parser = definition.buildFrom(definition.statementExit()).end();
-      expect(parser, isSuccess('exit(program)'));
-      expect(parser, isSuccess('exit(foo)'));
+      check(parser).isSuccess('exit(program)');
+      check(parser).isSuccess('exit(foo)');
     });
     test('block', () {
       final parser = definition.buildFrom(definition.block()).end();
-      expect(parser, isSuccess('begin end'));
-      expect(parser, isSuccess('label 1; begin end'));
-      expect(parser, isSuccess('const a = 1; begin end'));
-      expect(parser, isSuccess('type a = b; begin end'));
-      expect(parser, isSuccess('var a: b; begin end'));
-      expect(parser, isSuccess('procedure foo; begin end; begin end'));
-      expect(parser, isSuccess('function foo: a; begin end; begin end'));
+      check(parser).isSuccess('begin end');
+      check(parser).isSuccess('label 1; begin end');
+      check(parser).isSuccess('const a = 1; begin end');
+      check(parser).isSuccess('type a = b; begin end');
+      check(parser).isSuccess('var a: b; begin end');
+      check(parser).isSuccess('procedure foo; begin end; begin end');
+      check(parser).isSuccess('function foo: a; begin end; begin end');
     });
     test('block label', () {
       final parser = definition.buildFrom(definition.blockLabel()).end();
-      expect(parser, isSuccess('label 1;'));
-      expect(parser, isSuccess('label 1, 2;'));
+      check(parser).isSuccess('label 1;');
+      check(parser).isSuccess('label 1, 2;');
     });
     test('block const', () {
       final parser = definition.buildFrom(definition.blockConst()).end();
-      expect(parser, isSuccess('const a = 1;'));
-      expect(parser, isSuccess('const a = 1; b = 2;'));
+      check(parser).isSuccess('const a = 1;');
+      check(parser).isSuccess('const a = 1; b = 2;');
     });
     test('block type', () {
       final parser = definition.buildFrom(definition.blockType()).end();
-      expect(parser, isSuccess('type a = b;'));
-      expect(parser, isSuccess('type a = b; c = d;'));
+      check(parser).isSuccess('type a = b;');
+      check(parser).isSuccess('type a = b; c = d;');
     });
     test('block var', () {
       final parser = definition.buildFrom(definition.blockVar()).end();
-      expect(parser, isSuccess('var a: b;'));
-      expect(parser, isSuccess('var a, b: c;'));
-      expect(parser, isSuccess('var a: b; c: d;'));
+      check(parser).isSuccess('var a: b;');
+      check(parser).isSuccess('var a, b: c;');
+      check(parser).isSuccess('var a: b; c: d;');
     });
     test('block procedure', () {
       final parser = definition.buildFrom(definition.blockProcedure()).end();
-      expect(parser, isSuccess('procedure foo; begin end;'));
-      expect(parser, isSuccess('procedure foo(a: b); begin end;'));
-      expect(parser, isSuccess('procedure foo(a: b); var a: b; begin end;'));
+      check(parser).isSuccess('procedure foo; begin end;');
+      check(parser).isSuccess('procedure foo(a: b); begin end;');
+      check(parser).isSuccess('procedure foo(a: b); var a: b; begin end;');
     });
     test('block function', () {
       final parser = definition.buildFrom(definition.blockFunction()).end();
-      expect(parser, isSuccess('function foo: a; begin end;'));
-      expect(parser, isSuccess('function foo(a: b): c; begin end;'));
-      expect(parser, isSuccess('function foo(a: b): c; var a: b; begin end;'));
+      check(parser).isSuccess('function foo: a; begin end;');
+      check(parser).isSuccess('function foo(a: b): c; begin end;');
+      check(parser).isSuccess('function foo(a: b): c; var a: b; begin end;');
     });
     test('block statement', () {
       final parser = definition.buildFrom(definition.blockStatement()).end();
-      expect(parser, isSuccess('begin end'));
-      expect(parser, isSuccess('begin foo end'));
-      expect(parser, isSuccess('begin foo; bar end'));
+      check(parser).isSuccess('begin end');
+      check(parser).isSuccess('begin foo end');
+      check(parser).isSuccess('begin foo; bar end');
     });
     test('type', () {
       final parser = definition.buildFrom(definition.type()).end();
-      expect(parser, isSuccess('a'));
-      expect(parser, isSuccess('^a'));
-      expect(parser, isSuccess('packed set of a'));
-      expect(parser, isSuccess('packed array [a] of b'));
-      expect(parser, isSuccess('packed record a: b end'));
-      expect(parser, isSuccess('packed file'));
+      check(parser).isSuccess('a');
+      check(parser).isSuccess('^a');
+      check(parser).isSuccess('packed set of a');
+      check(parser).isSuccess('packed array [a] of b');
+      check(parser).isSuccess('packed record a: b end');
+      check(parser).isSuccess('packed file');
     });
     test('type pointer', () {
       final parser = definition.buildFrom(definition.typePointer()).end();
-      expect(parser, isSuccess('^a'));
+      check(parser).isSuccess('^a');
     });
     test('type set', () {
       final parser = definition.buildFrom(definition.typeSet()).end();
-      expect(parser, isSuccess('set of a'));
+      check(parser).isSuccess('set of a');
     });
     test('type array', () {
       final parser = definition.buildFrom(definition.typeArray()).end();
-      expect(parser, isSuccess('array [a] of b'));
-      expect(parser, isSuccess('array [a, b] of c'));
+      check(parser).isSuccess('array [a] of b');
+      check(parser).isSuccess('array [a, b] of c');
     });
     test('type record', () {
       final parser = definition.buildFrom(definition.typeRecord()).end();
-      expect(parser, isSuccess('record a: b end'));
-      expect(parser, isSuccess('record a, b: c end'));
-      expect(parser, isSuccess('record case a of 1: (b: c) end'));
-      expect(parser, isSuccess('record case a: b of 1: (a: b) end'));
-      expect(parser, isSuccess('record case a of 1, 2: (a: b) end'));
-      expect(parser, isSuccess('record case a of 1: (b: c); 2: (d: e) end'));
+      check(parser).isSuccess('record a: b end');
+      check(parser).isSuccess('record a, b: c end');
+      check(parser).isSuccess('record case a of 1: (b: c) end');
+      check(parser).isSuccess('record case a: b of 1: (a: b) end');
+      check(parser).isSuccess('record case a of 1, 2: (a: b) end');
+      check(parser).isSuccess('record case a of 1: (b: c); 2: (d: e) end');
     });
     test('type file', () {
       final parser = definition.buildFrom(definition.typeFile()).end();
-      expect(parser, isSuccess('file'));
-      expect(parser, isSuccess('file of a'));
+      check(parser).isSuccess('file');
+      check(parser).isSuccess('file of a');
     });
     test('identifier', () {
       final parser = definition.buildFrom(definition.identifier()).end();
-      expect(parser, isSuccess('a'));
-      expect(parser, isSuccess('abc'));
-      expect(parser, isSuccess('a123'));
+      check(parser).isSuccess('a');
+      check(parser).isSuccess('abc');
+      check(parser).isSuccess('a123');
     });
     test('variable', () {
       final parser = definition.buildFrom(definition.variable()).end();
-      expect(parser, isSuccess('a'));
-      expect(parser, isSuccess('a[1]'));
-      expect(parser, isSuccess('a[1,2]'));
-      expect(parser, isSuccess('a[1][2]'));
-      expect(parser, isSuccess('a.b'));
-      expect(parser, isSuccess('a.b.c'));
-      expect(parser, isSuccess('a^'));
-      expect(parser, isSuccess('a^^'));
+      check(parser).isSuccess('a');
+      check(parser).isSuccess('a[1]');
+      check(parser).isSuccess('a[1,2]');
+      check(parser).isSuccess('a[1][2]');
+      check(parser).isSuccess('a.b');
+      check(parser).isSuccess('a.b.c');
+      check(parser).isSuccess('a^');
+      check(parser).isSuccess('a^^');
     });
     test('unsigned number', () {
       final parser = definition.buildFrom(definition.unsignedNumber()).end();
-      expect(parser, isSuccess('0', value: 0));
-      expect(parser, isSuccess('123', value: 123));
-      expect(parser, isSuccess('123.456', value: 123.456));
-      expect(parser, isSuccess('123.456e7', value: 123.456e7));
-      expect(parser, isSuccess('123.456e+7', value: 123.456e+7));
-      expect(parser, isSuccess('123e-4', value: 123e-4));
+      check(parser).isSuccess('0', value: 0);
+      check(parser).isSuccess('123', value: 123);
+      check(parser).isSuccess('123.456', value: 123.456);
+      check(parser).isSuccess('123.456e7', value: 123.456e7);
+      check(parser).isSuccess('123.456e+7', value: 123.456e+7);
+      check(parser).isSuccess('123e-4', value: 123e-4);
     });
     test('string literal', () {
       final parser = definition.buildFrom(definition.stringLiteral()).end();
-      expect(parser, isSuccess("''", value: "''"));
-      expect(parser, isSuccess("'whatever'", value: "'whatever'"));
-      expect(parser, isSuccess("'don''t'", value: "'don''t'"));
+      check(parser).isSuccess("''", value: "''");
+      check(parser).isSuccess("'whatever'", value: "'whatever'");
+      check(parser).isSuccess("'don''t'", value: "'don''t'");
     });
     test('expression', () {
       final parser = definition.buildFrom(definition.expression()).end();
-      expect(parser, isSuccess('a'));
-      expect(parser, isSuccess('a = b'));
-      expect(parser, isSuccess('a <> b'));
-      expect(parser, isSuccess('a < b'));
-      expect(parser, isSuccess('a <= b'));
-      expect(parser, isSuccess('a > b'));
-      expect(parser, isSuccess('a >= b'));
-      expect(parser, isSuccess('1 in b'));
+      check(parser).isSuccess('a');
+      check(parser).isSuccess('a = b');
+      check(parser).isSuccess('a <> b');
+      check(parser).isSuccess('a < b');
+      check(parser).isSuccess('a <= b');
+      check(parser).isSuccess('a > b');
+      check(parser).isSuccess('a >= b');
+      check(parser).isSuccess('1 in b');
     });
     test('simple expression', () {
       final parser = definition.buildFrom(definition.simpleExpression()).end();
-      expect(parser, isSuccess('a'));
-      expect(parser, isSuccess('+ a'));
-      expect(parser, isSuccess('- a'));
-      expect(parser, isSuccess('a + b'));
-      expect(parser, isSuccess('a - b - c'));
-      expect(parser, isSuccess('a or b'));
-      expect(parser, isSuccess('a or b or c'));
+      check(parser).isSuccess('a');
+      check(parser).isSuccess('+ a');
+      check(parser).isSuccess('- a');
+      check(parser).isSuccess('a + b');
+      check(parser).isSuccess('a - b - c');
+      check(parser).isSuccess('a or b');
+      check(parser).isSuccess('a or b or c');
     });
     test('term', () {
       final parser = definition.buildFrom(definition.term()).end();
-      expect(parser, isSuccess('a'));
-      expect(parser, isSuccess('a * b'));
-      expect(parser, isSuccess('a mod b'));
-      expect(parser, isSuccess('a * b / c'));
-      expect(parser, isSuccess('a and b and c'));
+      check(parser).isSuccess('a');
+      check(parser).isSuccess('a * b');
+      check(parser).isSuccess('a mod b');
+      check(parser).isSuccess('a * b / c');
+      check(parser).isSuccess('a and b and c');
     });
     test('factor', () {
       final parser = definition.buildFrom(definition.factor()).end();
-      expect(parser, isSuccess('1'));
-      expect(parser, isSuccess('a'));
-      expect(parser, isSuccess('a.b'));
-      expect(parser, isSuccess('a.b.c'));
-      expect(parser, isSuccess('a[1]'));
-      expect(parser, isSuccess('a[1, 2]'));
-      expect(parser, isSuccess('a^'));
-      expect(parser, isSuccess('sin(a)'));
-      expect(parser, isSuccess('arctan(a, b)'));
-      expect(parser, isSuccess('not a'));
-      expect(parser, isSuccess('[]'));
-      expect(parser, isSuccess('[1]'));
-      expect(parser, isSuccess('[1, 2]'));
-      expect(parser, isSuccess('[1..2]'));
-      expect(parser, isSuccess('[1..2, 3..4]'));
+      check(parser).isSuccess('1');
+      check(parser).isSuccess('a');
+      check(parser).isSuccess('a.b');
+      check(parser).isSuccess('a.b.c');
+      check(parser).isSuccess('a[1]');
+      check(parser).isSuccess('a[1, 2]');
+      check(parser).isSuccess('a^');
+      check(parser).isSuccess('sin(a)');
+      check(parser).isSuccess('arctan(a, b)');
+      check(parser).isSuccess('not a');
+      check(parser).isSuccess('[]');
+      check(parser).isSuccess('[1]');
+      check(parser).isSuccess('[1, 2]');
+      check(parser).isSuccess('[1..2]');
+      check(parser).isSuccess('[1..2, 3..4]');
     });
     test('unsigned constant', () {
       final parser = definition.buildFrom(definition.unsignedConstant()).end();
-      expect(parser, isSuccess('1'));
-      expect(parser, isSuccess('a'));
-      expect(parser, isSuccess("''"));
-      expect(parser, isSuccess('nil'));
+      check(parser).isSuccess('1');
+      check(parser).isSuccess('a');
+      check(parser).isSuccess("''");
+      check(parser).isSuccess('nil');
 
       final strLit = parser.parse("'Mean exceeds threshold: '").value;
-      expect(strLit.raw, "'Mean exceeds threshold: '");
-      expect(strLit.value, 'Mean exceeds threshold: ');
+      check(strLit.raw).equals("'Mean exceeds threshold: '");
+      check(strLit.value).equals('Mean exceeds threshold: ');
 
       final escapedStrLit = parser.parse("'don''t'").value;
-      expect(escapedStrLit.raw, "'don''t'");
-      expect(escapedStrLit.value, "don't");
+      check(escapedStrLit.raw).equals("'don''t'");
+      check(escapedStrLit.value).equals("don't");
     });
     test('parameter list', () {
       final parser = definition.buildFrom(definition.parameterList()).end();
-      expect(parser, isSuccess(''));
-      expect(parser, isSuccess('(a: b)'));
-      expect(parser, isSuccess('(a: b; c: d)'));
-      expect(parser, isSuccess('(a, b: c)'));
-      expect(parser, isSuccess('(var a: b)'));
-      expect(parser, isSuccess('(var a: b; var c: d)'));
-      expect(parser, isSuccess('(var a, b: c)'));
+      check(parser).isSuccess('');
+      check(parser).isSuccess('(a: b)');
+      check(parser).isSuccess('(a: b; c: d)');
+      check(parser).isSuccess('(a, b: c)');
+      check(parser).isSuccess('(var a: b)');
+      check(parser).isSuccess('(var a: b; var c: d)');
+      check(parser).isSuccess('(var a, b: c)');
     });
     test('unsigned integer', () {
       final parser = definition.buildFrom(definition.unsignedInteger()).end();
-      expect(parser, isSuccess('0', value: 0));
-      expect(parser, isSuccess('123', value: 123));
-      expect(parser, isSuccess('12345', value: 12345));
+      check(parser).isSuccess('0', value: 0);
+      check(parser).isSuccess('123', value: 123);
+      check(parser).isSuccess('12345', value: 12345);
     });
     test('constant', () {
       final parser = definition.buildFrom(definition.constant()).end();
-      expect(parser, isSuccess('a'));
-      expect(parser, isSuccess('+b'));
-      expect(parser, isSuccess('-c'));
-      expect(parser, isSuccess('1'));
-      expect(parser, isSuccess('+2'));
-      expect(parser, isSuccess('-3'));
-      expect(parser, isSuccess('a'));
-      expect(parser, isSuccess("'hello'"));
-      expect(parser, isSuccess('nil'));
+      check(parser).isSuccess('a');
+      check(parser).isSuccess('+b');
+      check(parser).isSuccess('-c');
+      check(parser).isSuccess('1');
+      check(parser).isSuccess('+2');
+      check(parser).isSuccess('-3');
+      check(parser).isSuccess('a');
+      check(parser).isSuccess("'hello'");
+      check(parser).isSuccess('nil');
     });
     test('simple type', () {
       final parser = definition.buildFrom(definition.simpleType()).end();
-      expect(parser, isSuccess('a'));
-      expect(parser, isSuccess('(a)'));
-      expect(parser, isSuccess('(a, b)'));
-      expect(parser, isSuccess('a..b'));
+      check(parser).isSuccess('a');
+      check(parser).isSuccess('(a)');
+      check(parser).isSuccess('(a, b)');
+      check(parser).isSuccess('a..b');
     });
     test('field list', () {
       final parser = definition.buildFrom(definition.fieldList()).end();
-      expect(parser, isSuccess('a: b'));
-      expect(parser, isSuccess('a: b;'));
-      expect(parser, isSuccess('a, b: c'));
-      expect(parser, isSuccess('a, b: c;'));
-      expect(parser, isSuccess('a: b; c: d'));
-      expect(parser, isSuccess('a: b; c: d;'));
-      expect(parser, isSuccess('case a of b : (c: d)'));
-      expect(parser, isSuccess('case a : b of c : (d: e)'));
-      expect(parser, isSuccess('case a of b, c : (d: e)'));
-      expect(parser, isSuccess('case a of b : (c: d); e : (f: g)'));
-      expect(parser, isSuccess('a: b case c of d : (e: f)'));
+      check(parser).isSuccess('a: b');
+      check(parser).isSuccess('a: b;');
+      check(parser).isSuccess('a, b: c');
+      check(parser).isSuccess('a, b: c;');
+      check(parser).isSuccess('a: b; c: d');
+      check(parser).isSuccess('a: b; c: d;');
+      check(parser).isSuccess('case a of b : (c: d)');
+      check(parser).isSuccess('case a : b of c : (d: e)');
+      check(parser).isSuccess('case a of b, c : (d: e)');
+      check(parser).isSuccess('case a of b : (c: d); e : (f: g)');
+      check(parser).isSuccess('a: b case c of d : (e: f)');
     });
   });
   group('grammar', () {
     test('hello world', () {
-      expect(
-        parser,
-        isSuccess(
-          [
-            "program simple;",
-            "begin",
-            "  writeln('Hello World!');",
-            "end.",
-          ].join('\n'),
-        ),
+      check(parser).isSuccess(
+        [
+          "program simple;",
+          "begin",
+          "  writeln('Hello World!');",
+          "end.",
+        ].join('\n'),
       );
     });
     test('comparestrings', () {
-      expect(
-        parser,
-        isSuccess(
-          [
-            "program comparestrings;",
-            "var s: string;",
-            "    t: string;"
-                "begin",
-            "  s := 'something';",
-            "  t := 'something bigger';",
-            "  if s = t then",
-            "    writeln(s, ' is equal to ', t)"
-                "  else",
-            "    if s > t then",
-            "      writeln(s, ' is greater than ', t)",
-            "    else",
-            "      if s < t then",
-            "        writeln(s, ' is less than ', t);",
-            "end.",
-          ].join('\n'),
-        ),
+      check(parser).isSuccess(
+        [
+          "program comparestrings;",
+          "var s: string;",
+          "    t: string;"
+              "begin",
+          "  s := 'something';",
+          "  t := 'something bigger';",
+          "  if s = t then",
+          "    writeln(s, ' is equal to ', t)"
+              "  else",
+          "    if s > t then",
+          "      writeln(s, ' is greater than ', t)",
+          "    else",
+          "      if s < t then",
+          "        writeln(s, ' is less than ', t);",
+          "end.",
+        ].join('\n'),
       );
     });
     test('calculate stats', () {
@@ -422,7 +416,7 @@ begin
   else
     WriteLn('Mean is within limits');
 end.''';
-      expect(parser, isSuccess(code));
+      check(parser).isSuccess(code);
     });
     test('geometry demo', () {
       const code = '''
@@ -443,23 +437,23 @@ begin
   c.radius := 5.0;
   WriteLn('Circle at (', c.center.x, ', ', c.center.y, ')');
 end.''';
-      expect(parser, isSuccess(code));
+      check(parser).isSuccess(code);
     });
-    test('linter', () => expect(linter(parser), isEmpty));
+    test('linter', () => check(linter(parser)).isEmpty());
   });
 
   group('ast parser', () {
     test('simple program', () {
       final prog = parser.parse('program test; begin writeln(42); end.').value;
-      expect(prog.name, 'test');
-      expect(prog.parameters, isEmpty);
-      expect(prog.block.statement.statements, hasLength(1));
+      check(prog.name).equals('test');
+      check(prog.parameters).isEmpty();
+      check(prog.block.statement.statements).length.equals(1);
       final stmt =
           prog.block.statement.statements.first as ProcedureStatementNode;
-      expect(stmt.name, 'writeln');
-      expect(stmt.arguments, hasLength(1));
+      check(stmt.name).equals('writeln');
+      check(stmt.arguments).length.equals(1);
       final arg = stmt.arguments.first as LiteralExpressionNode;
-      expect(arg.value, 42);
+      check(arg.value).equals(42);
     });
 
     test('program with vars and if', () {
@@ -474,14 +468,12 @@ begin
     y := 0;
 end.''';
       final prog = parser.parse(code).value;
-      expect(prog.name, 'calc');
-      expect(prog.block.variables, hasLength(1));
-      expect(prog.block.variables.first.names, ['x', 'y']);
-      expect(
-        (prog.block.variables.first.type as SimpleTypeNode).name,
-        'Integer',
-      );
-      expect(prog.block.statement.statements, hasLength(2));
+      check(prog.name).equals('calc');
+      check(prog.block.variables).length.equals(1);
+      check(prog.block.variables.first.names).deepEquals(['x', 'y']);
+      check((prog.block.variables.first.type as SimpleTypeNode).name)
+          .equals('Integer');
+      check(prog.block.statement.statements).length.equals(2);
     });
 
     test('calculate stats', () {
@@ -516,17 +508,17 @@ begin
     WriteLn('Mean is within limits');
 end.''';
       final prog = parser.parse(code).value;
-      expect(prog.name, 'CalculateStats');
-      expect(prog.parameters, ['input', 'output']);
-      expect(prog.block.constants, hasLength(2));
-      expect(prog.block.types, hasLength(1));
-      expect(prog.block.variables, hasLength(3));
-      expect(prog.block.subroutines, hasLength(1));
+      check(prog.name).equals('CalculateStats');
+      check(prog.parameters).deepEquals(['input', 'output']);
+      check(prog.block.constants).length.equals(2);
+      check(prog.block.types).length.equals(1);
+      check(prog.block.variables).length.equals(3);
+      check(prog.block.subroutines).length.equals(1);
       final proc = prog.block.subroutines.first as ProcedureNode;
-      expect(proc.name, 'LoadData');
-      expect(proc.parameters, hasLength(1));
-      expect(proc.parameters.first.isVar, isTrue);
-      expect(prog.block.statement.statements, hasLength(5));
+      check(proc.name).equals('LoadData');
+      check(proc.parameters).length.equals(1);
+      check(proc.parameters.first.isVar).isTrue();
+      check(prog.block.statement.statements).length.equals(5);
     });
 
     test('geometry demo', () {
@@ -549,27 +541,27 @@ begin
   WriteLn('Circle at (', c.center.x, ', ', c.center.y, ')');
 end.''';
       final prog = parser.parse(code).value;
-      expect(prog.name, 'GeometryDemo');
-      expect(prog.block.types, hasLength(2));
+      check(prog.name).equals('GeometryDemo');
+      check(prog.block.types).length.equals(2);
       final pointType = prog.block.types[0].type as RecordTypeNode;
-      expect(pointType.fields, hasLength(1));
-      expect(pointType.fields.first.names, ['x', 'y']);
-      expect(prog.block.variables, hasLength(1));
-      expect(prog.block.statement.statements, hasLength(4));
+      check(pointType.fields).length.equals(1);
+      check(pointType.fields.first.names).deepEquals(['x', 'y']);
+      check(prog.block.variables).length.equals(1);
+      check(prog.block.statement.statements).length.equals(4);
       final lastStmt =
           prog.block.statement.statements.last as ProcedureStatementNode;
-      expect(lastStmt.name, 'WriteLn');
-      expect(lastStmt.arguments, hasLength(5));
-      expect(lastStmt.arguments[1], isA<FieldAccessExpressionNode>());
+      check(lastStmt.name).equals('WriteLn');
+      check(lastStmt.arguments).length.equals(5);
+      check(lastStmt.arguments[1]).isA<FieldAccessExpressionNode>();
     });
 
-    test('linter', () => expect(linter(parser), isEmpty));
+    test('linter', () => check(linter(parser)).isEmpty());
 
     test('failures', () {
-      expect(parser, isFailure(''));
-      expect(parser, isFailure('program;'));
-      expect(parser, isFailure('program foo; begin end'));
-      expect(parser, isFailure('program foo; begin writeln(42); end'));
+      check(parser).isFailure('');
+      check(parser).isFailure('program;');
+      check(parser).isFailure('program foo; begin end');
+      check(parser).isFailure('program foo; begin writeln(42); end');
     });
   });
 }

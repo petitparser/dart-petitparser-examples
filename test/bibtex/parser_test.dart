@@ -3,16 +3,9 @@ import 'dart:io';
 
 import 'package:petitparser/petitparser.dart';
 import 'package:petitparser_examples/bibtex.dart';
-import 'package:test/test.dart';
+import 'package:test/scaffolding.dart';
 
-Matcher isBibTeXEntry({
-  dynamic type = anything,
-  dynamic key = anything,
-  dynamic fields = anything,
-}) => const TypeMatcher<BibTeXEntry>()
-    .having((e) => e.type, 'type', type)
-    .having((e) => e.key, 'key', key)
-    .having((e) => e.fields, 'fields', fields);
+import 'bibtex_checks.dart';
 
 /// Synthetic hermetic BibTeX fixture containing diverse entry types, field
 /// formats, LaTeX escapes, and nested braces.
@@ -139,10 +132,10 @@ void main() {
   group('entryParser', () {
     test('parses a single entry', () {
       final result = entryParser.parse('@article{k1, title = "Hello"}');
-      expect(result is Success, isTrue);
+      check(result).isA<Success>();
       final entry = result.value;
-      expect(entry.key, 'k1');
-      expect(entry['title'], 'Hello');
+      check(entry.key).equals('k1');
+      check(entry['title']).equals('Hello');
     });
   });
 
@@ -161,14 +154,14 @@ void main() {
       await for (final entry in parseStream(input)) {
         entries.add(entry);
       }
-      expect(entries.length, 3);
-      expect(entries.map((e) => e.key), ['e1', 'e2', 'e3']);
+      check(entries).length.equals(3);
+      check(entries.map((e) => e.key)).deepEquals(['e1', 'e2', 'e3']);
     });
 
     test('parseEntries provides synchronous lazy iterable', () {
       final entries = parseEntries(input).toList();
-      expect(entries.length, 3);
-      expect(entries.map((e) => e.key), ['e1', 'e2', 'e3']);
+      check(entries).length.equals(3);
+      check(entries.map((e) => e.key)).deepEquals(['e1', 'e2', 'e3']);
     });
 
     test(
@@ -182,11 +175,11 @@ void main() {
           '{c2, title = "Second Chunked"}\n',
         ]);
         final entries = await parseStreamChunks(chunks).toList();
-        expect(entries.length, 2);
-        expect(entries[0].key, 'c1');
-        expect(entries[0]['title'], 'Chunked Entry');
-        expect(entries[1].key, 'c2');
-        expect(entries[1]['title'], 'Second Chunked');
+        check(entries).length.equals(2);
+        check(entries[0].key).equals('c1');
+        check(entries[0]['title']).equals('Chunked Entry');
+        check(entries[1].key).equals('c2');
+        check(entries[1]['title']).equals('Second Chunked');
       },
     );
 
@@ -197,11 +190,11 @@ void main() {
         '@book{c2, title = {Second}}\n',
       ]);
       final entries = await parseStreamChunks(chunks).toList();
-      expect(entries.length, 2);
-      expect(entries[0].key, 'c1');
-      expect(entries[0]['title'], 'First');
-      expect(entries[1].key, 'c2');
-      expect(entries[1]['title'], 'Second');
+      check(entries).length.equals(2);
+      check(entries[0].key).equals('c1');
+      check(entries[0]['title']).equals('First');
+      check(entries[1].key).equals('c2');
+      check(entries[1]['title']).equals('Second');
     });
 
     test(
@@ -216,13 +209,13 @@ void main() {
           '% Header with email contact@example.com\n@article{c1, title = {First}}\n',
         );
         await pumpEventQueue();
-        expect(emitted.length, 1);
-        expect(emitted[0].key, 'c1');
+        check(emitted).length.equals(1);
+        check(emitted[0].key).equals('c1');
 
         controller.add('@article{c2, title = {Second}}\n');
         await pumpEventQueue();
-        expect(emitted.length, 2);
-        expect(emitted[1].key, 'c2');
+        check(emitted).length.equals(2);
+        check(emitted[1].key).equals('c2');
 
         await controller.close();
         await subscription.cancel();
@@ -231,7 +224,7 @@ void main() {
 
     test('parseStreamChunks handles empty stream', () async {
       final entries = await parseStreamChunks(const Stream.empty()).toList();
-      expect(entries, isEmpty);
+      check(entries).isEmpty();
     });
   });
 
@@ -242,25 +235,24 @@ void main() {
     });
 
     test('parses all entry types', () {
-      expect(entries.length, equals(12));
+      check(entries).length.equals(12);
       final types = entries.map((e) => e.type).toSet();
-      expect(
-        types,
-        containsAll([
-          'article',
-          'book',
-          'inproceedings',
-          'misc',
-          'techreport',
-          'phdthesis',
-          'mastersthesis',
-          'proceedings',
-          'manual',
-          'comment',
-          'string',
-          'preamble',
-        ]),
-      );
+      for (final expectedType in [
+        'article',
+        'book',
+        'inproceedings',
+        'misc',
+        'techreport',
+        'phdthesis',
+        'mastersthesis',
+        'proceedings',
+        'manual',
+        'comment',
+        'string',
+        'preamble',
+      ]) {
+        check(types).contains(expectedType);
+      }
     });
 
     test('author filtering matches expected count', () {
@@ -268,30 +260,28 @@ void main() {
         (entry) =>
             entry.getField('author')?.rawValue.contains('Renggli') ?? false,
       );
-      expect(renggliEntries.length, equals(2));
+      check(renggliEntries).length.equals(2);
     });
 
     test('field normalization across entries', () {
       final reng10c = entries.firstWhere((e) => e.key == 'Reng10c');
-      expect(
-        reng10c['author'],
+      check(reng10c['author']).equals(
         'Lukas Renggli and Stéphane Ducasse and Tudor Gîrba and Oscar Nierstrasz',
       );
-      expect(reng10c['pages'], '1\u201410');
+      check(reng10c['pages']).equals('1\u201410');
 
       final knuth = entries.firstWhere((e) => e.key == 'Knuth1984');
-      expect(knuth['pages'], '97\u2013111');
-      expect(knuth['author'], 'Donald E. Knuth');
+      check(knuth['pages']).equals('97\u2013111');
+      check(knuth['author']).equals('Donald E. Knuth');
 
       final misc = entries.firstWhere((e) => e.key == 'Renggli2024');
-      expect(misc['note'], 'well-known');
+      check(misc['note']).equals('well-known');
     });
 
     test('round-trip via raw toString()', () {
       for (final entry in entries) {
         final parsed = entryParser.parse(entry.toString()).value;
-        expect(
-          parsed,
+        check(parsed).which(
           isBibTeXEntry(type: entry.type, key: entry.key, fields: entry.fields),
         );
       }
@@ -301,47 +291,41 @@ void main() {
   group('real-world literatur.bib pattern', () {
     test('parses full fixture with comments and trailing commas', () {
       final entries = parseEntries(realWorldFixture).toList();
-      expect(entries.length, 3);
-      expect(entries[0].key, 'abadi-et-al-misc2015');
-      expect(
-        entries[0]['author'],
-        'Martín Abadi and Ashish Agarwal and Jeffrey Dean',
-      );
-      expect(
-        entries[0].getField('author')?.value,
-        'Martín Abadi and Ashish Agarwal and Jeffrey Dean',
-      );
-      expect(
-        entries[0]['title'],
+      check(entries).length.equals(3);
+      check(entries[0].key).equals('abadi-et-al-misc2015');
+      check(entries[0]['author'])
+          .equals('Martín Abadi and Ashish Agarwal and Jeffrey Dean');
+      check(entries[0].getField('author')?.value)
+          .equals('Martín Abadi and Ashish Agarwal and Jeffrey Dean');
+      check(entries[0]['title']).equals(
         'TensorFlow: Large-Scale Machine Learning on Heterogeneous Systems',
       );
-      expect(
-        entries[0].getField('title')?.value,
+      check(entries[0].getField('title')?.value).equals(
         'TensorFlow: Large-Scale Machine Learning on Heterogeneous Systems',
       );
 
-      expect(entries[1].key, 'abbe-et-al-neurips2024');
-      expect(entries[1]['pages'], '27850\u201327895');
-      expect(entries[1].getField('pages')?.value, '27850\u201327895');
+      check(entries[1].key).equals('abbe-et-al-neurips2024');
+      check(entries[1]['pages']).equals('27850\u201327895');
+      check(entries[1].getField('pages')?.value).equals('27850\u201327895');
 
-      expect(entries[2].key, 'aljazzar-leue-aij2011');
-      expect(entries[2].getField('pages')?.value, '2129\u20132154');
-      expect(entries[2].getField('journal')?.rawValue, 'aij');
-      expect(entries[2]['pages'], '2129\u20132154');
-      expect(entries[2].getRaw('journal'), 'aij');
+      check(entries[2].key).equals('aljazzar-leue-aij2011');
+      check(entries[2].getField('pages')?.value).equals('2129\u20132154');
+      check(entries[2].getField('journal')?.rawValue).equals('aij');
+      check(entries[2]['pages']).equals('2129\u20132154');
+      check(entries[2].getRaw('journal')).equals('aij');
     });
 
     test('streams real-world fixture', () async {
       final streamed = await parseStream(realWorldFixture).toList();
-      expect(streamed.length, 3);
-      expect(streamed[2].key, 'aljazzar-leue-aij2011');
+      check(streamed).length.equals(3);
+      check(streamed[2].key).equals('aljazzar-leue-aij2011');
     });
 
     test('parses full /tmp/literatur.bib if present', () {
       final file = File('/tmp/literatur.bib');
       if (!file.existsSync()) return;
       final entries = parseEntries(file.readAsStringSync()).toList();
-      expect(entries.length, 2304);
+      check(entries).length.equals(2304);
     }, testOn: 'vm');
   });
 
@@ -350,36 +334,21 @@ void main() {
       final file = File('web/bibtex/bibtex.html');
       if (!file.existsSync()) return;
       final html = file.readAsStringSync();
-      expect(html, contains('class="examples-bar"'));
-      expect(
-        html,
-        contains(
-          'data-url="https://raw.githubusercontent.com/scgbern/scgbib/main/scg.bib"',
-        ),
+      check(html).contains('class="examples-bar"');
+      check(html).contains(
+        'data-url="https://raw.githubusercontent.com/scgbern/scgbib/main/scg.bib"',
       );
-      expect(
-        html,
-        contains(
-          'data-url="https://raw.githubusercontent.com/aibasel/bib/refs/heads/main/literatur.bib"',
-        ),
+      check(html).contains(
+        'data-url="https://raw.githubusercontent.com/aibasel/bib/refs/heads/main/literatur.bib"',
       );
-      expect(
-        html,
-        contains(
-          'data-url="https://raw.githubusercontent.com/wkjarosz/rendering-bib/master/rendering-bibtex.bib"',
-        ),
+      check(html).contains(
+        'data-url="https://raw.githubusercontent.com/wkjarosz/rendering-bib/master/rendering-bibtex.bib"',
       );
-      expect(
-        html,
-        contains(
-          'data-url="https://raw.githubusercontent.com/OMR-Research/omr-research.github.io/master/OMR-Research.bib"',
-        ),
+      check(html).contains(
+        'data-url="https://raw.githubusercontent.com/OMR-Research/omr-research.github.io/master/OMR-Research.bib"',
       );
-      expect(
-        html,
-        contains(
-          'data-url="https://raw.githubusercontent.com/iridia-ulb/references/master/biblio.bib"',
-        ),
+      check(html).contains(
+        'data-url="https://raw.githubusercontent.com/iridia-ulb/references/master/biblio.bib"',
       );
     }, testOn: 'vm');
   });

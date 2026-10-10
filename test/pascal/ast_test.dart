@@ -1,5 +1,6 @@
+import 'package:checks/checks.dart';
 import 'package:petitparser_examples/pascal.dart';
-import 'package:test/test.dart';
+import 'package:test/scaffolding.dart';
 
 /// Test visitor that records visits and returns the node class name.
 class TestPascalVisitor implements PascalVisitor<String, String> {
@@ -191,13 +192,13 @@ void main() {
         block: block,
       );
 
-      expect(program.accept(visitor, ctx), equals('ProgramNode:MyProg:test'));
-      expect(program.children, equals([block]));
-      expect(program.parameters, equals(['input', 'output']));
+      check(program.accept(visitor, ctx)).equals('ProgramNode:MyProg:test');
+      check(program.children).deepEquals([block]);
+      check(program.parameters).deepEquals(['input', 'output']);
 
-      expect(block.accept(visitor, ctx), equals('BlockNode:test'));
-      expect(block.labels, equals(['10', '20']));
-      expect(block.children, contains(isA<CompoundStatementNode>()));
+      check(block.accept(visitor, ctx)).equals('BlockNode:test');
+      check(block.labels).deepEquals(['10', '20']);
+      check(block.children).any((it) => it.isA<CompoundStatementNode>());
     });
   });
 
@@ -207,29 +208,23 @@ void main() {
 
     test('ConstantDefinitionNode', () {
       const constDef = ConstantDefinitionNode(name: 'MAX', value: lit);
-      expect(
-        constDef.accept(visitor, ctx),
-        equals('ConstantDefinitionNode:MAX:test'),
-      );
-      expect(constDef.children, equals([lit]));
+      check(constDef.accept(visitor, ctx))
+          .equals('ConstantDefinitionNode:MAX:test');
+      check(constDef.children).deepEquals([lit]);
     });
 
     test('TypeDefinitionNode', () {
       const typeDef = TypeDefinitionNode(name: 'TInt', type: simple);
-      expect(
-        typeDef.accept(visitor, ctx),
-        equals('TypeDefinitionNode:TInt:test'),
-      );
-      expect(typeDef.children, equals([simple]));
+      check(typeDef.accept(visitor, ctx))
+          .equals('TypeDefinitionNode:TInt:test');
+      check(typeDef.children).deepEquals([simple]);
     });
 
     test('VariableDeclarationNode', () {
       const varDecl = VariableDeclarationNode(names: ['x', 'y'], type: simple);
-      expect(
-        varDecl.accept(visitor, ctx),
-        equals('VariableDeclarationNode:x,y:test'),
-      );
-      expect(varDecl.children, equals([simple]));
+      check(varDecl.accept(visitor, ctx))
+          .equals('VariableDeclarationNode:x,y:test');
+      check(varDecl.children).deepEquals([simple]);
     });
 
     test('FormalParameterNode', () {
@@ -238,13 +233,10 @@ void main() {
         names: ['a', 'b'],
         type: simple,
       );
-      expect(
-        param.accept(visitor, ctx),
-        equals('FormalParameterNode:a,b:test'),
-      );
-      expect(param.children, equals([simple]));
-      expect(param.isVar, isTrue);
-      expect(param.type, equals(simple));
+      check(param.accept(visitor, ctx)).equals('FormalParameterNode:a,b:test');
+      check(param.children).deepEquals([simple]);
+      check(param.isVar).isTrue();
+      check(param.type).equals(simple);
     });
 
     test('ProcedureNode and FunctionNode', () {
@@ -260,8 +252,8 @@ void main() {
         parameters: [param],
         block: block,
       );
-      expect(proc.accept(visitor, ctx), equals('ProcedureNode:DoWork:test'));
-      expect(proc.children, equals([param, block]));
+      check(proc.accept(visitor, ctx)).equals('ProcedureNode:DoWork:test');
+      check(proc.children).deepEquals([param, block]);
 
       const func = FunctionNode(
         name: 'GetVal',
@@ -269,12 +261,10 @@ void main() {
         returnType: SimpleTypeNode('real'),
         block: block,
       );
-      expect(func.accept(visitor, ctx), equals('FunctionNode:GetVal:test'));
-      expect(
-        func.children,
-        equals([param, const SimpleTypeNode('real'), block]),
-      );
-      expect(func.returnType, equals(const SimpleTypeNode('real')));
+      check(func.accept(visitor, ctx)).equals('FunctionNode:GetVal:test');
+      check(func.children)
+          .deepEquals([param, const SimpleTypeNode('real'), block]);
+      check(func.returnType).equals(const SimpleTypeNode('real'));
     });
   });
 
@@ -284,47 +274,45 @@ void main() {
     const lit10 = LiteralExpressionNode(raw: '10', value: 10);
 
     test('SimpleTypeNode and SubrangeTypeNode', () {
-      expect(simple.accept(visitor, ctx), equals('SimpleTypeNode:char:test'));
-      expect(simple.children, isEmpty);
+      check(simple.accept(visitor, ctx)).equals('SimpleTypeNode:char:test');
+      check(simple.children).isEmpty();
 
       const subrange = SubrangeTypeNode(start: lit1, end: lit10);
-      expect(subrange.accept(visitor, ctx), equals('SubrangeTypeNode:test'));
-      expect(subrange.children, equals([lit1, lit10]));
+      check(subrange.accept(visitor, ctx)).equals('SubrangeTypeNode:test');
+      check(subrange.children).deepEquals([lit1, lit10]);
     });
 
     test('EnumeratedTypeNode and PointerTypeNode', () {
       const enumType = EnumeratedTypeNode(['red', 'green', 'blue']);
-      expect(
-        enumType.accept(visitor, ctx),
-        equals('EnumeratedTypeNode:red,green,blue:test'),
-      );
-      expect(enumType.children, isEmpty);
+      check(enumType.accept(visitor, ctx))
+          .equals('EnumeratedTypeNode:red,green,blue:test');
+      check(enumType.children).isEmpty();
 
       const ptrType = PointerTypeNode(SimpleTypeNode('node'));
-      expect(ptrType.accept(visitor, ctx), equals('PointerTypeNode:test'));
-      expect(ptrType.children, equals([const SimpleTypeNode('node')]));
+      check(ptrType.accept(visitor, ctx)).equals('PointerTypeNode:test');
+      check(ptrType.children).deepEquals([const SimpleTypeNode('node')]);
     });
 
     test('ArrayTypeNode and RecordTypeNode', () {
       const subrange = SubrangeTypeNode(start: lit1, end: lit10);
       const arrayType = ArrayTypeNode(indices: [subrange], elementType: simple);
-      expect(arrayType.accept(visitor, ctx), equals('ArrayTypeNode:test'));
-      expect(arrayType.children, equals([subrange, simple]));
+      check(arrayType.accept(visitor, ctx)).equals('ArrayTypeNode:test');
+      check(arrayType.children).deepEquals([subrange, simple]);
 
       const field = VariableDeclarationNode(names: ['name'], type: simple);
       const recordType = RecordTypeNode(fields: [field]);
-      expect(recordType.accept(visitor, ctx), equals('RecordTypeNode:test'));
-      expect(recordType.children, equals([field]));
+      check(recordType.accept(visitor, ctx)).equals('RecordTypeNode:test');
+      check(recordType.children).deepEquals([field]);
     });
 
     test('SetTypeNode and FileTypeNode', () {
       const setType = SetTypeNode(simple);
-      expect(setType.accept(visitor, ctx), equals('SetTypeNode:test'));
-      expect(setType.children, equals([simple]));
+      check(setType.accept(visitor, ctx)).equals('SetTypeNode:test');
+      check(setType.children).deepEquals([simple]);
 
       const fileType = FileTypeNode(simple);
-      expect(fileType.accept(visitor, ctx), equals('FileTypeNode:test'));
-      expect(fileType.children, equals([simple]));
+      check(fileType.accept(visitor, ctx)).equals('FileTypeNode:test');
+      check(fileType.children).deepEquals([simple]);
     });
   });
 
@@ -334,15 +322,12 @@ void main() {
     const empty = EmptyStatementNode();
 
     test('CompoundStatementNode and EmptyStatementNode', () {
-      expect(empty.accept(visitor, ctx), equals('EmptyStatementNode:test'));
-      expect(empty.children, isEmpty);
+      check(empty.accept(visitor, ctx)).equals('EmptyStatementNode:test');
+      check(empty.children).isEmpty();
 
       const compound = CompoundStatementNode(statements: [empty, empty]);
-      expect(
-        compound.accept(visitor, ctx),
-        equals('CompoundStatementNode:test'),
-      );
-      expect(compound.children, equals([empty, empty]));
+      check(compound.accept(visitor, ctx)).equals('CompoundStatementNode:test');
+      check(compound.children).deepEquals([empty, empty]);
     });
 
     test('AssignmentStatementNode and ProcedureStatementNode', () {
@@ -350,21 +335,16 @@ void main() {
         variable: vExpr,
         value: LiteralExpressionNode(raw: '10', value: 10),
       );
-      expect(
-        assign.accept(visitor, ctx),
-        equals('AssignmentStatementNode:test'),
-      );
-      expect(assign.children.length, equals(2));
+      check(assign.accept(visitor, ctx)).equals('AssignmentStatementNode:test');
+      check(assign.children.length).equals(2);
 
       const procStmt = ProcedureStatementNode(
         name: 'WriteLn',
         arguments: [LiteralExpressionNode(raw: "'hello'", value: 'hello')],
       );
-      expect(
-        procStmt.accept(visitor, ctx),
-        equals('ProcedureStatementNode:WriteLn:test'),
-      );
-      expect(procStmt.children.length, equals(1));
+      check(procStmt.accept(visitor, ctx))
+          .equals('ProcedureStatementNode:WriteLn:test');
+      check(procStmt.children.length).equals(1);
     });
 
     test('IfStatementNode with and without else', () {
@@ -373,11 +353,11 @@ void main() {
         thenStatement: empty,
         elseStatement: empty,
       );
-      expect(ifElse.accept(visitor, ctx), equals('IfStatementNode:test'));
-      expect(ifElse.children, equals([expr, empty, empty]));
+      check(ifElse.accept(visitor, ctx)).equals('IfStatementNode:test');
+      check(ifElse.children).deepEquals([expr, empty, empty]);
 
       const ifOnly = IfStatementNode(condition: expr, thenStatement: empty);
-      expect(ifOnly.children, equals([expr, empty]));
+      check(ifOnly.children).deepEquals([expr, empty]);
     });
 
     test('CaseStatementNode and CaseElementNode', () {
@@ -385,28 +365,25 @@ void main() {
         constants: [LiteralExpressionNode(raw: '1', value: 1)],
         statement: empty,
       );
-      expect(caseElem.accept(visitor, ctx), equals('CaseElementNode:test'));
-      expect(caseElem.children.length, equals(2));
+      check(caseElem.accept(visitor, ctx)).equals('CaseElementNode:test');
+      check(caseElem.children.length).equals(2);
 
       const caseStmt = CaseStatementNode(expression: vExpr, cases: [caseElem]);
-      expect(caseStmt.accept(visitor, ctx), equals('CaseStatementNode:test'));
-      expect(caseStmt.children, equals([vExpr, caseElem]));
+      check(caseStmt.accept(visitor, ctx)).equals('CaseStatementNode:test');
+      check(caseStmt.children).deepEquals([vExpr, caseElem]);
     });
 
     test('WhileStatementNode and RepeatStatementNode', () {
       const whileStmt = WhileStatementNode(condition: expr, statement: empty);
-      expect(whileStmt.accept(visitor, ctx), equals('WhileStatementNode:test'));
-      expect(whileStmt.children, equals([expr, empty]));
+      check(whileStmt.accept(visitor, ctx)).equals('WhileStatementNode:test');
+      check(whileStmt.children).deepEquals([expr, empty]);
 
       const repeatStmt = RepeatStatementNode(
         statements: [empty],
         condition: expr,
       );
-      expect(
-        repeatStmt.accept(visitor, ctx),
-        equals('RepeatStatementNode:test'),
-      );
-      expect(repeatStmt.children, equals([empty, expr]));
+      check(repeatStmt.accept(visitor, ctx)).equals('RepeatStatementNode:test');
+      check(repeatStmt.children).deepEquals([empty, expr]);
     });
 
     test('ForStatementNode (to and downto)', () {
@@ -417,11 +394,8 @@ void main() {
         finalValue: LiteralExpressionNode(raw: '10', value: 10),
         statement: empty,
       );
-      expect(
-        forUp.accept(visitor, ctx),
-        equals('ForStatementNode:i:false:test'),
-      );
-      expect(forUp.children.length, equals(3));
+      check(forUp.accept(visitor, ctx)).equals('ForStatementNode:i:false:test');
+      check(forUp.children.length).equals(3);
 
       const forDown = ForStatementNode(
         variable: 'j',
@@ -430,23 +404,18 @@ void main() {
         finalValue: LiteralExpressionNode(raw: '1', value: 1),
         statement: empty,
       );
-      expect(
-        forDown.accept(visitor, ctx),
-        equals('ForStatementNode:j:true:test'),
-      );
+      check(forDown.accept(visitor, ctx))
+          .equals('ForStatementNode:j:true:test');
     });
 
     test('WithStatementNode and GotoStatementNode', () {
       const withStmt = WithStatementNode(records: [vExpr], statement: empty);
-      expect(withStmt.accept(visitor, ctx), equals('WithStatementNode:test'));
-      expect(withStmt.children, equals([vExpr, empty]));
+      check(withStmt.accept(visitor, ctx)).equals('WithStatementNode:test');
+      check(withStmt.children).deepEquals([vExpr, empty]);
 
       const gotoStmt = GotoStatementNode(targetLabel: '100');
-      expect(
-        gotoStmt.accept(visitor, ctx),
-        equals('GotoStatementNode:100:test'),
-      );
-      expect(gotoStmt.children, isEmpty);
+      check(gotoStmt.accept(visitor, ctx)).equals('GotoStatementNode:100:test');
+      check(gotoStmt.children).isEmpty();
     });
   });
 
@@ -457,27 +426,22 @@ void main() {
 
     test('BinaryExpressionNode and UnaryExpressionNode', () {
       const bin = BinaryExpressionNode(operator: '+', left: left, right: right);
-      expect(bin.accept(visitor, ctx), equals('BinaryExpressionNode:+:test'));
-      expect(bin.children, equals([left, right]));
+      check(bin.accept(visitor, ctx)).equals('BinaryExpressionNode:+:test');
+      check(bin.children).deepEquals([left, right]);
 
       const un = UnaryExpressionNode(operator: '-', operand: left);
-      expect(un.accept(visitor, ctx), equals('UnaryExpressionNode:-:test'));
-      expect(un.children, equals([left]));
+      check(un.accept(visitor, ctx)).equals('UnaryExpressionNode:-:test');
+      check(un.children).deepEquals([left]);
     });
 
     test('VariableExpressionNode and LiteralExpressionNode', () {
-      expect(
-        vExpr.accept(visitor, ctx),
-        equals('VariableExpressionNode:arr:test'),
-      );
-      expect(vExpr.children, isEmpty);
+      check(vExpr.accept(visitor, ctx))
+          .equals('VariableExpressionNode:arr:test');
+      check(vExpr.children).isEmpty();
 
       const lit = LiteralExpressionNode(raw: "'val'", value: 'val');
-      expect(
-        lit.accept(visitor, ctx),
-        equals('LiteralExpressionNode:val:test'),
-      );
-      expect(lit.children, isEmpty);
+      check(lit.accept(visitor, ctx)).equals('LiteralExpressionNode:val:test');
+      check(lit.children).isEmpty();
     });
 
     test('ArrayAccessExpressionNode and FieldAccessExpressionNode', () {
@@ -485,55 +449,47 @@ void main() {
         array: vExpr,
         indices: [left],
       );
-      expect(
-        arrAccess.accept(visitor, ctx),
-        equals('ArrayAccessExpressionNode:test'),
-      );
-      expect(arrAccess.children, equals([vExpr, left]));
+      check(arrAccess.accept(visitor, ctx))
+          .equals('ArrayAccessExpressionNode:test');
+      check(arrAccess.children).deepEquals([vExpr, left]);
 
       const fieldAccess = FieldAccessExpressionNode(
         record: vExpr,
         field: 'count',
       );
-      expect(
-        fieldAccess.accept(visitor, ctx),
-        equals('FieldAccessExpressionNode:count:test'),
-      );
-      expect(fieldAccess.children, equals([vExpr]));
+      check(fieldAccess.accept(visitor, ctx))
+          .equals('FieldAccessExpressionNode:count:test');
+      check(fieldAccess.children).deepEquals([vExpr]);
     });
 
     test('PointerDereferenceExpressionNode and FunctionCallExpressionNode', () {
       const ptrDeref = PointerDereferenceExpressionNode(vExpr);
-      expect(
-        ptrDeref.accept(visitor, ctx),
-        equals('PointerDereferenceExpressionNode:test'),
-      );
-      expect(ptrDeref.children, equals([vExpr]));
+      check(ptrDeref.accept(visitor, ctx))
+          .equals('PointerDereferenceExpressionNode:test');
+      check(ptrDeref.children).deepEquals([vExpr]);
 
       const fnCall = FunctionCallExpressionNode(
         name: 'Sqrt',
         arguments: [left],
       );
-      expect(
-        fnCall.accept(visitor, ctx),
-        equals('FunctionCallExpressionNode:Sqrt:test'),
-      );
-      expect(fnCall.children, equals([left]));
+      check(fnCall.accept(visitor, ctx))
+          .equals('FunctionCallExpressionNode:Sqrt:test');
+      check(fnCall.children).deepEquals([left]);
     });
 
     test('SetExpressionNode and SetElementNode', () {
       const elem1 = SetElementNode(start: left);
       const elem2 = SetElementNode(start: left, end: right);
 
-      expect(elem1.accept(visitor, ctx), equals('SetElementNode:test'));
-      expect(elem1.children, equals([left]));
+      check(elem1.accept(visitor, ctx)).equals('SetElementNode:test');
+      check(elem1.children).deepEquals([left]);
 
-      expect(elem2.accept(visitor, ctx), equals('SetElementNode:test'));
-      expect(elem2.children, equals([left, right]));
+      check(elem2.accept(visitor, ctx)).equals('SetElementNode:test');
+      check(elem2.children).deepEquals([left, right]);
 
       const setExpr = SetExpressionNode([elem1, elem2]);
-      expect(setExpr.accept(visitor, ctx), equals('SetExpressionNode:test'));
-      expect(setExpr.children, equals([elem1, elem2]));
+      check(setExpr.accept(visitor, ctx)).equals('SetExpressionNode:test');
+      check(setExpr.children).deepEquals([elem1, elem2]);
     });
   });
 }

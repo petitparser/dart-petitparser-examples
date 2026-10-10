@@ -1,27 +1,18 @@
 import 'package:petitparser/petitparser.dart';
 import 'package:petitparser/reflection.dart';
 import 'package:petitparser_examples/bibtex.dart';
-import 'package:test/test.dart';
+import 'package:test/scaffolding.dart';
 
-import '../utils/expect.dart';
-
-Matcher isBibTeXEntry({
-  dynamic type = anything,
-  dynamic key = anything,
-  dynamic fields = anything,
-}) => const TypeMatcher<BibTeXEntry>()
-    .having((e) => e.type, 'type', type)
-    .having((e) => e.key, 'key', key)
-    .having((e) => e.fields, 'fields', fields);
+import '../utils/checks.dart';
+import 'bibtex_checks.dart';
 
 void main() {
   final parser = BibTeXDefinition().build();
 
   test('linter', () {
-    expect(
+    check(
       linter(parser, excludedRules: {'Duplicate parser'}, excludedTypes: {}),
-      isEmpty,
-    );
+    ).isEmpty();
   });
 
   group('grammar', () {
@@ -35,8 +26,7 @@ void main() {
 
     test('raw preserves original values', () {
       final entry = parser.parse(input).value.single;
-      expect(
-        entry,
+      check(entry).which(
         isBibTeXEntry(
           type: 'inproceedings',
           key: 'Reng10c',
@@ -64,7 +54,7 @@ void main() {
 
     test('toString round-trips via raw', () {
       final entry = parser.parse(input).value.single;
-      expect(entry.toString(), input);
+      check(entry.toString()).equals(input);
     });
 
     test('README example', () {
@@ -74,11 +64,11 @@ void main() {
   author = "Lukas Renggli and Stéphane Ducasse and Tudor Gîrba and Oscar Nierstrasz",
   year = 2010
 }''');
-      expect(result is Success, isTrue);
+      check(result).isA<Success>();
       final entry = result.value.single;
-      expect(entry.key, 'Reng10c');
-      expect(entry.type, 'inproceedings');
-      expect(entry.fields, [
+      check(entry.key).equals('Reng10c');
+      check(entry.type).equals('inproceedings');
+      check(entry.fields).deepEquals([
         BibTeXField(
           'title',
           '"Practical Dynamic Grammars for Dynamic Languages"',
@@ -89,31 +79,25 @@ void main() {
         ),
         BibTeXField('year', '2010'),
       ]);
-      expect(
-        entry['title'],
-        'Practical Dynamic Grammars for Dynamic Languages',
-      );
-      expect(
-        entry['author'],
+      check(entry['title'])
+          .equals('Practical Dynamic Grammars for Dynamic Languages');
+      check(entry['author']).equals(
         'Lukas Renggli and Stéphane Ducasse and Tudor Gîrba and Oscar Nierstrasz',
       );
-      expect(entry['year'], '2010');
-      expect(
-        entry.getField('title')?.value,
-        'Practical Dynamic Grammars for Dynamic Languages',
-      );
-      expect(
-        entry.getField('author')?.value,
+      check(entry['year']).equals('2010');
+      check(entry.getField('title')?.value)
+          .equals('Practical Dynamic Grammars for Dynamic Languages');
+      check(entry.getField('author')?.value).equals(
         'Lukas Renggli and Stéphane Ducasse and Tudor Gîrba and Oscar Nierstrasz',
       );
-      expect(entry.getField('year')?.value, '2010');
+      check(entry.getField('year')?.value).equals('2010');
     });
 
     test('entry type supports uppercase and mixed case', () {
       final entry = parser.parse('@ARTICLE{k1, title = "A"}').value.single;
-      expect(entry.type, 'ARTICLE');
-      expect(entry.key, 'k1');
-      expect(entry['title'], 'A');
+      check(entry.type).equals('ARTICLE');
+      check(entry.key).equals('k1');
+      check(entry['title']).equals('A');
     });
   });
 
@@ -123,16 +107,16 @@ void main() {
           .parse('@article{foo, pages = {10--20}}')
           .value
           .single;
-      expect(entry.getField('pages'), BibTeXField('pages', '{10--20}'));
-      expect(entry.getField('pages')?.rawKey, 'pages');
-      expect(entry.getField('pages')?.rawValue, '{10--20}');
+      check(entry.getField('pages')).equals(BibTeXField('pages', '{10--20}'));
+      check(entry.getField('pages')?.rawKey).equals('pages');
+      check(entry.getField('pages')?.rawValue).equals('{10--20}');
     });
 
     test('raw preserves ---', () {
       final entry = parser.parse('@article{foo, title = {A---B}}').value.single;
-      expect(entry.getField('title'), BibTeXField('title', '{A---B}'));
-      expect(entry.getField('title')?.rawKey, 'title');
-      expect(entry.getField('title')?.rawValue, '{A---B}');
+      check(entry.getField('title')).equals(BibTeXField('title', '{A---B}'));
+      check(entry.getField('title')?.rawKey).equals('title');
+      check(entry.getField('title')?.rawValue).equals('{A---B}');
     });
 
     test('single hyphens are preserved', () {
@@ -140,9 +124,9 @@ void main() {
           .parse('@article{foo, note = {well-known}}')
           .value
           .single;
-      expect(entry.getField('note'), BibTeXField('note', '{well-known}'));
-      expect(entry.getField('note')?.rawKey, 'note');
-      expect(entry.getField('note')?.rawValue, '{well-known}');
+      check(entry.getField('note')).equals(BibTeXField('note', '{well-known}'));
+      check(entry.getField('note')?.rawKey).equals('note');
+      check(entry.getField('note')?.rawValue).equals('{well-known}');
     });
   });
 
@@ -162,9 +146,9 @@ void main() {
 % Trailing comment at EOF
 ''';
       final entries = parser.parse(input).value;
-      expect(entries.length, 2);
-      expect(entries[0].key, 'a1');
-      expect(entries[1].key, 'b1');
+      check(entries).length.equals(2);
+      check(entries[0].key).equals('a1');
+      check(entries[1].key).equals('b1');
     });
 
     test('freeform @comment blocks are skipped', () {
@@ -176,16 +160,16 @@ void main() {
 @book{k2, title = "Title 2"}
 ''';
       final entries = parser.parse(input).value;
-      expect(entries.length, 2);
-      expect(entries.map((e) => e.key), ['k1', 'k2']);
+      check(entries).length.equals(2);
+      check(entries.map((e) => e.key)).deepEquals(['k1', 'k2']);
     });
 
     test('empty input and comment-only input yields empty list', () {
-      expect(parser.parse('').value, isEmpty);
-      expect(parser.parse('   \n\t  \r\n  ').value, isEmpty);
-      expect(parser.parse('% only comments\n% another line\n').value, isEmpty);
-      expect(parser.parse('@comment{just a comment}').value, isEmpty);
-      expect(parser.parse('@comment(parenthesized)').value, isEmpty);
+      check(parser.parse('').value).isEmpty();
+      check(parser.parse('   \n\t  \r\n  ').value).isEmpty();
+      check(parser.parse('% only comments\n% another line\n').value).isEmpty();
+      check(parser.parse('@comment{just a comment}').value).isEmpty();
+      check(parser.parse('@comment(parenthesized)').value).isEmpty();
     });
 
     test('entries with trailing commas in fields', () {
@@ -197,17 +181,17 @@ void main() {
 }
 ''';
       final entry = parser.parse(input).value.single;
-      expect(entry.key, 'trailing1');
-      expect(entry.fields.length, 3);
-      expect(entry['year'], '2024');
-      expect(entry.getField('year')?.value, '2024');
+      check(entry.key).equals('trailing1');
+      check(entry.fields).length.equals(3);
+      check(entry['year']).equals('2024');
+      check(entry.getField('year')?.value).equals('2024');
     });
 
     test('entries with no fields', () {
-      expect(parser.parse('@misc{empty1,}').value.single.key, 'empty1');
-      expect(parser.parse('@misc{empty2}').value.single.key, 'empty2');
-      expect(parser.parse('@misc{empty1,}').value.single.fields, isEmpty);
-      expect(parser.parse('@misc{empty2}').value.single.fields, isEmpty);
+      check(parser.parse('@misc{empty1,}').value.single.key).equals('empty1');
+      check(parser.parse('@misc{empty2}').value.single.key).equals('empty2');
+      check(parser.parse('@misc{empty1,}').value.single.fields).isEmpty();
+      check(parser.parse('@misc{empty2}').value.single.fields).isEmpty();
     });
 
     test('arbitrary preamble text outside entries', () {
@@ -224,32 +208,32 @@ And here is some text between entries explaining things.
 End of bibliography notes.
 ''';
       final entries = parser.parse(input).value;
-      expect(entries.length, 2);
-      expect(entries[0].key, 'k1');
-      expect(entries[1].key, 'k2');
+      check(entries).length.equals(2);
+      check(entries[0].key).equals('k1');
+      check(entries[1].key).equals('k2');
     });
   });
 
   group('failures', () {
     test('incomplete entry', () {
-      expect(parser, isFailure('@'));
-      expect(parser, isFailure('@article'));
-      expect(parser, isFailure('@article{'));
-      expect(parser, isFailure('@article{foo,'));
+      check(parser).isFailure('@');
+      check(parser).isFailure('@article');
+      check(parser).isFailure('@article{');
+      check(parser).isFailure('@article{foo,');
     });
 
     test('missing closing brace', () {
-      expect(parser, isFailure('@article{foo, bar = "baz"'));
+      check(parser).isFailure('@article{foo, bar = "baz"');
     });
 
     test('invalid type or key', () {
-      expect(parser, isFailure('@123{foo,}'));
-      expect(parser, isFailure('@article{, bar = "baz"}'));
+      check(parser).isFailure('@123{foo,}');
+      check(parser).isFailure('@article{, bar = "baz"}');
     });
 
     test('unterminated string', () {
-      expect(parser, isFailure('@article{foo, bar = "baz}'));
-      expect(parser, isFailure('@article{foo, bar = {baz}'));
+      check(parser).isFailure('@article{foo, bar = "baz}');
+      check(parser).isFailure('@article{foo, bar = {baz}');
     });
   });
 }

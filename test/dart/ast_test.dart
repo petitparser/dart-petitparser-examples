@@ -1,5 +1,6 @@
+import 'package:checks/checks.dart';
 import 'package:petitparser_examples/dart.dart';
-import 'package:test/test.dart';
+import 'package:test/scaffolding.dart';
 
 void main() {
   group('AST verification', () {
@@ -20,16 +21,16 @@ void main() {
   print(p);
 }
 ''');
-      expect(unit.directives, hasLength(2));
-      expect(unit.directives[0], isA<LibraryDirectiveNode>());
-      expect(unit.directives[1], isA<ImportDirectiveNode>());
-      expect(unit.declarations, hasLength(2));
-      expect(unit.declarations[0], isA<ClassDeclarationNode>());
-      expect(unit.declarations[1], isA<FunctionDeclarationNode>());
+      check(unit.directives).length.equals(2);
+      check(unit.directives[0]).isA<LibraryDirectiveNode>();
+      check(unit.directives[1]).isA<ImportDirectiveNode>();
+      check(unit.declarations).length.equals(2);
+      check(unit.declarations[0]).isA<ClassDeclarationNode>();
+      check(unit.declarations[1]).isA<FunctionDeclarationNode>();
 
       final classNode = unit.declarations[0] as ClassDeclarationNode;
-      expect(classNode.name, 'Point');
-      expect(classNode.members, hasLength(3));
+      check(classNode.name).equals('Point');
+      check(classNode.members).length.equals(3);
     });
 
     test(
@@ -47,53 +48,53 @@ void main() {
         final stmtA =
             body.block.statements[0] as VariableDeclarationStatementNode;
         final listA = stmtA.variables[0].initializer as CollectionLiteralNode;
-        expect(listA.elements, hasLength(1));
-        expect(listA.elements[0], isA<ForElementNode>());
+        check(listA.elements).length.equals(1);
+        check(listA.elements[0]).isA<ForElementNode>();
 
         final forA = listA.elements[0] as ForElementNode;
-        expect(forA.initialization, isA<VariableDeclarationStatementNode>());
-        expect(forA.condition, isA<BinaryExpressionNode>());
-        expect(forA.updates, hasLength(1));
-        expect(forA.updates[0], isA<UnaryExpressionNode>());
-        expect(forA.body, isA<ExpressionElementNode>());
+        check(forA.initialization).isA<VariableDeclarationStatementNode>();
+        check(forA.condition).isA<BinaryExpressionNode>();
+        check(forA.updates).length.equals(1);
+        check(forA.updates[0]).isA<UnaryExpressionNode>();
+        check(forA.body).isA<ExpressionElementNode>();
 
         final stmtB =
             body.block.statements[1] as VariableDeclarationStatementNode;
         final listB = stmtB.variables[0].initializer as CollectionLiteralNode;
-        expect(listB.elements, hasLength(1));
-        expect(listB.elements[0], isA<ForInElementNode>());
+        check(listB.elements).length.equals(1);
+        check(listB.elements[0]).isA<ForInElementNode>();
 
         final forB = listB.elements[0] as ForInElementNode;
-        expect(forB.variable, isA<VariableDeclarationStatementNode>());
-        expect(forB.iterable, isA<IdentifierNode>());
-        expect(forB.body, isA<ExpressionElementNode>());
+        check(forB.variable).isA<VariableDeclarationStatementNode>();
+        check(forB.iterable).isA<IdentifierNode>();
+        check(forB.body).isA<ExpressionElementNode>();
 
         final stmtC =
             body.block.statements[2] as VariableDeclarationStatementNode;
         final listC = stmtC.variables[0].initializer as CollectionLiteralNode;
-        expect(listC.elements, hasLength(1));
-        expect(listC.elements[0], isA<ForInElementNode>());
+        check(listC.elements).length.equals(1);
+        check(listC.elements[0]).isA<ForInElementNode>();
 
         final forC = listC.elements[0] as ForInElementNode;
-        expect(forC.pattern, isA<RecordPatternNode>());
-        expect(forC.iterable, isA<IdentifierNode>());
-        expect(forC.body, isA<ExpressionElementNode>());
+        check(forC.pattern).isA<RecordPatternNode>();
+        check(forC.iterable).isA<IdentifierNode>();
+        check(forC.body).isA<ExpressionElementNode>();
       },
     );
 
     group('directives', () {
       test('LibraryDirectiveNode, PartOfDirectiveNode, PartDirectiveNode', () {
         const lib = LibraryDirectiveNode('my_lib');
-        expect(lib.name, 'my_lib');
-        expect(lib.toString(), 'LibraryDirectiveNode(my_lib)');
+        check(lib.name).equals('my_lib');
+        check(lib.toString()).equals('LibraryDirectiveNode(my_lib)');
 
         const partOf = PartOfDirectiveNode('parent_lib');
-        expect(partOf.library, 'parent_lib');
-        expect(partOf.toString(), 'PartOfDirectiveNode(parent_lib)');
+        check(partOf.library).equals('parent_lib');
+        check(partOf.toString()).equals('PartOfDirectiveNode(parent_lib)');
 
         const part = PartDirectiveNode('foo.dart');
-        expect(part.uri, 'foo.dart');
-        expect(part.toString(), 'PartDirectiveNode(foo.dart)');
+        check(part.uri).equals('foo.dart');
+        check(part.toString()).equals('PartDirectiveNode(foo.dart)');
       });
 
       test('ConfigurationUriNode & Import/Export with Combinators', () {
@@ -102,19 +103,17 @@ void main() {
           name: 'dart.library.io',
           value: 'true',
         );
-        expect(config.uri, 'io.dart');
-        expect(
-          config.toString(),
-          contains('ConfigurationUriNode(if (dart.library.io'),
-        );
+        check(config.uri).equals('io.dart');
+        check(config.toString())
+            .contains('ConfigurationUriNode(if (dart.library.io');
 
         const show = ShowCombinatorNode(['a', 'b']);
-        expect(show.identifiers, ['a', 'b']);
-        expect(show.toString(), 'ShowCombinatorNode([a, b])');
+        check(show.identifiers).deepEquals(['a', 'b']);
+        check(show.toString()).equals('ShowCombinatorNode([a, b])');
 
         const hide = HideCombinatorNode(['c']);
-        expect(hide.identifiers, ['c']);
-        expect(hide.toString(), 'HideCombinatorNode([c])');
+        check(hide.identifiers).deepEquals(['c']);
+        check(hide.toString()).equals('HideCombinatorNode([c])');
 
         const importNode = ImportDirectiveNode(
           uri: 'dart:async',
@@ -123,19 +122,18 @@ void main() {
           configurations: [config],
           isDeferred: false,
         );
-        expect(importNode.asName, 'async');
-        expect(importNode.combinators, hasLength(2));
-        expect(
-          importNode.toString(),
-          contains('ImportDirectiveNode(dart:async, as: async)'),
-        );
+        check(importNode.asName).equals('async');
+        check(importNode.combinators).length.equals(2);
+        check(importNode.toString())
+            .contains('ImportDirectiveNode(dart:async, as: async)');
 
         const exportNode = ExportDirectiveNode(
           uri: 'src/model.dart',
           combinators: [show],
         );
-        expect(exportNode.uri, 'src/model.dart');
-        expect(exportNode.toString(), 'ExportDirectiveNode(src/model.dart)');
+        check(exportNode.uri).equals('src/model.dart');
+        check(exportNode.toString())
+            .equals('ExportDirectiveNode(src/model.dart)');
       });
     });
 
@@ -147,20 +145,17 @@ void main() {
           interfaces: [NamedTypeNode(name: 'MyInterface')],
           members: [],
         );
-        expect(mixin.name, 'MyMixin');
-        expect(mixin.onTypes, hasLength(1));
-        expect(mixin.toString(), 'MixinDeclarationNode(MyMixin)');
+        check(mixin.name).equals('MyMixin');
+        check(mixin.onTypes).length.equals(1);
+        check(mixin.toString()).equals('MixinDeclarationNode(MyMixin)');
 
         const ext = ExtensionDeclarationNode(
           name: 'MyExtension',
           onType: NamedTypeNode(name: 'String'),
           members: [],
         );
-        expect(ext.name, 'MyExtension');
-        expect(
-          ext.toString(),
-          contains('ExtensionDeclarationNode(MyExtension'),
-        );
+        check(ext.name).equals('MyExtension');
+        check(ext.toString()).contains('ExtensionDeclarationNode(MyExtension');
       });
 
       test('ExtensionTypeDeclarationNode & EnumDeclarationNode', () {
@@ -170,9 +165,9 @@ void main() {
           representationName: 'value',
           members: [],
         );
-        expect(extType.name, 'Id');
-        expect(extType.representationName, 'value');
-        expect(extType.toString(), contains('ExtensionTypeDeclarationNode(Id'));
+        check(extType.name).equals('Id');
+        check(extType.representationName).equals('value');
+        check(extType.toString()).contains('ExtensionTypeDeclarationNode(Id');
 
         const enumDecl = EnumDeclarationNode(
           name: 'Status',
@@ -181,9 +176,10 @@ void main() {
             EnumConstantNode(name: 'inactive'),
           ],
         );
-        expect(enumDecl.constants, hasLength(2));
-        expect(enumDecl.constants.first.toString(), 'EnumConstantNode(active)');
-        expect(enumDecl.toString(), contains('EnumDeclarationNode(Status'));
+        check(enumDecl.constants).length.equals(2);
+        check(enumDecl.constants.first.toString())
+            .equals('EnumConstantNode(active)');
+        check(enumDecl.toString()).contains('EnumDeclarationNode(Status');
       });
 
       test('ConstructorDeclarationNode & Initializers', () {
@@ -191,33 +187,30 @@ void main() {
           constructorName: 'named',
           arguments: [],
         );
-        expect(superInit.constructorName, 'named');
-        expect(superInit.toString(), 'SuperConstructorInitializerNode(named)');
+        check(superInit.constructorName).equals('named');
+        check(superInit.toString())
+            .equals('SuperConstructorInitializerNode(named)');
 
         const redirectInit = RedirectingConstructorInitializerNode(
           constructorName: 'other',
           arguments: [],
         );
-        expect(redirectInit.constructorName, 'other');
-        expect(
-          redirectInit.toString(),
-          contains('RedirectingConstructorInitializerNode'),
-        );
+        check(redirectInit.constructorName).equals('other');
+        check(redirectInit.toString())
+            .contains('RedirectingConstructorInitializerNode');
 
         const fieldInit = FieldInitializerNode(
           fieldName: 'x',
           value: IntegerLiteralNode(10),
         );
-        expect(fieldInit.fieldName, 'x');
-        expect(
-          fieldInit.toString(),
-          contains('FieldInitializerNode(x = IntegerLiteralNode(10))'),
-        );
+        check(fieldInit.fieldName).equals('x');
+        check(fieldInit.toString())
+            .contains('FieldInitializerNode(x = IntegerLiteralNode(10))');
 
         const assertInit = AssertInitializerNode(
           AssertStatementNode(BooleanLiteralNode(true)),
         );
-        expect(assertInit.toString(), contains('AssertInitializerNode'));
+        check(assertInit.toString()).contains('AssertInitializerNode');
 
         const ctor = ConstructorDeclarationNode(
           name: 'Point',
@@ -225,12 +218,10 @@ void main() {
           parameters: [],
           initializers: [fieldInit],
         );
-        expect(ctor.name, 'Point');
-        expect(ctor.constructorName, 'origin');
-        expect(
-          ctor.toString(),
-          contains('ConstructorDeclarationNode(Point.origin)'),
-        );
+        check(ctor.name).equals('Point');
+        check(ctor.constructorName).equals('origin');
+        check(ctor.toString())
+            .contains('ConstructorDeclarationNode(Point.origin)');
       });
 
       test('FieldDeclarationNode & TypeAliasDeclarationNode', () {
@@ -243,19 +234,17 @@ void main() {
           ],
           isStatic: true,
         );
-        expect(field.isStatic, isTrue);
-        expect(
-          field.variables.first.toString(),
-          'VariableDeclaratorNode(count = IntegerLiteralNode(0))',
-        );
-        expect(field.toString(), contains('FieldDeclarationNode'));
+        check(field.isStatic).isTrue();
+        check(field.variables.first.toString())
+            .equals('VariableDeclaratorNode(count = IntegerLiteralNode(0))');
+        check(field.toString()).contains('FieldDeclarationNode');
 
         const alias = TypeAliasDeclarationNode(
           name: 'IntList',
           type: NamedTypeNode(name: 'List'),
         );
-        expect(alias.name, 'IntList');
-        expect(alias.toString(), contains('TypeAliasDeclarationNode(IntList'));
+        check(alias.name).equals('IntList');
+        check(alias.toString()).contains('TypeAliasDeclarationNode(IntList');
       });
     });
 
@@ -274,13 +263,11 @@ void main() {
               ),
             ],
           );
-          expect(recType.positionalFields, hasLength(1));
-          expect(recType.namedFields.first.name, 'name');
-          expect(
-            recType.namedFields.first.toString(),
-            contains('RecordTypeFieldNode'),
-          );
-          expect(recType.toString(), contains('RecordTypeNode'));
+          check(recType.positionalFields).length.equals(1);
+          check(recType.namedFields.first.name).equals('name');
+          check(recType.namedFields.first.toString())
+              .contains('RecordTypeFieldNode');
+          check(recType.toString()).contains('RecordTypeNode');
 
           const fnType = FunctionTypeNode(
             returnType: NamedTypeNode(name: 'void'),
@@ -291,18 +278,16 @@ void main() {
               ),
             ],
           );
-          expect(fnType.parameters, hasLength(1));
-          expect(fnType.toString(), contains('FunctionTypeNode'));
+          check(fnType.parameters).length.equals(1);
+          check(fnType.toString()).contains('FunctionTypeNode');
 
           const typeParam = TypeParameterNode(
             name: 'T',
             bound: NamedTypeNode(name: 'Object'),
           );
-          expect(typeParam.bound, isNotNull);
-          expect(
-            typeParam.toString(),
-            contains('TypeParameterNode(T extends NamedTypeNode(Object))'),
-          );
+          check(typeParam.bound).isNotNull();
+          check(typeParam.toString())
+              .contains('TypeParameterNode(T extends NamedTypeNode(Object))');
         },
       );
 
@@ -314,34 +299,34 @@ void main() {
           isFinal: true,
           isNamed: true,
         );
-        expect(simple.isFinal, isTrue);
-        expect(simple.toString(), contains('ParameterNode(x'));
+        check(simple.isFinal).isTrue();
+        check(simple.toString()).contains('ParameterNode(x');
 
         const fnParam = FunctionTypedParameterNode(
           name: 'cb',
           type: NamedTypeNode(name: 'void'),
           parameters: [],
         );
-        expect(fnParam.name, 'cb');
-        expect(fnParam.toString(), 'FunctionTypedParameterNode(cb)');
+        check(fnParam.name).equals('cb');
+        check(fnParam.toString()).equals('FunctionTypedParameterNode(cb)');
 
         const emptyBody = EmptyFunctionBodyNode();
         const exprBody = ExpressionFunctionBodyNode(IntegerLiteralNode(42));
         const blockBody = BlockFunctionBodyNode(BlockStatementNode([]));
 
-        expect(emptyBody.toString(), 'EmptyFunctionBodyNode()');
-        expect(exprBody.toString(), contains('ExpressionFunctionBodyNode'));
-        expect(blockBody.toString(), 'BlockFunctionBodyNode()');
+        check(emptyBody.toString()).equals('EmptyFunctionBodyNode()');
+        check(exprBody.toString()).contains('ExpressionFunctionBodyNode');
+        check(blockBody.toString()).equals('BlockFunctionBodyNode()');
       });
     });
 
     group('statements', () {
       test('control flow statements and expressions', () {
         const emptyStmt = EmptyStatementNode();
-        expect(emptyStmt.toString(), 'EmptyStatementNode()');
+        check(emptyStmt.toString()).equals('EmptyStatementNode()');
 
         const exprStmt = ExpressionStatementNode(IntegerLiteralNode(1));
-        expect(exprStmt.toString(), contains('ExpressionStatementNode'));
+        check(exprStmt.toString()).contains('ExpressionStatementNode');
 
         const fnStmt = FunctionDeclarationStatementNode(
           FunctionDeclarationNode(
@@ -349,15 +334,15 @@ void main() {
             body: EmptyFunctionBodyNode(),
           ),
         );
-        expect(fnStmt.toString(), contains('FunctionDeclarationStatementNode'));
+        check(fnStmt.toString()).contains('FunctionDeclarationStatementNode');
 
         const ifStmt = IfStatementNode(
           condition: BooleanLiteralNode(true),
           thenBranch: EmptyStatementNode(),
           elseBranch: EmptyStatementNode(),
         );
-        expect(ifStmt.condition, isA<BooleanLiteralNode>());
-        expect(ifStmt.toString(), contains('IfStatementNode'));
+        check(ifStmt.condition).isA<BooleanLiteralNode>();
+        check(ifStmt.toString()).contains('IfStatementNode');
 
         const switchStmt = SwitchStatementNode(
           expression: IntegerLiteralNode(1),
@@ -368,12 +353,10 @@ void main() {
             ),
           ],
         );
-        expect(switchStmt.cases, hasLength(1));
-        expect(
-          switchStmt.cases.first.toString(),
-          contains('SwitchPatternCaseNode'),
-        );
-        expect(switchStmt.toString(), contains('SwitchStatementNode'));
+        check(switchStmt.cases).length.equals(1);
+        check(switchStmt.cases.first.toString())
+            .contains('SwitchPatternCaseNode');
+        check(switchStmt.toString()).contains('SwitchStatementNode');
 
         const forStmt = ForStatementNode(
           initialization: VariableDeclarationStatementNode(
@@ -394,20 +377,20 @@ void main() {
           ],
           body: EmptyStatementNode(),
         );
-        expect(forStmt.updates, hasLength(1));
-        expect(forStmt.toString(), 'ForStatementNode()');
+        check(forStmt.updates).length.equals(1);
+        check(forStmt.toString()).equals('ForStatementNode()');
 
         const whileStmt = WhileStatementNode(
           condition: BooleanLiteralNode(false),
           body: EmptyStatementNode(),
         );
-        expect(whileStmt.toString(), contains('WhileStatementNode'));
+        check(whileStmt.toString()).contains('WhileStatementNode');
 
         const doWhile = DoWhileStatementNode(
           body: EmptyStatementNode(),
           condition: BooleanLiteralNode(false),
         );
-        expect(doWhile.toString(), contains('DoWhileStatementNode'));
+        check(doWhile.toString()).contains('DoWhileStatementNode');
 
         const tryStmt = TryStatementNode(
           body: BlockStatementNode([]),
@@ -421,12 +404,10 @@ void main() {
           ],
           finallyBlock: BlockStatementNode([]),
         );
-        expect(tryStmt.catchClauses, hasLength(1));
-        expect(
-          tryStmt.catchClauses.first.toString(),
-          contains('CatchClauseNode'),
-        );
-        expect(tryStmt.toString(), 'TryStatementNode()');
+        check(tryStmt.catchClauses).length.equals(1);
+        check(tryStmt.catchClauses.first.toString())
+            .contains('CatchClauseNode');
+        check(tryStmt.toString()).equals('TryStatementNode()');
 
         const retStmt = ReturnStatementNode(IntegerLiteralNode(5));
         const breakStmt = BreakStatementNode('loop');
@@ -445,16 +426,15 @@ void main() {
           statement: emptyStmt,
         );
 
-        expect(retStmt.toString(), contains('ReturnStatementNode'));
-        expect(breakStmt.toString(), 'BreakStatementNode(loop)');
-        expect(contStmt.toString(), 'ContinueStatementNode(loop)');
-        expect(rethrowStmt.toString(), 'RethrowStatementNode()');
-        expect(
+        check(retStmt.toString()).contains('ReturnStatementNode');
+        check(breakStmt.toString()).equals('BreakStatementNode(loop)');
+        check(contStmt.toString()).equals('ContinueStatementNode(loop)');
+        check(rethrowStmt.toString()).equals('RethrowStatementNode()');
+        check(
           yieldStmt.toString(),
-          contains('YieldStatementNode(IntegerLiteralNode(1), isStar: true)'),
-        );
-        expect(assertStmt.toString(), contains('AssertStatementNode'));
-        expect(labeledStmt.toString(), contains('LabeledStatementNode(loop)'));
+        ).contains('YieldStatementNode(IntegerLiteralNode(1), isStar: true)');
+        check(assertStmt.toString()).contains('AssertStatementNode');
+        check(labeledStmt.toString()).contains('LabeledStatementNode(loop)');
       });
     });
 
@@ -466,23 +446,20 @@ void main() {
         const symLit = SymbolLiteralNode('sym');
         const nullLit = NullLiteralNode();
 
-        expect(doubleLit.toString(), 'DoubleLiteralNode(3.14)');
-        expect(boolLit.toString(), 'BooleanLiteralNode(false)');
-        expect(strLit.toString(), 'StringLiteralNode(abc, isRaw: false)');
-        expect(symLit.toString(), 'SymbolLiteralNode(#sym)');
-        expect(nullLit.toString(), 'NullLiteralNode()');
+        check(doubleLit.toString()).equals('DoubleLiteralNode(3.14)');
+        check(boolLit.toString()).equals('BooleanLiteralNode(false)');
+        check(strLit.toString()).equals('StringLiteralNode(abc, isRaw: false)');
+        check(symLit.toString()).equals('SymbolLiteralNode(#sym)');
+        check(nullLit.toString()).equals('NullLiteralNode()');
 
         const interp = InterpolatedStringNode([
           StringLiteralNode('val='),
           IdentifierNode('x'),
         ]);
-        expect(interp.parts, hasLength(2));
-        expect(
-          interp.parts.first.toString(),
-          contains('StringLiteralNode(val='),
-        );
-        expect(interp.parts.last.toString(), 'IdentifierNode(x)');
-        expect(interp.toString(), contains('InterpolatedStringNode'));
+        check(interp.parts).length.equals(2);
+        check(interp.parts.first.toString()).contains('StringLiteralNode(val=');
+        check(interp.parts.last.toString()).equals('IdentifierNode(x)');
+        check(interp.toString()).contains('InterpolatedStringNode');
 
         const setMap = CollectionLiteralNode(
           elements: [
@@ -492,12 +469,9 @@ void main() {
             ),
           ],
         );
-        expect(setMap.elements, hasLength(1));
-        expect(
-          setMap.elements.first.toString(),
-          contains('MapEntryElementNode'),
-        );
-        expect(setMap.toString(), contains('CollectionLiteralNode'));
+        check(setMap.elements).length.equals(1);
+        check(setMap.elements.first.toString()).contains('MapEntryElementNode');
+        check(setMap.toString()).contains('CollectionLiteralNode');
 
         const recLit = RecordLiteralNode(
           fields: [
@@ -505,12 +479,10 @@ void main() {
             RecordLiteralFieldNode(name: 'b', value: StringLiteralNode('2')),
           ],
         );
-        expect(recLit.fields, hasLength(2));
-        expect(
-          recLit.fields.first.toString(),
-          contains('RecordLiteralFieldNode'),
-        );
-        expect(recLit.toString(), contains('RecordLiteralNode'));
+        check(recLit.fields).length.equals(2);
+        check(recLit.fields.first.toString())
+            .contains('RecordLiteralFieldNode');
+        check(recLit.toString()).contains('RecordLiteralNode');
       });
 
       test('complex operators, invocations and elements', () {
@@ -519,7 +491,7 @@ void main() {
           thenExpression: IntegerLiteralNode(1),
           elseExpression: IntegerLiteralNode(2),
         );
-        expect(cond.toString(), contains('ConditionalExpressionNode'));
+        check(cond.toString()).contains('ConditionalExpressionNode');
 
         const cascade = CascadeExpressionNode(
           target: IdentifierNode('sb'),
@@ -530,8 +502,8 @@ void main() {
             ),
           ],
         );
-        expect(cascade.cascadeSections, hasLength(1));
-        expect(cascade.toString(), contains('CascadeExpressionNode'));
+        check(cascade.cascadeSections).length.equals(1);
+        check(cascade.toString()).contains('CascadeExpressionNode');
 
         const prop = PropertyAccessNode(
           target: IdentifierNode('a'),
@@ -545,70 +517,63 @@ void main() {
         const thisExpr = ThisExpressionNode();
         const superExpr = SuperExpressionNode();
 
-        expect(prop.toString(), 'PropertyAccessNode(IdentifierNode(a).b)');
-        expect(
-          idx.toString(),
+        check(prop.toString())
+            .equals('PropertyAccessNode(IdentifierNode(a).b)');
+        check(idx.toString()).equals(
           'IndexExpressionNode(IdentifierNode(a)[IntegerLiteralNode(0)])',
         );
-        expect(
-          paren.toString(),
-          'ParenthesizedExpressionNode(IntegerLiteralNode(1))',
-        );
-        expect(thisExpr.toString(), 'ThisExpressionNode()');
-        expect(superExpr.toString(), 'SuperExpressionNode()');
+        check(paren.toString())
+            .equals('ParenthesizedExpressionNode(IntegerLiteralNode(1))');
+        check(thisExpr.toString()).equals('ThisExpressionNode()');
+        check(superExpr.toString()).equals('SuperExpressionNode()');
 
         const fnInv = InvocationExpressionNode(
           target: IdentifierNode('f'),
           arguments: [],
         );
-        expect(fnInv.toString(), contains('InvocationExpressionNode'));
+        check(fnInv.toString()).contains('InvocationExpressionNode');
 
         const typeTest = TypeTestExpressionNode(
           expression: IdentifierNode('x'),
           type: NamedTypeNode(name: 'int'),
           isNegated: true,
         );
-        expect(typeTest.isNegated, isTrue);
-        expect(
-          typeTest.toString(),
-          contains(
-            'TypeTestExpressionNode(IdentifierNode(x) is! NamedTypeNode(int))',
-          ),
+        check(typeTest.isNegated).isTrue();
+        check(typeTest.toString()).contains(
+          'TypeTestExpressionNode(IdentifierNode(x) is! NamedTypeNode(int))',
         );
 
         const asExpr = TypeCastExpressionNode(
           expression: IdentifierNode('x'),
           type: NamedTypeNode(name: 'num'),
         );
-        expect(asExpr.toString(), contains('TypeCastExpressionNode'));
+        check(asExpr.toString()).contains('TypeCastExpressionNode');
 
         const throwExpr = ThrowExpressionNode(IdentifierNode('e'));
-        expect(throwExpr.toString(), contains('ThrowExpressionNode'));
+        check(throwExpr.toString()).contains('ThrowExpressionNode');
 
         const assignExpr = BinaryExpressionNode(
           left: IdentifierNode('x'),
           operator: '=',
           right: IntegerLiteralNode(1),
         );
-        expect(assignExpr.toString(), contains('BinaryExpressionNode'));
+        check(assignExpr.toString()).contains('BinaryExpressionNode');
 
         const spread = SpreadElementNode(
           expression: IdentifierNode('list'),
           isNullAware: true,
         );
-        expect(spread.isNullAware, isTrue);
-        expect(
-          spread.toString(),
-          'SpreadElementNode(...?IdentifierNode(list))',
-        );
+        check(spread.isNullAware).isTrue();
+        check(spread.toString())
+            .equals('SpreadElementNode(...?IdentifierNode(list))');
 
         const ifElem = IfElementNode(
           condition: BooleanLiteralNode(true),
           thenElement: ExpressionElementNode(IntegerLiteralNode(1)),
           elseElement: ExpressionElementNode(IntegerLiteralNode(2)),
         );
-        expect(ifElem.elseElement, isNotNull);
-        expect(ifElem.toString(), contains('IfElementNode'));
+        check(ifElem.elseElement).isNotNull();
+        check(ifElem.toString()).contains('IfElementNode');
       });
     });
 
@@ -619,31 +584,29 @@ void main() {
           type: NamedTypeNode(name: 'int'),
           isFinal: true,
         );
-        expect(declared.isFinal, isTrue);
-        expect(declared.toString(), contains('VariablePatternNode(val'));
+        check(declared.isFinal).isTrue();
+        check(declared.toString()).contains('VariablePatternNode(val');
 
         const rel = RelationalPatternNode(
           operator: '>',
           operand: IntegerLiteralNode(0),
         );
-        expect(rel.operator, '>');
-        expect(
-          rel.toString(),
-          'RelationalPatternNode(> IntegerLiteralNode(0))',
-        );
+        check(rel.operator).equals('>');
+        check(rel.toString())
+            .equals('RelationalPatternNode(> IntegerLiteralNode(0))');
 
         const castP = CastPatternNode(
           VariablePatternNode(name: 'v'),
           NamedTypeNode(name: 'num'),
         );
-        expect(castP.toString(), contains('CastPatternNode'));
+        check(castP.toString()).contains('CastPatternNode');
 
         const nullCheck = NullCheckPatternNode(VariablePatternNode(name: 'v'));
         const nullAssert = NullAssertPatternNode(
           VariablePatternNode(name: 'v'),
         );
-        expect(nullCheck.toString(), contains('NullCheckPatternNode'));
-        expect(nullAssert.toString(), contains('NullAssertPatternNode'));
+        check(nullCheck.toString()).contains('NullCheckPatternNode');
+        check(nullAssert.toString()).contains('NullAssertPatternNode');
 
         const andP = LogicalPatternNode(
           left: RelationalPatternNode(
@@ -656,19 +619,19 @@ void main() {
             operand: IntegerLiteralNode(10),
           ),
         );
-        expect(andP.toString(), contains('LogicalPatternNode'));
+        check(andP.toString()).contains('LogicalPatternNode');
 
         const orP = LogicalPatternNode(
           left: ConstantPatternNode(IntegerLiteralNode(1)),
           operator: '||',
           right: ConstantPatternNode(IntegerLiteralNode(2)),
         );
-        expect(orP.toString(), contains('LogicalPatternNode'));
+        check(orP.toString()).contains('LogicalPatternNode');
 
         const parenP = ParenthesizedPatternNode(
           ConstantPatternNode(IntegerLiteralNode(1)),
         );
-        expect(parenP.toString(), contains('ParenthesizedPatternNode'));
+        check(parenP.toString()).contains('ParenthesizedPatternNode');
 
         const listP = ListPatternNode(
           elements: [
@@ -676,9 +639,9 @@ void main() {
             RestPatternNode(),
           ],
         );
-        expect(listP.elements, hasLength(2));
-        expect(listP.elements.last.toString(), 'RestPatternNode(null)');
-        expect(listP.toString(), contains('ListPatternNode'));
+        check(listP.elements).length.equals(2);
+        check(listP.elements.last.toString()).equals('RestPatternNode(null)');
+        check(listP.toString()).contains('ListPatternNode');
 
         const mapP = MapPatternNode(
           entries: [
@@ -688,30 +651,30 @@ void main() {
             ),
           ],
         );
-        expect(mapP.entries, hasLength(1));
-        expect(mapP.entries.first.toString(), contains('MapPatternEntryNode'));
-        expect(mapP.toString(), contains('MapPatternNode'));
+        check(mapP.entries).length.equals(1);
+        check(mapP.entries.first.toString()).contains('MapPatternEntryNode');
+        check(mapP.toString()).contains('MapPatternNode');
 
         const recFieldP = PatternFieldNode(
           pattern: ConstantPatternNode(IntegerLiteralNode(1)),
           name: 'x',
         );
-        expect(recFieldP.name, 'x');
-        expect(recFieldP.toString(), contains('PatternFieldNode'));
+        check(recFieldP.name).equals('x');
+        check(recFieldP.toString()).contains('PatternFieldNode');
 
         const objFieldP = PatternFieldNode(
           name: 'length',
           pattern: ConstantPatternNode(IntegerLiteralNode(5)),
         );
-        expect(objFieldP.name, 'length');
-        expect(objFieldP.toString(), contains('PatternFieldNode'));
+        check(objFieldP.name).equals('length');
+        check(objFieldP.toString()).contains('PatternFieldNode');
 
         const objP = ObjectPatternNode(
           type: NamedTypeNode(name: 'String'),
           fields: [objFieldP],
         );
-        expect(objP.fields, hasLength(1));
-        expect(objP.toString(), contains('ObjectPatternNode'));
+        check(objP.fields).length.equals(1);
+        check(objP.toString()).contains('ObjectPatternNode');
       });
     });
   });

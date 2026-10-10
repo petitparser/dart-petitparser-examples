@@ -2,11 +2,50 @@ import 'package:meta/meta.dart';
 import 'package:petitparser/petitparser.dart';
 import 'package:petitparser/reflection.dart';
 import 'package:petitparser_examples/uri.dart';
-import 'package:test/test.dart';
+import 'package:test/scaffolding.dart';
 
-import 'utils/expect.dart';
+import 'utils/checks.dart';
 
 final parser = uri.end();
+
+typedef ParsedUri = ({
+  String? authority,
+  String? fragment,
+  String? hostname,
+  List<(String, String?)> params,
+  String? password,
+  String path,
+  String? port,
+  String? query,
+  String? scheme,
+  String? username,
+});
+
+extension ParsedUriChecks on Subject<ParsedUri> {
+  void matchesUri({
+    String? scheme,
+    String? authority,
+    String? username,
+    String? password,
+    String? hostname,
+    String? port,
+    required String path,
+    String? query,
+    List<(String, String?)> params = const [],
+    String? fragment,
+  }) {
+    has((v) => v.scheme, 'scheme').equals(scheme);
+    has((v) => v.authority, 'authority').equals(authority);
+    has((v) => v.username, 'username').equals(username);
+    has((v) => v.password, 'password').equals(password);
+    has((v) => v.hostname, 'hostname').equals(hostname);
+    has((v) => v.port, 'port').equals(port);
+    has((v) => v.path, 'path').equals(path);
+    has((v) => v.query, 'query').equals(query);
+    has((v) => v.params, 'params').deepEquals(params);
+    has((v) => v.fragment, 'fragment').equals(fragment);
+  }
+}
 
 @isTest
 void uriTest(
@@ -23,27 +62,32 @@ void uriTest(
   String? fragment,
 }) {
   test(source, () {
-    final result = parser.parse(source);
-    expect(result.position, source.length);
-    final value = result.value;
-    expect(value.scheme, scheme);
-    expect(value.authority, authority);
-    expect(value.username, username);
-    expect(value.password, password);
-    expect(value.hostname, hostname);
-    expect(value.port, port);
-    expect(value.path, path);
-    expect(value.query, query);
-    expect(value.params, params);
-    expect(value.fragment, fragment);
+    check(parser).isSuccess(
+      source,
+      position: source.length,
+      value: (Subject<dynamic> it) {
+        it.isA<ParsedUri>().matchesUri(
+          scheme: scheme,
+          authority: authority,
+          username: username,
+          password: password,
+          hostname: hostname,
+          port: port,
+          path: path,
+          query: query,
+          params: params,
+          fragment: fragment,
+        );
+      },
+    );
   });
 }
 
 void main() {
   test('linter', () {
-    expect(linter(parser), isEmpty);
-    expect(linter(authority), isEmpty);
-    expect(linter(query), isEmpty);
+    check(linter(parser)).isEmpty();
+    check(linter(authority)).isEmpty();
+    check(linter(query)).isEmpty();
   });
   uriTest(
     'http://www.ics.uci.edu/pub/ietf/uri/#Related',
@@ -133,91 +177,85 @@ void main() {
       'http://مثال.إختبار',
       'http://例子.测试',
       'http://उदाहरण.परीक्षा',
-      'http://-.~_!\$&\'()*+,;=:%40:80%2f::::::@example.com',
+      'http://-.~_!\\\$&\'()*+,;=:%40:80%2f::::::@example.com',
       'http://1337.net',
       'http://a.b-c.de',
       'http://223.255.255.254',
     ]) {
-      test(input, () => expect(parser, isSuccess(input)));
+      test(input, () => check(parser).isSuccess(input));
     }
   });
   group('authority failure edge-cases', () {
     final authParser = authority.end();
 
     test('malformed port with non-digits', () {
-      expect(authParser, isFailure('example.com:abc'));
-      expect(authParser, isFailure('example.com:80a'));
-      expect(authParser, isFailure('example.com:80b9'));
-      expect(authParser, isFailure('example.com:x1y2'));
+      check(authParser).isFailure('example.com:abc');
+      check(authParser).isFailure('example.com:80a');
+      check(authParser).isFailure('example.com:80b9');
+      check(authParser).isFailure('example.com:x1y2');
     });
 
     test('malformed port with trailing colon and no digits', () {
-      expect(authParser, isFailure('example.com:'));
-      expect(authParser, isFailure('user:pass@example.com:'));
+      check(authParser).isFailure('example.com:');
+      check(authParser).isFailure('user:pass@example.com:');
     });
 
     test('malformed port with negative sign or whitespace', () {
-      expect(authParser, isFailure('example.com:-80'));
-      expect(authParser, isFailure('example.com:+80'));
-      expect(authParser, isFailure('example.com: 80'));
-      expect(authParser, isFailure('example.com:80 '));
+      check(authParser).isFailure('example.com:-80');
+      check(authParser).isFailure('example.com:+80');
+      check(authParser).isFailure('example.com: 80');
+      check(authParser).isFailure('example.com:80 ');
     });
 
     test('multiple port delimiters', () {
-      expect(authParser, isFailure('example.com:80:80'));
-      expect(authParser, isFailure('example.com:80:'));
+      check(authParser).isFailure('example.com:80:80');
+      check(authParser).isFailure('example.com:80:');
     });
 
     test('missing username before password colon', () {
-      expect(authParser, isFailure(':secret@example.com'));
-      expect(authParser, isFailure(':secret@example.com:8080'));
+      check(authParser).isFailure(':secret@example.com');
+      check(authParser).isFailure(':secret@example.com:8080');
     });
 
     test('malformed port with user credentials', () {
-      expect(authParser, isFailure('user:pass@example.com:abc'));
-      expect(authParser, isFailure('user:pass@example.com:80xyz'));
-      expect(authParser, isFailure('user@example.com:invalid'));
+      check(authParser).isFailure('user:pass@example.com:abc');
+      check(authParser).isFailure('user:pass@example.com:80xyz');
+      check(authParser).isFailure('user@example.com:invalid');
     });
 
     test('malformed IPv6 host port separation', () {
-      expect(authParser, isFailure('[::1]:abc'));
-      expect(authParser, isFailure('[::1]:'));
-      expect(authParser, isFailure('[2001:db8::1]:badport'));
+      check(authParser).isFailure('[::1]:abc');
+      check(authParser).isFailure('[::1]:');
+      check(authParser).isFailure('[2001:db8::1]:badport');
     });
 
     test('trailing path or query delimiters unconsumed', () {
-      expect(authParser, isFailure('example.com:80/path'));
-      expect(authParser, isFailure('example.com:80?query'));
-      expect(authParser, isFailure('example.com:80#frag'));
+      check(authParser).isFailure('example.com:80/path');
+      check(authParser).isFailure('example.com:80?query');
+      check(authParser).isFailure('example.com:80#frag');
     });
   });
 
   group('query', () {
     test('parses multiple parameters', () {
-      final result = query.parse('key1=val1&key2=val2&noval&empty=');
-      expect(result, isA<Success<dynamic>>());
-      final entries = (result.value as List).cast<(String, String?)>();
-      expect(
-        entries,
-        equals([
+      check(query).isSuccess(
+        'key1=val1&key2=val2&noval&empty=',
+        value: [
           ('key1', 'val1'),
           ('key2', 'val2'),
           ('noval', null),
           ('empty', ''),
-        ]),
+        ],
       );
     });
 
     test('handles empty input and separator edge cases', () {
-      final resultEmpty = query.parse('');
-      expect(resultEmpty, isA<Success<dynamic>>());
-      expect(resultEmpty.value, isEmpty);
+      check(query).isSuccess(
+        '',
+        value: (Subject<dynamic> it) => it.isA<List<dynamic>>().isEmpty(),
+      );
 
-      final resultSeparators = query.parse('&a=1&&b=2&');
-      expect(resultSeparators, isA<Success<dynamic>>());
-      final entries = (resultSeparators.value as List)
-          .cast<(String, String?)>();
-      expect(entries, equals([('a', '1'), ('b', '2')]));
+      check(query).isSuccess('&a=1&&b=2&', value: [('a', '1'), ('b', '2')]);
     });
   });
 }

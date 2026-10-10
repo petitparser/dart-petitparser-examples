@@ -1,5 +1,6 @@
+import 'package:checks/checks.dart';
 import 'package:petitparser_examples/markdown.dart';
-import 'package:test/test.dart';
+import 'package:test/scaffolding.dart';
 
 void main() {
   group('ast and visitor', () {
@@ -8,9 +9,9 @@ void main() {
       const h2 = HeadingNode(1, TextNode('Title'));
       const h3 = HeadingNode(2, TextNode('Title'));
 
-      expect(h1, equals(h2));
-      expect(h1.hashCode, equals(h2.hashCode));
-      expect(h1, isNot(equals(h3)));
+      check(h1).equals(h2);
+      check(h1.hashCode).equals(h2.hashCode);
+      check(h1).not((it) => it.equals(h3));
     });
 
     test('DocumentNode equality', () {
@@ -22,8 +23,8 @@ void main() {
         HeadingNode(1, TextNode('Hello')),
         ParagraphNode(TextNode('World')),
       ]);
-      expect(doc1, equals(doc2));
-      expect(doc1.hashCode, equals(doc2.hashCode));
+      check(doc1).equals(doc2);
+      check(doc1.hashCode).equals(doc2.hashCode);
     });
 
     test('MarkdownHtmlRenderer renders complete document', () {
@@ -53,7 +54,7 @@ void main() {
 
       const renderer = MarkdownHtmlRenderer();
       final html = doc.accept(renderer);
-      expect(html, '''<h1>My Heading</h1>
+      check(html).equals('''<h1>My Heading</h1>
 <p>This is <strong>bold</strong> and <em>italic</em> and <code>code</code>.</p>
 <hr />
 <ul>
@@ -67,10 +68,8 @@ void main() {
         ParagraphNode(TextNode('Tom & Jerry <cartoon> "fun"')),
       ]);
       const renderer = MarkdownHtmlRenderer();
-      expect(
-        doc.accept(renderer),
-        '<p>Tom &amp; Jerry &lt;cartoon&gt; &quot;fun&quot;</p>',
-      );
+      check(doc.accept(renderer))
+          .equals('<p>Tom &amp; Jerry &lt;cartoon&gt; &quot;fun&quot;</p>');
     });
 
     test('TableNode rendering with alignments', () {
@@ -90,10 +89,10 @@ void main() {
 
       const renderer = MarkdownHtmlRenderer();
       final html = table.accept(renderer);
-      expect(html, contains('<th align="left">Left</th>'));
-      expect(html, contains('<th align="center">Center</th>'));
-      expect(html, contains('<td align="left">1</td>'));
-      expect(html, contains('<td align="center">2</td>'));
+      check(html).contains('<th align="left">Left</th>');
+      check(html).contains('<th align="center">Center</th>');
+      check(html).contains('<td align="left">1</td>');
+      check(html).contains('<td align="center">2</td>');
     });
 
     group('Markdown AST equality, hashCode, and toString for block nodes', () {
@@ -102,10 +101,10 @@ void main() {
         const d2 = DocumentNode([ParagraphNode(TextNode('text'))]);
         const d3 = DocumentNode([]);
 
-        expect(d1, equals(d2));
-        expect(d1.hashCode, equals(d2.hashCode));
-        expect(d1, isNot(equals(d3)));
-        expect(d1.toString(), contains('DocumentNode'));
+        check(d1).equals(d2);
+        check(d1.hashCode).equals(d2.hashCode);
+        check(d1).not((it) => it.equals(d3));
+        check(d1.toString()).contains('DocumentNode');
       });
 
       test('HeadingNode', () {
@@ -113,13 +112,11 @@ void main() {
         const h2 = HeadingNode(1, TextNode('Title'));
         const h3 = HeadingNode(2, TextNode('Title'));
 
-        expect(h1, equals(h2));
-        expect(h1.hashCode, equals(h2.hashCode));
-        expect(h1, isNot(equals(h3)));
-        expect(
-          h1.toString(),
-          'HeadingNode(level: 1, content: TextNode("Title"))',
-        );
+        check(h1).equals(h2);
+        check(h1.hashCode).equals(h2.hashCode);
+        check(h1).not((it) => it.equals(h3));
+        check(h1.toString())
+            .equals('HeadingNode(level: 1, content: TextNode("Title"))');
       });
 
       test('ParagraphNode', () {
@@ -127,10 +124,10 @@ void main() {
         const p2 = ParagraphNode(TextNode('A'));
         const p3 = ParagraphNode(TextNode('B'));
 
-        expect(p1, equals(p2));
-        expect(p1.hashCode, equals(p2.hashCode));
-        expect(p1, isNot(equals(p3)));
-        expect(p1.toString(), 'ParagraphNode(TextNode("A"))');
+        check(p1).equals(p2);
+        check(p1.hashCode).equals(p2.hashCode);
+        check(p1).not((it) => it.equals(p3));
+        check(p1.toString()).equals('ParagraphNode(TextNode("A"))');
       });
 
       test('BlockquoteNode', () {
@@ -138,10 +135,10 @@ void main() {
         const b2 = BlockquoteNode([ParagraphNode(TextNode('quote'))]);
         const b3 = BlockquoteNode([ParagraphNode(TextNode('other'))]);
 
-        expect(b1, equals(b2));
-        expect(b1.hashCode, equals(b2.hashCode));
-        expect(b1, isNot(equals(b3)));
-        expect(b1.toString(), contains('BlockquoteNode'));
+        check(b1).equals(b2);
+        check(b1.hashCode).equals(b2.hashCode);
+        check(b1).not((it) => it.equals(b3));
+        check(b1.toString()).contains('BlockquoteNode');
       });
 
       test('FencedCodeBlockNode', () {
@@ -150,14 +147,12 @@ void main() {
         const f3 = FencedCodeBlockNode('print(1)', info: 'python');
         const f4 = FencedCodeBlockNode('print(2)', info: 'dart');
 
-        expect(f1, equals(f2));
-        expect(f1.hashCode, equals(f2.hashCode));
-        expect(f1, isNot(equals(f3)));
-        expect(f1, isNot(equals(f4)));
-        expect(
-          f1.toString(),
-          'FencedCodeBlockNode(info: dart, code: print(1))',
-        );
+        check(f1).equals(f2);
+        check(f1.hashCode).equals(f2.hashCode);
+        check(f1).not((it) => it.equals(f3));
+        check(f1).not((it) => it.equals(f4));
+        check(f1.toString())
+            .equals('FencedCodeBlockNode(info: dart, code: print(1))');
       });
 
       test('IndentedCodeBlockNode', () {
@@ -165,19 +160,19 @@ void main() {
         const c2 = IndentedCodeBlockNode('code1');
         const c3 = IndentedCodeBlockNode('code2');
 
-        expect(c1, equals(c2));
-        expect(c1.hashCode, equals(c2.hashCode));
-        expect(c1, isNot(equals(c3)));
-        expect(c1.toString(), 'IndentedCodeBlockNode(code1)');
+        check(c1).equals(c2);
+        check(c1.hashCode).equals(c2.hashCode);
+        check(c1).not((it) => it.equals(c3));
+        check(c1.toString()).equals('IndentedCodeBlockNode(code1)');
       });
 
       test('ThematicBreakNode', () {
         const t1 = ThematicBreakNode();
         const t2 = ThematicBreakNode();
 
-        expect(t1, equals(t2));
-        expect(t1.hashCode, equals(t2.hashCode));
-        expect(t1.toString(), 'ThematicBreakNode()');
+        check(t1).equals(t2);
+        check(t1.hashCode).equals(t2.hashCode);
+        check(t1.toString()).equals('ThematicBreakNode()');
       });
 
       test('BulletListNode and ListItemNode', () {
@@ -189,19 +184,19 @@ void main() {
           isChecked: true,
         );
 
-        expect(item1, equals(item2));
-        expect(item1.hashCode, equals(item2.hashCode));
-        expect(item1, isNot(equals(item3)));
-        expect(item1.toString(), contains('ListItemNode'));
+        check(item1).equals(item2);
+        check(item1.hashCode).equals(item2.hashCode);
+        check(item1).not((it) => it.equals(item3));
+        check(item1.toString()).contains('ListItemNode');
 
         const list1 = BulletListNode([item1], isTight: true);
         const list2 = BulletListNode([item2], isTight: true);
         const list3 = BulletListNode([item1], isTight: false);
 
-        expect(list1, equals(list2));
-        expect(list1.hashCode, equals(list2.hashCode));
-        expect(list1, isNot(equals(list3)));
-        expect(list1.toString(), contains('BulletListNode(isTight: true'));
+        check(list1).equals(list2);
+        check(list1.hashCode).equals(list2.hashCode);
+        check(list1).not((it) => it.equals(list3));
+        check(list1.toString()).contains('BulletListNode(isTight: true');
       });
 
       test('OrderedListNode', () {
@@ -227,13 +222,11 @@ void main() {
           isTight: true,
         );
 
-        expect(o1, equals(o2));
-        expect(o1.hashCode, equals(o2.hashCode));
-        expect(o1, isNot(equals(o3)));
-        expect(
-          o1.toString(),
-          contains('OrderedListNode(start: 1, isTight: true'),
-        );
+        check(o1).equals(o2);
+        check(o1.hashCode).equals(o2.hashCode);
+        check(o1).not((it) => it.equals(o3));
+        check(o1.toString())
+            .contains('OrderedListNode(start: 1, isTight: true');
       });
 
       test('TableNode, TableRowNode, TableCellNode', () {
@@ -241,28 +234,28 @@ void main() {
         const cell2 = TableCellNode(TextNode('A'));
         const cell3 = TableCellNode(TextNode('B'));
 
-        expect(cell1, equals(cell2));
-        expect(cell1.hashCode, equals(cell2.hashCode));
-        expect(cell1, isNot(equals(cell3)));
-        expect(cell1.toString(), 'TableCellNode(TextNode("A"))');
+        check(cell1).equals(cell2);
+        check(cell1.hashCode).equals(cell2.hashCode);
+        check(cell1).not((it) => it.equals(cell3));
+        check(cell1.toString()).equals('TableCellNode(TextNode("A"))');
 
         const row1 = TableRowNode([cell1], isHeader: true);
         const row2 = TableRowNode([cell2], isHeader: true);
         const row3 = TableRowNode([cell1], isHeader: false);
 
-        expect(row1, equals(row2));
-        expect(row1.hashCode, equals(row2.hashCode));
-        expect(row1, isNot(equals(row3)));
-        expect(row1.toString(), contains('TableRowNode(isHeader: true'));
+        check(row1).equals(row2);
+        check(row1.hashCode).equals(row2.hashCode);
+        check(row1).not((it) => it.equals(row3));
+        check(row1.toString()).contains('TableRowNode(isHeader: true');
 
         const table1 = TableNode([row1], [TableAlignment.center]);
         const table2 = TableNode([row2], [TableAlignment.center]);
         const table3 = TableNode([row1], [TableAlignment.left]);
 
-        expect(table1, equals(table2));
-        expect(table1.hashCode, equals(table2.hashCode));
-        expect(table1, isNot(equals(table3)));
-        expect(table1.toString(), contains('TableNode'));
+        check(table1).equals(table2);
+        check(table1.hashCode).equals(table2.hashCode);
+        check(table1).not((it) => it.equals(table3));
+        check(table1.toString()).contains('TableNode');
       });
 
       test('HtmlBlockNode', () {
@@ -270,10 +263,10 @@ void main() {
         const h2 = HtmlBlockNode('<div>test</div>');
         const h3 = HtmlBlockNode('<p>test</p>');
 
-        expect(h1, equals(h2));
-        expect(h1.hashCode, equals(h2.hashCode));
-        expect(h1, isNot(equals(h3)));
-        expect(h1.toString(), 'HtmlBlockNode(<div>test</div>)');
+        check(h1).equals(h2);
+        check(h1.hashCode).equals(h2.hashCode);
+        check(h1).not((it) => it.equals(h3));
+        check(h1.toString()).equals('HtmlBlockNode(<div>test</div>)');
       });
 
       test('LinkReferenceDefinitionNode', () {
@@ -298,12 +291,11 @@ void main() {
           title: 'Example',
         );
 
-        expect(l1, equals(l2));
-        expect(l1.hashCode, equals(l2.hashCode));
-        expect(l1, isNot(equals(l3)));
-        expect(l1, isNot(equals(l4)));
-        expect(
-          l1.toString(),
+        check(l1).equals(l2);
+        check(l1.hashCode).equals(l2.hashCode);
+        check(l1).not((it) => it.equals(l3));
+        check(l1).not((it) => it.equals(l4));
+        check(l1.toString()).equals(
           'LinkReferenceDefinitionNode(label: ref, url: https://example.com, title: Example)',
         );
       });
@@ -315,28 +307,28 @@ void main() {
         const t2 = TextNode('hello');
         const t3 = TextNode('world');
 
-        expect(t1, equals(t2));
-        expect(t1.hashCode, equals(t2.hashCode));
-        expect(t1, isNot(equals(t3)));
-        expect(t1.toString(), 'TextNode("hello")');
+        check(t1).equals(t2);
+        check(t1.hashCode).equals(t2.hashCode);
+        check(t1).not((it) => it.equals(t3));
+        check(t1.toString()).equals('TextNode("hello")');
 
         const e1 = EmphasisNode(t1);
         const e2 = EmphasisNode(t2);
         const e3 = EmphasisNode(t3);
 
-        expect(e1, equals(e2));
-        expect(e1.hashCode, equals(e2.hashCode));
-        expect(e1, isNot(equals(e3)));
-        expect(e1.toString(), 'EmphasisNode(TextNode("hello"))');
+        check(e1).equals(e2);
+        check(e1.hashCode).equals(e2.hashCode);
+        check(e1).not((it) => it.equals(e3));
+        check(e1.toString()).equals('EmphasisNode(TextNode("hello"))');
 
         const s1 = StrongNode(t1);
         const s2 = StrongNode(t2);
         const s3 = StrongNode(t3);
 
-        expect(s1, equals(s2));
-        expect(s1.hashCode, equals(s2.hashCode));
-        expect(s1, isNot(equals(s3)));
-        expect(s1.toString(), 'StrongNode(TextNode("hello"))');
+        check(s1).equals(s2);
+        check(s1.hashCode).equals(s2.hashCode);
+        check(s1).not((it) => it.equals(s3));
+        check(s1.toString()).equals('StrongNode(TextNode("hello"))');
       });
 
       test('StrikethroughNode', () {
@@ -344,10 +336,10 @@ void main() {
         const s2 = StrikethroughNode(TextNode('del'));
         const s3 = StrikethroughNode(TextNode('other'));
 
-        expect(s1, equals(s2));
-        expect(s1.hashCode, equals(s2.hashCode));
-        expect(s1, isNot(equals(s3)));
-        expect(s1.toString(), 'StrikethroughNode(TextNode("del"))');
+        check(s1).equals(s2);
+        check(s1.hashCode).equals(s2.hashCode);
+        check(s1).not((it) => it.equals(s3));
+        check(s1.toString()).equals('StrikethroughNode(TextNode("del"))');
       });
 
       test('CodeSpanNode', () {
@@ -355,10 +347,10 @@ void main() {
         const c2 = CodeSpanNode('x = 1');
         const c3 = CodeSpanNode('y = 2');
 
-        expect(c1, equals(c2));
-        expect(c1.hashCode, equals(c2.hashCode));
-        expect(c1, isNot(equals(c3)));
-        expect(c1.toString(), 'CodeSpanNode("x = 1")');
+        check(c1).equals(c2);
+        check(c1.hashCode).equals(c2.hashCode);
+        check(c1).not((it) => it.equals(c3));
+        check(c1.toString()).equals('CodeSpanNode("x = 1")');
       });
 
       test('LinkNode & ImageNode', () {
@@ -378,11 +370,10 @@ void main() {
           title: 'Dart',
         );
 
-        expect(link1, equals(link2));
-        expect(link1.hashCode, equals(link2.hashCode));
-        expect(link1, isNot(equals(link3)));
-        expect(
-          link1.toString(),
+        check(link1).equals(link2);
+        check(link1.hashCode).equals(link2.hashCode);
+        check(link1).not((it) => it.equals(link3));
+        check(link1.toString()).equals(
           'LinkNode(text: TextNode("click"), url: https://dart.dev, title: Dart)',
         );
 
@@ -390,11 +381,10 @@ void main() {
         const img2 = ImageNode(TextNode('logo'), 'logo.png', title: 'Logo');
         const img3 = ImageNode(TextNode('logo'), 'icon.png', title: 'Logo');
 
-        expect(img1, equals(img2));
-        expect(img1.hashCode, equals(img2.hashCode));
-        expect(img1, isNot(equals(img3)));
-        expect(
-          img1.toString(),
+        check(img1).equals(img2);
+        check(img1.hashCode).equals(img2.hashCode);
+        check(img1).not((it) => it.equals(img3));
+        check(img1.toString()).equals(
           'ImageNode(alt: TextNode("logo"), url: logo.png, title: Logo)',
         );
       });
@@ -404,13 +394,11 @@ void main() {
         const a2 = AutolinkNode('https://dart.dev', isEmail: false);
         const a3 = AutolinkNode('support@dart.dev', isEmail: true);
 
-        expect(a1, equals(a2));
-        expect(a1.hashCode, equals(a2.hashCode));
-        expect(a1, isNot(equals(a3)));
-        expect(
-          a1.toString(),
-          'AutolinkNode(url: https://dart.dev, isEmail: false)',
-        );
+        check(a1).equals(a2);
+        check(a1.hashCode).equals(a2.hashCode);
+        check(a1).not((it) => it.equals(a3));
+        check(a1.toString())
+            .equals('AutolinkNode(url: https://dart.dev, isEmail: false)');
       });
 
       test('LineBreakNode', () {
@@ -418,10 +406,10 @@ void main() {
         const lb2 = LineBreakNode(isHard: true);
         const lb3 = LineBreakNode(isHard: false);
 
-        expect(lb1, equals(lb2));
-        expect(lb1.hashCode, equals(lb2.hashCode));
-        expect(lb1, isNot(equals(lb3)));
-        expect(lb1.toString(), 'LineBreakNode(isHard: true)');
+        check(lb1).equals(lb2);
+        check(lb1.hashCode).equals(lb2.hashCode);
+        check(lb1).not((it) => it.equals(lb3));
+        check(lb1.toString()).equals('LineBreakNode(isHard: true)');
       });
 
       test('CompositeInlineNode', () {
@@ -429,10 +417,10 @@ void main() {
         const ci2 = CompositeInlineNode([TextNode('a'), TextNode('b')]);
         const ci3 = CompositeInlineNode([TextNode('c')]);
 
-        expect(ci1, equals(ci2));
-        expect(ci1.hashCode, equals(ci2.hashCode));
-        expect(ci1, isNot(equals(ci3)));
-        expect(ci1.toString(), contains('CompositeInlineNode'));
+        check(ci1).equals(ci2);
+        check(ci1.hashCode).equals(ci2.hashCode);
+        check(ci1).not((it) => it.equals(ci3));
+        check(ci1.toString()).contains('CompositeInlineNode');
       });
 
       test('RawHtmlInlineNode', () {
@@ -440,16 +428,16 @@ void main() {
         const r2 = RawHtmlInlineNode('<span>hello</span>');
         const r3 = RawHtmlInlineNode('<b>hello</b>');
 
-        expect(r1, equals(r2));
-        expect(r1.hashCode, equals(r2.hashCode));
-        expect(r1, isNot(equals(r3)));
-        expect(r1.toString(), 'RawHtmlInlineNode("<span>hello</span>")');
+        check(r1).equals(r2);
+        check(r1.hashCode).equals(r2.hashCode);
+        check(r1).not((it) => it.equals(r3));
+        check(r1.toString()).equals('RawHtmlInlineNode("<span>hello</span>")');
       });
 
       test('Node offset tracking start and stop', () {
         const node = TextNode('hello', start: 5, stop: 10);
-        expect(node.start, 5);
-        expect(node.stop, 10);
+        check(node.start).equals(5);
+        check(node.stop).equals(10);
       });
     });
 
@@ -457,72 +445,59 @@ void main() {
       final visitor = FullTrackingVisitor();
 
       test('dispatches all block nodes correctly', () {
-        expect(const DocumentNode([]).accept(visitor), 'document:0');
-        expect(
-          const HeadingNode(3, TextNode('H')).accept(visitor),
-          'heading:3',
-        );
-        expect(const ParagraphNode(TextNode('P')).accept(visitor), 'paragraph');
-        expect(const BlockquoteNode([]).accept(visitor), 'blockquote:0');
-        expect(
-          const FencedCodeBlockNode('c', info: 'i').accept(visitor),
-          'fenced:i:c',
-        );
-        expect(const IndentedCodeBlockNode('c').accept(visitor), 'indented:c');
-        expect(const ThematicBreakNode().accept(visitor), 'thematic_break');
-        expect(const BulletListNode([]).accept(visitor), 'bullet_list:0');
-        expect(
-          const OrderedListNode([], startNumber: 5).accept(visitor),
-          'ordered_list:5',
-        );
-        expect(
+        check(const DocumentNode([]).accept(visitor)).equals('document:0');
+        check(const HeadingNode(3, TextNode('H')).accept(visitor))
+            .equals('heading:3');
+        check(const ParagraphNode(TextNode('P')).accept(visitor))
+            .equals('paragraph');
+        check(const BlockquoteNode([]).accept(visitor)).equals('blockquote:0');
+        check(const FencedCodeBlockNode('c', info: 'i').accept(visitor))
+            .equals('fenced:i:c');
+        check(const IndentedCodeBlockNode('c').accept(visitor))
+            .equals('indented:c');
+        check(const ThematicBreakNode().accept(visitor))
+            .equals('thematic_break');
+        check(const BulletListNode([]).accept(visitor)).equals('bullet_list:0');
+        check(const OrderedListNode([], startNumber: 5).accept(visitor))
+            .equals('ordered_list:5');
+        check(
           const ListItemNode(
             [],
             isTask: true,
             isChecked: false,
           ).accept(visitor),
-          'list_item:true:false',
-        );
-        expect(const TableNode([], []).accept(visitor), 'table:0');
-        expect(
-          const TableRowNode([], isHeader: true).accept(visitor),
-          'table_row:0:true',
-        );
-        expect(const TableCellNode(TextNode('')).accept(visitor), 'table_cell');
-        expect(const HtmlBlockNode('<hr>').accept(visitor), 'html_block:<hr>');
-        expect(
-          const LinkReferenceDefinitionNode('lbl', 'url').accept(visitor),
-          'link_ref:lbl:url',
-        );
+        ).equals('list_item:true:false');
+        check(const TableNode([], []).accept(visitor)).equals('table:0');
+        check(const TableRowNode([], isHeader: true).accept(visitor))
+            .equals('table_row:0:true');
+        check(const TableCellNode(TextNode('')).accept(visitor))
+            .equals('table_cell');
+        check(const HtmlBlockNode('<hr>').accept(visitor))
+            .equals('html_block:<hr>');
+        check(const LinkReferenceDefinitionNode('lbl', 'url').accept(visitor))
+            .equals('link_ref:lbl:url');
       });
 
       test('dispatches all inline nodes correctly', () {
-        expect(const TextNode('t').accept(visitor), 'text:t');
-        expect(const EmphasisNode(TextNode('e')).accept(visitor), 'emphasis');
-        expect(const StrongNode(TextNode('s')).accept(visitor), 'strong');
-        expect(
-          const StrikethroughNode(TextNode('d')).accept(visitor),
-          'strikethrough',
-        );
-        expect(const CodeSpanNode('x').accept(visitor), 'code_span:x');
-        expect(const LinkNode(TextNode('t'), 'u').accept(visitor), 'link:u');
-        expect(
-          const ImageNode(TextNode('a'), 'src').accept(visitor),
-          'image:src',
-        );
-        expect(
-          const AutolinkNode('u', isEmail: true).accept(visitor),
-          'autolink:u:true',
-        );
-        expect(
-          const LineBreakNode(isHard: false).accept(visitor),
-          'line_break:false',
-        );
-        expect(
-          const CompositeInlineNode([]).accept(visitor),
-          'composite_inline:0',
-        );
-        expect(const RawHtmlInlineNode('<i>').accept(visitor), 'raw_html:<i>');
+        check(const TextNode('t').accept(visitor)).equals('text:t');
+        check(const EmphasisNode(TextNode('e')).accept(visitor))
+            .equals('emphasis');
+        check(const StrongNode(TextNode('s')).accept(visitor)).equals('strong');
+        check(const StrikethroughNode(TextNode('d')).accept(visitor))
+            .equals('strikethrough');
+        check(const CodeSpanNode('x').accept(visitor)).equals('code_span:x');
+        check(const LinkNode(TextNode('t'), 'u').accept(visitor))
+            .equals('link:u');
+        check(const ImageNode(TextNode('a'), 'src').accept(visitor))
+            .equals('image:src');
+        check(const AutolinkNode('u', isEmail: true).accept(visitor))
+            .equals('autolink:u:true');
+        check(const LineBreakNode(isHard: false).accept(visitor))
+            .equals('line_break:false');
+        check(const CompositeInlineNode([]).accept(visitor))
+            .equals('composite_inline:0');
+        check(const RawHtmlInlineNode('<i>').accept(visitor))
+            .equals('raw_html:<i>');
       });
     });
   });

@@ -1,16 +1,9 @@
 import 'package:petitparser/reflection.dart';
 import 'package:petitparser_examples/lisp.dart';
-import 'package:test/test.dart';
+import 'package:test/scaffolding.dart';
 
-import 'utils/expect.dart';
-
-Matcher isName([dynamic name = anything]) =>
-    const TypeMatcher<Name>().having((name) => name.toString(), 'name', name);
-
-Matcher isCons({dynamic head = anything, dynamic tail = anything}) =>
-    const TypeMatcher<Cons>()
-        .having((cons) => cons.head, 'head', head)
-        .having((cons) => cons.tail, 'tail', tail);
+import 'lisp/lisp_checks.dart';
+import 'utils/checks.dart';
 
 void main() {
   final parserDefinition = LispParserDefinition();
@@ -26,102 +19,90 @@ void main() {
       final cell1 = Name('foo');
       final cell2 = Name('foo');
       final cell3 = Name('bar');
-      expect(cell1, cell2);
-      expect(cell1, same(cell2));
-      expect(cell1, isNot(cell3));
-      expect(cell1, isNot(same(cell3)));
+      check(cell1).equals(cell2);
+      check(cell1).identicalTo(cell2);
+      check(cell1).not((it) => it.equals(cell3));
+      check(cell1).not((it) => it.identicalTo(cell3));
     });
     test('Cons', () {
       final cell = Cons(1, 2);
-      expect(cell.car, 1);
-      expect(cell.head, 1);
-      expect(cell.cdr, 2);
-      expect(() => cell.tail, throwsStateError);
+      check(cell.car).equals(1);
+      check(cell.head).equals(1);
+      check(cell.cdr).equals(2);
+      check(() => cell.tail).throws<StateError>();
       cell.car = 3;
-      expect(cell.car, 3);
-      expect(cell.head, 3);
-      expect(cell.cdr, 2);
-      expect(() => cell.tail, throwsStateError);
+      check(cell.car).equals(3);
+      check(cell.head).equals(3);
+      check(cell.cdr).equals(2);
+      check(() => cell.tail).throws<StateError>();
       cell.cdr = Cons(4, 5);
-      expect(cell.car, 3);
-      expect(cell.head, 3);
-      expect(cell.tail?.car, 4);
-      expect(cell.tail?.head, 4);
-      expect(cell.tail?.cdr, 5);
-      expect(cell == cell, isTrue);
-      expect(cell.hashCode, isNonZero);
-      expect(cell.toString(), '(3 4 . 5)');
+      check(cell.car).equals(3);
+      check(cell.head).equals(3);
+      check(cell.tail?.car).equals(4);
+      check(cell.tail?.head).equals(4);
+      check(cell.tail?.cdr).equals(5);
+      check(cell == cell).isTrue();
+      check(cell.hashCode).not((it) => it.equals(0));
+      check(cell.toString()).equals('(3 4 . 5)');
     });
     test('Quote', () {
       final quote = Quote('datum_value');
-      expect(quote, isA<Quote>());
-      expect(quote.datum, equals('datum_value'));
+      check(quote).isA<Quote>();
+      check(quote.datum).equals('datum_value');
 
       quote.datum = 42;
-      expect(quote.datum, equals(42));
+      check(quote.datum).equals(42);
 
       quote.datum = null;
-      expect(quote.datum, isNull);
+      check(quote.datum).isNull();
 
       quote.datum = ['nested', 'list'];
-      expect(quote.datum, equals(['nested', 'list']));
+      check(quote.datum).isA<List<dynamic>>().deepEquals(['nested', 'list']);
 
       final innerQuote = Quote('inner');
       final outerQuote = Quote(innerQuote);
-      expect(outerQuote.datum, isA<Quote>());
-      expect((outerQuote.datum as Quote).datum, equals('inner'));
+      check(outerQuote.datum).isA<Quote>();
+      check((outerQuote.datum as Quote).datum).equals('inner');
     });
   });
   group('Environment', () {
     final env = standard.create();
     test('Standard', () {
-      expect(env.owner, isNotNull);
-      expect(env.keys, isEmpty);
-      expect(env.owner?.keys, isNot(isEmpty));
+      check(env.owner).isNotNull();
+      check(env.keys).isEmpty();
+      check(env.owner?.keys).isNotNull().isNotEmpty();
     });
     test('Create', () {
       final sub = env.create();
-      expect(sub.owner, same(env));
-      expect(sub.keys, isEmpty);
+      check(sub.owner).identicalTo(env);
+      check(sub.keys).isEmpty();
     });
     test('operator [] and []=', () {
       final root = Environment();
       final key = Name('x');
       root.define(key, 123);
-      expect(root[key], 123);
+      check(root[key]).equals(123);
 
       final nullKey = Name('n');
       root.define(nullKey, null);
-      expect(root[nullKey], isNull);
+      check(root[nullKey]).isNull();
 
       final child = root.create();
-      expect(child[key], 123);
+      check(child[key]).equals(123);
 
       child[key] = 456;
-      expect(child[key], 456);
-      expect(root[key], 456);
+      check(child[key]).equals(456);
+      check(root[key]).equals(456);
 
       final missingKey = Name('unbound');
-      expect(
-        () => root[missingKey],
-        throwsA(
-          isA<ArgumentError>().having(
-            (e) => e.message,
-            'message',
-            'Unknown binding for unbound',
-          ),
-        ),
-      );
-      expect(
-        () => root[missingKey] = 1,
-        throwsA(
-          isA<ArgumentError>().having(
-            (e) => e.message,
-            'message',
-            'Unknown binding for unbound',
-          ),
-        ),
-      );
+      check(() => root[missingKey])
+          .throws<ArgumentError>()
+          .has((e) => e.message, 'message')
+          .equals('Unknown binding for unbound');
+      check(() => root[missingKey] = 1)
+          .throws<ArgumentError>()
+          .has((e) => e.message, 'message')
+          .equals('Unknown binding for unbound');
     });
   });
   group('Parser', () {
@@ -129,147 +110,140 @@ void main() {
     final atom = parserDefinition.buildFrom(parserDefinition.atom());
 
     test('Linter', () {
-      expect(
+      check(
         linter(parser, excludedRules: {'Duplicate parser'}, excludedTypes: {}),
-        isEmpty,
-      );
-      expect(
+      ).isEmpty();
+      check(
         linter(atom, excludedRules: {'Duplicate parser'}, excludedTypes: {}),
-        isEmpty,
-      );
+      ).isEmpty();
     });
     test('Name', () {
-      expect(atom, isSuccess('foo', value: isName('foo')));
-      expect(parser, isSuccess('foo', value: [isName('foo')]));
+      check(atom).isSuccess('foo', value: isName('foo'));
+      check(parser).isSuccess('foo', value: [isName('foo')]);
     });
     test('Name for operator', () {
-      expect(atom, isSuccess('+', value: isName('+')));
+      check(atom).isSuccess('+', value: isName('+'));
     });
     test('Name for special', () {
-      expect(atom, isSuccess('set!', value: isName('set!')));
+      check(atom).isSuccess('set!', value: isName('set!'));
     });
     test('String', () {
-      expect(atom, isSuccess('"foo"', value: 'foo'));
-      expect(parser, isSuccess('"foo"', value: ['foo']));
+      check(atom).isSuccess('"foo"', value: 'foo');
+      check(parser).isSuccess('"foo"', value: ['foo']);
     });
     test('String with escape', () {
-      expect(atom, isSuccess('"\\""', value: '"'));
+      check(atom).isSuccess('"\\""', value: '"');
     });
     test('Number integer', () {
-      expect(atom, isSuccess('123', value: 123));
-      expect(parser, isSuccess('123', value: [123]));
+      check(atom).isSuccess('123', value: 123);
+      check(parser).isSuccess('123', value: [123]);
     });
     test('Number negative integer', () {
-      expect(atom, isSuccess('-123', value: -123));
+      check(atom).isSuccess('-123', value: -123);
     });
     test('Number positive integer', () {
-      expect(atom, isSuccess('+123', value: 123));
+      check(atom).isSuccess('+123', value: 123);
     });
     test('Number floating', () {
-      expect(atom, isSuccess('123.45', value: 123.45));
+      check(atom).isSuccess('123.45', value: 123.45);
     });
     test('Number floating exponential', () {
-      expect(atom, isSuccess('1.23e4', value: 1.23e4));
+      check(atom).isSuccess('1.23e4', value: 1.23e4);
     });
     test('List empty', () {
-      expect(atom, isSuccess('()', value: isNull));
-      expect(parser, isSuccess('()', value: [isNull]));
+      check(atom).isSuccess('()', value: isNullValue);
+      check(parser).isSuccess('()', value: [isNullValue]);
     });
     test('List empty []', () {
-      expect(atom, isSuccess('[]', value: isNull));
+      check(atom).isSuccess('[]', value: isNullValue);
     });
     test('List empty {}', () {
-      expect(atom, isSuccess('{}', value: isNull));
+      check(atom).isSuccess('{}', value: isNullValue);
     });
     test('List one element', () {
-      expect(atom, isSuccess('(1)', value: isCons(head: 1, tail: isNull)));
-      expect(parser, isSuccess('(1)', value: [isCons(head: 1, tail: isNull)]));
+      check(atom).isSuccess('(1)', value: isCons(head: 1, tail: isNullValue));
+      check(parser)
+          .isSuccess('(1)', value: [isCons(head: 1, tail: isNullValue)]);
     });
     test('List two elements', () {
-      expect(
-        atom,
-        isSuccess(
-          '(1 2)',
-          value: isCons(head: 1, tail: isCons(head: 2, tail: isNull)),
-        ),
+      check(atom).isSuccess(
+        '(1 2)',
+        value: isCons(head: 1, tail: isCons(head: 2, tail: isNullValue)),
       );
     });
     test('List three elements', () {
-      expect(
-        atom,
-        isSuccess(
-          '(+ 1 2)',
-          value: isCons(
-            head: isName('+'),
-            tail: isCons(head: 1, tail: isCons(head: 2, tail: isNull)),
-          ),
+      check(atom).isSuccess(
+        '(+ 1 2)',
+        value: isCons(
+          head: isName('+'),
+          tail: isCons(head: 1, tail: isCons(head: 2, tail: isNullValue)),
         ),
       );
     });
     test('Negative cases', () {
-      expect(parser, isFailure('('));
-      expect(parser, isFailure(')'));
-      expect(parser, isFailure('['));
-      expect(parser, isFailure(']'));
-      expect(parser, isFailure('{'));
-      expect(parser, isFailure('}'));
-      expect(parser, isFailure('(+ 1 2'));
-      expect(parser, isFailure('(+ 1 (+ 2 3)'));
-      expect(parser, isFailure('[+ 1 2'));
-      expect(parser, isFailure('{+ 1 2'));
-      expect(parser, isFailure('(+ 1 2))'));
-      expect(parser, isFailure('"unterminated'));
-      expect(parser, isFailure(r'"escaped \"'));
-      expect(parser, isFailure('(foo "bar'));
-      expect(parser, isFailure("'"));
-      expect(parser, isFailure('`'));
-      expect(parser, isFailure(','));
-      expect(parser, isFailure(',@'));
-      expect(parser, isFailure('`123'));
+      check(parser).isFailure('(');
+      check(parser).isFailure(')');
+      check(parser).isFailure('[');
+      check(parser).isFailure(']');
+      check(parser).isFailure('{');
+      check(parser).isFailure('}');
+      check(parser).isFailure('(+ 1 2');
+      check(parser).isFailure('(+ 1 (+ 2 3)');
+      check(parser).isFailure('[+ 1 2');
+      check(parser).isFailure('{+ 1 2');
+      check(parser).isFailure('(+ 1 2))');
+      check(parser).isFailure('"unterminated');
+      check(parser).isFailure(r'"escaped \"');
+      check(parser).isFailure('(foo "bar');
+      check(parser).isFailure("'");
+      check(parser).isFailure('`');
+      check(parser).isFailure(',');
+      check(parser).isFailure(',@');
+      check(parser).isFailure('`123');
     });
   });
 
   group('Natives', () {
     test('Define', () {
-      expect(exec('(define a 1)'), 1);
-      expect(exec('(define a 2) a'), 2);
-      expect(exec('((define (a) 3))'), 3);
-      expect(exec('(define (a) 4) (a)'), 4);
-      expect(exec('((define (a x) x) 5)'), 5);
-      expect(exec('(define (a x) x) (a 6)'), 6);
-      expect(() => exec('(define 12)'), throwsArgumentError);
+      check(exec('(define a 1)')).equals(1);
+      check(exec('(define a 2) a')).equals(2);
+      check(exec('((define (a) 3))')).equals(3);
+      check(exec('(define (a) 4) (a)')).equals(4);
+      check(exec('((define (a x) x) 5)')).equals(5);
+      check(exec('(define (a x) x) (a 6)')).equals(6);
+      check(() => exec('(define 12)')).throws<ArgumentError>();
     });
     test('Lambda', () {
-      expect(exec('((lambda () 1) 2)'), 1);
-      expect(exec('((lambda (x) x) 2)'), 2);
-      expect(exec('((lambda (x) (+ x x)) 2)'), 4);
-      expect(exec('((lambda (x y) (+ x y)) 2 4)'), 6);
-      expect(exec('((lambda (x y z) (+ x y z)) 2 4 6)'), 12);
+      check(exec('((lambda () 1) 2)')).equals(1);
+      check(exec('((lambda (x) x) 2)')).equals(2);
+      check(exec('((lambda (x) (+ x x)) 2)')).equals(4);
+      check(exec('((lambda (x y) (+ x y)) 2 4)')).equals(6);
+      check(exec('((lambda (x y z) (+ x y z)) 2 4 6)')).equals(12);
     });
     test('Quote', () {
-      expect(exec('(quote 1)'), 1);
-      expect(exec('(quote a)'), Name('a'));
-      expect(exec('(quote (+ 1))'), Cons(Name('+'), Cons(1)));
+      check(exec('(quote 1)')).equals(1);
+      check(exec('(quote a)')).equals(Name('a'));
+      check(exec('(quote (+ 1))')).equals(Cons(Name('+'), Cons(1)));
     });
     test('Quote (syntax)', () {
-      expect(exec("'()"), null);
-      expect(exec("'a"), Name('a'));
-      expect(exec("'(1)"), Cons(1));
-      expect(exec("'(+ 1)"), Cons(Name('+'), Cons(1)));
+      check(exec("'()")).equals(null);
+      check(exec("'a")).equals(Name('a'));
+      check(exec("'(1)")).equals(Cons(1));
+      check(exec("'(+ 1)")).equals(Cons(Name('+'), Cons(1)));
     });
     test('Eval', () {
-      expect(exec('(eval (quote (+ 1 2)))'), 3);
+      check(exec('(eval (quote (+ 1 2)))')).equals(3);
     });
     test('Apply', () {
-      expect(exec('(apply + 1 2 3)'), 6);
-      expect(exec('(apply + 1 2 3 (+ 2 2))'), 10);
+      check(exec('(apply + 1 2 3)')).equals(6);
+      check(exec('(apply + 1 2 3 (+ 2 2))')).equals(10);
     });
     test('Let', () {
-      expect(exec('(let ((a 1)) a)'), 1);
-      expect(exec('(let ((a 1) (b 2)) a)'), 1);
-      expect(exec('(let ((a 1) (b 2)) b)'), 2);
-      expect(exec('(let ((a 1) (b 2)) (+ a b))'), 3);
-      expect(exec('(let ((a 1) (b 2)) (+ a b) 4)'), 4);
+      check(exec('(let ((a 1)) a)')).equals(1);
+      check(exec('(let ((a 1) (b 2)) a)')).equals(1);
+      check(exec('(let ((a 1) (b 2)) b)')).equals(2);
+      check(exec('(let ((a 1) (b 2)) (+ a b))')).equals(3);
+      check(exec('(let ((a 1) (b 2)) (+ a b) 4)')).equals(4);
     });
     group('Print', () {
       final buffer = StringBuffer();
@@ -281,261 +255,260 @@ void main() {
         buffer.clear();
       });
       test('empty', () {
-        expect(exec('(print)'), isNull);
-        expect(buffer.toString(), isEmpty);
+        check(exec('(print)')).isNull();
+        check(buffer.toString()).isEmpty();
       });
       test('elements', () {
-        expect(exec('(print 1 2 3)'), isNull);
-        expect(buffer.toString(), '123');
+        check(exec('(print 1 2 3)')).isNull();
+        check(buffer.toString()).equals('123');
       });
       test('expression', () {
-        expect(exec('(print (+ 1 2) " " (+ 3 4))'), isNull);
-        expect(buffer.toString(), '3 7');
+        check(exec('(print (+ 1 2) " " (+ 3 4))')).isNull();
+        check(buffer.toString()).equals('3 7');
       });
     });
     test('Set!', () {
       final env = standard.create();
       env.define(Name('a'), null);
-      expect(exec('(set! a 1)', env), 1);
-      expect(exec('(set! a (+ 1 2))', env), 3);
-      expect(exec('(set! a (+ 1 2)) (+ a 1)', env), 4);
+      check(exec('(set! a 1)', env)).equals(1);
+      check(exec('(set! a (+ 1 2))', env)).equals(3);
+      check(exec('(set! a (+ 1 2)) (+ a 1)', env)).equals(4);
     });
     test('Set! (undefined)', () {
-      expect(() => exec('(set! a 1)'), throwsArgumentError);
-      expect(() => standard[Name('a')], throwsArgumentError);
+      check(() => exec('(set! a 1)')).throws<ArgumentError>();
+      check(() => standard[Name('a')]).throws<ArgumentError>();
     });
     test('If', () {
-      expect(exec('(if true)'), isNull);
-      expect(exec('(if false)'), isNull);
-      expect(exec('(if true 1)'), 1);
-      expect(exec('(if false 1)'), isNull);
-      expect(exec('(if true 1 2)'), 1);
-      expect(exec('(if false 1 2)'), 2);
+      check(exec('(if true)')).isNull();
+      check(exec('(if false)')).isNull();
+      check(exec('(if true 1)')).equals(1);
+      check(exec('(if false 1)')).isNull();
+      check(exec('(if true 1 2)')).equals(1);
+      check(exec('(if false 1 2)')).equals(2);
     });
     test('If (laziness)', () {
-      expect(exec('(if (= 1 1) 3 4)'), 3);
-      expect(exec('(if (= 1 2) 3 4)'), 4);
+      check(exec('(if (= 1 1) 3 4)')).equals(3);
+      check(exec('(if (= 1 2) 3 4)')).equals(4);
     });
     test('While', () {
       final env = standard.create();
       env.define(Name('a'), 0);
       exec('(while (< a 3) (set! a (+ a 1)))', env);
-      expect(env[Name('a')], 3);
+      check(env[Name('a')]).equals(3);
     });
     test('True', () {
-      expect(exec('true'), isTrue);
+      check(exec('true')).isTrue();
     });
     test('False', () {
-      expect(exec('false'), isFalse);
+      check(exec('false')).isFalse();
     });
     test('And', () {
-      expect(exec('(and)'), isTrue);
-      expect(exec('(and true)'), isTrue);
-      expect(exec('(and false)'), isFalse);
-      expect(exec('(and true true)'), isTrue);
-      expect(exec('(and true false)'), isFalse);
-      expect(exec('(and false true)'), isFalse);
-      expect(exec('(and false false)'), isFalse);
-      expect(exec('(and true true true)'), isTrue);
-      expect(exec('(and true true false)'), isFalse);
-      expect(exec('(and true false true)'), isFalse);
-      expect(exec('(and true false false)'), isFalse);
-      expect(exec('(and false true true)'), isFalse);
-      expect(exec('(and false true false)'), isFalse);
-      expect(exec('(and false false true)'), isFalse);
-      expect(exec('(and false false false)'), isFalse);
+      check(exec('(and)')).isTrue();
+      check(exec('(and true)')).isTrue();
+      check(exec('(and false)')).isFalse();
+      check(exec('(and true true)')).isTrue();
+      check(exec('(and true false)')).isFalse();
+      check(exec('(and false true)')).isFalse();
+      check(exec('(and false false)')).isFalse();
+      check(exec('(and true true true)')).isTrue();
+      check(exec('(and true true false)')).isFalse();
+      check(exec('(and true false true)')).isFalse();
+      check(exec('(and true false false)')).isFalse();
+      check(exec('(and false true true)')).isFalse();
+      check(exec('(and false true false)')).isFalse();
+      check(exec('(and false false true)')).isFalse();
+      check(exec('(and false false false)')).isFalse();
     });
     test('And (laziness)', () {
       final env = standard.create();
       env.define(Name('a'), null);
       exec('(and false (set! a true))', env);
-      expect(env[Name('a')], isNull);
+      check(env[Name('a')]).isNull();
       exec('(and true (set! a true))', env);
-      expect(env[Name('a')], isTrue);
+      check(env[Name('a')]).isTrue();
     });
     test('Or', () {
-      expect(exec('(or)'), isFalse);
-      expect(exec('(or true)'), isTrue);
-      expect(exec('(or false)'), isFalse);
-      expect(exec('(or true true)'), isTrue);
-      expect(exec('(or true false)'), isTrue);
-      expect(exec('(or false true)'), isTrue);
-      expect(exec('(or false false)'), isFalse);
-      expect(exec('(or true true true)'), isTrue);
-      expect(exec('(or true true false)'), isTrue);
-      expect(exec('(or true false true)'), isTrue);
-      expect(exec('(or true false false)'), isTrue);
-      expect(exec('(or false true true)'), isTrue);
-      expect(exec('(or false true false)'), isTrue);
-      expect(exec('(or false false true)'), isTrue);
-      expect(exec('(or false false false)'), isFalse);
+      check(exec('(or)')).isFalse();
+      check(exec('(or true)')).isTrue();
+      check(exec('(or false)')).isFalse();
+      check(exec('(or true true)')).isTrue();
+      check(exec('(or true false)')).isTrue();
+      check(exec('(or false true)')).isTrue();
+      check(exec('(or false false)')).isFalse();
+      check(exec('(or true true true)')).isTrue();
+      check(exec('(or true true false)')).isTrue();
+      check(exec('(or true false true)')).isTrue();
+      check(exec('(or true false false)')).isTrue();
+      check(exec('(or false true true)')).isTrue();
+      check(exec('(or false true false)')).isTrue();
+      check(exec('(or false false true)')).isTrue();
+      check(exec('(or false false false)')).isFalse();
     });
     test('Or (laziness)', () {
       final env = standard.create();
       env.define(Name('a'), null);
       exec('(or true (set! a true))', env);
-      expect(env[Name('a')], isNull);
+      check(env[Name('a')]).isNull();
       exec('(or false (set! a true))', env);
-      expect(env[Name('a')], isTrue);
+      check(env[Name('a')]).isTrue();
     });
     test('Not', () {
-      expect(exec('(not true)'), isFalse);
-      expect(exec('(not false)'), isTrue);
+      check(exec('(not true)')).isFalse();
+      check(exec('(not false)')).isTrue();
     });
     test('Add', () {
-      expect(exec('(+ 1)'), 1);
-      expect(exec('(+ 1 2)'), 3);
-      expect(exec('(+ 1 2 3)'), 6);
-      expect(exec('(+ 1 2 3 4)'), 10);
+      check(exec('(+ 1)')).equals(1);
+      check(exec('(+ 1 2)')).equals(3);
+      check(exec('(+ 1 2 3)')).equals(6);
+      check(exec('(+ 1 2 3 4)')).equals(10);
     });
     test('Sub', () {
-      expect(exec('(- 1)'), -1);
-      expect(exec('(- 1 2)'), -1);
-      expect(exec('(- 1 2 3)'), -4);
-      expect(exec('(- 1 2 3 4)'), -8);
+      check(exec('(- 1)')).equals(-1);
+      check(exec('(- 1 2)')).equals(-1);
+      check(exec('(- 1 2 3)')).equals(-4);
+      check(exec('(- 1 2 3 4)')).equals(-8);
     });
     test('Mul', () {
-      expect(exec('(* 2)'), 2);
-      expect(exec('(* 2 3)'), 6);
-      expect(exec('(* 2 3 4)'), 24);
+      check(exec('(* 2)')).equals(2);
+      check(exec('(* 2 3)')).equals(6);
+      check(exec('(* 2 3 4)')).equals(24);
     });
     test('Div', () {
-      expect(exec('(/ 24)'), 24);
-      expect(exec('(/ 24 3)'), 8);
-      expect(exec('(/ 24 3 2)'), 4);
+      check(exec('(/ 24)')).equals(24);
+      check(exec('(/ 24 3)')).equals(8);
+      check(exec('(/ 24 3 2)')).equals(4);
     });
     test('Mod', () {
-      expect(exec('(% 24)'), 24);
-      expect(exec('(% 24 5)'), 4);
-      expect(exec('(% 24 5 3)'), 1);
+      check(exec('(% 24)')).equals(24);
+      check(exec('(% 24 5)')).equals(4);
+      check(exec('(% 24 5 3)')).equals(1);
     });
     test('Less', () {
-      expect(exec('(< 1 2)'), isTrue);
-      expect(exec('(< 1 1)'), isFalse);
-      expect(exec('(< 2 1)'), isFalse);
-      expect(exec('(< "a" "b")'), isTrue);
-      expect(exec('(< "a" "a")'), isFalse);
-      expect(exec('(< "b" "a")'), isFalse);
+      check(exec('(< 1 2)')).isTrue();
+      check(exec('(< 1 1)')).isFalse();
+      check(exec('(< 2 1)')).isFalse();
+      check(exec('(< "a" "b")')).isTrue();
+      check(exec('(< "a" "a")')).isFalse();
+      check(exec('(< "b" "a")')).isFalse();
     });
     test('Less equal', () {
-      expect(exec('(<= 1 2)'), isTrue);
-      expect(exec('(<= 1 1)'), isTrue);
-      expect(exec('(<= 2 1)'), isFalse);
-      expect(exec('(<= "a" "b")'), isTrue);
-      expect(exec('(<= "a" "a")'), isTrue);
-      expect(exec('(<= "b" "a")'), isFalse);
+      check(exec('(<= 1 2)')).isTrue();
+      check(exec('(<= 1 1)')).isTrue();
+      check(exec('(<= 2 1)')).isFalse();
+      check(exec('(<= "a" "b")')).isTrue();
+      check(exec('(<= "a" "a")')).isTrue();
+      check(exec('(<= "b" "a")')).isFalse();
     });
     test('Equal', () {
-      expect(exec('(= 1 1)'), isTrue);
-      expect(exec('(= 1 2)'), isFalse);
-      expect(exec('(= 2 1)'), isFalse);
-      expect(exec('(= "a" "a")'), isTrue);
-      expect(exec('(= "a" "b")'), isFalse);
-      expect(exec('(= "b" "a")'), isFalse);
+      check(exec('(= 1 1)')).isTrue();
+      check(exec('(= 1 2)')).isFalse();
+      check(exec('(= 2 1)')).isFalse();
+      check(exec('(= "a" "a")')).isTrue();
+      check(exec('(= "a" "b")')).isFalse();
+      check(exec('(= "b" "a")')).isFalse();
     });
     test('Not equal', () {
-      expect(exec('(!= 1 1)'), isFalse);
-      expect(exec('(!= 1 2)'), isTrue);
-      expect(exec('(!= 2 1)'), isTrue);
-      expect(exec('(!= "a" "a")'), isFalse);
-      expect(exec('(!= "a" "b")'), isTrue);
-      expect(exec('(!= "b" "a")'), isTrue);
+      check(exec('(!= 1 1)')).isFalse();
+      check(exec('(!= 1 2)')).isTrue();
+      check(exec('(!= 2 1)')).isTrue();
+      check(exec('(!= "a" "a")')).isFalse();
+      check(exec('(!= "a" "b")')).isTrue();
+      check(exec('(!= "b" "a")')).isTrue();
     });
     test('Larger', () {
-      expect(exec('(> 1 1)'), isFalse);
-      expect(exec('(> 1 2)'), isFalse);
-      expect(exec('(> 2 1)'), isTrue);
-      expect(exec('(> "a" "a")'), isFalse);
-      expect(exec('(> "a" "b")'), isFalse);
-      expect(exec('(> "b" "a")'), isTrue);
+      check(exec('(> 1 1)')).isFalse();
+      check(exec('(> 1 2)')).isFalse();
+      check(exec('(> 2 1)')).isTrue();
+      check(exec('(> "a" "a")')).isFalse();
+      check(exec('(> "a" "b")')).isFalse();
+      check(exec('(> "b" "a")')).isTrue();
     });
     test('Larger equal', () {
-      expect(exec('(>= 1 1)'), isTrue);
-      expect(exec('(>= 1 2)'), isFalse);
-      expect(exec('(>= 2 1)'), isTrue);
-      expect(exec('(>= "a" "a")'), isTrue);
-      expect(exec('(>= "a" "b")'), isFalse);
-      expect(exec('(>= "b" "a")'), isTrue);
+      check(exec('(>= 1 1)')).isTrue();
+      check(exec('(>= 1 2)')).isFalse();
+      check(exec('(>= 2 1)')).isTrue();
+      check(exec('(>= "a" "a")')).isTrue();
+      check(exec('(>= "a" "b")')).isFalse();
+      check(exec('(>= "b" "a")')).isTrue();
     });
     test('Cons', () {
-      expect(exec('(cons 1 2)'), Cons(1, 2));
-      expect(exec('(cons 1 null)'), Cons(1));
-      expect(exec('(cons null 2)'), Cons(null, 2));
-      expect(exec('(cons null null)'), Cons());
-      expect(
-        exec('(cons 1 (cons 2 (cons 3 null)))'),
-        Cons(1, Cons(2, Cons(3))),
-      );
+      check(exec('(cons 1 2)')).equals(Cons(1, 2));
+      check(exec('(cons 1 null)')).equals(Cons(1));
+      check(exec('(cons null 2)')).equals(Cons(null, 2));
+      check(exec('(cons null null)')).equals(Cons());
+      check(exec('(cons 1 (cons 2 (cons 3 null)))'))
+          .equals(Cons(1, Cons(2, Cons(3))));
     });
     test('Car', () {
-      expect(exec('(car null)'), isNull);
-      expect(exec('(car (cons 1 2))'), 1);
+      check(exec('(car null)')).isNull();
+      check(exec('(car (cons 1 2))')).equals(1);
     });
     test('Car!', () {
-      expect(exec('(car! null 3)'), isNull);
-      expect(exec('(car! (cons 1 2) 3)'), Cons(3, 2));
+      check(exec('(car! null 3)')).isNull();
+      check(exec('(car! (cons 1 2) 3)')).equals(Cons(3, 2));
     });
     test('Cdr', () {
-      expect(exec('(cdr null)'), isNull);
-      expect(exec('(cdr (cons 1 2))'), 2);
+      check(exec('(cdr null)')).isNull();
+      check(exec('(cdr (cons 1 2))')).equals(2);
     });
     test('Cdr!', () {
-      expect(exec('(cdr! null 3)'), isNull);
-      expect(exec('(cdr! (cons 1 2) 3)'), Cons(1, 3));
+      check(exec('(cdr! null 3)')).isNull();
+      check(exec('(cdr! (cons 1 2) 3)')).equals(Cons(1, 3));
     });
   });
   group('Library', () {
     test('Null', () {
-      expect(exec('null'), isNull);
+      check(exec('null')).isNull();
     });
     test('Null? (true)', () {
-      expect(exec("(null? '())"), isTrue);
-      expect(exec('(null? null)'), isTrue);
+      check(exec("(null? '())")).isTrue();
+      check(exec('(null? null)')).isTrue();
     });
     test('Null? (false)', () {
-      expect(exec('(null? 1)'), isFalse);
-      expect(exec('(null? "a")'), isFalse);
-      expect(exec('(null? (quote a))'), isFalse);
-      expect(exec('(null? true)'), isFalse);
-      expect(exec('(null? false)'), isFalse);
+      check(exec('(null? 1)')).isFalse();
+      check(exec('(null? "a")')).isFalse();
+      check(exec('(null? (quote a))')).isFalse();
+      check(exec('(null? true)')).isFalse();
+      check(exec('(null? false)')).isFalse();
     });
     test('Length', () {
-      expect(exec("(length '())"), 0);
-      expect(exec("(length '(1))"), 1);
-      expect(exec("(length '(1 1))"), 2);
-      expect(exec("(length '(1 1 1))"), 3);
-      expect(exec("(length '(1 1 1 1))"), 4);
-      expect(exec("(length '(1 1 1 1 1))"), 5);
+      check(exec("(length '())")).equals(0);
+      check(exec("(length '(1))")).equals(1);
+      check(exec("(length '(1 1))")).equals(2);
+      check(exec("(length '(1 1 1))")).equals(3);
+      check(exec("(length '(1 1 1 1))")).equals(4);
+      check(exec("(length '(1 1 1 1 1))")).equals(5);
     });
     test('Append', () {
-      expect(exec("(append '() '())"), isNull);
-      expect(exec("(append '(1) '())"), exec("'(1)"));
-      expect(exec("(append '() '(1))"), exec("'(1)"));
-      expect(exec("(append '(1) '(2))"), exec("'(1 2)"));
-      expect(exec("(append '(1 2) '(3))"), exec("'(1 2 3)"));
-      expect(exec("(append '(1) '(2 3))"), exec("'(1 2 3)"));
+      check(exec("(append '() '())")).isNull();
+      check(exec("(append '(1) '())")).equals(exec("'(1)"));
+      check(exec("(append '() '(1))")).equals(exec("'(1)"));
+      check(exec("(append '(1) '(2))")).equals(exec("'(1 2)"));
+      check(exec("(append '(1 2) '(3))")).equals(exec("'(1 2 3)"));
+      check(exec("(append '(1) '(2 3))")).equals(exec("'(1 2 3)"));
     });
     test('List Head', () {
-      expect(exec("(list-head '(5 6 7) 0)"), 5);
-      expect(exec("(list-head '(5 6 7) 1)"), 6);
-      expect(exec("(list-head '(5 6 7) 2)"), 7);
-      expect(exec("(list-head '(5 6 7) 3)"), isNull);
+      check(exec("(list-head '(5 6 7) 0)")).equals(5);
+      check(exec("(list-head '(5 6 7) 1)")).equals(6);
+      check(exec("(list-head '(5 6 7) 2)")).equals(7);
+      check(exec("(list-head '(5 6 7) 3)")).isNull();
     });
     test('List Tail', () {
-      expect(exec("(list-tail '(5 6 7) 0)"), exec("'(6 7)"));
-      expect(exec("(list-tail '(5 6 7) 1)"), exec("'(7)"));
-      expect(exec("(list-tail '(5 6 7) 2)"), isNull);
+      check(exec("(list-tail '(5 6 7) 0)")).equals(exec("'(6 7)"));
+      check(exec("(list-tail '(5 6 7) 1)")).equals(exec("'(7)"));
+      check(exec("(list-tail '(5 6 7) 2)")).isNull();
     });
     test('Map', () {
-      expect(exec("(map '() (lambda (x) (* 2 x)))"), isNull);
-      expect(exec("(map '(2) (lambda (x) (* 2 x)))"), exec("'(4)"));
-      expect(exec("(map '(2 3) (lambda (x) (* 2 x)))"), exec("'(4 6)"));
-      expect(exec("(map '(2 3 4) (lambda (x) (* 2 x)))"), exec("'(4 6 8)"));
+      check(exec("(map '() (lambda (x) (* 2 x)))")).isNull();
+      check(exec("(map '(2) (lambda (x) (* 2 x)))")).equals(exec("'(4)"));
+      check(exec("(map '(2 3) (lambda (x) (* 2 x)))")).equals(exec("'(4 6)"));
+      check(exec("(map '(2 3 4) (lambda (x) (* 2 x)))"))
+          .equals(exec("'(4 6 8)"));
     });
     test('Inject', () {
-      expect(exec("(inject '() 5 (lambda (s e) (+ s e 1)))"), 5);
-      expect(exec("(inject '(2) 5 (lambda (s e) (+ s e 1)))"), 8);
-      expect(exec("(inject '(2 3) 5 (lambda (s e) (+ s e 1)))"), 12);
+      check(exec("(inject '() 5 (lambda (s e) (+ s e 1)))")).equals(5);
+      check(exec("(inject '(2) 5 (lambda (s e) (+ s e 1)))")).equals(8);
+      check(exec("(inject '(2 3) 5 (lambda (s e) (+ s e 1)))")).equals(12);
     });
   });
   group('Examples', () {
@@ -548,12 +521,12 @@ void main() {
         '    (+ (fib (- n 1)) (fib (- n 2)))))',
         env,
       );
-      expect(exec('(fib 0)', env), 1);
-      expect(exec('(fib 1)', env), 1);
-      expect(exec('(fib 2)', env), 2);
-      expect(exec('(fib 3)', env), 3);
-      expect(exec('(fib 4)', env), 5);
-      expect(exec('(fib 5)', env), 8);
+      check(exec('(fib 0)', env)).equals(1);
+      check(exec('(fib 1)', env)).equals(1);
+      check(exec('(fib 2)', env)).equals(2);
+      check(exec('(fib 3)', env)).equals(3);
+      check(exec('(fib 4)', env)).equals(5);
+      check(exec('(fib 5)', env)).equals(8);
     });
     test('Closure', () {
       final env = standard.create();
@@ -562,9 +535,9 @@ void main() {
         '  (lambda (x) (* n x)))',
         env,
       );
-      expect(exec('((mul 2) 3)', env), 6);
-      expect(exec('((mul 3) 4)', env), 12);
-      expect(exec('((mul 4) 5)', env), 20);
+      check(exec('((mul 2) 3)', env)).equals(6);
+      check(exec('((mul 3) 4)', env)).equals(12);
+      check(exec('((mul 4) 5)', env)).equals(20);
     });
     test('Object', () {
       final env = standard.create();
@@ -577,12 +550,12 @@ void main() {
       );
       exec('(define a (counter 10))', env);
       exec('(define b (counter 20))', env);
-      expect(exec('(a)', env), 11);
-      expect(exec('(b)', env), 21);
-      expect(exec('(a)', env), 12);
-      expect(exec('(b)', env), 22);
-      expect(exec('(a)', env), 13);
-      expect(exec('(b)', env), 23);
+      check(exec('(a)', env)).equals(11);
+      check(exec('(b)', env)).equals(21);
+      check(exec('(a)', env)).equals(12);
+      check(exec('(b)', env)).equals(22);
+      check(exec('(a)', env)).equals(13);
+      check(exec('(b)', env)).equals(23);
     });
   });
 }
