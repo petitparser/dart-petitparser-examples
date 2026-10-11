@@ -130,7 +130,7 @@ This real-time application demonstrates PetitParser by parsing dynamic mathemati
 
 ### Key Features
 
-- **ExpressionBuilder**: Uses PetitParser's `ExpressionBuilder` to construct an operator-precedence grammar defining prefix operators (`+`, `-`), right-associative exponentiation (`^`), and left-associative arithmetic (`*`, `/`, `+`, `-`).
+- **ExpressionBuilder**: Uses PetitParser's `ExpressionBuilder` to construct an operator-precedence grammar defining right-associative exponentiation (`^`), prefix operators (`+`, `-`), and left-associative arithmetic (`*`, `/`, `+`, `-`).
 - **Function & Variable Bindings**: Combines combinators (`seq2`, `starSeparated`, `skip`) to parse multi-variable identifiers (`x`, `y`, `t`), mathematical constants (`pi`, `e`), and function invocations (`sin`, `cos`, `tan`, `sqrt`, `exp`, `log`, `abs`).
 - **AST Generation & Fast Evaluation**: Transforms the parsed input into an Abstract Syntax Tree ([Expression]) that is evaluated repeatedly with variable environment maps in real-time animation loops.
 - **Precise Error Diagnostics**: Leverages PetitParser's failure reporting to pinpoint exact character offsets and provide descriptive error messages as formulas are typed.

@@ -8,8 +8,8 @@ import 'common.dart';
 /// A mathematical expression parser supporting arithmetic, functions, and variables.
 ///
 /// Evaluates expressions using standard operator precedence: parentheses,
-/// function calls, exponentiation (`^`), multiplication/division (`*`, `/`),
-/// and addition/subtraction (`+`, `-`).
+/// function calls, exponentiation (`^`), unary prefix operators (`+`, `-`),
+/// multiplication/division (`*`, `/`), and addition/subtraction (`+`, `-`).
 ///
 /// Returns an [Expression] AST node that can be evaluated against a variable map.
 ///
@@ -51,15 +51,15 @@ final parser = () {
     char(')').trim(),
     (left, value, right) => value,
   );
-  // Unary prefix operators (+, -)
-  builder.group()
-    ..prefix(char('+').trim(), (op, a) => a)
-    ..prefix(char('-').trim(), (op, a) => Application('-', [a], (x) => -x));
   // Exponentiation (right-associative)
   builder.group().right(
     char('^').trim(),
     (a, op, b) => Application('^', [a, b], math.pow),
   );
+  // Unary prefix operators (+, -)
+  builder.group()
+    ..prefix(char('+').trim(), (op, a) => a)
+    ..prefix(char('-').trim(), (op, a) => Application('-', [a], (x) => -x));
   // Multiplicative operators (*, /, left-associative)
   builder.group()
     ..left(

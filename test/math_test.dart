@@ -71,9 +71,21 @@ void main() {
   });
   test('power', () {
     verify('2 ^ 3', 8);
-    verify('2 ^ -3', 0.125);
+    verify('2 ^ 2', 4);
+    verify('2 ^ 0', 1);
+    verify('2 ^ (-3)', 0.125);
+    verify('-2 ^ 2', -4);
+    verify('(-2) ^ 2', 4);
     verify('-2 ^ 3', -8);
-    verify('-2 ^ -3', -0.125);
+    verify('(-2) ^ 3', -8);
+    verify('-2 ^ (-3)', -0.125);
+    verify('-(2 ^ 2)', -4);
+    verify('-x ^ 2', -16, variables: {'x': 4});
+    verify('(-x) ^ 2', 16, variables: {'x': 4});
+    verify('-(x ^ 2)', -16, variables: {'x': 4});
+    verify('+x ^ 2', 16, variables: {'x': 4});
+    verify('2 ^ 2 ^ 3', 256);
+    verify('-2 ^ 2 ^ 3', -256);
   });
   test('multiply', () {
     verify('2 * 3', 6);
@@ -91,6 +103,12 @@ void main() {
     verify('1 + 2 * 3', 7);
     verify('1 + (2 * 3)', 7);
     verify('(1 + 2) * 3', 9);
+    verify('-2 ^ 2', -4);
+    verify('(-2) ^ 2', 4);
+    verify('2 * -3 ^ 2', -18);
+    verify('-2 * 3 ^ 2', -18);
+    verify('10 - 2 ^ 3', 2);
+    verify('10 - -2 ^ 3', 18);
   });
   group('failures', () {
     test('empty', () {
@@ -111,6 +129,9 @@ void main() {
       check(parser).isFailure('1.');
       check(parser).isFailure('@');
       check(parser).isFailure('1 & 2');
+      check(parser).isFailure('^ 2');
+      check(parser).isFailure('2 ^ -3');
+      check(parser).isFailure('2 ^ +3');
     });
   });
 }
