@@ -44,7 +44,7 @@ void verify(
     test('grammar', () => parse(source, grammarProduction));
     test('parser', () {
       final ast = parse(source, parserProduction);
-      check(NodeCollector.allNodes(ast)).isNotEmpty();
+      check(NodeCollector.allNodes(ast)).isNotEmpty;
       check(ast).which(parseMatcher);
     });
   });
@@ -75,7 +75,7 @@ exampleWithNumber: x
       check(() => grammar.token(123)).throws<ArgumentError>();
     });
     test('linter', () {
-      check(linter(grammar.build())).isEmpty();
+      check(linter(grammar.build())).isEmpty;
     });
     // All the productions and production actions of the grammar and parser.
     verify('Array1', '{}', grammar.array, parser.array, isArrayNode());
@@ -1432,7 +1432,7 @@ exampleWithNumber: x
       ),
     );
     test('parser linter', () {
-      check(linter(parser.build())).isEmpty();
+      check(linter(parser.build())).isEmpty;
     });
     group('negative syntax edge-cases', () {
       final methodParser = parser.build();

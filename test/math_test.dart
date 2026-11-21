@@ -19,7 +19,7 @@ void verify(
 
 void main() {
   test('linter', () {
-    check(linter(parser, excludedRules: {})).isEmpty();
+    check(linter(parser, excludedRules: {})).isEmpty;
   });
   test('number', () {
     verify('0', 0);

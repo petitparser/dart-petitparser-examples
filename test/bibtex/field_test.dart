@@ -15,8 +15,8 @@ void main() {
 
     test('caching of normalized key and value', () {
       final field = BibTeXField('booktitle', '{A---B}');
-      check(identical(field.key, field.key)).isTrue();
-      check(identical(field.value, field.value)).isTrue();
+      check(identical(field.key, field.key)).isTrue;
+      check(identical(field.value, field.value)).isTrue;
     });
 
     test('empty and blank values', () {
@@ -56,8 +56,8 @@ void main() {
       final f4 = BibTeXField('title', '{bar}');
       check(f1).equals(f2);
       check(f1.hashCode).equals(f2.hashCode);
-      check(f1).not((it) => it.equals(f3));
-      check(f1).not((it) => it.equals(f4));
+      check(f1).not(Condition.it()..equals(f3));
+      check(f1).not(Condition.it()..equals(f4));
     });
   });
 }

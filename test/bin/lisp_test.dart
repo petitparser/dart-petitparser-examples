@@ -44,7 +44,7 @@ void main() {
       check(out).contains('>> ');
       check(out).contains('=> 5');
       check(out).contains('=> 42');
-      check(utf8.decode(errBytes)).isEmpty();
+      check(utf8.decode(errBytes)).isEmpty;
 
       await inputController.close();
       await outSink.close();

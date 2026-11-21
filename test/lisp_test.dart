@@ -21,8 +21,8 @@ void main() {
       final cell3 = Name('bar');
       check(cell1).equals(cell2);
       check(cell1).identicalTo(cell2);
-      check(cell1).not((it) => it.equals(cell3));
-      check(cell1).not((it) => it.identicalTo(cell3));
+      check(cell1).not(Condition.it()..equals(cell3));
+      check(cell1).not(Condition.it()..identicalTo(cell3));
     });
     test('Cons', () {
       final cell = Cons(1, 2);
@@ -41,8 +41,8 @@ void main() {
       check(cell.tail?.car).equals(4);
       check(cell.tail?.head).equals(4);
       check(cell.tail?.cdr).equals(5);
-      check(cell == cell).isTrue();
-      check(cell.hashCode).not((it) => it.equals(0));
+      check(cell == cell).isTrue;
+      check(cell.hashCode).not(Condition.it()..equals(0));
       check(cell.toString()).equals('(3 4 . 5)');
     });
     test('Quote', () {
@@ -54,7 +54,7 @@ void main() {
       check(quote.datum).equals(42);
 
       quote.datum = null;
-      check(quote.datum).isNull();
+      check(quote.datum).isNull;
 
       quote.datum = ['nested', 'list'];
       check(quote.datum).isA<List<dynamic>>().deepEquals(['nested', 'list']);
@@ -69,13 +69,13 @@ void main() {
     final env = standard.create();
     test('Standard', () {
       check(env.owner).isNotNull();
-      check(env.keys).isEmpty();
-      check(env.owner?.keys).isNotNull().isNotEmpty();
+      check(env.keys).isEmpty;
+      check(env.owner?.keys).isNotNull().isNotEmpty;
     });
     test('Create', () {
       final sub = env.create();
       check(sub.owner).identicalTo(env);
-      check(sub.keys).isEmpty();
+      check(sub.keys).isEmpty;
     });
     test('operator [] and []=', () {
       final root = Environment();
@@ -85,7 +85,7 @@ void main() {
 
       final nullKey = Name('n');
       root.define(nullKey, null);
-      check(root[nullKey]).isNull();
+      check(root[nullKey]).isNull;
 
       final child = root.create();
       check(child[key]).equals(123);
@@ -97,11 +97,11 @@ void main() {
       final missingKey = Name('unbound');
       check(() => root[missingKey])
           .throws<ArgumentError>()
-          .has((e) => e.message, 'message')
+          .has('message', (e) => e.message)
           .equals('Unknown binding for unbound');
       check(() => root[missingKey] = 1)
           .throws<ArgumentError>()
-          .has((e) => e.message, 'message')
+          .has('message', (e) => e.message)
           .equals('Unknown binding for unbound');
     });
   });
@@ -112,10 +112,10 @@ void main() {
     test('Linter', () {
       check(
         linter(parser, excludedRules: {'Duplicate parser'}, excludedTypes: {}),
-      ).isEmpty();
+      ).isEmpty;
       check(
         linter(atom, excludedRules: {'Duplicate parser'}, excludedTypes: {}),
-      ).isEmpty();
+      ).isEmpty;
     });
     test('Name', () {
       check(atom).isSuccess('foo', value: isName('foo'));
@@ -255,15 +255,15 @@ void main() {
         buffer.clear();
       });
       test('empty', () {
-        check(exec('(print)')).isNull();
-        check(buffer.toString()).isEmpty();
+        check(exec('(print)')).isNull;
+        check(buffer.toString()).isEmpty;
       });
       test('elements', () {
-        check(exec('(print 1 2 3)')).isNull();
+        check(exec('(print 1 2 3)')).isNull;
         check(buffer.toString()).equals('123');
       });
       test('expression', () {
-        check(exec('(print (+ 1 2) " " (+ 3 4))')).isNull();
+        check(exec('(print (+ 1 2) " " (+ 3 4))')).isNull;
         check(buffer.toString()).equals('3 7');
       });
     });
@@ -279,10 +279,10 @@ void main() {
       check(() => standard[Name('a')]).throws<ArgumentError>();
     });
     test('If', () {
-      check(exec('(if true)')).isNull();
-      check(exec('(if false)')).isNull();
+      check(exec('(if true)')).isNull;
+      check(exec('(if false)')).isNull;
       check(exec('(if true 1)')).equals(1);
-      check(exec('(if false 1)')).isNull();
+      check(exec('(if false 1)')).isNull;
       check(exec('(if true 1 2)')).equals(1);
       check(exec('(if false 1 2)')).equals(2);
     });
@@ -297,64 +297,64 @@ void main() {
       check(env[Name('a')]).equals(3);
     });
     test('True', () {
-      check(exec('true')).isTrue();
+      check(exec('true')).isTrue;
     });
     test('False', () {
-      check(exec('false')).isFalse();
+      check(exec('false')).isFalse;
     });
     test('And', () {
-      check(exec('(and)')).isTrue();
-      check(exec('(and true)')).isTrue();
-      check(exec('(and false)')).isFalse();
-      check(exec('(and true true)')).isTrue();
-      check(exec('(and true false)')).isFalse();
-      check(exec('(and false true)')).isFalse();
-      check(exec('(and false false)')).isFalse();
-      check(exec('(and true true true)')).isTrue();
-      check(exec('(and true true false)')).isFalse();
-      check(exec('(and true false true)')).isFalse();
-      check(exec('(and true false false)')).isFalse();
-      check(exec('(and false true true)')).isFalse();
-      check(exec('(and false true false)')).isFalse();
-      check(exec('(and false false true)')).isFalse();
-      check(exec('(and false false false)')).isFalse();
+      check(exec('(and)')).isTrue;
+      check(exec('(and true)')).isTrue;
+      check(exec('(and false)')).isFalse;
+      check(exec('(and true true)')).isTrue;
+      check(exec('(and true false)')).isFalse;
+      check(exec('(and false true)')).isFalse;
+      check(exec('(and false false)')).isFalse;
+      check(exec('(and true true true)')).isTrue;
+      check(exec('(and true true false)')).isFalse;
+      check(exec('(and true false true)')).isFalse;
+      check(exec('(and true false false)')).isFalse;
+      check(exec('(and false true true)')).isFalse;
+      check(exec('(and false true false)')).isFalse;
+      check(exec('(and false false true)')).isFalse;
+      check(exec('(and false false false)')).isFalse;
     });
     test('And (laziness)', () {
       final env = standard.create();
       env.define(Name('a'), null);
       exec('(and false (set! a true))', env);
-      check(env[Name('a')]).isNull();
+      check(env[Name('a')]).isNull;
       exec('(and true (set! a true))', env);
-      check(env[Name('a')]).isTrue();
+      check(env[Name('a')]).isTrue;
     });
     test('Or', () {
-      check(exec('(or)')).isFalse();
-      check(exec('(or true)')).isTrue();
-      check(exec('(or false)')).isFalse();
-      check(exec('(or true true)')).isTrue();
-      check(exec('(or true false)')).isTrue();
-      check(exec('(or false true)')).isTrue();
-      check(exec('(or false false)')).isFalse();
-      check(exec('(or true true true)')).isTrue();
-      check(exec('(or true true false)')).isTrue();
-      check(exec('(or true false true)')).isTrue();
-      check(exec('(or true false false)')).isTrue();
-      check(exec('(or false true true)')).isTrue();
-      check(exec('(or false true false)')).isTrue();
-      check(exec('(or false false true)')).isTrue();
-      check(exec('(or false false false)')).isFalse();
+      check(exec('(or)')).isFalse;
+      check(exec('(or true)')).isTrue;
+      check(exec('(or false)')).isFalse;
+      check(exec('(or true true)')).isTrue;
+      check(exec('(or true false)')).isTrue;
+      check(exec('(or false true)')).isTrue;
+      check(exec('(or false false)')).isFalse;
+      check(exec('(or true true true)')).isTrue;
+      check(exec('(or true true false)')).isTrue;
+      check(exec('(or true false true)')).isTrue;
+      check(exec('(or true false false)')).isTrue;
+      check(exec('(or false true true)')).isTrue;
+      check(exec('(or false true false)')).isTrue;
+      check(exec('(or false false true)')).isTrue;
+      check(exec('(or false false false)')).isFalse;
     });
     test('Or (laziness)', () {
       final env = standard.create();
       env.define(Name('a'), null);
       exec('(or true (set! a true))', env);
-      check(env[Name('a')]).isNull();
+      check(env[Name('a')]).isNull;
       exec('(or false (set! a true))', env);
-      check(env[Name('a')]).isTrue();
+      check(env[Name('a')]).isTrue;
     });
     test('Not', () {
-      check(exec('(not true)')).isFalse();
-      check(exec('(not false)')).isTrue();
+      check(exec('(not true)')).isFalse;
+      check(exec('(not false)')).isTrue;
     });
     test('Add', () {
       check(exec('(+ 1)')).equals(1);
@@ -384,52 +384,52 @@ void main() {
       check(exec('(% 24 5 3)')).equals(1);
     });
     test('Less', () {
-      check(exec('(< 1 2)')).isTrue();
-      check(exec('(< 1 1)')).isFalse();
-      check(exec('(< 2 1)')).isFalse();
-      check(exec('(< "a" "b")')).isTrue();
-      check(exec('(< "a" "a")')).isFalse();
-      check(exec('(< "b" "a")')).isFalse();
+      check(exec('(< 1 2)')).isTrue;
+      check(exec('(< 1 1)')).isFalse;
+      check(exec('(< 2 1)')).isFalse;
+      check(exec('(< "a" "b")')).isTrue;
+      check(exec('(< "a" "a")')).isFalse;
+      check(exec('(< "b" "a")')).isFalse;
     });
     test('Less equal', () {
-      check(exec('(<= 1 2)')).isTrue();
-      check(exec('(<= 1 1)')).isTrue();
-      check(exec('(<= 2 1)')).isFalse();
-      check(exec('(<= "a" "b")')).isTrue();
-      check(exec('(<= "a" "a")')).isTrue();
-      check(exec('(<= "b" "a")')).isFalse();
+      check(exec('(<= 1 2)')).isTrue;
+      check(exec('(<= 1 1)')).isTrue;
+      check(exec('(<= 2 1)')).isFalse;
+      check(exec('(<= "a" "b")')).isTrue;
+      check(exec('(<= "a" "a")')).isTrue;
+      check(exec('(<= "b" "a")')).isFalse;
     });
     test('Equal', () {
-      check(exec('(= 1 1)')).isTrue();
-      check(exec('(= 1 2)')).isFalse();
-      check(exec('(= 2 1)')).isFalse();
-      check(exec('(= "a" "a")')).isTrue();
-      check(exec('(= "a" "b")')).isFalse();
-      check(exec('(= "b" "a")')).isFalse();
+      check(exec('(= 1 1)')).isTrue;
+      check(exec('(= 1 2)')).isFalse;
+      check(exec('(= 2 1)')).isFalse;
+      check(exec('(= "a" "a")')).isTrue;
+      check(exec('(= "a" "b")')).isFalse;
+      check(exec('(= "b" "a")')).isFalse;
     });
     test('Not equal', () {
-      check(exec('(!= 1 1)')).isFalse();
-      check(exec('(!= 1 2)')).isTrue();
-      check(exec('(!= 2 1)')).isTrue();
-      check(exec('(!= "a" "a")')).isFalse();
-      check(exec('(!= "a" "b")')).isTrue();
-      check(exec('(!= "b" "a")')).isTrue();
+      check(exec('(!= 1 1)')).isFalse;
+      check(exec('(!= 1 2)')).isTrue;
+      check(exec('(!= 2 1)')).isTrue;
+      check(exec('(!= "a" "a")')).isFalse;
+      check(exec('(!= "a" "b")')).isTrue;
+      check(exec('(!= "b" "a")')).isTrue;
     });
     test('Larger', () {
-      check(exec('(> 1 1)')).isFalse();
-      check(exec('(> 1 2)')).isFalse();
-      check(exec('(> 2 1)')).isTrue();
-      check(exec('(> "a" "a")')).isFalse();
-      check(exec('(> "a" "b")')).isFalse();
-      check(exec('(> "b" "a")')).isTrue();
+      check(exec('(> 1 1)')).isFalse;
+      check(exec('(> 1 2)')).isFalse;
+      check(exec('(> 2 1)')).isTrue;
+      check(exec('(> "a" "a")')).isFalse;
+      check(exec('(> "a" "b")')).isFalse;
+      check(exec('(> "b" "a")')).isTrue;
     });
     test('Larger equal', () {
-      check(exec('(>= 1 1)')).isTrue();
-      check(exec('(>= 1 2)')).isFalse();
-      check(exec('(>= 2 1)')).isTrue();
-      check(exec('(>= "a" "a")')).isTrue();
-      check(exec('(>= "a" "b")')).isFalse();
-      check(exec('(>= "b" "a")')).isTrue();
+      check(exec('(>= 1 1)')).isTrue;
+      check(exec('(>= 1 2)')).isFalse;
+      check(exec('(>= 2 1)')).isTrue;
+      check(exec('(>= "a" "a")')).isTrue;
+      check(exec('(>= "a" "b")')).isFalse;
+      check(exec('(>= "b" "a")')).isTrue;
     });
     test('Cons', () {
       check(exec('(cons 1 2)')).equals(Cons(1, 2));
@@ -440,36 +440,36 @@ void main() {
           .equals(Cons(1, Cons(2, Cons(3))));
     });
     test('Car', () {
-      check(exec('(car null)')).isNull();
+      check(exec('(car null)')).isNull;
       check(exec('(car (cons 1 2))')).equals(1);
     });
     test('Car!', () {
-      check(exec('(car! null 3)')).isNull();
+      check(exec('(car! null 3)')).isNull;
       check(exec('(car! (cons 1 2) 3)')).equals(Cons(3, 2));
     });
     test('Cdr', () {
-      check(exec('(cdr null)')).isNull();
+      check(exec('(cdr null)')).isNull;
       check(exec('(cdr (cons 1 2))')).equals(2);
     });
     test('Cdr!', () {
-      check(exec('(cdr! null 3)')).isNull();
+      check(exec('(cdr! null 3)')).isNull;
       check(exec('(cdr! (cons 1 2) 3)')).equals(Cons(1, 3));
     });
   });
   group('Library', () {
     test('Null', () {
-      check(exec('null')).isNull();
+      check(exec('null')).isNull;
     });
     test('Null? (true)', () {
-      check(exec("(null? '())")).isTrue();
-      check(exec('(null? null)')).isTrue();
+      check(exec("(null? '())")).isTrue;
+      check(exec('(null? null)')).isTrue;
     });
     test('Null? (false)', () {
-      check(exec('(null? 1)')).isFalse();
-      check(exec('(null? "a")')).isFalse();
-      check(exec('(null? (quote a))')).isFalse();
-      check(exec('(null? true)')).isFalse();
-      check(exec('(null? false)')).isFalse();
+      check(exec('(null? 1)')).isFalse;
+      check(exec('(null? "a")')).isFalse;
+      check(exec('(null? (quote a))')).isFalse;
+      check(exec('(null? true)')).isFalse;
+      check(exec('(null? false)')).isFalse;
     });
     test('Length', () {
       check(exec("(length '())")).equals(0);
@@ -480,7 +480,7 @@ void main() {
       check(exec("(length '(1 1 1 1 1))")).equals(5);
     });
     test('Append', () {
-      check(exec("(append '() '())")).isNull();
+      check(exec("(append '() '())")).isNull;
       check(exec("(append '(1) '())")).equals(exec("'(1)"));
       check(exec("(append '() '(1))")).equals(exec("'(1)"));
       check(exec("(append '(1) '(2))")).equals(exec("'(1 2)"));
@@ -491,15 +491,15 @@ void main() {
       check(exec("(list-head '(5 6 7) 0)")).equals(5);
       check(exec("(list-head '(5 6 7) 1)")).equals(6);
       check(exec("(list-head '(5 6 7) 2)")).equals(7);
-      check(exec("(list-head '(5 6 7) 3)")).isNull();
+      check(exec("(list-head '(5 6 7) 3)")).isNull;
     });
     test('List Tail', () {
       check(exec("(list-tail '(5 6 7) 0)")).equals(exec("'(6 7)"));
       check(exec("(list-tail '(5 6 7) 1)")).equals(exec("'(7)"));
-      check(exec("(list-tail '(5 6 7) 2)")).isNull();
+      check(exec("(list-tail '(5 6 7) 2)")).isNull;
     });
     test('Map', () {
-      check(exec("(map '() (lambda (x) (* 2 x)))")).isNull();
+      check(exec("(map '() (lambda (x) (* 2 x)))")).isNull;
       check(exec("(map '(2) (lambda (x) (* 2 x)))")).equals(exec("'(4)"));
       check(exec("(map '(2 3) (lambda (x) (* 2 x)))")).equals(exec("'(4 6)"));
       check(exec("(map '(2 3 4) (lambda (x) (* 2 x)))"))

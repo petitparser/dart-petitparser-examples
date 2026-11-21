@@ -198,7 +198,7 @@ void main() {
 
       check(block.accept(visitor, ctx)).equals('BlockNode:test');
       check(block.labels).deepEquals(['10', '20']);
-      check(block.children).any((it) => it.isA<CompoundStatementNode>());
+      check(block.children).any(Condition.it()..isA<CompoundStatementNode>());
     });
   });
 
@@ -235,7 +235,7 @@ void main() {
       );
       check(param.accept(visitor, ctx)).equals('FormalParameterNode:a,b:test');
       check(param.children).deepEquals([simple]);
-      check(param.isVar).isTrue();
+      check(param.isVar).isTrue;
       check(param.type).equals(simple);
     });
 
@@ -275,7 +275,7 @@ void main() {
 
     test('SimpleTypeNode and SubrangeTypeNode', () {
       check(simple.accept(visitor, ctx)).equals('SimpleTypeNode:char:test');
-      check(simple.children).isEmpty();
+      check(simple.children).isEmpty;
 
       const subrange = SubrangeTypeNode(start: lit1, end: lit10);
       check(subrange.accept(visitor, ctx)).equals('SubrangeTypeNode:test');
@@ -286,7 +286,7 @@ void main() {
       const enumType = EnumeratedTypeNode(['red', 'green', 'blue']);
       check(enumType.accept(visitor, ctx))
           .equals('EnumeratedTypeNode:red,green,blue:test');
-      check(enumType.children).isEmpty();
+      check(enumType.children).isEmpty;
 
       const ptrType = PointerTypeNode(SimpleTypeNode('node'));
       check(ptrType.accept(visitor, ctx)).equals('PointerTypeNode:test');
@@ -323,7 +323,7 @@ void main() {
 
     test('CompoundStatementNode and EmptyStatementNode', () {
       check(empty.accept(visitor, ctx)).equals('EmptyStatementNode:test');
-      check(empty.children).isEmpty();
+      check(empty.children).isEmpty;
 
       const compound = CompoundStatementNode(statements: [empty, empty]);
       check(compound.accept(visitor, ctx)).equals('CompoundStatementNode:test');
@@ -415,7 +415,7 @@ void main() {
 
       const gotoStmt = GotoStatementNode(targetLabel: '100');
       check(gotoStmt.accept(visitor, ctx)).equals('GotoStatementNode:100:test');
-      check(gotoStmt.children).isEmpty();
+      check(gotoStmt.children).isEmpty;
     });
   });
 
@@ -437,11 +437,11 @@ void main() {
     test('VariableExpressionNode and LiteralExpressionNode', () {
       check(vExpr.accept(visitor, ctx))
           .equals('VariableExpressionNode:arr:test');
-      check(vExpr.children).isEmpty();
+      check(vExpr.children).isEmpty;
 
       const lit = LiteralExpressionNode(raw: "'val'", value: 'val');
       check(lit.accept(visitor, ctx)).equals('LiteralExpressionNode:val:test');
-      check(lit.children).isEmpty();
+      check(lit.children).isEmpty;
     });
 
     test('ArrayAccessExpressionNode and FieldAccessExpressionNode', () {

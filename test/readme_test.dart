@@ -19,39 +19,36 @@ void main() {
   group('README examples', () {
     test('BibTeX', () {
       final parser = BibTeXDefinition().build();
-      check(parser).isSuccess(
-        r'''
+      final bibtexCondition = Condition.it<Object?>();
+      final entry = bibtexCondition.isA<List<BibTeXEntry>>().single;
+      entry.has('key', (e) => e.key).equals('Reng10c');
+      entry.has('type', (e) => e.type).equals('inproceedings');
+      entry
+          .has("['title']", (e) => e['title'])
+          .equals('Practical Dynamic Grammars for Dynamic Languages');
+      entry
+          .has("['author']", (e) => e['author'])
+          .equals(
+            'Lukas Renggli and Stéphane Ducasse and Tudor Gîrba and Oscar Nierstrasz',
+          );
+      entry.has("['year']", (e) => e['year']).equals('2010');
+      entry.has('fields', (e) => e.fields).deepEquals([
+        BibTeXField(
+          'title',
+          '"Practical Dynamic Grammars for Dynamic Languages"',
+        ),
+        BibTeXField(
+          'author',
+          '"Lukas Renggli and Stéphane Ducasse and Tudor Gîrba and Oscar Nierstrasz"',
+        ),
+        BibTeXField('year', '2010'),
+      ]);
+      check(parser).isSuccess(r'''
 @inproceedings{Reng10c,
   title = "Practical Dynamic Grammars for Dynamic Languages",
   author = "Lukas Renggli and Stéphane Ducasse and Tudor Gîrba and Oscar Nierstrasz",
   year = 2010
-}''',
-        value: (Subject<dynamic> it) {
-          final entry = it.isA<List<BibTeXEntry>>().single;
-          entry.has((e) => e.key, 'key').equals('Reng10c');
-          entry.has((e) => e.type, 'type').equals('inproceedings');
-          entry
-              .has((e) => e['title'], "['title']")
-              .equals('Practical Dynamic Grammars for Dynamic Languages');
-          entry
-              .has((e) => e['author'], "['author']")
-              .equals(
-                'Lukas Renggli and Stéphane Ducasse and Tudor Gîrba and Oscar Nierstrasz',
-              );
-          entry.has((e) => e['year'], "['year']").equals('2010');
-          entry.has((e) => e.fields, 'fields').deepEquals([
-            BibTeXField(
-              'title',
-              '"Practical Dynamic Grammars for Dynamic Languages"',
-            ),
-            BibTeXField(
-              'author',
-              '"Lukas Renggli and Stéphane Ducasse and Tudor Gîrba and Oscar Nierstrasz"',
-            ),
-            BibTeXField('year', '2010'),
-          ]);
-        },
-      );
+}''', value: bibtexCondition);
     });
 
     test('Dart', () {
@@ -80,9 +77,9 @@ void main() {
       final document = parseMarkdown('# Hello World\n\nThis is **bold** text.');
       check(document.blocks).length.equals(2);
       final heading = check(document.blocks.first).isA<HeadingNode>();
-      heading.has((h) => h.level, 'level').equals(1);
+      heading.has('level', (h) => h.level).equals(1);
       heading
-          .has((h) => h.content, 'content')
+          .has('content', (h) => h.content)
           .equals(const TextNode('Hello World'));
 
       final html = markdownToHtml('# Hello World\n\nThis is **bold** text.');
@@ -135,7 +132,7 @@ sibling(X, Y) :- parent(Z, X), parent(Z, Y).
       final nfa = Nfa.fromString(r'a*b+');
       check(nfa.matchAsPrefix('aaab')).isNotNull();
       check(nfa.matchAsPrefix('b')).isNotNull();
-      check(nfa.matchAsPrefix('a')).isNull();
+      check(nfa.matchAsPrefix('a')).isNull;
     });
 
     test('Smalltalk', () {
@@ -159,31 +156,31 @@ example
     });
 
     test('URI', () {
+      final uriCondition = Condition.it<Object?>();
+      final val = uriCondition
+          .isA<
+            ({
+              String? authority,
+              String? fragment,
+              String? hostname,
+              List<(String, String?)> params,
+              String? password,
+              String path,
+              String? port,
+              String? query,
+              String? scheme,
+              String? username,
+            })
+          >();
+      val.has('scheme', (v) => v.scheme).equals('https');
+      val.has('hostname', (v) => v.hostname).equals('example.com');
+      val.has('port', (v) => v.port).equals('8080');
+      val.has('path', (v) => v.path).equals('/path/to/page');
+      val.has('query', (v) => v.query).equals('lang=en');
+      val.has('fragment', (v) => v.fragment).equals('heading');
       check(uri).isSuccess(
         'https://user:pass@example.com:8080/path/to/page?lang=en#heading',
-        value: (Subject<dynamic> it) {
-          final val = it
-              .isA<
-                ({
-                  String? authority,
-                  String? fragment,
-                  String? hostname,
-                  List<(String, String?)> params,
-                  String? password,
-                  String path,
-                  String? port,
-                  String? query,
-                  String? scheme,
-                  String? username,
-                })
-              >();
-          val.has((v) => v.scheme, 'scheme').equals('https');
-          val.has((v) => v.hostname, 'hostname').equals('example.com');
-          val.has((v) => v.port, 'port').equals('8080');
-          val.has((v) => v.path, 'path').equals('/path/to/page');
-          val.has((v) => v.query, 'query').equals('lang=en');
-          val.has((v) => v.fragment, 'fragment').equals('heading');
-        },
+        value: uriCondition,
       );
     });
   });

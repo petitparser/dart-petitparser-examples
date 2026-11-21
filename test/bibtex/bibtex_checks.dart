@@ -5,9 +5,9 @@ export 'package:checks/checks.dart';
 
 /// Reusable domain-specific checks on [BibTeXEntry] subjects.
 extension BibTeXEntryChecks on Subject<BibTeXEntry> {
-  Subject<String> get type => has((e) => e.type, 'type');
-  Subject<String> get key => has((e) => e.key, 'key');
-  Subject<List<BibTeXField>> get fields => has((e) => e.fields, 'fields');
+  Subject<String> get type => has('type', (e) => e.type);
+  Subject<String> get key => has('key', (e) => e.key);
+  Subject<List<BibTeXField>> get fields => has('fields', (e) => e.fields);
 
   void matchesEntry({
     Object? type,
@@ -25,14 +25,16 @@ Condition<Object?> isBibTeXEntry({
   Object? type,
   Object? key,
   Iterable<BibTeXField>? fields,
-}) => (subject) {
-  subject.isA<BibTeXEntry>().matchesEntry(type: type, key: key, fields: fields);
-};
+}) {
+  final it = Condition.it<Object?>();
+  it.isA<BibTeXEntry>().matchesEntry(type: type, key: key, fields: fields);
+  return it;
+}
 
 /// Reusable domain-specific checks on [BibTeXField] subjects.
 extension BibTeXFieldChecks on Subject<BibTeXField> {
-  Subject<String> get rawKey => has((f) => f.rawKey, 'rawKey');
-  Subject<String> get rawValue => has((f) => f.rawValue, 'rawValue');
-  Subject<String> get key => has((f) => f.key, 'key');
-  Subject<String> get value => has((f) => f.value, 'value');
+  Subject<String> get rawKey => has('rawKey', (f) => f.rawKey);
+  Subject<String> get rawValue => has('rawValue', (f) => f.rawValue);
+  Subject<String> get key => has('key', (f) => f.key);
+  Subject<String> get value => has('value', (f) => f.value);
 }

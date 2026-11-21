@@ -8,6 +8,6 @@ void main() {
 
   test('grammar linter', () {
     final issues = linter(grammar.build());
-    check(because: issues.join('\n'), issues).isEmpty();
+    check(because: issues.join('\n'), issues).isEmpty;
   });
 }

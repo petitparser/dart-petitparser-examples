@@ -8,7 +8,7 @@ import 'utils/checks.dart';
 void main() {
   final parser = JsonDefinition().build();
   test('linter', () {
-    check(linter(parser, excludedRules: {})).isEmpty();
+    check(linter(parser, excludedRules: {})).isEmpty;
   });
   group('arrays', () {
     test('empty', () {
@@ -306,7 +306,7 @@ void main() {
         {'key': 'value'},
       ];
       check(values).length.equals(5);
-      check(values[0]).isNull();
+      check(values[0]).isNull;
       check(values[1]).equals(42);
       check(values[2]).equals('hello');
       check(values[3]).isA<List<Object?>>();

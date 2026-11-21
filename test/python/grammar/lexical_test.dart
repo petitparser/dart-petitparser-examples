@@ -161,26 +161,20 @@ void main() {
     });
 
     test('f-string concatenation with strings', () {
-      check(strParser).isSuccess(
-        '"hello " f"{name}"',
-        value: (Subject it) {
-          it
-              .isA<JoinedStrNode>()
-              .has((node) => node.values, 'values')
-              .length
-              .equals(2);
-        },
-      );
-      check(strParser).isSuccess(
-        'f"{a} " "middle " f"{b}"',
-        value: (Subject it) {
-          it
-              .isA<JoinedStrNode>()
-              .has((node) => node.values, 'values')
-              .length
-              .equals(4);
-        },
-      );
+      final it1 = Condition.it<Object?>();
+      it1
+          .isA<JoinedStrNode>()
+          .has('values', (node) => node.values)
+          .length
+          .equals(2);
+      check(strParser).isSuccess('"hello " f"{name}"', value: it1);
+      final it2 = Condition.it<Object?>();
+      it2
+          .isA<JoinedStrNode>()
+          .has('values', (node) => node.values)
+          .length
+          .equals(4);
+      check(strParser).isSuccess('f"{a} " "middle " f"{b}"', value: it2);
     });
   });
 
@@ -193,15 +187,12 @@ void main() {
     });
 
     test('constant-only f-string produces ConstantNode', () {
-      check(fStrParser).isSuccess(
-        'f"simple text"',
-        value: (Subject it) {
-          it
-              .isA<ConstantNode>()
-              .has((node) => node.value, 'value')
-              .equals('simple text');
-        },
-      );
+      final it = Condition.it<Object?>();
+      it
+          .isA<ConstantNode>()
+          .has('value', (node) => node.value)
+          .equals('simple text');
+      check(fStrParser).isSuccess('f"simple text"', value: it);
     });
 
     test('f-string with format specifier', () {

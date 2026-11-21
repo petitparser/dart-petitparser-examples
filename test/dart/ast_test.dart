@@ -234,7 +234,7 @@ void main() {
           ],
           isStatic: true,
         );
-        check(field.isStatic).isTrue();
+        check(field.isStatic).isTrue;
         check(field.variables.first.toString())
             .equals('VariableDeclaratorNode(count = IntegerLiteralNode(0))');
         check(field.toString()).contains('FieldDeclarationNode');
@@ -299,7 +299,7 @@ void main() {
           isFinal: true,
           isNamed: true,
         );
-        check(simple.isFinal).isTrue();
+        check(simple.isFinal).isTrue;
         check(simple.toString()).contains('ParameterNode(x');
 
         const fnParam = FunctionTypedParameterNode(
@@ -538,7 +538,7 @@ void main() {
           type: NamedTypeNode(name: 'int'),
           isNegated: true,
         );
-        check(typeTest.isNegated).isTrue();
+        check(typeTest.isNegated).isTrue;
         check(typeTest.toString()).contains(
           'TypeTestExpressionNode(IdentifierNode(x) is! NamedTypeNode(int))',
         );
@@ -563,7 +563,7 @@ void main() {
           expression: IdentifierNode('list'),
           isNullAware: true,
         );
-        check(spread.isNullAware).isTrue();
+        check(spread.isNullAware).isTrue;
         check(spread.toString())
             .equals('SpreadElementNode(...?IdentifierNode(list))');
 
@@ -584,7 +584,7 @@ void main() {
           type: NamedTypeNode(name: 'int'),
           isFinal: true,
         );
-        check(declared.isFinal).isTrue();
+        check(declared.isFinal).isTrue;
         check(declared.toString()).contains('VariablePatternNode(val');
 
         const rel = RelationalPatternNode(

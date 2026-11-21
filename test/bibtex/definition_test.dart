@@ -12,7 +12,7 @@ void main() {
   test('linter', () {
     check(
       linter(parser, excludedRules: {'Duplicate parser'}, excludedTypes: {}),
-    ).isEmpty();
+    ).isEmpty;
   });
 
   group('grammar', () {
@@ -26,29 +26,27 @@ void main() {
 
     test('raw preserves original values', () {
       final entry = parser.parse(input).value.single;
-      check(entry).which(
-        isBibTeXEntry(
-          type: 'inproceedings',
-          key: 'Reng10c',
-          fields: [
-            BibTeXField(
-              'Title',
-              '"Practical Dynamic Grammars for Dynamic Languages"',
-            ),
-            BibTeXField(
-              'Author',
-              '{Lukas Renggli and St\\\'ephane Ducasse and '
-                  'Tudor G\\^irba and Oscar Nierstrasz}',
-            ),
-            BibTeXField('Month', 'jun'),
-            BibTeXField('Year', '2010'),
-            BibTeXField(
-              'Url',
-              '{http://scg.unibe.ch/archive/papers/'
-                  'Reng10cDynamicGrammars.pdf}',
-            ),
-          ],
-        ),
+      check(entry).matchesEntry(
+        type: 'inproceedings',
+        key: 'Reng10c',
+        fields: [
+          BibTeXField(
+            'Title',
+            '"Practical Dynamic Grammars for Dynamic Languages"',
+          ),
+          BibTeXField(
+            'Author',
+            '{Lukas Renggli and St\\\'ephane Ducasse and '
+                'Tudor G\\^irba and Oscar Nierstrasz}',
+          ),
+          BibTeXField('Month', 'jun'),
+          BibTeXField('Year', '2010'),
+          BibTeXField(
+            'Url',
+            '{http://scg.unibe.ch/archive/papers/'
+                'Reng10cDynamicGrammars.pdf}',
+          ),
+        ],
       );
     });
 
@@ -165,11 +163,11 @@ void main() {
     });
 
     test('empty input and comment-only input yields empty list', () {
-      check(parser.parse('').value).isEmpty();
-      check(parser.parse('   \n\t  \r\n  ').value).isEmpty();
-      check(parser.parse('% only comments\n% another line\n').value).isEmpty();
-      check(parser.parse('@comment{just a comment}').value).isEmpty();
-      check(parser.parse('@comment(parenthesized)').value).isEmpty();
+      check(parser.parse('').value).isEmpty;
+      check(parser.parse('   \n\t  \r\n  ').value).isEmpty;
+      check(parser.parse('% only comments\n% another line\n').value).isEmpty;
+      check(parser.parse('@comment{just a comment}').value).isEmpty;
+      check(parser.parse('@comment(parenthesized)').value).isEmpty;
     });
 
     test('entries with trailing commas in fields', () {
@@ -190,8 +188,8 @@ void main() {
     test('entries with no fields', () {
       check(parser.parse('@misc{empty1,}').value.single.key).equals('empty1');
       check(parser.parse('@misc{empty2}').value.single.key).equals('empty2');
-      check(parser.parse('@misc{empty1,}').value.single.fields).isEmpty();
-      check(parser.parse('@misc{empty2}').value.single.fields).isEmpty();
+      check(parser.parse('@misc{empty1,}').value.single.fields).isEmpty;
+      check(parser.parse('@misc{empty2}').value.single.fields).isEmpty;
     });
 
     test('arbitrary preamble text outside entries', () {

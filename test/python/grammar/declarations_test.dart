@@ -46,21 +46,19 @@ void main() {
     });
 
     test('decorated async functions', () {
-      check(decl).isSuccess(
-        '@staticmethod\nasync def foo():\n  pass\n',
-        value: (Subject it) {
-          final fn = it.isA<AsyncFunctionDefNode>();
-          fn.has((fn) => fn.name, 'name').equals('foo');
-          fn.has((fn) => fn.decoratorList, 'decoratorList').length.equals(1);
-        },
-      );
+      final it1 = Condition.it<Object?>();
+      final fn1 = it1.isA<AsyncFunctionDefNode>();
+      fn1.has('name', (fn) => fn.name).equals('foo');
+      fn1.has('decoratorList', (fn) => fn.decoratorList).length.equals(1);
+      check(decl)
+          .isSuccess('@staticmethod\nasync def foo():\n  pass\n', value: it1);
+      final it2 = Condition.it<Object?>();
+      final fn2 = it2.isA<AsyncFunctionDefNode>();
+      fn2.has('decoratorList', (fn) => fn.decoratorList).length.equals(2);
+      fn2.has('returns', (fn) => fn.returns).isA<NameNode>();
       check(decl).isSuccess(
         '@dec1\n@dec2(opt=True)\nasync def foo(x: int) -> str:\n  return "x"\n',
-        value: (Subject it) {
-          final fn = it.isA<AsyncFunctionDefNode>();
-          fn.has((fn) => fn.decoratorList, 'decoratorList').length.equals(2);
-          fn.has((fn) => fn.returns, 'returns').isA<NameNode>();
-        },
+        value: it2,
       );
     });
   });

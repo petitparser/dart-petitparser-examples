@@ -224,7 +224,7 @@ void main() {
 
     test('parseStreamChunks handles empty stream', () async {
       final entries = await parseStreamChunks(const Stream.empty()).toList();
-      check(entries).isEmpty();
+      check(entries).isEmpty;
     });
   });
 
@@ -281,9 +281,9 @@ void main() {
     test('round-trip via raw toString()', () {
       for (final entry in entries) {
         final parsed = entryParser.parse(entry.toString()).value;
-        check(parsed).which(
-          isBibTeXEntry(type: entry.type, key: entry.key, fields: entry.fields),
-        );
+        check(
+          parsed,
+        ).matchesEntry(type: entry.type, key: entry.key, fields: entry.fields);
       }
     });
   });

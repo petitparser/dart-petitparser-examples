@@ -167,82 +167,69 @@ void main() {
     });
 
     test('function-typed parameter with metadata annotations', () {
-      check(formalParams).isSuccess(
-        '(@meta void cb())',
-        value: (Subject it) {
-          final node = it
-              .isA<List<ParameterNode>>()
-              .has((list) => list.first, 'first')
-              .isA<FunctionTypedParameterNode>();
-          node.has((p) => p.name, 'name').equals('cb');
-          node.has((p) => p.metadata, 'metadata').length.equals(1);
-        },
-      );
+      final it = Condition.it<Object?>();
+      final node = it
+          .isA<List<ParameterNode>>()
+          .has('first', (list) => list.first)
+          .isA<FunctionTypedParameterNode>();
+      node.has('name', (p) => p.name).equals('cb');
+      node.has('metadata', (p) => p.metadata).length.equals(1);
+      check(formalParams).isSuccess('(@meta void cb())', value: it);
       check(formalParams).isSuccess('(@foo @bar int Function() cb)');
     });
 
     test('optional positional parameter defaults', () {
-      check(formalParams).isSuccess(
-        '([int x = 42])',
-        value: (Subject it) {
-          final node = it
-              .isA<List<ParameterNode>>()
-              .has((list) => list.first, 'first')
-              .isA<SimpleParameterNode>();
-          node.has((p) => p.name, 'name').equals('x');
-          node
-              .has((p) => p.defaultValue, 'defaultValue')
-              .isA<IntegerLiteralNode>();
-        },
-      );
-      check(formalParams).isSuccess(
-        '([void cb() = defaultCallback])',
-        value: (Subject it) {
-          final node = it
-              .isA<List<ParameterNode>>()
-              .has((list) => list.first, 'first')
-              .isA<FunctionTypedParameterNode>();
-          node.has((p) => p.name, 'name').equals('cb');
-          node.has((p) => p.defaultValue, 'defaultValue').isA<IdentifierNode>();
-        },
-      );
+      final it1 = Condition.it<Object?>();
+      final node1 = it1
+          .isA<List<ParameterNode>>()
+          .has('first', (list) => list.first)
+          .isA<SimpleParameterNode>();
+      node1.has('name', (p) => p.name).equals('x');
+      node1
+          .has('defaultValue', (p) => p.defaultValue)
+          .isA<IntegerLiteralNode>();
+      check(formalParams).isSuccess('([int x = 42])', value: it1);
+      final it2 = Condition.it<Object?>();
+      final node2 = it2
+          .isA<List<ParameterNode>>()
+          .has('first', (list) => list.first)
+          .isA<FunctionTypedParameterNode>();
+      node2.has('name', (p) => p.name).equals('cb');
+      node2.has('defaultValue', (p) => p.defaultValue).isA<IdentifierNode>();
+      check(formalParams)
+          .isSuccess('([void cb() = defaultCallback])', value: it2);
     });
 
     test('named function-typed parameter defaults', () {
-      check(formalParams).isSuccess(
-        '({void cb() = defaultCallback})',
-        value: (Subject it) {
-          final node = it
-              .isA<List<ParameterNode>>()
-              .has((list) => list.first, 'first')
-              .isA<FunctionTypedParameterNode>();
-          node.has((p) => p.name, 'name').equals('cb');
-          node.has((p) => p.isNamed, 'isNamed').isTrue();
-          node.has((p) => p.defaultValue, 'defaultValue').isA<IdentifierNode>();
-        },
-      );
-      check(formalParams).isSuccess(
-        '({void cb(): defaultCallback})',
-        value: (Subject it) {
-          final node = it
-              .isA<List<ParameterNode>>()
-              .has((list) => list.first, 'first')
-              .isA<FunctionTypedParameterNode>();
-          node.has((p) => p.name, 'name').equals('cb');
-          node.has((p) => p.defaultValue, 'defaultValue').isA<IdentifierNode>();
-        },
-      );
-      check(formalParams).isSuccess(
-        '({@meta required void cb() = defaultCallback})',
-        value: (Subject it) {
-          final node = it
-              .isA<List<ParameterNode>>()
-              .has((list) => list.first, 'first')
-              .isA<FunctionTypedParameterNode>();
-          node.has((p) => p.metadata, 'metadata').length.equals(1);
-          node.has((p) => p.isRequired, 'isRequired').isTrue();
-        },
-      );
+      final it1 = Condition.it<Object?>();
+      final node1 = it1
+          .isA<List<ParameterNode>>()
+          .has('first', (list) => list.first)
+          .isA<FunctionTypedParameterNode>();
+      node1.has('name', (p) => p.name).equals('cb');
+      node1.has('isNamed', (p) => p.isNamed).isTrue;
+      node1.has('defaultValue', (p) => p.defaultValue).isA<IdentifierNode>();
+      check(formalParams)
+          .isSuccess('({void cb() = defaultCallback})', value: it1);
+      final it2 = Condition.it<Object?>();
+      final node2 = it2
+          .isA<List<ParameterNode>>()
+          .has('first', (list) => list.first)
+          .isA<FunctionTypedParameterNode>();
+      node2.has('name', (p) => p.name).equals('cb');
+      node2.has('defaultValue', (p) => p.defaultValue).isA<IdentifierNode>();
+      check(formalParams)
+          .isSuccess('({void cb(): defaultCallback})', value: it2);
+      final it3 = Condition.it<Object?>();
+      final node3 = it3
+          .isA<List<ParameterNode>>()
+          .has('first', (list) => list.first)
+          .isA<FunctionTypedParameterNode>();
+      node3.has('metadata', (p) => p.metadata).length.equals(1);
+      node3.has('isRequired', (p) => p.isRequired).isTrue;
+      check(
+        formalParams,
+      ).isSuccess('({@meta required void cb() = defaultCallback})', value: it3);
     });
   });
 }

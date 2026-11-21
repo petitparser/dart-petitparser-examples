@@ -22,7 +22,7 @@ void main() {
       const entry = BibTeXEntry(type: 'misc', key: 'empty');
       check(entry.type).equals('misc');
       check(entry.key).equals('empty');
-      check(entry.fields).isEmpty();
+      check(entry.fields).isEmpty;
     });
   });
 
@@ -40,12 +40,12 @@ void main() {
       check(entry.getField('title')?.key).equals('title');
       check(entry.getField('title')?.value).equals('My Title');
       check(entry.getField('Author')?.value).equals('Me');
-      check(entry.getField('unknown')).isNull();
+      check(entry.getField('unknown')).isNull;
       check(entry.getRaw('title')).equals('{My Title}');
-      check(entry.getRaw('unknown')).isNull();
-      check(entry.containsField('title')).isTrue();
-      check(entry.containsField('author')).isTrue();
-      check(entry.containsField('unknown')).isFalse();
+      check(entry.getRaw('unknown')).isNull;
+      check(entry.containsField('title')).isTrue;
+      check(entry.containsField('author')).isTrue;
+      check(entry.containsField('unknown')).isFalse;
     });
 
     test('normalized fields from parsed entry', () {
@@ -117,9 +117,9 @@ void main() {
       );
       check(e1).equals(e2);
       check(e1.hashCode).equals(e2.hashCode);
-      check(e1).not((it) => it.equals(e3));
-      check(e1).not((it) => it.equals(e4));
-      check(e1).not((it) => it.equals(e5));
+      check(e1).not(Condition.it()..equals(e3));
+      check(e1).not(Condition.it()..equals(e4));
+      check(e1).not(Condition.it()..equals(e5));
     });
   });
 }

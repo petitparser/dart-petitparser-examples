@@ -10,7 +10,7 @@ const Object _sentinel = Object();
 extension ParserChecks<T> on Subject<Parser<T>> {
   /// Asserts that parsing [input] returns a [Result], returning its subject.
   Subject<Result<T>> parse(String input) =>
-      has((parser) => parser.parse(input), 'parse "$input"');
+      has('parse "$input"', (parser) => parser.parse(input));
 
   /// Asserts that parsing [input] succeeds, optionally checking [value] and
   /// [position]. Defaults to checking that all input was consumed.
@@ -34,89 +34,88 @@ extension ParserChecks<T> on Subject<Parser<T>> {
 extension ResultChecks<T> on Subject<Result<T>> {
   /// Asserts that this result is a [Success], optionally checking [value] and
   /// [position].
-  Subject<Success<T>> isSuccess({Object? value = _sentinel, int? position}) =>
-      context.nest<Success<T>>(
-        () => ['is a successful parse'],
-        (actual) => actual is Success<T>
-            ? Extracted.value(actual)
-            : Extracted.rejection(
-                which: [
-                  'is a failure at position ${actual.position}: '
-                      '"${actual.message}"',
-                ],
-              ),
-      )..which((success) {
-        if (position != null) {
-          success.has((s) => s.position, 'position').equals(position);
+  Subject<Success<T>> isSuccess({Object? value = _sentinel, int? position}) {
+    final success = context.nest<Success<T>>(
+      () => ['is a successful parse'],
+      (actual) => actual is Success<T>
+          ? Extracted.value(actual)
+          : Extracted.rejection(
+              which: [
+                'is a failure at position ${actual.position}: '
+                    '"${actual.message}"',
+              ],
+            ),
+    );
+    if (position != null) {
+      success.has('position', (s) => s.position).equals(position);
+    }
+    if (!identical(value, _sentinel)) {
+      final valueSubject = success.has<Object?>('value', (s) {
+        final v = s.value;
+        if (v is Token && value is! Token) {
+          return v.value;
         }
-        if (!identical(value, _sentinel)) {
-          final valueSubject = success.has<Object?>((s) {
-            final v = s.value;
-            if (v is Token && value is! Token) {
-              return v.value;
-            }
-            return v;
-          }, 'value');
-          _checkValue(valueSubject, value);
-        }
+        return v;
       });
+      _checkValue(valueSubject, value);
+    }
+    return success;
+  }
 
   /// Asserts that this result is a [Failure], optionally checking [message] and
   /// [position].
   Subject<Failure> isFailure({
     Object? message = _sentinel,
     Object? position = _sentinel,
-  }) =>
-      context.nest<Failure>(
-        () => ['is a failed parse'],
-        (actual) => actual is Failure
-            ? Extracted.value(actual)
-            : Extracted.rejection(
-                which: [
-                  'is a success with value ${actual.value} at position '
-                      '${actual.position}',
-                ],
-              ),
-      )..which((failure) {
-        if (!identical(position, _sentinel)) {
-          final posSubject = failure.has((f) => f.position, 'position');
-          if (position is Condition<int>) {
-            posSubject.which(position);
-          } else {
-            posSubject.equals(position as int);
-          }
-        }
-        if (!identical(message, _sentinel)) {
-          final msgSubject = failure.has((f) => f.message, 'message');
-          if (message is Condition<String>) {
-            msgSubject.which(message);
-          } else if (message is Pattern) {
-            msgSubject.matchesPattern(message);
-          } else {
-            msgSubject.equals(message as String);
-          }
-        }
-      });
+  }) {
+    final failure = context.nest<Failure>(
+      () => ['is a failed parse'],
+      (actual) => actual is Failure
+          ? Extracted.value(actual)
+          : Extracted.rejection(
+              which: [
+                'is a success with value ${actual.value} at position '
+                    '${actual.position}',
+              ],
+            ),
+    );
+    if (!identical(position, _sentinel)) {
+      final posSubject = failure.has('position', (f) => f.position);
+      if (position is Condition<int>) {
+        posSubject.which(position);
+      } else {
+        posSubject.equals(position as int);
+      }
+    }
+    if (!identical(message, _sentinel)) {
+      final msgSubject = failure.has('message', (f) => f.message);
+      if (message is Condition<String>) {
+        msgSubject.which(message);
+      } else if (message is Pattern) {
+        msgSubject.matchesPattern(message);
+      } else {
+        msgSubject.equals(message as String);
+      }
+    }
+    return failure;
+  }
 }
 
 void _checkValue(Subject<Object?> subject, Object? expected) {
   if (expected is Condition<Object?>) {
     subject.which(expected);
-  } else if (expected is void Function(Subject<dynamic>)) {
-    expected(subject);
   } else if (expected is Map) {
     subject.isA<Map<Object?, Object?>>().deepEquals(expected);
   } else if (expected is Iterable) {
-    final hasCondition = expected.any(
-      (e) => e is Condition<Object?> || e is void Function(Subject<dynamic>),
-    );
+    final hasCondition = expected.any((e) => e is Condition<Object?>);
     if (hasCondition) {
-      subject.isA<Iterable<Object?>>().pairwiseMatches(
-        expected.toList(),
-        (exp) =>
-            (item) => _checkValue(item, exp),
-        'matches expected condition',
-      );
+      subject.isA<Iterable<Object?>>().pairwiseMatches(expected.toList(), (
+        exp,
+      ) {
+        final item = Condition.it<Object?>();
+        _checkValue(item, exp);
+        return item;
+      }, 'matches expected condition');
     } else {
       subject.isA<Iterable<Object?>>().deepEquals(expected);
     }

@@ -7,6 +7,6 @@ void main() {
   final grammar = PythonGrammarDefinition();
 
   test('grammar linter', () {
-    check(linter(grammar.build())).isEmpty();
+    check(linter(grammar.build())).isEmpty;
   });
 }

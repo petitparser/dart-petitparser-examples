@@ -11,7 +11,7 @@ void main() {
 
       check(h1).equals(h2);
       check(h1.hashCode).equals(h2.hashCode);
-      check(h1).not((it) => it.equals(h3));
+      check(h1).not(Condition.it()..equals(h3));
     });
 
     test('DocumentNode equality', () {
@@ -103,7 +103,7 @@ void main() {
 
         check(d1).equals(d2);
         check(d1.hashCode).equals(d2.hashCode);
-        check(d1).not((it) => it.equals(d3));
+        check(d1).not(Condition.it()..equals(d3));
         check(d1.toString()).contains('DocumentNode');
       });
 
@@ -114,7 +114,7 @@ void main() {
 
         check(h1).equals(h2);
         check(h1.hashCode).equals(h2.hashCode);
-        check(h1).not((it) => it.equals(h3));
+        check(h1).not(Condition.it()..equals(h3));
         check(h1.toString())
             .equals('HeadingNode(level: 1, content: TextNode("Title"))');
       });
@@ -126,7 +126,7 @@ void main() {
 
         check(p1).equals(p2);
         check(p1.hashCode).equals(p2.hashCode);
-        check(p1).not((it) => it.equals(p3));
+        check(p1).not(Condition.it()..equals(p3));
         check(p1.toString()).equals('ParagraphNode(TextNode("A"))');
       });
 
@@ -137,7 +137,7 @@ void main() {
 
         check(b1).equals(b2);
         check(b1.hashCode).equals(b2.hashCode);
-        check(b1).not((it) => it.equals(b3));
+        check(b1).not(Condition.it()..equals(b3));
         check(b1.toString()).contains('BlockquoteNode');
       });
 
@@ -149,8 +149,8 @@ void main() {
 
         check(f1).equals(f2);
         check(f1.hashCode).equals(f2.hashCode);
-        check(f1).not((it) => it.equals(f3));
-        check(f1).not((it) => it.equals(f4));
+        check(f1).not(Condition.it()..equals(f3));
+        check(f1).not(Condition.it()..equals(f4));
         check(f1.toString())
             .equals('FencedCodeBlockNode(info: dart, code: print(1))');
       });
@@ -162,7 +162,7 @@ void main() {
 
         check(c1).equals(c2);
         check(c1.hashCode).equals(c2.hashCode);
-        check(c1).not((it) => it.equals(c3));
+        check(c1).not(Condition.it()..equals(c3));
         check(c1.toString()).equals('IndentedCodeBlockNode(code1)');
       });
 
@@ -186,7 +186,7 @@ void main() {
 
         check(item1).equals(item2);
         check(item1.hashCode).equals(item2.hashCode);
-        check(item1).not((it) => it.equals(item3));
+        check(item1).not(Condition.it()..equals(item3));
         check(item1.toString()).contains('ListItemNode');
 
         const list1 = BulletListNode([item1], isTight: true);
@@ -195,7 +195,7 @@ void main() {
 
         check(list1).equals(list2);
         check(list1.hashCode).equals(list2.hashCode);
-        check(list1).not((it) => it.equals(list3));
+        check(list1).not(Condition.it()..equals(list3));
         check(list1.toString()).contains('BulletListNode(isTight: true');
       });
 
@@ -224,7 +224,7 @@ void main() {
 
         check(o1).equals(o2);
         check(o1.hashCode).equals(o2.hashCode);
-        check(o1).not((it) => it.equals(o3));
+        check(o1).not(Condition.it()..equals(o3));
         check(o1.toString())
             .contains('OrderedListNode(start: 1, isTight: true');
       });
@@ -236,7 +236,7 @@ void main() {
 
         check(cell1).equals(cell2);
         check(cell1.hashCode).equals(cell2.hashCode);
-        check(cell1).not((it) => it.equals(cell3));
+        check(cell1).not(Condition.it()..equals(cell3));
         check(cell1.toString()).equals('TableCellNode(TextNode("A"))');
 
         const row1 = TableRowNode([cell1], isHeader: true);
@@ -245,7 +245,7 @@ void main() {
 
         check(row1).equals(row2);
         check(row1.hashCode).equals(row2.hashCode);
-        check(row1).not((it) => it.equals(row3));
+        check(row1).not(Condition.it()..equals(row3));
         check(row1.toString()).contains('TableRowNode(isHeader: true');
 
         const table1 = TableNode([row1], [TableAlignment.center]);
@@ -254,7 +254,7 @@ void main() {
 
         check(table1).equals(table2);
         check(table1.hashCode).equals(table2.hashCode);
-        check(table1).not((it) => it.equals(table3));
+        check(table1).not(Condition.it()..equals(table3));
         check(table1.toString()).contains('TableNode');
       });
 
@@ -265,7 +265,7 @@ void main() {
 
         check(h1).equals(h2);
         check(h1.hashCode).equals(h2.hashCode);
-        check(h1).not((it) => it.equals(h3));
+        check(h1).not(Condition.it()..equals(h3));
         check(h1.toString()).equals('HtmlBlockNode(<div>test</div>)');
       });
 
@@ -293,8 +293,8 @@ void main() {
 
         check(l1).equals(l2);
         check(l1.hashCode).equals(l2.hashCode);
-        check(l1).not((it) => it.equals(l3));
-        check(l1).not((it) => it.equals(l4));
+        check(l1).not(Condition.it()..equals(l3));
+        check(l1).not(Condition.it()..equals(l4));
         check(l1.toString()).equals(
           'LinkReferenceDefinitionNode(label: ref, url: https://example.com, title: Example)',
         );
@@ -309,7 +309,7 @@ void main() {
 
         check(t1).equals(t2);
         check(t1.hashCode).equals(t2.hashCode);
-        check(t1).not((it) => it.equals(t3));
+        check(t1).not(Condition.it()..equals(t3));
         check(t1.toString()).equals('TextNode("hello")');
 
         const e1 = EmphasisNode(t1);
@@ -318,7 +318,7 @@ void main() {
 
         check(e1).equals(e2);
         check(e1.hashCode).equals(e2.hashCode);
-        check(e1).not((it) => it.equals(e3));
+        check(e1).not(Condition.it()..equals(e3));
         check(e1.toString()).equals('EmphasisNode(TextNode("hello"))');
 
         const s1 = StrongNode(t1);
@@ -327,7 +327,7 @@ void main() {
 
         check(s1).equals(s2);
         check(s1.hashCode).equals(s2.hashCode);
-        check(s1).not((it) => it.equals(s3));
+        check(s1).not(Condition.it()..equals(s3));
         check(s1.toString()).equals('StrongNode(TextNode("hello"))');
       });
 
@@ -338,7 +338,7 @@ void main() {
 
         check(s1).equals(s2);
         check(s1.hashCode).equals(s2.hashCode);
-        check(s1).not((it) => it.equals(s3));
+        check(s1).not(Condition.it()..equals(s3));
         check(s1.toString()).equals('StrikethroughNode(TextNode("del"))');
       });
 
@@ -349,7 +349,7 @@ void main() {
 
         check(c1).equals(c2);
         check(c1.hashCode).equals(c2.hashCode);
-        check(c1).not((it) => it.equals(c3));
+        check(c1).not(Condition.it()..equals(c3));
         check(c1.toString()).equals('CodeSpanNode("x = 1")');
       });
 
@@ -372,7 +372,7 @@ void main() {
 
         check(link1).equals(link2);
         check(link1.hashCode).equals(link2.hashCode);
-        check(link1).not((it) => it.equals(link3));
+        check(link1).not(Condition.it()..equals(link3));
         check(link1.toString()).equals(
           'LinkNode(text: TextNode("click"), url: https://dart.dev, title: Dart)',
         );
@@ -383,7 +383,7 @@ void main() {
 
         check(img1).equals(img2);
         check(img1.hashCode).equals(img2.hashCode);
-        check(img1).not((it) => it.equals(img3));
+        check(img1).not(Condition.it()..equals(img3));
         check(img1.toString()).equals(
           'ImageNode(alt: TextNode("logo"), url: logo.png, title: Logo)',
         );
@@ -396,7 +396,7 @@ void main() {
 
         check(a1).equals(a2);
         check(a1.hashCode).equals(a2.hashCode);
-        check(a1).not((it) => it.equals(a3));
+        check(a1).not(Condition.it()..equals(a3));
         check(a1.toString())
             .equals('AutolinkNode(url: https://dart.dev, isEmail: false)');
       });
@@ -408,7 +408,7 @@ void main() {
 
         check(lb1).equals(lb2);
         check(lb1.hashCode).equals(lb2.hashCode);
-        check(lb1).not((it) => it.equals(lb3));
+        check(lb1).not(Condition.it()..equals(lb3));
         check(lb1.toString()).equals('LineBreakNode(isHard: true)');
       });
 
@@ -419,7 +419,7 @@ void main() {
 
         check(ci1).equals(ci2);
         check(ci1.hashCode).equals(ci2.hashCode);
-        check(ci1).not((it) => it.equals(ci3));
+        check(ci1).not(Condition.it()..equals(ci3));
         check(ci1.toString()).contains('CompositeInlineNode');
       });
 
@@ -430,7 +430,7 @@ void main() {
 
         check(r1).equals(r2);
         check(r1.hashCode).equals(r2.hashCode);
-        check(r1).not((it) => it.equals(r3));
+        check(r1).not(Condition.it()..equals(r3));
         check(r1.toString()).equals('RawHtmlInlineNode("<span>hello</span>")');
       });
 

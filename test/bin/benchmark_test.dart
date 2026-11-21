@@ -16,14 +16,14 @@ void main() {
     final parser = benchmark_cli.arguments;
 
     test('defines required flags and options', () {
-      check(parser.options.containsKey('help')).isTrue();
-      check(parser.options.containsKey('verify')).isTrue();
-      check(parser.options.containsKey('benchmark')).isTrue();
-      check(parser.options.containsKey('stderr')).isTrue();
-      check(parser.options.containsKey('confidence')).isTrue();
-      check(parser.options.containsKey('filter')).isTrue();
-      check(parser.options.containsKey('separator')).isTrue();
-      check(parser.options.containsKey('human')).isTrue();
+      check(parser.options.containsKey('help')).isTrue;
+      check(parser.options.containsKey('verify')).isTrue;
+      check(parser.options.containsKey('benchmark')).isTrue;
+      check(parser.options.containsKey('stderr')).isTrue;
+      check(parser.options.containsKey('confidence')).isTrue;
+      check(parser.options.containsKey('filter')).isTrue;
+      check(parser.options.containsKey('separator')).isTrue;
+      check(parser.options.containsKey('human')).isTrue;
     });
 
     test('parses options and sets runner properties via callbacks', () {
@@ -37,13 +37,13 @@ void main() {
         '--no-human',
       ]);
 
-      check(runner.optionBenchmark).isFalse();
-      check(runner.optionVerification).isFalse();
-      check(runner.optionPrintStandardError).isTrue();
-      check(runner.optionPrintConfidenceIntervals).isTrue();
+      check(runner.optionBenchmark).isFalse;
+      check(runner.optionVerification).isFalse;
+      check(runner.optionPrintStandardError).isTrue;
+      check(runner.optionPrintConfidenceIntervals).isTrue;
       check(runner.optionFilter).equals('json');
       check(runner.optionSeparator).equals(',');
-      check(runner.optionHumanReadable).isFalse();
+      check(runner.optionHumanReadable).isFalse;
 
       // Restore defaults
       runner.optionBenchmark = true;

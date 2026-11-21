@@ -13,7 +13,7 @@ void main() {
           excludedTypes: {},
           excludedRules: {'Duplicate parser'},
         ),
-      ).isEmpty();
+      ).isEmpty;
     });
     test('empty', () {
       final db = Database.parse('foo.');
@@ -47,8 +47,8 @@ void main() {
     });
     test('parse error', () {
       final error = check(() => Database.parse('1')).throws<ParserException>();
-      error.has((e) => e.message, 'message').equals('end of input expected');
-      error.has((e) => e.offset, 'offset').equals(0);
+      error.has('message', (e) => e.message).equals('end of input expected');
+      error.has('offset', (e) => e.offset).equals(0);
     });
   });
   group('term', () {
@@ -59,7 +59,7 @@ void main() {
           excludedTypes: {},
           excludedRules: {'Duplicate parser'},
         ),
-      ).isEmpty();
+      ).isEmpty;
     });
     test('empty', () {
       final query = Term.parse('foo');
@@ -75,8 +75,8 @@ void main() {
     });
     test('parse error', () {
       final error = check(() => Term.parse('1')).throws<ParserException>();
-      error.has((e) => e.message, 'message').equals('Value expected');
-      error.has((e) => e.offset, 'offset').equals(0);
+      error.has('message', (e) => e.message).equals('Value expected');
+      error.has('offset', (e) => e.offset).equals(0);
     });
   });
   group('Forrester family', () {
@@ -216,8 +216,8 @@ void main() {
 
       check(v1).equals(v2);
       check(v1.hashCode).equals(v2.hashCode);
-      check(v1).not((it) => it.equals(v3));
-      check(v1.hashCode).not((it) => it.equals(v3.hashCode));
+      check(v1).not(Condition.it()..equals(v3));
+      check(v1.hashCode).not(Condition.it()..equals(v3.hashCode));
       check(v1.toString()).equals('X');
     });
 
@@ -228,7 +228,7 @@ void main() {
 
       check(t1).equals(t2);
       check(t1.hashCode).equals(t2.hashCode);
-      check(t1).not((it) => it.equals(t3));
+      check(t1).not(Condition.it()..equals(t3));
       check(t1.toString()).equals('parent(X, bob)');
     });
 
@@ -239,7 +239,7 @@ void main() {
 
       check(val1).equals(val2);
       check(val1.hashCode).equals(val2.hashCode);
-      check(val1).not((it) => it.equals(val3));
+      check(val1).not(Condition.it()..equals(val3));
       check(val1.query(db)).deepEquals([val1]);
       check(val1.toString()).equals('apple');
     });
@@ -252,9 +252,9 @@ void main() {
 
       check(c1).equals(c2);
       check(c1.hashCode).equals(c2.hashCode);
-      check(c1).not((it) => it.equals(c3));
-      check(c1).not((it) => it.equals(c4));
-      check(c1 as Object).not((it) => it.equals(const Value('a')));
+      check(c1).not(Condition.it()..equals(c3));
+      check(c1).not(Condition.it()..equals(c4));
+      check(c1 as Object).not(Condition.it()..equals(const Value('a')));
       check(c1.toString()).equals('a, b');
     });
   });

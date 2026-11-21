@@ -12,7 +12,7 @@ void main() {
         excludedRules: {'Duplicate parser', 'Nested choice'},
         excludedTypes: {},
       ),
-    ).isEmpty();
+    ).isEmpty;
   });
 
   group('normalizeFieldValue', () {

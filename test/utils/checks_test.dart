@@ -17,12 +17,9 @@ void main() {
     });
 
     test('isSuccess with condition', () {
-      check(parser).isSuccess(
-        'a',
-        value: (Subject<Object?> it) {
-          it.isA<String>().equals('a');
-        },
-      );
+      final it = Condition.it<Object?>();
+      it.isA<String>().equals('a');
+      check(parser).isSuccess('a', value: it);
     });
 
     test('isSuccess default consumes all', () {

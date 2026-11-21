@@ -8,7 +8,7 @@ void main() {
   group('csv', () {
     final csv = TabularDefinition.csv().build();
     test('linter', () {
-      check(linter(csv)).isEmpty();
+      check(linter(csv)).isEmpty;
     });
     test('basic string', () {
       check(csv).isSuccess(
@@ -150,7 +150,7 @@ void main() {
   group('tsv', () {
     final tsv = TabularDefinition.tsv().build();
     test('linter', () {
-      check(linter(tsv)).isEmpty();
+      check(linter(tsv)).isEmpty;
     });
     test('basic string', () {
       check(tsv).isSuccess(

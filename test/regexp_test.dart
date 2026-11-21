@@ -8,8 +8,8 @@ import 'utils/checks.dart';
 extension NodeChecks on Subject<Node> {
   void isEqualToNode(Node expected) {
     equals(expected);
-    has((n) => n.hashCode, 'hashCode').equals(expected.hashCode);
-    has((n) => n.toString(), 'toString').equals(expected.toString());
+    has('hashCode', (n) => n.hashCode).equals(expected.hashCode);
+    has('toString', (n) => n.toString()).equals(expected.toString());
   }
 }
 
@@ -223,8 +223,8 @@ void main() {
       check(nfa.tryMatch('a', 0, 1)).equals(-1);
 
       final unanchored = Nfa.fromString('a{0}');
-      check(unanchored.tryMatch('', 0, 0) == 0).isTrue();
-      check(unanchored.tryMatch('a', 0, 1) == 1).isFalse();
+      check(unanchored.tryMatch('', 0, 0) == 0).isTrue;
+      check(unanchored.tryMatch('a', 0, 1) == 1).isFalse;
     });
   });
   group('pattern', () {
@@ -242,7 +242,7 @@ void main() {
     });
     test('matchAsPrefix with non-matching input', () {
       final noMatch = pattern.matchAsPrefix('baaa');
-      check(noMatch).isNull();
+      check(noMatch).isNull;
     });
     test('matchAsPrefix with start index', () {
       final match = pattern.matchAsPrefix('baaa', 1)!;
@@ -311,15 +311,15 @@ void main() {
       check(match.groupCount).equals(0);
       check(match.group(0)).equals('test');
       check(match[0]).equals('test');
-      check(match.group(1)).isNull();
-      check(match[1]).isNull();
+      check(match.group(1)).isNull;
+      check(match[1]).isNull;
       check(match.groups([0, 1])).deepEquals(['test', null]);
     });
     test('boundary behaviors and range checks', () {
       final RegexpPattern pattern = Nfa.fromString('abc');
       check(() => pattern.matchAsPrefix('abc', -1)).throws<RangeError>();
       check(() => pattern.matchAsPrefix('abc', 5)).throws<RangeError>();
-      check(pattern.matchAsPrefix('abc', 3)).isNull();
+      check(pattern.matchAsPrefix('abc', 3)).isNull;
 
       final RegexpPattern emptyPattern = Nfa.fromString('');
       final emptyMatch = emptyPattern.matchAsPrefix('abc', 3);
@@ -387,7 +387,7 @@ void main() {
     });
   });
   test('linter', () {
-    check(linter(nodeParser)).isEmpty();
+    check(linter(nodeParser)).isEmpty;
   });
 }
 

@@ -34,7 +34,7 @@ void main() {
       final ifStmt =
           parser.parse('20: if a > 0 then b := 1').value as IfStatementNode;
       check(ifStmt.label).equals('20');
-      check(ifStmt.elseStatement).isNull();
+      check(ifStmt.elseStatement).isNull;
 
       final caseStmt =
           parser.parse('30: case a of 1: b := 1 end').value
@@ -439,14 +439,14 @@ begin
 end.''';
       check(parser).isSuccess(code);
     });
-    test('linter', () => check(linter(parser)).isEmpty());
+    test('linter', () => check(linter(parser)).isEmpty);
   });
 
   group('ast parser', () {
     test('simple program', () {
       final prog = parser.parse('program test; begin writeln(42); end.').value;
       check(prog.name).equals('test');
-      check(prog.parameters).isEmpty();
+      check(prog.parameters).isEmpty;
       check(prog.block.statement.statements).length.equals(1);
       final stmt =
           prog.block.statement.statements.first as ProcedureStatementNode;
@@ -517,7 +517,7 @@ end.''';
       final proc = prog.block.subroutines.first as ProcedureNode;
       check(proc.name).equals('LoadData');
       check(proc.parameters).length.equals(1);
-      check(proc.parameters.first.isVar).isTrue();
+      check(proc.parameters.first.isVar).isTrue;
       check(prog.block.statement.statements).length.equals(5);
     });
 
@@ -555,7 +555,7 @@ end.''';
       check(lastStmt.arguments[1]).isA<FieldAccessExpressionNode>();
     });
 
-    test('linter', () => check(linter(parser)).isEmpty());
+    test('linter', () => check(linter(parser)).isEmpty);
 
     test('failures', () {
       check(parser).isFailure('');

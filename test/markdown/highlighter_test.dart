@@ -52,7 +52,7 @@ void main() {
           '[![Pub Package](https://img.shields.io/pub/v/petitparser_examples.svg)](https://pub.dev/packages/petitparser_examples)\n'
           '[![Pub Package](https://img.shields.io/pub/v/petitparser_examples.svg)](https://pub.dev/packages/petitparser_examples)',
         );
-        check(html).not((it) => it.contains('hl-italic'));
+        check(html).not(Condition.it()..contains('hl-italic'));
         check(html)
             .contains('https://img.shields.io/pub/v/petitparser_examples.svg');
         check(html).contains('https://pub.dev/packages/petitparser_examples');

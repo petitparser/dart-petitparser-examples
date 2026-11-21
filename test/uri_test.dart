@@ -34,16 +34,16 @@ extension ParsedUriChecks on Subject<ParsedUri> {
     List<(String, String?)> params = const [],
     String? fragment,
   }) {
-    has((v) => v.scheme, 'scheme').equals(scheme);
-    has((v) => v.authority, 'authority').equals(authority);
-    has((v) => v.username, 'username').equals(username);
-    has((v) => v.password, 'password').equals(password);
-    has((v) => v.hostname, 'hostname').equals(hostname);
-    has((v) => v.port, 'port').equals(port);
-    has((v) => v.path, 'path').equals(path);
-    has((v) => v.query, 'query').equals(query);
-    has((v) => v.params, 'params').deepEquals(params);
-    has((v) => v.fragment, 'fragment').equals(fragment);
+    has('scheme', (v) => v.scheme).equals(scheme);
+    has('authority', (v) => v.authority).equals(authority);
+    has('username', (v) => v.username).equals(username);
+    has('password', (v) => v.password).equals(password);
+    has('hostname', (v) => v.hostname).equals(hostname);
+    has('port', (v) => v.port).equals(port);
+    has('path', (v) => v.path).equals(path);
+    has('query', (v) => v.query).equals(query);
+    has('params', (v) => v.params).deepEquals(params);
+    has('fragment', (v) => v.fragment).equals(fragment);
   }
 }
 
@@ -62,32 +62,28 @@ void uriTest(
   String? fragment,
 }) {
   test(source, () {
-    check(parser).isSuccess(
-      source,
-      position: source.length,
-      value: (Subject<dynamic> it) {
-        it.isA<ParsedUri>().matchesUri(
-          scheme: scheme,
-          authority: authority,
-          username: username,
-          password: password,
-          hostname: hostname,
-          port: port,
-          path: path,
-          query: query,
-          params: params,
-          fragment: fragment,
-        );
-      },
+    final it = Condition.it<Object?>();
+    it.isA<ParsedUri>().matchesUri(
+      scheme: scheme,
+      authority: authority,
+      username: username,
+      password: password,
+      hostname: hostname,
+      port: port,
+      path: path,
+      query: query,
+      params: params,
+      fragment: fragment,
     );
+    check(parser).isSuccess(source, position: source.length, value: it);
   });
 }
 
 void main() {
   test('linter', () {
-    check(linter(parser)).isEmpty();
-    check(linter(authority)).isEmpty();
-    check(linter(query)).isEmpty();
+    check(linter(parser)).isEmpty;
+    check(linter(authority)).isEmpty;
+    check(linter(query)).isEmpty;
   });
   uriTest(
     'http://www.ics.uci.edu/pub/ietf/uri/#Related',
@@ -250,10 +246,9 @@ void main() {
     });
 
     test('handles empty input and separator edge cases', () {
-      check(query).isSuccess(
-        '',
-        value: (Subject<dynamic> it) => it.isA<List<dynamic>>().isEmpty(),
-      );
+      final it = Condition.it<Object?>();
+      it.isA<List<dynamic>>().isEmpty;
+      check(query).isSuccess('', value: it);
 
       check(query).isSuccess('&a=1&&b=2&', value: [('a', '1'), ('b', '2')]);
     });

@@ -492,7 +492,7 @@ def identity[T: str](x: T) -> T:
     group('pattern matching nodes', () {
       test('MatchSingletonNode, MatchMappingNode, MatchClassNode, MatchAsNode, MatchOrNode', () {
         const singleton = MatchSingletonNode(null);
-        check(singleton.value).isNull();
+        check(singleton.value).isNull;
         check(singleton.toString()).equals('MatchSingletonNode(null)');
 
         const mapping = MatchMappingNode(
